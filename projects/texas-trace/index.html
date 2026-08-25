@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Texas Trace - a map-first Texas journey presentation">
+    <title>Texas Trace Journey Player</title>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://basemaps.cartocdn.com">
+    <link rel="preconnect" href="https://server.arcgisonline.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQZf5xQpY8Z7rJpC6fJL7NfTGszbkvM=" crossorigin="">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260526-max-lightbox">
+  </head>
+  <body>
+    <main class="journey-player" aria-label="Texas Trace Journey Player">
+      <section class="map-stage" aria-label="Interactive journey map">
+        <div id="trace-map" class="trace-map" role="application" aria-label="Texas Trace map"></div>
+        <div id="map-transition-mask" class="map-transition-mask" aria-hidden="true"></div>
+        <div id="map-fallback" class="map-fallback" hidden>
+          지도를 불러오지 못했습니다. 네트워크 또는 외부 지도 타일 접근을 확인해주세요.
+        </div>
+        <div class="stage-vignette" aria-hidden="true"></div>
+      </section>
+
+      <header class="player-topbar">
+        <a class="brand-lockup" href="./" aria-label="Texas Trace">
+          <span class="brand-signal" aria-hidden="true"></span>
+          <span>
+            <strong>Texas Trace</strong>
+            <small>Austin / Houston Journey Player</small>
+          </span>
+        </a>
+        <a class="canvas-home" href="../" aria-label="Build Canvas로 돌아가기">← build _ canvas</a>
+        <div class="step-counter" aria-live="polite">
+          <span id="current-step-number">01</span>
+          <span class="counter-divider">/</span>
+          <span id="total-step-number">19</span>
+        </div>
+      </header>
+
+      <section class="point-panel" aria-label="Current journey point">
+        <div class="point-copy">
+          <div class="point-meta">
+            <span id="point-role" class="role-badge">departure</span>
+            <span id="route-label" class="route-label">Journey start</span>
+          </div>
+          <h1 id="point-title">Texas Trace</h1>
+          <p id="point-subtitle" class="point-subtitle">Loading journey point...</p>
+          <p id="point-summary" class="point-summary"></p>
+          <p id="coordinate-note" class="coordinate-note"></p>
+        </div>
+
+        <div class="photo-panel" aria-label="Current point photo preview">
+          <div class="photo-panel-header">
+            <span>Photo Memory</span>
+            <small id="photo-count-label">0 photos</small>
+          </div>
+          <div id="photo-preview" class="photo-preview"></div>
+        </div>
+      </section>
+
+      <nav class="player-controls" aria-label="Journey controls">
+        <button id="prev-step" class="nav-button" type="button">
+          <span aria-hidden="true">←</span>
+          Prev
+        </button>
+        <div id="progress-dots" class="progress-dots" aria-label="Journey progress"></div>
+        <button id="next-step" class="nav-button primary" type="button">
+          Next
+          <span aria-hidden="true">→</span>
+        </button>
+      </nav>
+    </main>
+
+    <div id="photo-lightbox" class="lightbox" hidden>
+      <div class="lightbox-backdrop" data-lightbox-close></div>
+      <figure class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="Fullscreen photo">
+        <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close photo">×</button>
+        <button id="lightbox-prev" class="lightbox-nav prev" type="button" data-lightbox-prev aria-label="Previous photo">‹</button>
+        <img id="lightbox-image" alt="">
+        <button id="lightbox-next" class="lightbox-nav next" type="button" data-lightbox-next aria-label="Next photo">›</button>
+        <figcaption id="lightbox-caption"></figcaption>
+      </figure>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="data/texasTraceData.js"></script>
+    <script src="assets/js/dataAdapter.js?v=20260526-progress-tooltip"></script>
+    <script src="assets/js/stepController.js?v=20260526-progress-tooltip"></script>
+    <script src="assets/js/mapController.js?v=20260526-progress-tooltip"></script>
+    <script src="assets/js/photoController.js?v=20260526-lightbox-gallery"></script>
+    <script src="assets/js/main.js?v=20260526-lightbox-gallery"></script>
+  </body>
+</html>
