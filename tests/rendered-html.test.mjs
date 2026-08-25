@@ -27,5 +27,8 @@ test("renders the portfolio entry content", async () => {
   assert.match(html, /생각, 그림,/);
   assert.match(html, /href="\.\/orca\/"/);
   assert.match(html, /href="\.\/texas-trace\/"/);
+  assert.ok(html.indexOf("ORCA") < html.indexOf("TEXAS TRACE"));
+  assert.match(html, />02<\/span><strong>ORCA<\/strong>/);
+  assert.match(html, />01<\/span><strong>TEXAS TRACE<\/strong>/);
   assert.doesNotMatch(html, /codex-preview/);
 });

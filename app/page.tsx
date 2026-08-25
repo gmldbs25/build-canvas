@@ -1,13 +1,14 @@
+// Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
-    index: "01",
+    index: "02",
     title: "ORCA",
     type: "AI · INTERACTIVE STORY",
     year: "2026",
     href: "./orca/",
   },
   {
-    index: "02",
+    index: "01",
     title: "TEXAS TRACE",
     type: "TRAVEL · MAP EXPERIENCE",
     year: "2026",
@@ -20,7 +21,7 @@ export default function Home() {
     <main className="canvas-page">
       <section className="identity" aria-labelledby="site-title">
         <h1 id="site-title" className="wordmark">
-          build <span aria-hidden="true">_</span> canvas
+          build <span className="cursor-mark" aria-hidden="true">_</span> canvas
         </h1>
         <p className="statement">
           <span>생각, 그림,</span>

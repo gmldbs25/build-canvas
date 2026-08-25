@@ -22,7 +22,7 @@ scripts/build-pages.sh  # 통합 Pages 빌드
 ## Add a project
 
 1. `projects/<slug>/` 아래에 새 프로젝트를 추가합니다.
-2. `app/page.tsx`의 `works` 배열에 목록 한 줄을 추가합니다.
+2. `app/page.tsx`의 `works` 배열 맨 위에 목록을 추가하고, 기존 최댓값 다음 번호를 부여합니다. 최신 작업이 항상 위에 표시됩니다.
 3. `scripts/build-pages.sh`에서 결과물을 `dist-pages/<slug>/`로 복사합니다.
 
 이미지는 긴 변 1,280px 이하의 WebP를 기본으로 사용하고, 대표 이미지는 가능하면
