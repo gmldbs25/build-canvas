@@ -134,6 +134,7 @@ a {
 .work-row strong {
   font-size: clamp(1.35rem, 2vw, 1.85rem);
   font-weight: 500;
+  line-height: 1.12;
   letter-spacing: -0.035em;
 }
 

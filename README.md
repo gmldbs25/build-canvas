@@ -6,6 +6,7 @@
 
 ## Projects
 
+- **FROM TRANSFORMER TO AGENT SYSTEMS** — LLM의 예측이 Agent Runtime의 실제 행동으로 이어지는 과정을 설명하는 인터랙티브 자료
 - **ORCA** — 월드 모델과 ORCA 논문을 설명하는 인터랙티브 프레젠테이션
 - **Texas Trace** — Austin과 Houston의 여정을 따라가는 인터랙티브 지도
 
@@ -13,6 +14,7 @@
 
 ```text
 app/                    # 엔트리 페이지
+projects/transformer-to-agent/ # Transformer → Agent Systems 소스
 projects/orca/          # ORCA 소스
 projects/texas-trace/   # Texas Trace 정적 소스
 scripts/build-pages.sh  # 통합 Pages 빌드
@@ -32,7 +34,7 @@ scripts/build-pages.sh  # 통합 Pages 빌드
 
 ```bash
 npm ci
-chmod +x scripts/*.sh projects/orca/scripts/*.sh
+chmod +x scripts/*.sh projects/orca/scripts/*.sh projects/transformer-to-agent/scripts/*.sh
 npm run build:pages
 ```
 

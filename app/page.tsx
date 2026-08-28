@@ -1,6 +1,13 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
+    index: "03",
+    title: "FROM TRANSFORMER TO AGENT SYSTEMS",
+    type: "AI · INTERACTIVE EXPLAINER",
+    year: "2026",
+    href: "./transformer-to-agent/",
+  },
+  {
     index: "02",
     title: "ORCA",
     type: "AI · INTERACTIVE STORY",
