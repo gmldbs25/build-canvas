@@ -63,7 +63,7 @@ if (new RegExp(`(?<!${basePath})/assets/`).test(html)) {
 for (const asset of [
   "agent-runtime-handoff.webp",
   "agent-runtime-handoff-appendix.webp",
-  "orca-classification.webp",
+  "dog-classification.webp",
 ]) {
   await access(path.join(outputDir, asset));
 }

@@ -36,6 +36,6 @@ test("preserves Korean word boundaries and static appendix assets", async () => 
   await Promise.all([
     access(new URL("../public/agent-runtime-handoff.webp", import.meta.url)),
     access(new URL("../public/agent-runtime-handoff-appendix.webp", import.meta.url)),
-    access(new URL("../public/orca-classification.webp", import.meta.url)),
+    access(new URL("../public/dog-classification.webp", import.meta.url)),
   ]);
 });

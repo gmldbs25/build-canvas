@@ -137,7 +137,7 @@ const ARTICLE_BEAT_COPY: Record<PageId, string[]> = {
     "Agent는 LLM의 새 이름이 아니라 소프트웨어 시스템입니다. Runtime은 Tool Schema와 Context를 Model에 제공하고, 구조화된 요청을 검증·실행한 뒤 결과를 다시 Context에 넣습니다. 경로 제한·승인·Timeout·결과 변환은 Model 바깥의 책임입니다.",
   ],
   "classification-language": [
-    "분류 모델은 ORCA, DOLPHIN, SHARK처럼 미리 정의된 클래스마다 점수를 만들고 분포를 계산합니다. 화면의 91%는 현재 후보 집합에서 ORCA에 가장 큰 확률 질량이 배정됐다는 교육용 예시입니다.",
+    "분류 모델은 DOG, CAT처럼 미리 정의된 클래스마다 점수를 만들고 분포를 계산합니다. 화면의 92%는 현재 후보 집합에서 DOG에 가장 큰 확률 질량이 배정됐다는 교육용 예시입니다.",
     "언어 모델에서는 후보 집합이 고정된 동물 클래스가 아니라 Vocabulary의 Token들입니다. 두 문제는 현재 입력으로 후보들을 점수화한다는 틀로 연결되지만, 입력·후보 공간·Architecture가 같다는 뜻은 아닙니다.",
   ],
   "next-token": [
@@ -242,11 +242,11 @@ function ClassificationLanguageScene({ beat, animate }: { beat: number; animate:
   return <div className={`classification-language-scene beat-${beat} ${language ? "is-language" : "is-image"} ${animate ? "is-animating" : "is-complete"}`}>
     <div className="prediction-kind"><span className="mono">{language ? "LANGUAGE MODEL" : "IMAGE CLASSIFIER"}</span><strong>{language ? "다음 Token 후보" : "고정 Class 후보"}</strong></div>
     <div className="prediction-pipeline">
-      <section className="prediction-input"><span className="mono scene-label">INPUT</span>{!language ? <figure><img src="./orca-classification.webp" alt="수면 위로 떠오른 범고래" /><figcaption>IMAGE · 1672 × 941</figcaption></figure> : <div className="language-context"><span className="mono">CURRENT CONTEXT</span><p>에이전트는<br />오류 로그를</p><div><i>에이전트</i><i>는</i><i>오류</i><i>로그를</i></div></div>}</section>
+      <section className="prediction-input"><span className="mono scene-label">INPUT</span>{!language ? <figure><img src="./dog-classification.webp" alt="부드러운 야외 배경 앞의 골든 리트리버" /><figcaption>IMAGE · 1672 × 941</figcaption></figure> : <div className="language-context"><span className="mono">CURRENT CONTEXT</span><p>에이전트는<br />오류 로그를</p><div><i>에이전트</i><i>는</i><i>오류</i><i>로그를</i></div></div>}</section>
       <div className="prediction-path" aria-hidden="true"><i /><ChevronRight /></div>
       <section className="shared-model"><span className="mono scene-label">SCORE CANDIDATES</span><div className="model-layers">{[0, 1, 2, 3, 4].map((n) => <i key={n} style={{ "--i": n } as CSSProperties} />)}<strong>{language ? "LLM" : "CLASSIFIER"}</strong></div><small>{language ? "context-dependent scores" : "learned class scores"}</small></section>
       <div className="prediction-path" aria-hidden="true"><i /><ChevronRight /></div>
-      <section className="candidate-board"><span className="mono scene-label">{language ? "TOKEN PROBABILITY" : "CLASS PROBABILITY"}</span>{!language ? <><ProbabilityRow label="ORCA" value={91} show={computed} selected animate={animate} /><ProbabilityRow label="DOLPHIN" value={6} show={computed} /><ProbabilityRow label="SHARK" value={3} show={computed} /></> : <><ProbabilityRow label="확인한다" value={46} show selected animate={animate} /><ProbabilityRow label="분석한다" value={31} show /><ProbabilityRow label="남긴다" value={13} show /></>}</section>
+      <section className="candidate-board"><span className="mono scene-label">{language ? "TOKEN PROBABILITY" : "CLASS PROBABILITY"}</span>{!language ? <><ProbabilityRow label="DOG" value={92} show={computed} selected animate={animate} /><ProbabilityRow label="CAT" value={8} show={computed} /></> : <><ProbabilityRow label="확인한다" value={46} show selected animate={animate} /><ProbabilityRow label="분석한다" value={31} show /><ProbabilityRow label="남긴다" value={13} show /></>}</section>
     </div>
     <div className={`shared-shape ${beat >= 1 ? "is-visible" : ""}`}><span>현재 입력</span><ChevronRight /><span>후보별 점수</span><ChevronRight /><span>분포</span><ChevronRight /><span>선택</span></div>
     <p className={`concept-caution ${beat >= 1 ? "is-visible" : ""}`}><LockKeyhole /> 같은 것은 <strong>예측 문제의 형태</strong>입니다. 입력·후보 공간·Architecture까지 같다는 뜻은 아닙니다.</p>
