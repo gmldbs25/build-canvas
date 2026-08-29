@@ -213,6 +213,25 @@
     });
 
     document.addEventListener("keydown", function (event) {
+      if (
+        event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        !event.shiftKey &&
+        (event.code === "KeyH" || event.key.toLowerCase() === "h")
+      ) {
+        event.preventDefault();
+        var homeUrl = new URL("../", window.location.href);
+        var isLocalHost = ["localhost", "127.0.0.1", "[::1]", "terminal.local"].indexOf(
+          window.location.hostname
+        ) !== -1;
+        if (isLocalHost && window.location.pathname === "/" && document.title !== "build _ canvas") {
+          homeUrl.port = "5173";
+        }
+        window.location.assign(homeUrl.href);
+        return;
+      }
+
       var lightbox = document.getElementById("photo-lightbox");
       if (lightbox && !lightbox.hidden) {
         return;

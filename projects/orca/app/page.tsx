@@ -535,6 +535,25 @@ export default function Home() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        !event.shiftKey &&
+        (event.code === "KeyH" || event.key.toLowerCase() === "h")
+      ) {
+        event.preventDefault();
+        const homeUrl = new URL("../", window.location.href);
+        const isLocalHost = ["localhost", "127.0.0.1", "[::1]", "terminal.local"].includes(
+          window.location.hostname,
+        );
+        if (isLocalHost && window.location.pathname === "/" && document.title !== "build _ canvas") {
+          homeUrl.port = "5173";
+        }
+        window.location.assign(homeUrl.href);
+        return;
+      }
+
       if (event.key === "ArrowRight" || event.key === "PageDown") {
         event.preventDefault();
         goTo(current + 1);

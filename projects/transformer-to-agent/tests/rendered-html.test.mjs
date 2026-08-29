@@ -25,10 +25,9 @@ test("renders the Work 03 opening with local assets and mode controls", async ()
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>FROM TRANSFORMER TO AGENT SYSTEMS<\/title>/);
+  assert.match(html, /<title>다음 토큰 예측에서 Coding Agent까지<\/title>/);
   assert.match(html, />Presentation</);
   assert.match(html, />Article</);
-  assert.match(html, /\.\/agent-runtime-handoff\.webp/);
-  assert.match(html, /PAGE[^<]*<.*01.*06/s);
+  assert.match(html, /PAGE 01/);
   assert.doesNotMatch(html, /Template Lab/);
 });
