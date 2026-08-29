@@ -1,0 +1,18 @@
+name: transformer-to-agent-dev
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      # Docker Desktop bind mounts need polling for reliable HMR on macOS.
+      VITE_USE_POLLING: "true"
+    volumes:
+      - .:/app
+      - transformer_to_agent_node_modules:/app/node_modules
+
+volumes:
+  transformer_to_agent_node_modules:

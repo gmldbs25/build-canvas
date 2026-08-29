@@ -10,6 +10,8 @@ const { d1, r2 } = hostingConfig;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
+const usePolling =
+  isCodexSeatbeltSandbox || process.env.VITE_USE_POLLING === "true";
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 const pagesBasePath =
   process.env.PAGES_BASE_PATH ?? "/build-canvas/transformer-to-agent";
@@ -51,7 +53,7 @@ export default defineConfig(async () => {
     server: {
       host: "0.0.0.0",
       allowedHosts: ["terminal.local"],
-      ...(isCodexSeatbeltSandbox
+      ...(usePolling
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),
     },
