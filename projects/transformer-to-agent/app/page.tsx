@@ -101,6 +101,9 @@ export default function Home() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const isInteractive = Boolean(target?.closest("button, a, [tabindex]"));
+      const isSceneNavigationControl = Boolean(
+        target?.closest(".details-trigger, .scene-navigation"),
+      );
       const isEditing = isEditingTarget(target);
 
       if (
@@ -140,7 +143,7 @@ export default function Home() {
         toggleDetails();
         return;
       }
-      if (isEditing || (!detailsOpen && isInteractive)) return;
+      if (isEditing || (!detailsOpen && isInteractive && !isSceneNavigationControl)) return;
       if (event.key === "ArrowLeft" && canGoBack) {
         event.preventDefault();
         navigate(index - 1);

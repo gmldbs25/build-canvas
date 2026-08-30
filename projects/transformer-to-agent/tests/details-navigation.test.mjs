@@ -13,7 +13,8 @@ test("keeps Details open across scenes that have content and closes it for empty
 test("supports a non-editing D shortcut and horizontal navigation while Details is open", () => {
   assert.match(pageSource, /event\.key\.toLowerCase\(\)\s*===\s*"d"/);
   assert.match(pageSource, /\[contenteditable\]/);
-  assert.match(pageSource, /isEditing\s*\|\|\s*\(!detailsOpen\s*&&\s*isInteractive\)/);
+  assert.match(pageSource, /\.details-trigger, \.scene-navigation/);
+  assert.match(pageSource, /isEditing\s*\|\|\s*\(!detailsOpen\s*&&\s*isInteractive\s*&&\s*!isSceneNavigationControl\)/);
   assert.match(pageSource, /aria-keyshortcuts="D"/);
   assert.match(pageSource, /<kbd>D<\/kbd>/);
 });

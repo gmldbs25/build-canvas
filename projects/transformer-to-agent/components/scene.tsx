@@ -60,12 +60,7 @@ function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" |
             <p>원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
           </div>
         </div>
-      ) : (
-        <div className="incident-request">
-          <Eyebrow>USER REQUEST</Eyebrow>
-          <p>운영 서버에서 NullPointerException이 발생했다.<br />원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
-        </div>
-      )}
+      ) : null}
       <div className="stack-focus">
         <Eyebrow>PRODUCTION LOG</Eyebrow>
         <strong>NullPointerException</strong>
@@ -89,7 +84,6 @@ function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" |
           <span>→ src/main/.../UserMapper.java</span>
         </div>
       )}
-      {mode === "decoded" && <div className="incident-decoded-legend">MODEL · CONTEXT · REQUEST · EXECUTION · RESULT · LOOP · VALIDATION</div>}
     </div>
   );
 }
@@ -218,8 +212,10 @@ function ModelInputScene() {
       </div>
       <div className="context-to-model">→</div>
       <div className="model-core"><Eyebrow>INFERENCE</Eyebrow><strong>MODEL</strong><p>지금 보이는 정보로<br />다음 출력을 계산</p></div>
-      <div className="repository-ghost"><Eyebrow>REPOSITORY</Eyebrow><span>현재 입력 밖에 존재</span></div>
-      <p className="model-input-message">CONTEXT = 현재 Model Call에서 LLM에게 실제로 보이는 정보</p>
+      <div className="model-input-message">
+        <strong>CONTEXT</strong>
+        <p>현재 Model Call에서<br />LLM에게 실제로 보이는 정보</p>
+      </div>
     </section>
   );
 }
@@ -227,7 +223,10 @@ function ModelInputScene() {
 function AttentionScene() {
   return (
     <section className="scene scene-attention">
-      <header><Eyebrow>SELF-ATTENTION · CONCEPTUAL VIEW</Eyebrow><h2>멀리 떨어진 코드도<br />관계를 계산할 수 있다.</h2></header>
+      <header>
+        <Eyebrow>SELF-ATTENTION · CONCEPTUAL VIEW</Eyebrow>
+        <h2><span>멀리 떨어진 코드도</span><span>관계를 계산할 수 있다.</span></h2>
+      </header>
       <div className="attention-code">
         <pre><code>
           <span><i>38</i>public UserResponse toResponse(User user) {'{'}</span>
@@ -242,9 +241,8 @@ function AttentionScene() {
           <span><i>47</i>  );</span>
           <span><i>48</i>{'}'}</span>
         </code></pre>
-        <div className="attention-relation"><i /><span>content-dependent relation</span></div>
+        <div className="attention-relation"><i /></div>
       </div>
-      <p className="attention-note">연결선은 실제 특정 Attention Head의 인간적 해석이 아니라, 접근 가능한 위치 사이 관계의 직관적 표현이다.</p>
     </section>
   );
 }
@@ -259,7 +257,7 @@ function RepositoryContextScene() {
           {files.map((file, index) => <span className={file.includes("UserMapper") ? "selected-file" : ""} style={{ "--file-index": index } as React.CSSProperties} key={file}>{file}</span>)}
         </div>
       </div>
-      <div className="selection-bridge"><span>select / read</span><i>→</i><i>→</i></div>
+      <div className="selection-bridge"><strong>일부만 선택</strong><i>→</i><i>→</i></div>
       <div className="model-context-space">
         <header><Eyebrow>MODEL CONTEXT</Eyebrow><strong>현재 필요한 일부</strong></header>
         <div className="context-items"><span>NPE LOG</span><span>USER REQUEST</span><span className="context-selected">UserMapper.java</span><span className="context-selected delayed">UserMapperTest.java</span></div>
@@ -286,7 +284,7 @@ function ExecutionLayerScene() {
   const stages = ["REQUEST", "VALIDATE", "PERMISSION", "EXECUTE"];
   return (
     <section className="scene scene-execution-layer">
-      <div className="execution-model"><Eyebrow>MODEL</Eyebrow><code>read_file(&quot;src/UserMapper.java&quot;)</code></div>
+      <div className="execution-model"><Eyebrow>MODEL REQUEST</Eyebrow><code>read_file(<br />&quot;src/UserMapper.java&quot;)</code></div>
       <div className="execution-boundary"><span>BOUNDARY</span></div>
       <div className="execution-path">
         <Eyebrow>EXECUTION LAYER · RESPONSIBILITY</Eyebrow>
@@ -294,7 +292,7 @@ function ExecutionLayerScene() {
         <i className="execution-signal" />
       </div>
       <div className="execution-environment"><Eyebrow>ENVIRONMENT</Eyebrow><div className="file-open"><span>UserMapper.java</span><b>OPEN / READ</b></div></div>
-      <p>요청을 검증하고, 허용된 capability를 실제 Environment의 행동으로 연결한다.</p>
+      <p><strong>시스템이 요청을 실제 행동으로 연결한다.</strong><span>검증 · 권한 · 실행은 Model 밖의 책임이다.</span></p>
     </section>
   );
 }
@@ -303,7 +301,7 @@ function RequestsExecutesScene() {
   return (
     <section className="scene scene-requests-executes">
       <div className="statement-half statement-model"><span>MODEL</span><strong>REQUESTS</strong></div>
-      <div className="statement-divider"><i /></div>
+      <div className="statement-divider" aria-label="System boundary"><i /></div>
       <div className="statement-half statement-system"><span>SYSTEM</span><strong>EXECUTES</strong></div>
       <p>Model은 행동을 요청하고, 실행 가능한 시스템이 실제 Environment의 행동으로 연결한다.</p>
     </section>
@@ -317,7 +315,7 @@ function ResultReturnsScene() {
       <div className="result-context"><Eyebrow>UPDATED CONTEXT</Eyebrow><span>USER REQUEST</span><span>MODEL TOOL REQUEST</span><span className="returned-context">TOOL RESULT · UserMapper.java</span></div>
       <div className="result-execution"><Eyebrow>EXECUTION</Eyebrow><strong>결과를 현재<br />workflow로 반환</strong></div>
       <div className="result-environment"><Eyebrow>ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><code>profile.getDisplayName()</code></div>
-      <div className="return-path"><i /><span>TOOL RESULT</span></div>
+      <div className="return-path"><i /><span>RESULT → CONTEXT</span></div>
       <h2>결과가 돌아오면,<br /><em>Context가 달라진다.</em></h2>
     </section>
   );
@@ -370,7 +368,6 @@ function StopScene() {
       <header><Eyebrow>TERMINATION CONDITION</Eyebrow><h2>반복의 목적은<br />끝없이 반복하는 것이 아니다.</h2></header>
       <div className="stop-loop"><span>PATCH</span><i>→</i><span>TEST</span><i>↺</i></div>
       <div className="stop-exit"><span>TEST PASS</span><i>→</i><span>VERIFY</span><i>→</i><strong>TASK COMPLETE</strong></div>
-      <div className="secondary-exits"><span>approval required</span><span>permission denied</span><span>max iterations</span><span>unrecoverable error</span></div>
     </section>
   );
 }
@@ -395,7 +392,7 @@ function DifferentAgentScene({ motionPaused }: { motionPaused: boolean }) {
 
   useEffect(() => {
     if (motionPaused || manual) return;
-    const timer = window.setInterval(() => setState((current) => current === "minimal" ? "full" : "minimal"), 3600);
+    const timer = window.setInterval(() => setState((current) => current === "minimal" ? "full" : "minimal"), 5200);
     return () => window.clearInterval(timer);
   }, [motionPaused, manual]);
 
@@ -423,7 +420,7 @@ function DifferentAgentScene({ motionPaused }: { motionPaused: boolean }) {
         <div><span>search / read / edit</span><span>scoped permission</span><span>tests + validation</span></div>
         <strong>PATCH VERIFIED</strong>
       </div>
-      <p>같은 Model도 주변 시스템에 따라 다른 Agent Experience를 만든다.</p>
+      <p>같은 Model도 Context · Tools · Validation에 따라 결과가 달라진다.</p>
     </section>
   );
 }
@@ -468,7 +465,7 @@ function AppendixScene() {
   return (
     <section className="scene scene-appendix">
       <AgentArtwork variant="appendix" />
-      <div className="appendix-copy"><Eyebrow>APPENDIX · A1</Eyebrow><h2>처음에는 질문이고,<br /><em>마지막에는 답이 된다.</em></h2><p>MODEL → REQUEST → EXECUTION → RESULT → UPDATED CONTEXT → MODEL</p></div>
+      <div className="appendix-copy"><Eyebrow>APPENDIX · A1</Eyebrow><h2>처음에는 질문이고,<br /><em>마지막에는 답이 된다.</em></h2></div>
     </section>
   );
 }
