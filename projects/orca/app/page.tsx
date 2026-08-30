@@ -5,6 +5,21 @@ import type { CSSProperties } from "react";
 
 const TOTAL_SLIDES = 15;
 
+function isEditingTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+
+  return Boolean(target.closest([
+    "input",
+    "textarea",
+    "select",
+    '[contenteditable]:not([contenteditable="false"])',
+    '[role="textbox"]',
+    "[data-code-editor]",
+    ".monaco-editor",
+    ".CodeMirror",
+  ].join(", ")));
+}
+
 const notes = [
   "오늘은 모델 구조보다 먼저, 왜 연구자들이 다시 ‘세계’를 이야기하는지부터 시작합니다. 방향키로 장면을 넘길 수 있습니다.",
   "Hugging Face 투표는 학술적 우열 그 자체가 아니라 커뮤니티 관심의 신호입니다. 5월부터 7월까지 월간 1위 제목에 월드 모델 계열 연구가 이어졌다는 점을 봅니다.",
@@ -536,11 +551,12 @@ export default function Home() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (
-        event.ctrlKey &&
         !event.metaKey &&
+        !event.ctrlKey &&
         !event.altKey &&
-        !event.shiftKey &&
-        (event.code === "KeyH" || event.key.toLowerCase() === "h")
+        !event.isComposing &&
+        event.key.toLowerCase() === "h" &&
+        !isEditingTarget(event.target)
       ) {
         event.preventDefault();
         const homeUrl = new URL("../", window.location.href);

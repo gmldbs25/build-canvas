@@ -6,6 +6,21 @@ import { DetailsDrawer } from "@/components/details-drawer";
 import { Scene } from "@/components/scene";
 import { scenes, TOTAL_SCENES } from "@/content/pages";
 
+function isEditingTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+
+  return Boolean(target.closest([
+    "input",
+    "textarea",
+    "select",
+    '[contenteditable]:not([contenteditable="false"])',
+    '[role="textbox"]',
+    "[data-code-editor]",
+    ".monaco-editor",
+    ".CodeMirror",
+  ].join(", ")));
+}
+
 function indexFromLocation() {
   if (typeof window === "undefined") return 0;
   const params = new URLSearchParams(window.location.search);
@@ -33,11 +48,28 @@ export default function Home() {
   ].includes(scene.id);
   const canGoBack = index > 0;
   const canGoForward = index < TOTAL_SCENES - 1;
+  const sceneHasDetails = Boolean(scene.details?.length);
+
+  const closeDetails = useCallback((restoreFocus = true) => {
+    setDetailsOpen(false);
+    if (restoreFocus) {
+      window.setTimeout(() => detailsButtonRef.current?.focus(), 0);
+    }
+  }, []);
+
+  const toggleDetails = useCallback(() => {
+    if (detailsOpen) {
+      closeDetails();
+      return;
+    }
+    if (sceneHasDetails) setDetailsOpen(true);
+  }, [closeDetails, detailsOpen, sceneHasDetails]);
 
   const navigate = useCallback((nextIndex: number, replace = false) => {
     const safeIndex = Math.max(0, Math.min(TOTAL_SCENES - 1, nextIndex));
     setDirection(safeIndex < index ? "backward" : "forward");
     setIndex(safeIndex);
+    setDetailsOpen((isOpen) => isOpen && Boolean(scenes[safeIndex].details?.length));
     const url = new URL(window.location.href);
     url.searchParams.delete("mode");
     url.searchParams.delete("page");
@@ -59,6 +91,7 @@ export default function Home() {
       const nextIndex = indexFromLocation();
       setDirection(nextIndex < index ? "backward" : "forward");
       setIndex(nextIndex);
+      setDetailsOpen((isOpen) => isOpen && Boolean(scenes[nextIndex].details?.length));
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
@@ -68,14 +101,46 @@ export default function Home() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const isInteractive = Boolean(target?.closest("button, a, [tabindex]"));
+      const isEditing = isEditingTarget(target);
+
+      if (
+        !event.metaKey
+        && !event.ctrlKey
+        && !event.altKey
+        && !event.isComposing
+        && event.key.toLowerCase() === "h"
+        && !isEditing
+      ) {
+        event.preventDefault();
+        const homeUrl = new URL("../", window.location.href);
+        const isLocalHost = ["localhost", "127.0.0.1", "[::1]", "terminal.local"].includes(
+          window.location.hostname,
+        );
+        if (isLocalHost && window.location.pathname === "/" && document.title !== "build _ canvas") {
+          homeUrl.port = "5173";
+        }
+        window.location.assign(homeUrl.href);
+        return;
+      }
 
       if (event.key === "Escape" && detailsOpen) {
         event.preventDefault();
-        setDetailsOpen(false);
-        window.setTimeout(() => detailsButtonRef.current?.focus(), 0);
+        closeDetails();
         return;
       }
-      if (isInteractive) return;
+      if (
+        event.key.toLowerCase() === "d"
+        && !event.repeat
+        && !event.altKey
+        && !event.ctrlKey
+        && !event.metaKey
+        && !isEditing
+      ) {
+        event.preventDefault();
+        toggleDetails();
+        return;
+      }
+      if (isEditing || (!detailsOpen && isInteractive)) return;
       if (event.key === "ArrowLeft" && canGoBack) {
         event.preventDefault();
         navigate(index - 1);
@@ -87,7 +152,7 @@ export default function Home() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canGoBack, canGoForward, detailsOpen, index, navigate]);
+  }, [canGoBack, canGoForward, closeDetails, detailsOpen, index, navigate, toggleDetails]);
 
   return (
     <main
@@ -103,9 +168,17 @@ export default function Home() {
         </div>
       )}
 
-      {scene.details && (
-        <button ref={detailsButtonRef} className="details-trigger" aria-expanded={detailsOpen} onClick={() => setDetailsOpen(true)}>
-          Details
+      {sceneHasDetails && (
+        <button
+          ref={detailsButtonRef}
+          className="details-trigger"
+          aria-controls="scene-details"
+          aria-expanded={detailsOpen}
+          aria-keyshortcuts="D"
+          onClick={toggleDetails}
+        >
+          <span>Details</span>
+          <kbd>D</kbd>
         </button>
       )}
 
@@ -129,7 +202,7 @@ export default function Home() {
         </button>
       </nav>
 
-      <DetailsDrawer open={detailsOpen} scene={scene} onClose={() => setDetailsOpen(false)} />
+      <DetailsDrawer open={detailsOpen} scene={scene} onClose={closeDetails} />
       <div className="desktop-notice">이 프레젠테이션은 Desktop 화면에 최적화되어 있습니다.</div>
     </main>
   );

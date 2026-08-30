@@ -12,13 +12,11 @@
 - `Same Model, Different Agent`의 `MINIMAL / FULL` 비교
 - Desktop presentation target: 1280×720, 1440×900, 1920×1080
 
-## Docker development
+## Local development
 
-```bash
-docker compose up --build
-```
+Docker preview는 저장소 루트의 단일 Compose 구성으로 통합되어 있습니다.
 
-Local URL: `http://localhost:5173/`
+Local URL: `http://localhost:4173/build-canvas/transformer-to-agent/`
 
 ## Verification
 

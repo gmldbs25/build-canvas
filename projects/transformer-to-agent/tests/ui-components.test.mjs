@@ -41,3 +41,15 @@ test("implements the two required state comparisons and approved artwork", async
     access(new URL("../public/favicon.svg", import.meta.url)),
   ]);
 });
+
+test("keeps the ACT 1 second-pass learning sequence explicit", () => {
+  assert.doesNotMatch(sceneSource, /우리가 매일 쓰는 Coding Agent 안에서는/);
+  assert.match(sceneSource, /다음 Token 예측에서/);
+  assert.match(sceneSource, /AGENT가 되기까지/);
+  assert.match(sceneSource, /CURRENT INPUT \/ CONTEXT/);
+  assert.match(sceneSource, /THE MODEL PREDICTS/);
+  assert.match(sceneSource, /DECODING RESULT/);
+  assert.match(sceneSource, /하나가 결정되면/);
+  assert.match(cssSource, /workflow-connector/);
+  assert.match(cssSource, /grid-template-columns:\s*minmax\(180px/);
+});

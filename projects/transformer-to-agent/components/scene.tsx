@@ -52,10 +52,20 @@ const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH",
 function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" | "decoded" }) {
   return (
     <div className={`incident-workspace incident-mode-${mode}`}>
-      <div className="incident-request">
-        <Eyebrow>USER REQUEST</Eyebrow>
-        <p>운영 서버에서 NullPointerException이 발생했다.<br />원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
-      </div>
+      {mode === "mystery" ? (
+        <div className="incident-narrative">
+          <strong>운영 서버에서 NullPointerException이 발생했다.</strong>
+          <div>
+            <Eyebrow>USER REQUEST</Eyebrow>
+            <p>원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="incident-request">
+          <Eyebrow>USER REQUEST</Eyebrow>
+          <p>운영 서버에서 NullPointerException이 발생했다.<br />원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
+        </div>
+      )}
       <div className="stack-focus">
         <Eyebrow>PRODUCTION LOG</Eyebrow>
         <strong>NullPointerException</strong>
@@ -65,7 +75,7 @@ function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" |
       <div className="incident-trace" aria-label="NPE 처리 과정">
         {incidentSteps.map((step, index) => (
           <div className="incident-trace-step" style={{ "--step": index } as React.CSSProperties} key={step}>
-            <i />
+            <i><b /></i>
             <span>{step}</span>
             {mode === "decoded" && <small>{["RESULT → CONTEXT", "MODEL REQUEST", "TOOL RESULT", "UPDATED CONTEXT", "EXECUTION", "VALIDATION", "COMPLETE"][index]}</small>}
           </div>
@@ -91,9 +101,8 @@ function IntroScene() {
       <div className="intro-copy">
         <Eyebrow>WORK 03 · BUILD CANVAS</Eyebrow>
         <h1>LLM <span>to</span><br />AGENT</h1>
-        <p>다음 Token 예측에서 Coding Agent까지</p>
+        <p className="intro-subtitle"><span>다음 Token 예측에서</span><span>AGENT가 되기까지</span></p>
       </div>
-      <p className="intro-question">우리가 매일 쓰는 Coding Agent 안에서는 실제로 무슨 일이 일어날까?</p>
     </section>
   );
 }
@@ -101,7 +110,6 @@ function IntroScene() {
 function IncidentScene() {
   return (
     <section className="scene scene-incident">
-      <ActLead act={1} title="MODEL" question="복잡해 보이는 Agent 행동에서 Model 자체는 무엇을 하는가?" />
       <IncidentWorkspace />
     </section>
   );
@@ -113,15 +121,25 @@ function StripScene() {
       <div className="strip-remnants" aria-hidden="true">
         <span>REPOSITORY</span><span>PATCH</span><span>TEST</span><span>TOOLS</span>
       </div>
-      <div className="strip-model">
-        <Eyebrow>LANGUAGE MODEL</Eyebrow>
-        <strong>MODEL</strong>
+      <div className="strip-pipeline" aria-label="현재 입력에서 다음 Token 예측까지의 흐름">
+        <div className="strip-input">
+          <Eyebrow>CURRENT INPUT / CONTEXT</Eyebrow>
+          <code>java.lang.NullPointer</code>
+        </div>
+        <div className="strip-arrow" aria-hidden="true"><i /><span>→</span></div>
+        <div className="strip-model">
+          <Eyebrow>LANGUAGE MODEL</Eyebrow>
+          <strong>LLM</strong>
+        </div>
+        <div className="strip-arrow" aria-hidden="true"><i /><span>→</span></div>
+        <div className="strip-next">
+          <Eyebrow>NEXT TOKEN</Eyebrow>
+          <code>Exception</code>
+        </div>
       </div>
-      <div className="strip-arrow">→</div>
-      <div className="strip-output"><span>java</span><span>.</span><span>lang</span><span>.</span><span>Null</span><span>Pointer</span></div>
       <div className="strip-statement">
-        <h2>THE MODEL<br /><em>GENERATES TOKENS.</em></h2>
-        <p>Model 자체의 직접적인 출력은 Token 단위로 생성된다.</p>
+        <h2>THE MODEL PREDICTS<br /><em>THE NEXT TOKEN.</em></h2>
+        <p>LLM은 현재 입력을 바탕으로 다음 Token을 예측한다.</p>
       </div>
     </section>
   );
@@ -140,35 +158,47 @@ function NextTokenScene() {
         <h2>다음 Token의 가능성을 계산한다.</h2>
       </header>
       <div className="token-prompt">java.lang.NullPointer <span>___</span></div>
-      <div className="candidate-distribution">
-        {candidates.map(([token, value, width], index) => (
-          <div className={index === 0 ? "candidate candidate-primary" : "candidate"} key={token}>
-            <strong>{token}</strong>
-            <i><b style={{ width: `${width}%` }} /></i>
-            <span>{value}</span>
-          </div>
-        ))}
+      <div className="prediction-outcome">
+        <div className="candidate-distribution" aria-label="다음 Token 후보별 예시 가능성">
+          <div className="candidate-columns" aria-hidden="true"><span>TOKEN</span><span>CANDIDATE SCORE</span><span>VALUE</span></div>
+          {candidates.map(([token, value, width], index) => (
+            <div className={index === 0 ? "candidate candidate-primary" : "candidate"} key={token}>
+              <strong>{token}</strong>
+              <i><b style={{ width: `${width}%` }} /></i>
+              <span>{value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="decoding-result">
+          <Eyebrow>DECODING RESULT</Eyebrow>
+          <span>NEXT TOKEN</span>
+          <i aria-hidden="true">→</i>
+          <strong>Exception</strong>
+        </div>
       </div>
-      <div className="chosen-token">Exception</div>
     </section>
   );
 }
 
 function GenerationScene() {
-  const tokens = ["java", ".", "lang", ".", "Null", "Pointer", "Exception"];
   return (
     <section className="scene scene-generation">
       <div className="generation-title">
         <Eyebrow>AUTOREGRESSIVE GENERATION</Eyebrow>
-        <h2>하나를 고르고,<br />다시 계산한다.</h2>
+        <h2>하나가 결정되면,<br />다시 다음을 예측한다.</h2>
       </div>
       <div className="generation-lane">
+        <div className="generation-decision"><Eyebrow>DECIDED NEXT TOKEN</Eyebrow><strong>Exception</strong><i>↓</i></div>
+        <Eyebrow>CURRENT SEQUENCE</Eyebrow>
         <div className="generation-sequence">
-          {tokens.map((token, index) => <span style={{ "--token-index": index } as React.CSSProperties} key={`${token}-${index}`}>{token}</span>)}
-          <i className="generation-cursor" />
+          <span className="generation-base">java.lang.NullPointer</span>
+          <span className="generation-appended">Exception</span>
+          <span className="generation-next-state"><b>NEXT</b> ___</span>
         </div>
         <div className="generation-cycle">
-          <span>PREDICT</span><b>→</b><span>APPEND</span><b>→</b><span>PREDICT</span><b>→</b><span>APPEND</span>
+          {["PREDICT", "APPEND", "PREDICT", "APPEND"].map((step, index) => (
+            <span style={{ "--cycle-index": index } as React.CSSProperties} key={`${step}-${index}`}>{step}</span>
+          ))}
         </div>
       </div>
       <p className="generation-summary">결정된 Token이 늘어난 sequence의 일부가 되고, 다음 예측의 조건이 된다.</p>

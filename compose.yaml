@@ -1,0 +1,19 @@
+name: build-canvas-dev
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4173:4173"
+    volumes:
+      - .:/app
+      - root_node_modules:/app/node_modules
+      - orca_node_modules:/app/projects/orca/node_modules
+      - transformer_to_agent_node_modules:/app/projects/transformer-to-agent/node_modules
+
+volumes:
+  root_node_modules:
+  orca_node_modules:
+  transformer_to_agent_node_modules:

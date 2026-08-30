@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useLayoutEffect, useRef, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
 import type { SceneDefinition } from "@/content/pages";
 
@@ -7,7 +10,39 @@ type DetailsDrawerProps = {
   onClose: () => void;
 };
 
+function handleVerticalScroll(event: KeyboardEvent<HTMLDivElement>) {
+  const target = event.target as HTMLElement;
+  if (target.closest("input, textarea, [contenteditable]:not([contenteditable=\"false\"]), [role=\"textbox\"], [data-code-editor]")) {
+    return;
+  }
+
+  const pageDistance = Math.max(1, Math.round(event.currentTarget.clientHeight * 0.85));
+  const distance = {
+    ArrowDown: 48,
+    ArrowUp: -48,
+    PageDown: pageDistance,
+    PageUp: -pageDistance,
+  }[event.key];
+
+  if (distance === undefined) return;
+  event.preventDefault();
+  event.currentTarget.scrollTop += distance;
+}
+
 export function DetailsDrawer({ open, scene, onClose }: DetailsDrawerProps) {
+  const drawerRef = useRef<HTMLElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (open && scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [open, scene.id]);
+
+  useEffect(() => {
+    if (!open && drawerRef.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement).blur();
+    }
+  }, [open]);
+
   return (
     <>
       <button
@@ -18,6 +53,8 @@ export function DetailsDrawer({ open, scene, onClose }: DetailsDrawerProps) {
         onClick={onClose}
       />
       <aside
+        ref={drawerRef}
+        id="scene-details"
         className="details-drawer"
         data-open={open}
         aria-hidden={!open}
@@ -33,7 +70,12 @@ export function DetailsDrawer({ open, scene, onClose }: DetailsDrawerProps) {
           </button>
         </header>
 
-        <div className="details-scroll" tabIndex={open ? 0 : -1}>
+        <div
+          ref={scrollRef}
+          className="details-scroll"
+          tabIndex={open ? 0 : -1}
+          onKeyDown={handleVerticalScroll}
+        >
           {scene.details?.map((section, sectionIndex) => (
             <section className="details-section" key={`${section.title}-${sectionIndex}`}>
               <h3>{section.title}</h3>

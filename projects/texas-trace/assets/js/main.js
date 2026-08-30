@@ -203,6 +203,23 @@
     });
   }
 
+  function isEditingTarget(target) {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+
+    return Boolean(target.closest([
+      "input",
+      "textarea",
+      "select",
+      '[contenteditable]:not([contenteditable="false"])',
+      '[role="textbox"]',
+      "[data-code-editor]",
+      ".monaco-editor",
+      ".CodeMirror"
+    ].join(", ")));
+  }
+
   function bindControls() {
     elements.prevButton.addEventListener("click", function () {
       requestPrev();
@@ -214,11 +231,12 @@
 
     document.addEventListener("keydown", function (event) {
       if (
-        event.ctrlKey &&
         !event.metaKey &&
+        !event.ctrlKey &&
         !event.altKey &&
-        !event.shiftKey &&
-        (event.code === "KeyH" || event.key.toLowerCase() === "h")
+        !event.isComposing &&
+        event.key.toLowerCase() === "h" &&
+        !isEditingTarget(event.target)
       ) {
         event.preventDefault();
         var homeUrl = new URL("../", window.location.href);

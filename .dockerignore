@@ -1,0 +1,11 @@
+.git
+.sites-runtime
+.wrangler
+node_modules
+**/node_modules
+dist
+dist-pages
+**/dist
+**/dist-pages
+**/*.tsbuildinfo
+.DS_Store

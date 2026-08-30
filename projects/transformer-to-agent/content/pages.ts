@@ -99,7 +99,7 @@ export const scenes: SceneDefinition[] = [
         title: "What does the model actually produce?",
         paragraphs: [
           "Language Model은 현재 입력을 바탕으로 다음 위치에 올 Token에 대한 값을 계산한다. 이를 반복하면서 긴 출력이 만들어진다.",
-          "Presentation의 THE MODEL GENERATES TOKENS.는 이 핵심을 단순화한 표현이다.",
+          "Presentation의 THE MODEL PREDICTS THE NEXT TOKEN.은 이 입출력 관계를 단순화한 표현이다.",
         ],
         code: ["Context\n   ↓\nLanguage Model\n   ↓\nNext-token scores"],
       },
