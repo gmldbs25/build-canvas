@@ -7,11 +7,25 @@ cd "$project_root"
 GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas npm run build
 GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas node scripts/export-github-pages.mjs
 
-npm run install:ci --prefix projects/orca
+if [[ "$(uname -s)" == "Linux" ]]; then
+  npm run install:ci --prefix projects/orca
+else
+  test -x projects/orca/node_modules/.bin/vinext || {
+    echo "ORCA dependencies are missing. Run npm install --prefix projects/orca first." >&2
+    exit 69
+  }
+fi
 chmod +x projects/orca/scripts/*.sh
 GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/orca npm run build:pages --prefix projects/orca
 
-npm run install:ci --prefix projects/transformer-to-agent
+if [[ "$(uname -s)" == "Linux" ]]; then
+  npm run install:ci --prefix projects/transformer-to-agent
+else
+  test -x projects/transformer-to-agent/node_modules/.bin/vinext || {
+    echo "Transformer dependencies are missing. Run npm install --prefix projects/transformer-to-agent first." >&2
+    exit 69
+  }
+fi
 chmod +x projects/transformer-to-agent/scripts/*.sh
 GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/transformer-to-agent npm run build:pages --prefix projects/transformer-to-agent
 

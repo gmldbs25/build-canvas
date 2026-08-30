@@ -39,3 +39,14 @@ npm run build:pages
 ```
 
 통합 결과물은 `dist-pages/`에 생성됩니다.
+
+## Local preview
+
+```bash
+npm run dev
+```
+
+`npm run dev`는 메인 앱과 세 work를 함께 빌드한 뒤, GitHub Pages와 같은
+`/build-canvas/` 경로로 통합 프리뷰 서버를 엽니다. 기본 주소는
+`http://localhost:5173/build-canvas/`입니다. 메인 앱만 빠르게 HMR로 실행하려면
+`npm run dev:app`을 사용합니다.
