@@ -255,9 +255,11 @@ function ModelInputScene() {
       </div>
       <div className="context-to-model">→</div>
       <div className="model-core"><Eyebrow>INFERENCE</Eyebrow><strong>MODEL</strong><p>지금 보이는 정보로<br />다음 출력을 계산</p></div>
-      <div className="model-input-message">
-        <strong>CONTEXT</strong>
-        <p>현재 Model Call에서<br />LLM에게 실제로 보이는 정보</p>
+      <p className="model-input-note">현재 Model Call에서 LLM에게 실제로 보이는 정보</p>
+      <div className="context-repository">
+        <Eyebrow>REPOSITORY</Eyebrow>
+        <strong>2,418 files</strong>
+        <span>Model 입력 바깥에 있다</span>
       </div>
     </section>
   );
@@ -291,13 +293,35 @@ function AttentionScene() {
 }
 
 function RepositoryContextScene() {
-  const files = ["src/", "main/", "UserController.java", "UserService.java", "UserMapper.java", "User.java", "test/", "UserMapperTest.java", "build.gradle", "README.md"];
+  // Column 1 holds src/ and test/ so both selected files sit clear of the fade;
+  // column 2 carries project root files. 35 rows stand in for 2,418.
+  const files: [string, number, boolean?][] = [
+    ["src/", 0], ["main/", 1], ["java/", 2],
+    ["UserController.java", 3], ["UserService.java", 3], ["UserMapper.java", 3, true],
+    ["User.java", 3], ["UserProfile.java", 3], ["UserRepository.java", 3],
+    ["resources/", 1], ["application.yml", 2], ["schema.sql", 2],
+    ["test/", 0], ["java/", 1], ["UserMapperTest.java", 2, true],
+    ["UserServiceTest.java", 2], ["OrderServiceTest.java", 2], ["MapperContractTest.java", 2],
+    ["build.gradle", 0], ["settings.gradle", 0], ["gradle.properties", 0],
+    ["Dockerfile", 0], ["compose.yaml", 0], ["README.md", 0], ["CHANGELOG.md", 0],
+    ["docs/", 0], ["architecture.md", 1], ["runbook.md", 1],
+    ["config/", 0], ["logback.xml", 1], ["flyway.conf", 1],
+    [".github/", 0], ["workflows/", 1], ["deploy.yml", 2], ["LICENSE", 0],
+  ];
   return (
     <section className="scene scene-repository-context">
       <div className="repository-space">
         <header><Eyebrow>REPOSITORY</Eyebrow><strong>2,418 files</strong></header>
         <div className="repository-tree">
-          {files.map((file, index) => <span className={file.includes("UserMapper") ? "selected-file" : ""} style={{ "--file-index": index } as React.CSSProperties} key={file}>{file}</span>)}
+          {files.map(([name, depth, selected], index) => (
+            <span
+              className={selected ? "selected-file" : undefined}
+              style={{ "--depth": depth } as React.CSSProperties}
+              key={`${name}-${index}`}
+            >
+              {name}
+            </span>
+          ))}
         </div>
       </div>
       <div className="selection-bridge"><strong>일부만 선택</strong><i>→</i><i>→</i></div>
