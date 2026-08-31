@@ -331,7 +331,11 @@ function ExecutionLayerScene() {
       <div className="execution-boundary"><span>BOUNDARY</span></div>
       <div className="execution-path">
         <Eyebrow>EXECUTION LAYER · RESPONSIBILITY</Eyebrow>
-        {stages.map((stage, index) => <span style={{ "--execution-index": index } as React.CSSProperties} key={stage}>{stage}</span>)}
+        {stages.map((stage, index) => (
+          <span className="execution-stage-cell" style={{ "--execution-index": index } as React.CSSProperties} key={stage}>
+            {stage}
+          </span>
+        ))}
         <i className="execution-signal" />
       </div>
       <div className="execution-environment"><Eyebrow>ENVIRONMENT</Eyebrow><div className="file-open"><span>UserMapper.java</span><b>OPEN / READ</b></div></div>
@@ -496,7 +500,7 @@ function SynthesisScene() {
         <div className="agent-boundary"><span>CODING AGENT</span></div>
       </div>
       <div className="synthesis-copy">
-        <h2>THE MODEL IS<br /><em>NOT THE AGENT.</em></h2>
+        <h2><span>THE MODEL IS</span><em>NOT THE AGENT.</em></h2>
         <p>Model은 Agent의 핵심이다. Context, Tools, Execution, Control, Validation과 Loop가 함께 우리가 경험하는 Coding Agent를 만든다.</p>
       </div>
       <div className="final-questions"><span>What does it see?</span><span>What can it do?</span><span>What is it allowed to do?</span><span>How is it verified?</span></div>
