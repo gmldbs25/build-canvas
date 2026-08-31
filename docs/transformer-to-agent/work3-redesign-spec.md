@@ -3687,3 +3687,75 @@ This file is the Single Source of Truth for the Work 3 redesign.
 Implementation phases are sequencing instructions, not partial deliverables.
 
 Complete the entire specification before declaring the first redesign finished.
+
+---
+
+# 45. IMPLEMENTATION DELTAS
+
+The build intentionally differs from earlier sections in the places below. They are
+recorded here so this document stays the Single Source of Truth and future reviews do
+not re-open settled decisions.
+
+## 45.1 Scene 02 statement
+
+Section 15 proposes `THE MODEL GENERATES TOKENS.`
+
+The implementation uses:
+
+# **THE MODEL PREDICTS THE NEXT TOKEN.**
+
+Reason: it matches the work's subtitle (`다음 Token 예측에서 Coding Agent까지`) and sets up
+Scene 03, which then refines prediction into `scores + decoding`. Details for Scene 03
+still carry the precise wording. Every reference to the statement — Appendix A1 included —
+must quote this form.
+
+## 45.2 Scene 00 hook line
+
+The optional line in section 13 (`우리가 매일 쓰는 Coding Agent 안에서는 …`) is deliberately
+absent from the Presentation, so the Intro stays an editorial poster. A test asserts it
+stays out of the Scene source.
+
+## 45.3 Scene 00 Details
+
+Section 13 states the Intro does not require Details. The implementation gives it a
+reading guide (structure, shortcuts, the five ACT questions, and the simplification
+notice). This is what makes the Details affordance discoverable at all — without it the
+first screen has no `Details` button and the accuracy layer can go unnoticed.
+
+## 45.4 ACT 3 question
+
+The framing question used everywhere is section 3's wording:
+
+`Context에 없는 정보는 어떻게 실제 Environment에서 가져오는가?`
+
+It bridges from ACT 2's unresolved problem. `actQuestion` in `content/pages.ts` is the
+only place any ACT question is declared; the ACT lead reads from it.
+
+## 45.5 Persistent chrome additions
+
+Section 6.3 lists the minimum chrome. Two additions sit inside the existing chrome scale
+and do not introduce a navigation bar or large page numbers:
+
+- a five-segment ACT rail beside `ACT N · M`,
+- `N / 22` beside the bottom-left Scene caption.
+
+## 45.6 Overview overlay
+
+`O` opens a full-screen index of all 22 Scenes grouped by ACT, each ACT showing its
+framing question; selecting a Scene navigates through the existing history handling.
+Section 6.4 forbids scroll-based and swipe Scene navigation, not a deliberate index.
+Opening the overview pauses Scene motion, like Details.
+
+## 45.7 NPE line numbers
+
+The Java renderings are anchored so the highlighted expression is line 42, matching
+`at UserMapper.toResponse(UserMapper.java:42)` in the stack trace. The broken file runs
+39–44, the patched file 39–48, and Scene 06's relational variant 39–49. Scene 06 shows the
+patched shape before the story patches it, so its Details name it as a variant rather than
+the current state of the file.
+
+## 45.8 Scene 19 recap
+
+The recap keeps Scene 01's seven-step workflow, but the `TEST` step now carries
+`TEST FAILED → CONTEXT → RETRY` with a loop-back arc to `PATCH`, so the recap contains the
+failure-and-retry pivot ACT 4 taught rather than a clean linear success.

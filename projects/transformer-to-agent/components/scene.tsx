@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AgentArtwork } from "@/components/artwork";
+import { scenes } from "@/content/pages";
 
 type SceneProps = {
   sceneId: string;
@@ -12,12 +13,15 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <span className="eyebrow">{children}</span>;
 }
 
-function ActLead({ act, title, question }: { act: number; title: string; question: string }) {
+function ActLead({ sceneId }: { sceneId: string }) {
+  const scene = scenes.find((candidate) => candidate.id === sceneId);
+  if (!scene?.act || !scene.actTitle || !scene.actQuestion) return null;
+
   return (
-    <div className="act-lead" aria-hidden="true">
-      <span>ACT {act}</span>
-      <strong>{title}</strong>
-      <p>{question}</p>
+    <div className="act-lead">
+      <span>ACT {scene.act}</span>
+      <strong>{scene.actTitle}</strong>
+      <p>{scene.actQuestion}</p>
     </div>
   );
 }
@@ -26,28 +30,40 @@ function JavaCode({ patched = false, corrected = false }: { patched?: boolean; c
   return (
     <pre className="java-code" aria-label={corrected ? "수정 완료 코드" : patched ? "첫 번째 수정 코드" : "문제가 있는 Java 코드"}>
       <code>
-        <span><i>38</i><b>public UserResponse</b> toResponse(User user) {'{'}</span>
-        {patched ? <span><i>39</i>  UserProfile profile = user.getProfile();</span> : <span><i>39</i>  return new UserResponse(</span>}
-        {patched && <span><i>40</i> </span>}
-        {patched && <span><i>41</i>  return new UserResponse(</span>}
-        <span><i>{patched ? "42" : "40"}</i>    user.getId(),</span>
+        <span><i>39</i><b>public UserResponse</b> toResponse(User user) {'{'}</span>
+        {patched ? <span><i>40</i>  UserProfile profile = user.getProfile();</span> : <span><i>40</i>  return new UserResponse(</span>}
+        {patched && <span><i>41</i> </span>}
+        {patched && <span><i>42</i>  return new UserResponse(</span>}
+        <span><i>{patched ? "43" : "41"}</i>    user.getId(),</span>
         {patched ? (
           <>
-            <span className={corrected ? "code-success" : "code-risk"}><i>43</i>    profile != null</span>
-            <span className={corrected ? "code-success" : "code-risk"}><i>44</i>      ? profile.getDisplayName()</span>
-            <span className={corrected ? "code-success" : "code-risk"}><i>45</i>      : {corrected ? '"Unknown"' : "null"}</span>
+            <span className={corrected ? "code-success" : "code-risk"}><i>44</i>    profile != null</span>
+            <span className={corrected ? "code-success" : "code-risk"}><i>45</i>      ? profile.getDisplayName()</span>
+            <span className={corrected ? "code-success" : "code-risk"}><i>46</i>      : {corrected ? '"Unknown"' : "null"}</span>
           </>
         ) : (
-          <span className="code-error"><i>41</i>    user.getProfile().getDisplayName()</span>
+          <span className="code-error"><i>42</i>    user.getProfile().getDisplayName()</span>
         )}
-        <span><i>{patched ? "46" : "42"}</i>  );</span>
-        <span><i>{patched ? "47" : "43"}</i>{'}'}</span>
+        <span><i>{patched ? "47" : "43"}</i>  );</span>
+        <span><i>{patched ? "48" : "44"}</i>{'}'}</span>
       </code>
     </pre>
   );
 }
 
 const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH", "TEST", "VERIFY"];
+
+// Observable workflow only — Tool Request, Tool Result and workspace state.
+// Never hidden reasoning. See the observable-state rule in the Work 3 specification.
+const observableWorkflow: { step: string; request: string; result: string }[] = [
+  { step: "READ LOG", request: "NPE LOG → CONTEXT", result: "UserMapper.java : 42" },
+  { step: "SEARCH CODE", request: "search_code(\"UserMapper\")", result: "2 file candidates" },
+  { step: "READ FILE", request: "read_file(\".../UserMapper.java\")", result: "line 42 in context" },
+  { step: "TRACE", request: "UPDATED CONTEXT", result: "log + file + test 계약" },
+  { step: "PATCH", request: "apply_patch(\"UserMapper.java\")", result: "workspace changed" },
+  { step: "TEST", request: "run_tests(\"UserMapperTest\")", result: "FAILED · expected \"Unknown\"" },
+  { step: "VERIFY", request: "—", result: "아직 충족되지 않음" },
+];
 
 function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" | "decoded" }) {
   return (
@@ -72,16 +88,42 @@ function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" |
           <div className="incident-trace-step" style={{ "--step": index } as React.CSSProperties} key={step}>
             <i><b /></i>
             <span>{step}</span>
-            {mode === "decoded" && <small>{["RESULT → CONTEXT", "MODEL REQUEST", "TOOL RESULT", "UPDATED CONTEXT", "EXECUTION", "VALIDATION", "COMPLETE"][index]}</small>}
+            {mode === "decoded" && (
+              <small>
+                {[
+                  "TOOL RESULT → CONTEXT",
+                  "MODEL CALL → TOOL REQUEST",
+                  "EXECUTION → TOOL RESULT",
+                  "UPDATED CONTEXT",
+                  "MODEL OUTPUT → WORKSPACE",
+                  "TEST FAILED → CONTEXT → RETRY",
+                  "VALIDATION → COMPLETE",
+                ][index]}
+              </small>
+            )}
+            {mode === "decoded" && step === "TEST" && (
+              <em className="retry-arc" aria-label="테스트 실패 결과가 다시 PATCH 단계로 돌아간다" />
+            )}
           </div>
         ))}
       </div>
       {mode === "mystery" && <p className="incident-question">그런데 이 모든 행동을 실제로 하는 것은 무엇일까?</p>}
       {mode === "follow" && (
-        <div className="observable-state">
+        <div className="observable-log">
           <Eyebrow>OBSERVABLE WORKFLOW STATE</Eyebrow>
-          <strong>search_code(&quot;UserMapper&quot;)</strong>
-          <span>→ src/main/.../UserMapper.java</span>
+          <ol>
+            {observableWorkflow.map((entry, index) => (
+              <li
+                className={index === observableWorkflow.length - 1 ? "observable-pending" : undefined}
+                style={{ "--step": index } as React.CSSProperties}
+                key={entry.step}
+              >
+                <b>{entry.step}</b>
+                <code>{entry.request}</code>
+                <span>{entry.result}</span>
+              </li>
+            ))}
+          </ol>
         </div>
       )}
     </div>
@@ -104,6 +146,7 @@ function IntroScene() {
 function IncidentScene() {
   return (
     <section className="scene scene-incident">
+      <ActLead sceneId="incident" />
       <IncidentWorkspace />
     </section>
   );
@@ -204,7 +247,7 @@ function ModelInputScene() {
   const context = ["SYSTEM", "USER REQUEST", "NPE LOG", "CODE", "TOOL RESULT"];
   return (
     <section className="scene scene-model-input">
-      <ActLead act={2} title="CONTEXT" question="Model은 무엇을 근거로 판단하는가?" />
+      <ActLead sceneId="model-input" />
       <div className="context-stream">
         <Eyebrow>CURRENT MODEL CALL</Eyebrow>
         {context.map((item, index) => <span style={{ "--context-index": index } as React.CSSProperties} key={item}>{item}</span>)}
@@ -229,17 +272,17 @@ function AttentionScene() {
       </header>
       <div className="attention-code">
         <pre><code>
-          <span><i>38</i>public UserResponse toResponse(User user) {'{'}</span>
-          <span className="attention-source"><i>39</i>  UserProfile <b>profile</b> = user.getProfile();</span>
-          <span><i>40</i></span>
-          <span><i>41</i>{"  // ..."}</span>
-          <span><i>42</i>{"  // spatial distance"}</span>
-          <span><i>43</i></span>
-          <span><i>44</i>  return new UserResponse(</span>
-          <span><i>45</i>    user.getId(),</span>
-          <span className="attention-target"><i>46</i>    <b>profile</b>.getDisplayName()</span>
-          <span><i>47</i>  );</span>
-          <span><i>48</i>{'}'}</span>
+          <span><i>39</i>public UserResponse toResponse(User user) {'{'}</span>
+          <span className="attention-source"><i>40</i>  UserProfile <b>profile</b> = user.getProfile();</span>
+          <span><i>41</i></span>
+          <span><i>42</i>{"  // ..."}</span>
+          <span><i>43</i>{"  // spatial distance"}</span>
+          <span><i>44</i></span>
+          <span><i>45</i>  return new UserResponse(</span>
+          <span><i>46</i>    user.getId(),</span>
+          <span className="attention-target"><i>47</i>    <b>profile</b>.getDisplayName()</span>
+          <span><i>48</i>  );</span>
+          <span><i>49</i>{'}'}</span>
         </code></pre>
         <div className="attention-relation"><i /></div>
       </div>
@@ -270,7 +313,7 @@ function RepositoryContextScene() {
 function BoundaryScene() {
   return (
     <section className="scene scene-boundary">
-      <ActLead act={3} title="BOUNDARY" question="Model은 어떻게 실제 Environment와 연결되는가?" />
+      <ActLead sceneId="boundary" />
       <div className="boundary-side boundary-model"><Eyebrow>MODEL</Eyebrow><strong>다음 행동을<br />요청하는 출력</strong></div>
       <div className="boundary-wall"><span>SYSTEM BOUNDARY</span></div>
       <div className="boundary-side boundary-environment"><Eyebrow>REPOSITORY / ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><span>아직 읽히지 않음</span></div>
@@ -311,7 +354,7 @@ function RequestsExecutesScene() {
 function ResultReturnsScene() {
   return (
     <section className="scene scene-result-returns">
-      <ActLead act={4} title="LOOP" question="한 번의 Tool Call은 어떻게 지속적인 개발 작업이 되는가?" />
+      <ActLead sceneId="result-returns" />
       <div className="result-context"><Eyebrow>UPDATED CONTEXT</Eyebrow><span>USER REQUEST</span><span>MODEL TOOL REQUEST</span><span className="returned-context">TOOL RESULT · UserMapper.java</span></div>
       <div className="result-execution"><Eyebrow>EXECUTION</Eyebrow><strong>결과를 현재<br />workflow로 반환</strong></div>
       <div className="result-environment"><Eyebrow>ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><code>profile.getDisplayName()</code></div>
@@ -375,7 +418,7 @@ function StopScene() {
 function BuildAgentScene() {
   return (
     <section className="scene scene-build-agent">
-      <ActLead act={5} title="AGENT" question="Model과 Loop를 실제 Coding Agent로 만드는 전체 시스템은 무엇인가?" />
+      <ActLead sceneId="build-agent" />
       <div className="agent-region agent-context"><Eyebrow>CONTEXT</Eyebrow><strong>현재 무엇을 보는가</strong><span>GOAL · CODE · RESULTS</span></div>
       <div className="agent-region agent-tools"><Eyebrow>REPOSITORY / TOOLS</Eyebrow><strong>무엇을 할 수 있는가</strong><span>SEARCH · READ · EDIT · TEST</span></div>
       <div className="agent-region agent-execution"><Eyebrow>EXECUTION</Eyebrow><strong>요청을 실제 행동으로</strong><span>REQUEST → RESULT</span></div>

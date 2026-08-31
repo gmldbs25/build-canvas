@@ -42,6 +42,10 @@ const refs = {
     label: "OpenAI — Running Codex safely",
     url: "https://openai.com/index/running-codex-safely/",
   },
+  claudeTools: {
+    label: "Anthropic — Tool use with Claude",
+    url: "https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview",
+  },
 };
 
 export const scenes: SceneDefinition[] = [
@@ -50,6 +54,39 @@ export const scenes: SceneDefinition[] = [
     number: "00",
     title: "LLM to AGENT",
     act: null,
+    details: [
+      {
+        title: "이 자료를 읽는 법",
+        paragraphs: [
+          "이 자료는 Intro와 ACT 1–5, Appendix까지 22개 화면으로 이어지는 하나의 흐름이다. 각 ACT는 하나의 질문으로 시작해 그 질문에 답한 뒤 다음 ACT의 질문으로 넘어간다.",
+          "Presentation 화면은 직관을 담당하고, 지금 보고 있는 Details는 정확성을 담당한다. 화면의 표현이 어디까지 단순화된 것인지, 실제 시스템에서는 무엇이 달라질 수 있는지는 항상 Details에 적혀 있다.",
+        ],
+        bullets: [
+          "← / → — 이전 / 다음 Scene",
+          "D — 현재 Scene의 Details 열기·닫기",
+          "O — 전체 목차 열기, 원하는 Scene으로 이동",
+          "H — Build Canvas 홈으로",
+        ],
+      },
+      {
+        title: "다섯 개의 질문",
+        paragraphs: ["전체 흐름은 다음 다섯 질문을 차례로 해결한다."],
+        bullets: [
+          "ACT 1 MODEL — 복잡해 보이는 Agent 행동에서 Model 자체는 무엇을 하는가?",
+          "ACT 2 CONTEXT — Model은 무엇을 근거로 판단하는가?",
+          "ACT 3 BOUNDARY — Context에 없는 정보는 어떻게 실제 Environment에서 가져오는가?",
+          "ACT 4 LOOP — 한 번의 Tool Call은 어떻게 지속적인 개발 작업이 되는가?",
+          "ACT 5 AGENT — Model과 Loop를 실제 Coding Agent로 만드는 전체 시스템은 무엇인가?",
+        ],
+      },
+      {
+        title: "표기에 대하여",
+        paragraphs: [
+          "화면에 등장하는 Token 경계, 확률 값, JSON 형태의 Tool Request, 4단계 실행 경로는 모두 설명을 위해 단순화한 예시다. 특정 Model을 측정한 값이거나 특정 제품의 내부 구조를 그대로 옮긴 것이 아니다.",
+          "전체에서 사용하는 NullPointerException Incident 역시 Agent 동작을 설명하기 위해 만든 교육용 Scenario다.",
+        ],
+      },
+    ],
   },
   {
     id: "incident",
@@ -66,7 +103,7 @@ export const scenes: SceneDefinition[] = [
           "운영 서버에서 NullPointerException이 발생했다. Coding Agent에게 로그를 주고 원인 분석부터 수정, 테스트까지 요청하면 Agent는 여러 단계를 거쳐 문제를 해결하는 것처럼 보인다.",
           "이 자료에서는 이 하나의 Incident를 처음부터 끝까지 계속 사용한다.",
         ],
-        code: ["READ LOG\n→ SEARCH CODE\n→ READ FILE\n→ PATCH\n→ TEST\n→ VERIFY"],
+        code: ["READ LOG\n→ SEARCH CODE\n→ READ FILE\n→ TRACE\n→ PATCH\n→ TEST\n→ VERIFY"],
       },
       {
         title: "Incident Definition",
@@ -117,6 +154,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.transformer],
   },
   {
     id: "next-token",
@@ -142,6 +180,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.transformer],
   },
   {
     id: "generation",
@@ -172,6 +211,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.transformer],
   },
   {
     id: "model-input",
@@ -223,6 +263,13 @@ export const scenes: SceneDefinition[] = [
         title: "Why Attention matters here",
         paragraphs: [
           "Transformer의 Self-Attention에서는 Context 내 접근 가능한 위치들이 서로의 representation에 영향을 줄 수 있다. Presentation의 두 코드 위치 연결은 이 직관을 단순화한 표현이다.",
+        ],
+      },
+      {
+        title: "About the code on screen",
+        paragraphs: [
+          "이 Scene의 코드는 declaration과 사용 위치의 거리를 보여주기 위해 UserMapper를 변형한 예시다. Incident의 원본 코드에는 profile 지역 변수가 없고, 이 형태는 Scene 14에서 patch가 적용된 뒤에야 등장한다.",
+          "즉 이 화면은 Incident의 시간 순서상 현재 파일 상태가 아니라 Attention 설명을 위한 별도 예시다.",
         ],
       },
       {
@@ -281,6 +328,13 @@ export const scenes: SceneDefinition[] = [
           "제품마다 방법은 다르다. Model은 Repository 전체를 자동으로 알고 있는 것이 아니라 현재 Model Call에 제공된 Context를 바탕으로 판단한다.",
         ],
       },
+      {
+        title: "ACT 2 Summary",
+        paragraphs: [
+          "Model은 Repository 전체를 자동으로 알고 있는 것이 아니라 현재 Model Call에 제공된 Context를 바탕으로 판단한다.",
+          "그렇다면 필요한 파일이 아직 Context에 없을 때는 어떻게 가져올까?",
+        ],
+      },
     ],
     references: [refs.context],
   },
@@ -291,7 +345,7 @@ export const scenes: SceneDefinition[] = [
     act: 3,
     actTitle: "BOUNDARY",
     actPosition: 1,
-    actQuestion: "Model은 어떻게 실제 Environment와 연결되는가?",
+    actQuestion: "Context에 없는 정보는 어떻게 실제 Environment에서 가져오는가?",
     details: [
       {
         title: "Model output vs side effect",
@@ -313,7 +367,7 @@ export const scenes: SceneDefinition[] = [
         bullets: ["executed", "rejected", "require approval", "fail validation", "fail during execution"],
       },
     ],
-    references: [refs.tools],
+    references: [refs.tools, refs.claudeTools],
   },
   {
     id: "execution-layer",
@@ -350,7 +404,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
-    references: [refs.tools, refs.safety],
+    references: [refs.tools, refs.claudeTools, refs.safety],
   },
   {
     id: "requests-executes",
@@ -371,6 +425,13 @@ export const scenes: SceneDefinition[] = [
         paragraphs: [
           "Model capability와 System capability/permission은 별개의 문제다. 매우 강한 Model이라도 read-only 권한만 있다면 파일 수정은 수행하지 못할 수 있다. 반대로 권한을 넓힌다고 Model의 판단 능력이 높아지는 것도 아니다.",
           "Model의 Tool Request와 실제 Tool Execution은 다른 책임이다.",
+        ],
+      },
+      {
+        title: "ACT 3 Summary",
+        paragraphs: [
+          "Model은 행동을 요청하고, 실행 가능한 시스템이 그 요청을 실제 Environment의 행동으로 연결한다. 두 책임은 분리되어 있다.",
+          "그렇다면 실제로 읽은 파일의 결과는 그 다음에 어디로 갈까?",
         ],
       },
     ],
@@ -405,7 +466,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
-    references: [refs.running, refs.context],
+    references: [refs.running, refs.context, refs.claudeTools],
   },
   {
     id: "agent-loop",
@@ -499,6 +560,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.running, refs.tools],
   },
   {
     id: "stop",
@@ -524,10 +586,17 @@ export const scenes: SceneDefinition[] = [
         title: "Agent ≠ infinite autonomy",
         paragraphs: [
           "이 자료에서 Agent는 현재 상태를 바탕으로 다음 행동을 선택하고, 결과를 다시 상태에 반영하며, 목표 또는 종료 조건에 도달할 때까지 반복할 수 있는 시스템이다.",
+        ],
+      },
+      {
+        title: "ACT 4 Summary",
+        paragraphs: [
           "Agent는 한 번 Tool을 호출하는 Model이 아니라 결과를 다시 보고 다음 행동을 선택할 수 있는 반복 시스템이다.",
+          "그렇다면 이 Loop를 실제 Coding Agent로 만드는 전체 시스템은 무엇일까?",
         ],
       },
     ],
+    references: [refs.running],
   },
   {
     id: "build-agent",
@@ -609,6 +678,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.agents, refs.tools],
   },
   {
     id: "developer-questions",
@@ -639,6 +709,7 @@ export const scenes: SceneDefinition[] = [
         bullets: ["Test", "Build", "Lint", "Type Check", "Diff", "Human Review"],
       },
     ],
+    references: [refs.context, refs.tools, refs.safety],
   },
   {
     id: "incident-return",
@@ -663,6 +734,7 @@ export const scenes: SceneDefinition[] = [
         ],
       },
     ],
+    references: [refs.running],
   },
   {
     id: "synthesis",
@@ -694,11 +766,48 @@ export const scenes: SceneDefinition[] = [
         ],
       },
       {
+        title: "용어 정리",
+        paragraphs: [
+          "이 자료에서 사용한 용어의 범위를 한자리에 모은다. framework마다 경계가 다르므로 이름보다 책임을 기준으로 읽는 편이 안전하다.",
+        ],
+        bullets: [
+          "Token — Model이 다루는 단위. 자연어 단어와 1:1로 대응하지 않는다.",
+          "Context — 이 자료에서는 현재 Model Call에서 LLM이 볼 수 있는 정보. Application의 local runtime state와는 다를 수 있다.",
+          "Tool Request — Model이 생성한 구조화된 행동 요청. 실행이 보장된 것은 아니다.",
+          "Tool Execution — 그 요청을 실제 capability로 수행하는 별개의 책임.",
+          "Execution Layer — 요청을 검증하고 Tool에 연결한 뒤 결과를 workflow로 돌려주는 책임. 보편적 컴포넌트 이름이 아니다.",
+          "Model Call — Model에 대한 한 번의 호출.",
+          "Agent Run — 하나의 User Goal을 위해 여러 Model Call과 Tool Execution을 포함하는 실행 단위.",
+          "Validation — ‘수정했다’는 출력 대신 test, build, lint, diff처럼 실제 결과를 확인하는 것.",
+          "Agent Harness — Model을 동작하는 Agent 경험으로 만드는 주변 시스템 전체를 가리키는 편의상의 표현.",
+        ],
+      },
+      {
+        title: "Final learning check",
+        paragraphs: ["자료를 마친 뒤 다음 질문에 스스로 답할 수 있으면 목표에 도달한 것이다."],
+        bullets: [
+          "LLM 자체가 생성하는 직접적인 출력은 무엇인가?",
+          "Token과 자연어 단어는 왜 정확히 같은 개념이 아닌가?",
+          "Repository에 존재하는 정보와 현재 Model Context는 왜 다른가?",
+          "Self-Attention을 이 자료에서는 어떤 수준으로 이해해야 하는가?",
+          "Tool Request와 실제 Tool Execution은 왜 구분해야 하는가?",
+          "Execution Layer라는 말은 이 자료에서 무엇을 뜻하는가?",
+          "Tool Result는 어떻게 다음 Model 판단에 영향을 줄 수 있는가?",
+          "Agent Loop는 무엇인가?",
+          "Test Failure가 왜 유용한 Feedback이 될 수 있는가?",
+          "Loop는 왜 종료 조건을 필요로 하는가?",
+          "왜 Tool Calling 하나만으로 Coding Agent 전체를 설명하기 어려운가?",
+          "같은 Model이라도 Agent Experience가 달라질 수 있는 이유는 무엇인가?",
+          "Coding Agent를 사용할 때 개발자는 어떤 네 질문을 확인해야 하는가?",
+          "THE MODEL IS NOT THE AGENT.라는 문장의 정확한 뜻은 무엇인가?",
+        ],
+      },
+      {
         title: "Final mental model",
         code: ["CURRENT CONTEXT\n      ↓\n    MODEL\n      ↓\n TOOL REQUEST\n      ↓\n  EXECUTION\n      ↓\n     TOOL\n      ↓\n ENVIRONMENT\n      ↓\n TOOL RESULT\n      ↓\nUPDATED CONTEXT\n      ↺", "PERMISSIONS / SANDBOX / APPROVAL / VALIDATION / LOOP CONTROL"],
       },
     ],
-    references: [refs.agents, refs.running, refs.context, refs.tools, refs.safety],
+    references: [refs.agents, refs.running, refs.context, refs.tools, refs.claudeTools, refs.safety],
   },
   {
     id: "appendix",
@@ -713,7 +822,7 @@ export const scenes: SceneDefinition[] = [
           "각 요소는 실제 Component를 1:1로 복제하기보다 책임과 관계를 상징한다.",
         ],
       },
-      { title: "MODEL", paragraphs: ["현재 Context를 입력받고 출력을 생성하는 핵심 Model을 상징한다. THE MODEL GENERATES TOKENS.의 출발점이지만 전체 화면을 독점하지 않는다."] },
+      { title: "MODEL", paragraphs: ["현재 Context를 입력받고 출력을 생성하는 핵심 Model을 상징한다. THE MODEL PREDICTS THE NEXT TOKEN.의 출발점이지만 전체 화면을 독점하지 않는다."] },
       { title: "CONTEXT", paragraphs: ["User Goal, Instructions, Code, Log, Tool Results 등 현재 판단에 사용되는 정보 흐름을 상징한다. Repository 전체가 이미 Model 내부에 있다는 뜻은 아니다."] },
       { title: "TOOL REQUEST", paragraphs: ["Model에서 Environment 방향으로 나가는 signal은 행동 그 자체가 아니라 행동 요청을 나타낸다. MODEL REQUESTS."] },
       { title: "BOUNDARY", paragraphs: ["Model output과 실제 side effect 사이의 책임 경계를 상징한다. Requested와 Executed는 다르다."] },
