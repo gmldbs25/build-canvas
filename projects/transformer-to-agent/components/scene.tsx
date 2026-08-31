@@ -255,9 +255,11 @@ function ModelInputScene() {
       </div>
       <div className="context-to-model">→</div>
       <div className="model-core"><Eyebrow>INFERENCE</Eyebrow><strong>MODEL</strong><p>지금 보이는 정보로<br />다음 출력을 계산</p></div>
-      <div className="model-input-message">
-        <strong>CONTEXT</strong>
-        <p>현재 Model Call에서<br />LLM에게 실제로 보이는 정보</p>
+      <p className="model-input-note">현재 Model Call에서 LLM에게 실제로 보이는 정보</p>
+      <div className="context-repository">
+        <Eyebrow>REPOSITORY</Eyebrow>
+        <strong>2,418 files</strong>
+        <span>Model 입력 바깥에 있다</span>
       </div>
     </section>
   );
@@ -291,13 +293,35 @@ function AttentionScene() {
 }
 
 function RepositoryContextScene() {
-  const files = ["src/", "main/", "UserController.java", "UserService.java", "UserMapper.java", "User.java", "test/", "UserMapperTest.java", "build.gradle", "README.md"];
+  // Column 1 holds src/ and test/ so both selected files sit clear of the fade;
+  // column 2 carries project root files. 35 rows stand in for 2,418.
+  const files: [string, number, boolean?][] = [
+    ["src/", 0], ["main/", 1], ["java/", 2],
+    ["UserController.java", 3], ["UserService.java", 3], ["UserMapper.java", 3, true],
+    ["User.java", 3], ["UserProfile.java", 3], ["UserRepository.java", 3],
+    ["resources/", 1], ["application.yml", 2], ["schema.sql", 2],
+    ["test/", 0], ["java/", 1], ["UserMapperTest.java", 2, true],
+    ["UserServiceTest.java", 2], ["OrderServiceTest.java", 2], ["MapperContractTest.java", 2],
+    ["build.gradle", 0], ["settings.gradle", 0], ["gradle.properties", 0],
+    ["Dockerfile", 0], ["compose.yaml", 0], ["README.md", 0], ["CHANGELOG.md", 0],
+    ["docs/", 0], ["architecture.md", 1], ["runbook.md", 1],
+    ["config/", 0], ["logback.xml", 1], ["flyway.conf", 1],
+    [".github/", 0], ["workflows/", 1], ["deploy.yml", 2], ["LICENSE", 0],
+  ];
   return (
     <section className="scene scene-repository-context">
       <div className="repository-space">
         <header><Eyebrow>REPOSITORY</Eyebrow><strong>2,418 files</strong></header>
         <div className="repository-tree">
-          {files.map((file, index) => <span className={file.includes("UserMapper") ? "selected-file" : ""} style={{ "--file-index": index } as React.CSSProperties} key={file}>{file}</span>)}
+          {files.map(([name, depth, selected], index) => (
+            <span
+              className={selected ? "selected-file" : undefined}
+              style={{ "--depth": depth } as React.CSSProperties}
+              key={`${name}-${index}`}
+            >
+              {name}
+            </span>
+          ))}
         </div>
       </div>
       <div className="selection-bridge"><strong>일부만 선택</strong><i>→</i><i>→</i></div>
@@ -318,7 +342,7 @@ function BoundaryScene() {
       <div className="boundary-wall"><span>SYSTEM BOUNDARY</span></div>
       <div className="boundary-side boundary-environment"><Eyebrow>REPOSITORY / ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><span>아직 읽히지 않음</span></div>
       <code className="boundary-request">read_file(&quot;src/UserMapper.java&quot;)</code>
-      <h2>REQUESTED <em>≠</em> EXECUTED</h2>
+      <h2><span>REQUESTED</span><em>≠</em><span>EXECUTED</span></h2>
     </section>
   );
 }
@@ -331,7 +355,11 @@ function ExecutionLayerScene() {
       <div className="execution-boundary"><span>BOUNDARY</span></div>
       <div className="execution-path">
         <Eyebrow>EXECUTION LAYER · RESPONSIBILITY</Eyebrow>
-        {stages.map((stage, index) => <span style={{ "--execution-index": index } as React.CSSProperties} key={stage}>{stage}</span>)}
+        {stages.map((stage, index) => (
+          <span className="execution-stage-cell" style={{ "--execution-index": index } as React.CSSProperties} key={stage}>
+            {stage}
+          </span>
+        ))}
         <i className="execution-signal" />
       </div>
       <div className="execution-environment"><Eyebrow>ENVIRONMENT</Eyebrow><div className="file-open"><span>UserMapper.java</span><b>OPEN / READ</b></div></div>
@@ -409,8 +437,18 @@ function StopScene() {
   return (
     <section className="scene scene-stop">
       <header><Eyebrow>TERMINATION CONDITION</Eyebrow><h2>반복의 목적은<br />끝없이 반복하는 것이 아니다.</h2></header>
-      <div className="stop-loop"><span>PATCH</span><i>→</i><span>TEST</span><i>↺</i></div>
-      <div className="stop-exit"><span>TEST PASS</span><i>→</i><span>VERIFY</span><i>→</i><strong>TASK COMPLETE</strong></div>
+      <div className="stop-flow">
+        <div className="stop-loop" aria-label="PATCH과 TEST를 오가는 반복">
+          <span>PATCH</span>
+          <i aria-hidden="true">↻</i>
+          <span>TEST</span>
+        </div>
+        <div className="stop-branch">
+          <i aria-hidden="true" />
+          <span>TEST PASS</span>
+        </div>
+        <div className="stop-exit"><span>VERIFY</span><i aria-hidden="true">→</i><strong>TASK COMPLETE</strong></div>
+      </div>
     </section>
   );
 }
@@ -496,7 +534,7 @@ function SynthesisScene() {
         <div className="agent-boundary"><span>CODING AGENT</span></div>
       </div>
       <div className="synthesis-copy">
-        <h2>THE MODEL IS<br /><em>NOT THE AGENT.</em></h2>
+        <h2><span>THE MODEL IS</span><em>NOT THE AGENT.</em></h2>
         <p>Model은 Agent의 핵심이다. Context, Tools, Execution, Control, Validation과 Loop가 함께 우리가 경험하는 Coding Agent를 만든다.</p>
       </div>
       <div className="final-questions"><span>What does it see?</span><span>What can it do?</span><span>What is it allowed to do?</span><span>How is it verified?</span></div>
