@@ -318,7 +318,7 @@ function BoundaryScene() {
       <div className="boundary-wall"><span>SYSTEM BOUNDARY</span></div>
       <div className="boundary-side boundary-environment"><Eyebrow>REPOSITORY / ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><span>아직 읽히지 않음</span></div>
       <code className="boundary-request">read_file(&quot;src/UserMapper.java&quot;)</code>
-      <h2>REQUESTED <em>≠</em> EXECUTED</h2>
+      <h2><span>REQUESTED</span><em>≠</em><span>EXECUTED</span></h2>
     </section>
   );
 }
@@ -413,8 +413,18 @@ function StopScene() {
   return (
     <section className="scene scene-stop">
       <header><Eyebrow>TERMINATION CONDITION</Eyebrow><h2>반복의 목적은<br />끝없이 반복하는 것이 아니다.</h2></header>
-      <div className="stop-loop"><span>PATCH</span><i>→</i><span>TEST</span><i>↺</i></div>
-      <div className="stop-exit"><span>TEST PASS</span><i>→</i><span>VERIFY</span><i>→</i><strong>TASK COMPLETE</strong></div>
+      <div className="stop-flow">
+        <div className="stop-loop" aria-label="PATCH과 TEST를 오가는 반복">
+          <span>PATCH</span>
+          <i aria-hidden="true">↻</i>
+          <span>TEST</span>
+        </div>
+        <div className="stop-branch">
+          <i aria-hidden="true" />
+          <span>TEST PASS</span>
+        </div>
+        <div className="stop-exit"><span>VERIFY</span><i aria-hidden="true">→</i><strong>TASK COMPLETE</strong></div>
+      </div>
     </section>
   );
 }
