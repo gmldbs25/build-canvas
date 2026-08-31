@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DetailsDrawer } from "@/components/details-drawer";
+import { OverviewOverlay } from "@/components/overview-overlay";
 import { Scene } from "@/components/scene";
 import { scenes, TOTAL_SCENES } from "@/content/pages";
 
@@ -38,6 +39,7 @@ export default function Home() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [overviewOpen, setOverviewOpen] = useState(false);
   const [ready, setReady] = useState(false);
   const detailsButtonRef = useRef<HTMLButtonElement>(null);
   const scene = scenes[index];
@@ -76,6 +78,11 @@ export default function Home() {
     url.searchParams.set("scene", scenes[safeIndex].number);
     window.history[replace ? "replaceState" : "pushState"]({}, "", url);
   }, [index]);
+
+  const selectFromOverview = useCallback((nextIndex: number) => {
+    setOverviewOpen(false);
+    navigate(nextIndex);
+  }, [navigate]);
 
   useEffect(() => {
     const initialIndex = indexFromLocation();
@@ -126,9 +133,22 @@ export default function Home() {
         return;
       }
 
-      if (event.key === "Escape" && detailsOpen) {
+      if (event.key === "Escape" && (detailsOpen || overviewOpen)) {
         event.preventDefault();
-        closeDetails();
+        if (overviewOpen) setOverviewOpen(false);
+        else closeDetails();
+        return;
+      }
+      if (
+        event.key.toLowerCase() === "o"
+        && !event.repeat
+        && !event.altKey
+        && !event.ctrlKey
+        && !event.metaKey
+        && !isEditing
+      ) {
+        event.preventDefault();
+        setOverviewOpen((isOpen) => !isOpen);
         return;
       }
       if (
@@ -155,19 +175,27 @@ export default function Home() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canGoBack, canGoForward, closeDetails, detailsOpen, index, navigate, toggleDetails]);
+  }, [canGoBack, canGoForward, closeDetails, detailsOpen, index, navigate, overviewOpen, toggleDetails]);
 
   return (
     <main
       className="presentation"
-      data-motion-paused={detailsOpen}
+      data-motion-paused={detailsOpen || overviewOpen}
       data-ready={ready}
       data-act={scene.act ?? "artwork"}
       data-tone={isDarkScene ? "dark" : "light"}
     >
       {scene.act !== null && (
-        <div className="act-indicator" aria-label={`ACT ${scene.act}, scene ${scene.actPosition}`}>
+        <div
+          className="act-indicator"
+          aria-label={`ACT ${scene.act}, scene ${scene.actPosition}. 전체 ${TOTAL_SCENES}개 중 ${index + 1}번째`}
+        >
           ACT {scene.act} <i /> {scene.actPosition}
+          <span className="act-rail" aria-hidden="true">
+            {[1, 2, 3, 4, 5].map((act) => (
+              <b key={act} data-state={act === scene.act ? "current" : act < scene.act! ? "done" : "upcoming"} />
+            ))}
+          </span>
         </div>
       )}
 
@@ -194,7 +222,11 @@ export default function Home() {
       <div className="scene-caption-chrome" aria-hidden="true">
         <span>{scene.number}</span>
         <strong>{scene.title}</strong>
+        <em>{index + 1} / {TOTAL_SCENES}</em>
       </div>
+      {scene.act === null && (
+        <p className="sr-only">{`전체 ${TOTAL_SCENES}개 중 ${index + 1}번째 화면`}</p>
+      )}
 
       <nav className="scene-navigation" aria-label="Scene navigation">
         <button aria-label="이전 Scene" disabled={!canGoBack} onClick={() => navigate(index - 1)}>
@@ -206,6 +238,12 @@ export default function Home() {
       </nav>
 
       <DetailsDrawer open={detailsOpen} scene={scene} onClose={closeDetails} />
+      <OverviewOverlay
+        open={overviewOpen}
+        currentIndex={index}
+        onSelect={selectFromOverview}
+        onClose={() => setOverviewOpen(false)}
+      />
       <div className="desktop-notice">이 프레젠테이션은 Desktop 화면에 최적화되어 있습니다.</div>
     </main>
   );

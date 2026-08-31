@@ -6,8 +6,11 @@
 
 - Intro + ACT 1–5 + Appendix, 총 22개 화면
 - `ArrowLeft` / `ArrowRight` 및 화면 우측 하단 탐색
-- Scene별 기술 원고를 담은 오른쪽 `Details` overlay
-- Details가 열리면 Presentation motion pause
+- `O` — ACT별로 묶인 전체 Scene 목차 overlay
+- `D` — Scene별 기술 원고를 담은 오른쪽 `Details` overlay
+- `H` — Build Canvas 홈
+- Details 또는 목차가 열리면 Presentation motion pause
+- 좌측 상단 ACT rail과 좌측 하단 `N / 22`로 현재 위치 표시
 - `Failure Is Context`의 `FAIL / PASS` 비교
 - `Same Model, Different Agent`의 `MINIMAL / FULL` 비교
 - Desktop presentation target: 1280×720, 1440×900, 1920×1080
