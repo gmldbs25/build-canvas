@@ -224,6 +224,9 @@ export default function Home() {
         <strong>{scene.title}</strong>
         <em>{index + 1} / {TOTAL_SCENES}</em>
       </div>
+      {scene.act === null && (
+        <p className="sr-only">{`전체 ${TOTAL_SCENES}개 중 ${index + 1}번째 화면`}</p>
+      )}
 
       <nav className="scene-navigation" aria-label="Scene navigation">
         <button aria-label="이전 Scene" disabled={!canGoBack} onClick={() => navigate(index - 1)}>

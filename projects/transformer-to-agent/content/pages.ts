@@ -356,7 +356,7 @@ export const scenes: SceneDefinition[] = [
       {
         title: "What is a Tool Request?",
         paragraphs: [
-          "Tool-capable systems can provide a model with information about available tools and their inputs. 교육용 화면에서는 읽기 쉬운 JSON으로 요청을 표현할 수 있다.",
+          "Tool을 지원하는 시스템은 사용할 수 있는 Tool의 목록과 각 Tool이 받는 입력 형식을 Model에게 알려줄 수 있다. 교육용 화면에서는 그 요청을 읽기 쉬운 JSON으로 표현할 수 있다.",
           "이것은 모든 Tool Call이 JSON 문자열이라는 뜻이 아니다. 중요한 개념은 structured action-request output이다.",
         ],
         code: ["{\n  \"tool\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/UserMapper.java\"\n  }\n}"],
