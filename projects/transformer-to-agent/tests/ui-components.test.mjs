@@ -60,7 +60,7 @@ test("keeps the NPE incident internally consistent", () => {
   assert.match(sceneSource, /<span className="code-error"><i>42<\/i>    user\.getProfile\(\)\.getDisplayName\(\)<\/span>/);
   // The canonical workflow has seven steps in both the Scene and its Details.
   assert.match(sceneSource, /"READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH", "TEST", "VERIFY"/);
-  assert.match(contentSource, /READ LOG\\n→ SEARCH CODE\\n→ READ FILE\\n→ TRACE\\n→ PATCH\\n→ TEST\\n→ VERIFY/);
+  assert.match(contentSource, /READ LOG → SEARCH CODE → READ FILE → TRACE → PATCH → TEST → VERIFY/);
   // Details must not quote a statement the Presentation never shows.
   assert.doesNotMatch(contentSource, /THE MODEL GENERATES TOKENS/);
   assert.match(sceneSource, /THE MODEL PREDICTS/);
@@ -72,15 +72,20 @@ test("frames every ACT with its own question", () => {
   }
   // The lead reads from content, so the questions are declared exactly once.
   assert.doesNotMatch(sceneSource, /ActLead act=\{/);
-  for (const summary of ["ACT 1 Summary", "ACT 2 Summary", "ACT 3 Summary", "ACT 4 Summary"]) {
-    assert.match(contentSource, new RegExp(summary));
+  for (const transition of [
+    "여기까지가 Model 자체에 대한 첫 번째 답이다",
+    "ACT 2의 결론은 다음과 같다",
+    "ACT 3에서 기억해야 할 핵심은 아주 짧다",
+    "ACT 4의 질문에도 이제 답할 수 있다",
+  ]) {
+    assert.match(contentSource, new RegExp(transition));
   }
 });
 
 test("orients the viewer across the 22 scenes", () => {
-  // Intro carries a reading guide, which also makes the Details affordance discoverable.
-  assert.match(contentSource, /이 자료를 읽는 법/);
-  assert.match(contentSource, /다섯 개의 질문/);
+  // Intro now opens the standalone article and establishes its five-stage arc.
+  assert.match(contentSource, /다음 Token을 생성하는 Model을 중심으로/);
+  assert.match(contentSource, /이 글은 그 질문을 다섯 단계로 나누어 살펴본다/);
   // Overview overlay, its shortcut, and the persistent position indicators.
   assert.match(pageSource, /OverviewOverlay/);
   assert.match(pageSource, /event\.key\.toLowerCase\(\) === "o"/);
