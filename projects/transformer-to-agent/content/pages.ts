@@ -19,6 +19,28 @@ export type SceneDefinition = {
 
 type SceneMeta = Omit<SceneDefinition, "title" | "details">;
 
+const presentationTitles: Record<string, string> = {
+  "00": "LLM to AGENT",
+  "01": "운영 장애에서 Agent Workflow까지",
+  "02": "LLM은 실제로 무엇을 할까?",
+  "03": "다음 Token은 어떻게 결정될까?",
+  "04": "Token 생성은 반복이다",
+  "05": "작업이 진행되며 Context도 달라진다",
+  "06": "멀리 떨어진 정보도 같은 판단에 영향을 준다",
+  "07": "ACCESS ≠ CONTEXT",
+  "08": "필요한 행동은 Model이 요청한다",
+  "09": "실제 실행은 Execution Layer가 맡는다",
+  "10": "Result는 다음 Context에 반영될 수 있다",
+  "11": "첫 출력이 최종 답이 아니라면?",
+  "12": "이 반복이 Agent Loop다",
+  "13": "실제 NPE를 Agent Loop로 따라가보자",
+  "14": "실패가 다음 수정을 만든다",
+  "15": "검증이 끝나면 작업도 끝난다",
+  "16": "구성 요소가 Agent를 만든다",
+  "19": "LLM to AGENT",
+  A1: "Reference & Artwork",
+};
+
 const sceneMetas: SceneMeta[] = [
   { id: "intro", number: "00", act: null, tone: "light" },
   {
@@ -91,7 +113,7 @@ export const scenes: SceneDefinition[] = sceneMetas.map((meta) => {
   if (!articleScene) {
     throw new Error(`Details v4 is missing Scene ${meta.number}.`);
   }
-  return { ...meta, title: articleScene.title, details: articleScene.blocks };
+  return { ...meta, title: presentationTitles[meta.number], details: articleScene.blocks };
 });
 
 if (scenes.map((scene) => scene.number).join(",") !== detailsArticle.order.join(",")) {

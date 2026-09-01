@@ -51,16 +51,16 @@ test("implements the required causal Presentation sequence", () => {
   assert.match(sceneSource, /"READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH", "TEST", "VERIFY"/);
   assert.match(sceneSource, /NullPointerException/);
   assert.match(sceneSource, /UserMapper\.java:42/);
-  assert.match(sceneSource, /FOCUS NEXT → LLM/);
+  assert.match(sceneSource, /NEXT FOCUS → LLM/);
 
-  assert.match(sceneSource, /WHAT DOES THE LLM/);
+  assert.match(sceneSource, /LLM은 실제로/);
   assert.match(sceneSource, /NEXT TOKEN \?/);
   assert.match(sceneSource, /VOCABULARY LOGITS/);
   assert.match(sceneSource, /SOFTMAX →/);
   assert.match(sceneSource, /\["Exception", "8\.7", "72%"\]/);
   assert.match(sceneSource, /ONE TOKEN GENERATED/);
   assert.match(sceneSource, /PREDICT → APPEND/);
-  assert.match(sceneSource, /GENERATION IS REPETITION/);
+  assert.match(sceneSource, /PREDICT → APPEND → REPEAT/);
 
   const contextGrowth = functionBlock("ContextGrowthScene", "EvidenceContextScene");
   assert.doesNotMatch(contextGrowth, /read_file|grep|shell|Tool Schema|JSON Tool Call/);
@@ -69,17 +69,17 @@ test("implements the required causal Presentation sequence", () => {
 
   const modelRequests = functionBlock("ModelRequestsScene", "ExecutionActsScene");
   assert.match(modelRequests, /NEED SOURCE/);
-  assert.match(modelRequests, /REQUEST RECEIVED · NOT YET EXECUTED/);
+  assert.match(modelRequests, /REQUEST 수신 · 아직 실행 전/);
   assert.doesNotMatch(modelRequests, /TOOL RESULT/);
 
   const resultContext = functionBlock("ResultContextScene", "OnePassScene");
   assert.match(resultContext, /FILTER.*SELECT.*SUMMARIZE.*COMPRESS/s);
-  assert.match(resultContext, /MODEL NOT RUN YET/);
+  assert.match(resultContext, /MODEL 실행 전/);
 
   const onePass = functionBlock("OnePassScene", "AgentLoopScene");
-  assert.match(onePass, /NOW WHAT\?/);
-  assert.doesNotMatch(onePass, /THIS IS THE AGENT LOOP/);
-  assert.match(sceneSource, /THIS IS THE AGENT LOOP/);
+  assert.match(onePass, /그다음은\?/);
+  assert.doesNotMatch(onePass, /DECIDE → ACT → OBSERVE → UPDATE → DECIDE AGAIN/);
+  assert.match(sceneSource, /DECIDE → ACT → OBSERVE → UPDATE → DECIDE AGAIN/);
 });
 
 test("enforces NPE reveal timing and observable reasoning labels", () => {
@@ -87,7 +87,7 @@ test("enforces NPE reveal timing and observable reasoning labels", () => {
   const beforeScene14 = sceneSource.slice(0, sceneSource.indexOf("function PatchCode"));
   assert.doesNotMatch(beforeNpeIterations, /profile == null/);
   assert.doesNotMatch(beforeScene14, /Unknown/);
-  assert.match(sceneSource, /profile == null is the likely cause/);
+  assert.match(sceneSource, /profile == null이 원인일 가능성이 높다/);
   assert.match(sceneSource, /expected: <b>&quot;Unknown&quot;<\/b>/);
   assert.match(sceneSource, /OBSERVATION/);
   assert.match(sceneSource, /CURRENT ASSESSMENT/);
@@ -99,12 +99,35 @@ test("enforces NPE reveal timing and observable reasoning labels", () => {
 test("keeps Scene 16 integration and Scene 19 conclusion distinct", () => {
   const system = functionBlock("AgentSystemScene", "ConclusionScene");
   const conclusion = functionBlock("ConclusionScene", "AppendixScene");
-  assert.match(sceneSource, /"CONTROL", "What is allowed\?"/);
-  assert.match(sceneSource, /"VALIDATION", "Is the result correct\?"/);
-  assert.match(system, /AN AGENT/);
+  assert.match(sceneSource, /"CONTROL", "허용된 행동의 범위"/);
+  assert.match(sceneSource, /"VALIDATION", "Result가 올바른지 검증"/);
+  assert.match(system, /구성 요소가/);
   assert.match(conclusion, /The model predicts\./);
   assert.match(conclusion, /The system turns predictions into actions\./);
   assert.doesNotMatch(conclusion, /NullPointerException|UserMapper|Patch|TESTS|UserService|NPE/);
+});
+
+test("applies Korean-first Presentation copy while preserving technical theses", () => {
+  for (const copy of [
+    "LLM은 실제로", "다음 Token은 어떻게", "작업이 진행되며", "그럼 코드는 어떻게",
+    "필요한 행동은", "실제 실행은", "첫 출력이", "이 반복이",
+    "실제 NPE를 Agent Loop로", "실패가 다음", "검증이 끝나면",
+  ]) {
+    assert.match(sceneSource, new RegExp(copy));
+  }
+  for (const oldCopy of [
+    "WHAT DOES THE LLM", "HOW THE NEXT TOKEN", "CONTEXT GROWS", "HOW DOES THE CODE GET IN",
+    "THE MODEL REQUESTS", "THE EXECUTION LAYER", "WHAT IF THE FIRST OUTPUT", "TASK COMPLETE<br",
+  ]) {
+    assert.doesNotMatch(sceneSource, new RegExp(oldCopy));
+  }
+  assert.match(sceneSource, /ACCESS <em>≠<\/em> CONTEXT/);
+  assert.match(sceneSource, /REQUEST <em>≠<\/em> EXECUTION/);
+  assert.match(sceneSource, /MODEL CONTEXT ≠ ENTIRE AGENT STATE/);
+  assert.match(sceneSource, /The model predicts\./);
+  assert.match(sceneSource, /The system turns predictions into actions\./);
+  assert.match(contentSource, /"03": "다음 Token은 어떻게 결정될까\?"/);
+  assert.match(contentSource, /title: presentationTitles\[meta\.number\]/);
 });
 
 test("uses a complete uncropped A1 artwork without competing copy", async () => {

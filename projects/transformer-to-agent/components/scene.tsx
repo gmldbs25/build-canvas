@@ -117,7 +117,7 @@ function IntroScene() {
         <h1>LLM <span>to</span><br />AGENT</h1>
         <p className="intro-subtitle">다음 Token 예측에서<br />Coding Agent가 되기까지</p>
         <p className="intro-question">
-          How does a next-token model participate in a system<br />that reads code, edits files, and runs tests?
+          다음 Token 예측 Model은 어떻게 코드를 읽고,<br />파일을 수정하고 테스트하는 System에 참여할까?
         </p>
       </div>
     </section>
@@ -130,15 +130,15 @@ function IncidentScene() {
   return (
     <section className="scene scene-flow scene-incident">
       <SceneHeading
-        label="01 · FROM INCIDENT TO AGENT"
-        title={<>A production error becomes<br /><em>an Agent workflow.</em></>}
+        label="01 · INCIDENT → AGENT"
+        title={<>운영 장애에서<br /><em>Agent Workflow까지</em></>}
       />
 
       <div className="incident-stage">
         <Panel label="APPLICATION" className="incident-application reveal" >
           <div className="application-toolbar"><i /><span>production · /users/42</span></div>
-          <div className="application-normal"><b>200</b><span>Application healthy</span></div>
-          <div className="application-error"><b>ERROR</b><span>Request failed</span></div>
+          <div className="application-normal"><b>200</b><span>Application 정상</span></div>
+          <div className="application-error"><b>ERROR</b><span>요청 실패</span></div>
         </Panel>
 
         <Panel label="LOGS / STACK TRACE" className="incident-stack reveal">
@@ -177,7 +177,7 @@ function IncidentScene() {
             <strong>{step}</strong>
           </div>
         ))}
-        <span className="workflow-focus">FOCUS NEXT → LLM</span>
+        <span className="workflow-focus">NEXT FOCUS → LLM</span>
       </div>
     </section>
   );
@@ -206,8 +206,8 @@ function FocusLlmScene() {
 
       <SceneHeading
         align="center"
-        label="02 · FOCUS ON THE LLM"
-        title={<>WHAT DOES THE LLM<br /><em>ACTUALLY DO?</em></>}
+        label="02 · LLM"
+        title={<>LLM은 실제로<br /><em>무엇을 할까?</em></>}
         note="주변 시스템을 잠시 치우고 Model 자체만 본다."
       />
     </section>
@@ -225,9 +225,9 @@ function NextTokenScene() {
   return (
     <section className="scene scene-flow scene-next-token">
       <SceneHeading
-        label="03 · NEXT TOKEN CALCULATION"
-        title={<>HOW THE NEXT TOKEN<br /><em>IS CHOSEN</em></>}
-        note="Conceptual tokenization and illustrative values"
+        label="03 · NEXT TOKEN"
+        title={<>다음 Token은 어떻게<br /><em>결정될까?</em></>}
+        note="개념적인 Token 분할과 예시 값을 사용한다."
       />
 
       <div className="token-calculation">
@@ -245,7 +245,7 @@ function NextTokenScene() {
 
         <Panel label="MODEL CALCULATION" className="token-model stage-card">
           <strong>CONTEXT<br />REPRESENTATION</strong>
-          <span>current sequence → next position</span>
+          <span>현재 Sequence → 다음 위치</span>
         </Panel>
 
         <FlowArrow />
@@ -264,7 +264,7 @@ function NextTokenScene() {
               <b>{probability}</b>
             </div>
           ))}
-          <small>Illustrative scores and probabilities</small>
+          <small>예시 점수와 확률</small>
         </div>
 
         <FlowArrow />
@@ -289,9 +289,9 @@ function GenerationScene() {
   return (
     <section className="scene scene-flow scene-generation">
       <SceneHeading
-        label="04 · AUTOREGRESSIVE GENERATION"
-        title={<>PREDICT → APPEND<br /><em>→ REPEAT</em></>}
-        note="One chosen Token becomes part of the next sequence."
+        label="04 · GENERATION"
+        title={<>Token 생성은<br /><em>반복이다</em></>}
+        note="선택된 Token은 다음 Sequence의 일부가 된다."
       />
 
       <div className="generation-main">
@@ -305,7 +305,7 @@ function GenerationScene() {
           </div>
           <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
         </div>
-        <div className="generation-thesis">GENERATION IS REPETITION</div>
+        <div className="generation-thesis">PREDICT → APPEND → REPEAT</div>
       </div>
 
       <div className="scene-footer generation-cycles">
@@ -328,9 +328,9 @@ function ContextGrowthScene() {
   return (
     <section className="scene scene-flow scene-context-growth">
       <SceneHeading
-        label="05 · SUCCESSIVE MODEL CALLS"
-        title={<>CONTEXT GROWS<br /><em>WITH THE TASK</em></>}
-        note="Richer snapshots—not one Prompt growing forever."
+        label="05 · MODEL CONTEXT"
+        title={<>작업이 진행되며<br /><em>Context도 달라진다</em></>}
+        note="하나의 Prompt가 계속 커지는 것이 아니라, Model Call마다 Context가 달라질 수 있다."
       />
 
       <div className="context-growth-stage">
@@ -342,7 +342,7 @@ function ContextGrowthScene() {
             { label: "ERROR LOG", value: "NullPointerException · UserMapper.java:42" },
           ]}
         />
-        <div className="task-progress-arrow"><span>TASK PROGRESSES</span><i>→</i></div>
+        <div className="task-progress-arrow"><span>작업 진행</span><i>→</i></div>
         <ContextSnapshot
           label="MODEL CONTEXT #2"
           meta="LATER CALL · SELECTED SNAPSHOT"
@@ -361,7 +361,7 @@ function ContextGrowthScene() {
         <div className="context-growth-guardrail">
           SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
         </div>
-        <h3 className="context-growth-question">HOW DID THE NEW INFORMATION GET HERE?</h3>
+        <h3 className="context-growth-question">새로운 정보는 어떻게 Context에 들어왔을까?</h3>
       </div>
     </section>
   );
@@ -380,14 +380,14 @@ function EvidenceContextScene() {
   return (
     <section className="scene scene-flow scene-evidence-context">
       <SceneHeading
-        label="06 · LONG CONTEXT · CONCEPTUAL VIEW"
-        title={<>EVIDENCE ACROSS<br /><em>THE CONTEXT</em></>}
-        note="Distant relevant blocks can jointly influence the current calculation."
+        label="06 · LONG CONTEXT"
+        title={<>멀리 떨어진 정보도<br /><em>같은 판단에 영향을 준다</em></>}
+        note="Context 안의 관련 정보를 함께 활용한다."
       />
 
       <div className="evidence-stage">
         <div className="long-context-window">
-          <header><Eyebrow>CURRENT MODEL CONTEXT</Eyebrow><span>SCROLL MOTION = PRESENTATION METAPHOR</span></header>
+          <header><Eyebrow>CURRENT MODEL CONTEXT</Eyebrow><span>SCROLL MOTION = 표현을 위한 비유</span></header>
           <div className="long-context-track">
             {evidenceBlocks.map(([label, value], index) => (
               <div className={[1, 2, 4].includes(index) ? "evidence-block evidence-relevant" : "evidence-block"} style={{ "--i": index } as CSSProperties} key={label}>
@@ -411,7 +411,7 @@ function AccessContextScene() {
       <SceneHeading
         label="07 · REPOSITORY ACCESS"
         title={<>ACCESS <em>≠</em> CONTEXT</>}
-        note="Capability to retrieve is not the same as information in this Model Call."
+        note="가져올 수 있는 정보와 현재 Model Call에 들어온 정보는 다르다."
       />
 
       <div className="access-stage">
@@ -421,13 +421,13 @@ function AccessContextScene() {
               <i className={[9, 17, 31].includes(index) ? "repo-file repo-file-selected" : "repo-file"} key={index} />
             ))}
           </div>
-          <strong>THOUSANDS OF FILES</strong>
+          <strong>수천 개의 파일</strong>
         </Panel>
 
         <div className="access-not-equal">
           <div className="wrong-model"><span>ENTIRE REPO</span><i>→</i></div>
           <strong>≠</strong>
-          <span>ONLY RELEVANT PIECES</span>
+          <span>관련 부분만</span>
         </div>
 
         <ContextSnapshot
@@ -442,7 +442,7 @@ function AccessContextScene() {
         />
       </div>
 
-      <h3 className="scene-footer access-question">HOW DOES THE CODE GET IN?</h3>
+      <h3 className="scene-footer access-question">그럼 코드는 어떻게 Context에 들어올까?</h3>
     </section>
   );
 }
@@ -451,9 +451,9 @@ function ModelRequestsScene() {
   return (
     <section className="scene scene-flow scene-model-requests">
       <SceneHeading
-        label="08 · MODEL → REQUEST"
-        title={<>THE MODEL<br /><em>REQUESTS</em></>}
-        note="A request describes an action. It does not perform it."
+        label="08 · MODEL REQUEST"
+        title={<>필요한 행동은<br /><em>Model이 요청한다</em></>}
+        note="Request는 행동을 설명할 뿐, 직접 실행하지 않는다."
       />
 
       <div className="request-stage">
@@ -474,9 +474,9 @@ function ModelRequestsScene() {
         <div className="execution-gate">
           <Eyebrow>EXECUTION LAYER</Eyebrow>
           <div className="request-card"><span>READ</span><strong>UserMapper.java</strong></div>
-          <small>REQUEST RECEIVED · NOT YET EXECUTED</small>
+          <small>REQUEST 수신 · 아직 실행 전</small>
         </div>
-        <Panel label="ENVIRONMENT" className="request-repository"><strong>REPOSITORY</strong><span>not read yet</span></Panel>
+        <Panel label="ENVIRONMENT" className="request-repository"><strong>REPOSITORY</strong><span>아직 읽지 않음</span></Panel>
       </div>
 
       <div className="scene-footer request-thesis">REQUEST <em>≠</em> EXECUTION</div>
@@ -488,9 +488,9 @@ function ExecutionActsScene() {
   return (
     <section className="scene scene-flow scene-execution-acts">
       <SceneHeading
-        label="09 · EXTERNAL ACTION"
-        title={<>THE EXECUTION LAYER<br /><em>ACTS</em></>}
-        note="A conceptual responsibility—not a universal component name."
+        label="09 · EXECUTION"
+        title={<>실제 실행은<br /><em>Execution Layer가 맡는다</em></>}
+        note="보편적인 구성 요소 이름이 아니라, 개념적인 책임을 뜻한다."
       />
 
       <div className="execution-stage">
@@ -503,7 +503,7 @@ function ExecutionActsScene() {
           <span>REQUEST ↓</span>
           <div className="execution-layer-box">
             <Eyebrow>EXECUTION LAYER</Eyebrow>
-            <strong>CONNECT REQUEST<br />TO CAPABILITY</strong>
+            <strong>REQUEST를 실행 기능에<br />연결한다</strong>
           </div>
           <span>↓ FILE READ</span>
         </div>
@@ -523,7 +523,7 @@ function ExecutionActsScene() {
         <div className="execution-result">
           <Eyebrow>TOOL RESULT / AGENT STATE</Eyebrow>
           <code>user.getProfile().getDisplayName()</code>
-          <span>compact relevant result returned</span>
+          <span>관련 Result를 간결하게 반환</span>
         </div>
       </div>
     </section>
@@ -534,16 +534,16 @@ function ResultContextScene() {
   return (
     <section className="scene scene-flow scene-result-context">
       <SceneHeading
-        label="10 · LATER MODEL CALL"
-        title={<>NEW RESULT →<br /><em>NEXT MODEL CONTEXT</em></>}
-        note="The returned result can be selected, summarized, or compressed."
+        label="10 · MODEL CONTEXT"
+        title={<>Result는 다음<br /><em>Context에 반영될 수 있다</em></>}
+        note="반환된 Result는 선별하거나 요약·압축할 수 있다."
       />
 
       <div className="result-context-stage">
         <Panel label="RETURNED RESULT" className="raw-result-card">
           <strong>UserMapper.java</strong>
           <code>… user.getProfile().getDisplayName() …</code>
-          <span>longer raw result may exist</span>
+          <span>더 긴 원본 Result가 있을 수 있음</span>
         </Panel>
 
         <div className="context-construction">
@@ -564,11 +564,11 @@ function ResultContextScene() {
           ]}
         />
 
-        <FlowArrow label="READY FOR A LATER CALL" />
+        <FlowArrow label="다음 MODEL CALL 준비" />
         <ModelNode label="MODEL" className="model-not-run" />
       </div>
 
-      <p className="scene-footer result-context-guardrail">NOT THE ENTIRE TOOL RESULT · NOT THE ENTIRE AGENT STATE · MODEL NOT RUN YET</p>
+      <p className="scene-footer result-context-guardrail">MODEL CONTEXT ≠ ENTIRE AGENT STATE · TOOL RESULT 전체 아님 · MODEL 실행 전</p>
     </section>
   );
 }
@@ -578,8 +578,8 @@ function OnePassScene() {
     <section className="scene scene-flow scene-one-pass">
       <SceneHeading
         align="center"
-        label="11 · THE QUESTION BEFORE THE LOOP"
-        title={<>WHAT IF THE FIRST OUTPUT<br /><em>ISN&apos;T THE FINAL ANSWER?</em></>}
+        label="11 · FIRST OUTPUT"
+        title={<>첫 출력이<br /><em>최종 답이 아니라면?</em></>}
       />
 
       <div className="one-pass-comparison">
@@ -596,11 +596,11 @@ function OnePassScene() {
               </div>
             ))}
           </div>
-          <p>First output = NEXT ACTION / MORE CONTEXT REQUEST</p>
+          <p>첫 출력 = NEXT ACTION / 추가 CONTEXT REQUEST</p>
         </div>
       </div>
 
-      <div className="scene-footer now-what"><span>NEXT CONTEXT IS READY</span><strong>NOW WHAT?</strong></div>
+      <div className="scene-footer now-what"><span>NEXT CONTEXT 준비 완료</span><strong>그다음은?</strong></div>
     </section>
   );
 }
@@ -611,8 +611,8 @@ function AgentLoopScene() {
   return (
     <section className="scene scene-flow scene-agent-loop">
       <SceneHeading
-        label="12 · THE AGENT LOOP IN MOTION"
-        title={<>DECIDE → ACT → OBSERVE<br /><em>→ UPDATE → DECIDE AGAIN</em></>}
+        label="12 · AGENT LOOP"
+        title={<>이 반복이<br /><em>Agent Loop다</em></>}
       />
 
       <div className="agent-loop-stage">
@@ -623,7 +623,7 @@ function AgentLoopScene() {
               {index < loopStages.length - 1 && <b>↓</b>}
             </div>
           ))}
-          <div className="loop-return" aria-hidden="true"><span>DIFFERENT NEXT DECISION</span><i /><b>↖</b></div>
+          <div className="loop-return" aria-hidden="true"><span>다음 판단은 달라진다</span><i /><b>↖</b></div>
         </div>
 
         <div className="loop-context-state">
@@ -631,10 +631,10 @@ function AgentLoopScene() {
             label="CURRENT / NEXT MODEL CONTEXT"
             meta="CHANGING STATE"
             items={[
-              { label: "USER REQUEST", value: "Fix this NPE." },
+              { label: "USER REQUEST", value: "이 NPE를 수정해줘." },
               { label: "ERROR LOG", value: "NullPointerException · line 42" },
               { label: "+ SOURCE RESULT", value: "UserMapper.java", accent: true },
-              { label: "+ RELATED PATH", value: "new evidence", accent: true },
+              { label: "+ RELATED PATH", value: "새로운 근거", accent: true },
             ]}
           />
           <div className="iteration-cards">
@@ -642,11 +642,11 @@ function AgentLoopScene() {
             <i>→</i>
             <div><span>ITERATION 02</span><strong>INSPECT RELATED PATH</strong></div>
           </div>
-          <p>NEW RESULT → CHANGED STATE → DIFFERENT NEXT DECISION</p>
+          <p>NEW RESULT → 상태 변화 → 다음 판단 변화</p>
         </div>
       </div>
 
-      <div className="scene-footer agent-loop-thesis">THIS IS THE AGENT LOOP</div>
+      <div className="scene-footer agent-loop-thesis">DECIDE → ACT → OBSERVE → UPDATE → DECIDE AGAIN</div>
     </section>
   );
 }
@@ -656,8 +656,8 @@ const npeIterations = [
     number: "01",
     context: ["USER REQUEST", "ERROR LOG", "UserMapper.java:42"],
     summaries: [
-      ["OBSERVATION", "Stack Trace points to UserMapper.java:42"],
-      ["NEXT ACTION", "Locate relevant implementation"],
+      ["OBSERVATION", "Stack Trace는 UserMapper.java:42를 가리킨다."],
+      ["NEXT ACTION", "관련 구현을 찾는다."],
     ],
     output: "SEARCH CODE · UserMapper",
   },
@@ -665,9 +665,9 @@ const npeIterations = [
     number: "02",
     context: ["USER REQUEST", "ERROR LOG", "SOURCE · user.getProfile().getDisplayName()"],
     summaries: [
-      ["OBSERVATION", "The failing expression contains multiple dereferences."],
-      ["CURRENT ASSESSMENT", "Current evidence does not prove which value is null."],
-      ["NEXT ACTION", "Inspect related data path."],
+      ["OBSERVATION", "실패한 식에는 여러 단계의 참조가 있다."],
+      ["CURRENT ASSESSMENT", "현재 근거만으로는 어떤 값이 null인지 확정할 수 없다."],
+      ["NEXT ACTION", "관련 데이터 경로를 확인한다."],
     ],
     output: "INSPECT RELATED PATH",
   },
@@ -675,9 +675,9 @@ const npeIterations = [
     number: "03",
     context: ["USER REQUEST", "ERROR LOG", "SOURCE CODE", "REPOSITORY EVIDENCE · profile may be absent"],
     summaries: [
-      ["OBSERVATION", "Existing user data can omit a profile."],
-      ["WORKING HYPOTHESIS", "profile == null is the likely cause"],
-      ["NEXT ACTION", "Patch null handling, then validate."],
+      ["OBSERVATION", "기존 사용자 데이터에는 profile이 없을 수 있다."],
+      ["WORKING HYPOTHESIS", "profile == null이 원인일 가능성이 높다."],
+      ["NEXT ACTION", "null 처리를 Patch한 뒤 검증한다."],
     ],
     output: "PATCH NULL HANDLING",
   },
@@ -687,9 +687,9 @@ function NpeRunScene() {
   return (
     <section className="scene scene-flow scene-npe-run">
       <SceneHeading
-        label="13 · REAL NPE AGENT RUN"
-        title={<>THE LOOP CHANGES<br /><em>THE STATE EACH TIME</em></>}
-        note="Observable summaries only—not hidden reasoning."
+        label="13 · NPE AGENT RUN"
+        title={<>실제 NPE를 Agent Loop로<br /><em>따라가보자</em></>}
+        note="숨겨진 추론이 아니라, 관찰 가능한 요약만 보여준다."
       />
 
       <div className="npe-run-stage">
@@ -744,9 +744,9 @@ function PatchReviseScene() {
   return (
     <section className="scene scene-flow scene-patch-revise">
       <SceneHeading
-        label="14 · VALIDATION CHANGES THE NEXT ACTION"
-        title={<>PATCH. TEST.<br /><em>REVISE.</em></>}
-        note="Failure is new evidence—not retraining."
+        label="14 · VALIDATION"
+        title={<>실패가 다음<br /><em>수정을 만든다</em></>}
+        note="실패는 재학습이 아니라 새로운 근거다."
       />
 
       <div className="revision-main">
@@ -766,14 +766,14 @@ function PatchReviseScene() {
           <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
             <strong>FAIL</strong>
             <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
-            <span>FAILURE IS FEEDBACK</span>
+            <span>실패도 다음 판단을 위한 Feedback이다</span>
           </Panel>
 
           <div className="revision-summary">
             <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
-            <div><span>OBSERVATION</span><strong>NPE is gone.</strong></div>
-            <div><span>NEW EVIDENCE</span><strong>Returning null breaks expected behavior.</strong></div>
-            <div><span>NEXT ACTION</span><strong>Revise Patch.</strong></div>
+            <div><span>OBSERVATION</span><strong>NPE는 해결됐다.</strong></div>
+            <div><span>NEW EVIDENCE</span><strong>null 반환은 기대 동작을 깨뜨린다.</strong></div>
+            <div><span>NEXT ACTION</span><strong>Patch를 다시 고친다.</strong></div>
           </div>
 
           <Panel label="PATCH #2" className="second-patch-card">
@@ -791,9 +791,9 @@ function TaskCompleteScene() {
   return (
     <section className="scene scene-flow scene-task-complete">
       <SceneHeading
-        label="15 · VALID STOP CONDITION"
-        title={<>GOAL ACHIEVED<br /><em>→ STOP</em></>}
-        note="This result satisfies the objective, so no return path activates."
+        label="15 · STOP CONDITION"
+        title={<>검증이 끝나면<br /><em>작업도 끝난다</em></>}
+        note="이 결과가 목표를 충족해, 다시 Model로 돌아가지 않는다."
       />
 
       <div className="completion-stage">
@@ -801,9 +801,9 @@ function TaskCompleteScene() {
           <Eyebrow>AGENT RUN</Eyebrow>
           <h3>TASK COMPLETE</h3>
           <ul>
-            <li><i>✓</i><span>NPE resolved</span></li>
-            <li><i>✓</i><span>Patch verified</span></li>
-            <li><i>✓</i><span>Tests passed</span></li>
+            <li><i>✓</i><span>NPE 해결</span></li>
+            <li><i>✓</i><span>Patch 검증</span></li>
+            <li><i>✓</i><span>Test 통과</span></li>
           </ul>
         </div>
 
@@ -815,7 +815,7 @@ function TaskCompleteScene() {
               {index < completionSteps.length - 1 && <b>→</b>}
             </div>
           ))}
-          <p>PASS → COMPLETE <span>·</span> NO RETURN TO MODEL</p>
+          <p>PASS → COMPLETE <span>·</span> MODEL로 돌아가지 않음</p>
         </div>
       </div>
     </section>
@@ -823,23 +823,23 @@ function TaskCompleteScene() {
 }
 
 const agentParts = [
-  ["CONTEXT", "What does the Model see?"],
-  ["TOOLS", "Available capabilities"],
-  ["EXECUTION", "Request → action"],
-  ["ENVIRONMENT", "Repository / workspace"],
-  ["CONTROL", "What is allowed?"],
-  ["VALIDATION", "Is the result correct?"],
-  ["RESULT / FEEDBACK", "External evidence"],
-  ["LOOP", "Decide again"],
+  ["CONTEXT", "Model에 제공되는 정보"],
+  ["TOOLS", "사용할 수 있는 기능"],
+  ["EXECUTION", "Request를 행동으로 전환"],
+  ["ENVIRONMENT", "Repository / Workspace"],
+  ["CONTROL", "허용된 행동의 범위"],
+  ["VALIDATION", "Result가 올바른지 검증"],
+  ["RESULT / FEEDBACK", "외부에서 얻은 근거"],
+  ["LOOP", "다시 판단"],
 ] as const;
 
 function AgentSystemScene() {
   return (
     <section className="scene scene-split-flow scene-agent-system">
       <SceneHeading
-        label="16 · STRUCTURAL INTEGRATION"
-        title={<>AN AGENT<br /><em>IS A SYSTEM</em></>}
-        note="Previously separated responsibilities assemble around the Model."
+        label="16 · AGENT SYSTEM"
+        title={<>구성 요소가<br /><em>Agent를 만든다</em></>}
+        note="나뉘어 있던 책임이 Model 주변에서 하나의 System을 이룬다."
       />
 
       <div className="agent-system-stage">

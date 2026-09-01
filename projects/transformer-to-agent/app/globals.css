@@ -367,6 +367,7 @@ code, pre { font-family: var(--mono); }
 /* 09 — Execution acts */
 .scene-execution-acts { color: #edf2ee; background: #142019; }
 .scene-execution-acts .scene-heading h2 { font-size: clamp(36px, 3.8vw, 64px); }
+.scene-execution-acts .scene-heading { max-width: 700px; }
 .scene-execution-acts .scene-heading h2 em { color: #9bcbaa; }
 .scene-execution-acts .scene-heading p, .scene-execution-acts .eyebrow { color: #8fa096; }
 .execution-stage { position: relative; display: grid; min-height: 0; grid-template-columns: 0.72fr 0.86fr 0.98fr 0.86fr; gap: clamp(12px, 1.3vw, 22px); align-items: center; }
@@ -391,7 +392,7 @@ code, pre { font-family: var(--mono); }
 
 /* 10 — Result to next context */
 .scene-result-context { background: #eef1ec; }
-.scene-result-context .scene-heading { max-width: 560px; }
+.scene-result-context .scene-heading { max-width: 650px; }
 .scene-result-context .scene-heading h2 { font-size: clamp(36px, 3.8vw, 64px); }
 .scene-result-context .scene-heading h2 em { color: var(--green); }
 .result-context-stage { display: grid; min-height: 0; grid-template-columns: minmax(180px, 0.72fr) minmax(140px, 0.46fr) minmax(250px, 1fr) 28px minmax(145px, 0.58fr); gap: clamp(8px, 0.85vw, 13px); align-items: center; }
