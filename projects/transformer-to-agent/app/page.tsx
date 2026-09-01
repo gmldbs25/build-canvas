@@ -7,6 +7,8 @@ import { OverviewOverlay } from "@/components/overview-overlay";
 import { Scene } from "@/components/scene";
 import { scenes, TOTAL_SCENES } from "@/content/pages";
 
+const DETAIL_SCROLL_STEP = 64;
+
 function isEditingTarget(target: EventTarget | null) {
   if (!(target instanceof Element)) return false;
 
@@ -42,6 +44,7 @@ export default function Home() {
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [ready, setReady] = useState(false);
   const detailsButtonRef = useRef<HTMLButtonElement>(null);
+  const detailsScrollRef = useRef<HTMLDivElement>(null);
   const scene = scenes[index];
   const isDarkScene = [
     "incident", "model-input", "repository-context", "boundary", "execution-layer",
@@ -163,6 +166,16 @@ export default function Home() {
         toggleDetails();
         return;
       }
+      if (!isEditing && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        event.preventDefault();
+        if (detailsOpen) {
+          detailsScrollRef.current?.scrollBy({
+            top: event.key === "ArrowDown" ? DETAIL_SCROLL_STEP : -DETAIL_SCROLL_STEP,
+            behavior: "auto",
+          });
+        }
+        return;
+      }
       if (isEditing || (!detailsOpen && isInteractive && !isSceneNavigationControl)) return;
       if (event.key === "ArrowLeft" && canGoBack) {
         event.preventDefault();
@@ -237,7 +250,12 @@ export default function Home() {
         </button>
       </nav>
 
-      <DetailsDrawer open={detailsOpen} scene={scene} onClose={closeDetails} />
+      <DetailsDrawer
+        open={detailsOpen}
+        scene={scene}
+        scrollRef={detailsScrollRef}
+        onClose={closeDetails}
+      />
       <OverviewOverlay
         open={overviewOpen}
         currentIndex={index}

@@ -1,41 +1,22 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { X } from "lucide-react";
 import type { SceneDefinition } from "@/content/pages";
 
 type DetailsDrawerProps = {
   open: boolean;
   scene: SceneDefinition;
+  scrollRef: RefObject<HTMLDivElement | null>;
   onClose: () => void;
 };
 
-function handleVerticalScroll(event: KeyboardEvent<HTMLDivElement>) {
-  const target = event.target as HTMLElement;
-  if (target.closest("input, textarea, [contenteditable]:not([contenteditable=\"false\"]), [role=\"textbox\"], [data-code-editor]")) {
-    return;
-  }
-
-  const pageDistance = Math.max(1, Math.round(event.currentTarget.clientHeight * 0.85));
-  const distance = {
-    ArrowDown: 48,
-    ArrowUp: -48,
-    PageDown: pageDistance,
-    PageUp: -pageDistance,
-  }[event.key];
-
-  if (distance === undefined) return;
-  event.preventDefault();
-  event.currentTarget.scrollTop += distance;
-}
-
-export function DetailsDrawer({ open, scene, onClose }: DetailsDrawerProps) {
+export function DetailsDrawer({ open, scene, scrollRef, onClose }: DetailsDrawerProps) {
   const drawerRef = useRef<HTMLElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [open, scene.id]);
+  }, [open, scene.id, scrollRef]);
 
   useEffect(() => {
     if (!open && drawerRef.current?.contains(document.activeElement)) {
@@ -74,7 +55,6 @@ export function DetailsDrawer({ open, scene, onClose }: DetailsDrawerProps) {
           ref={scrollRef}
           className="details-scroll"
           tabIndex={open ? 0 : -1}
-          onKeyDown={handleVerticalScroll}
         >
           {scene.details?.map((section, sectionIndex) => (
             <section className="details-section" key={`${section.title}-${sectionIndex}`}>
