@@ -128,7 +128,7 @@ const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH",
 
 function IncidentScene() {
   return (
-    <section className="scene scene-incident">
+    <section className="scene scene-flow scene-incident">
       <SceneHeading
         label="01 · FROM INCIDENT TO AGENT"
         title={<>A production error becomes<br /><em>an Agent workflow.</em></>}
@@ -166,7 +166,7 @@ function IncidentScene() {
         </Panel>
       </div>
 
-      <div className="incident-workflow" aria-label="Agent workflow">
+      <div className="scene-footer incident-workflow" aria-label="Agent workflow">
         {incidentSteps.map((step, index) => (
           <div
             className={index === incidentSteps.length - 1 ? "workflow-step workflow-step-final" : "workflow-step"}
@@ -186,20 +186,22 @@ function IncidentScene() {
 function FocusLlmScene() {
   const parts = ["CONTEXT", "TOOLS", "EXECUTION", "ENVIRONMENT"];
   return (
-    <section className="scene scene-focus-llm">
-      <div className="agent-dissolve" aria-hidden="true">
-        {parts.map((part, index) => (
-          <span className={`dissolve-part dissolve-part-${index + 1}`} key={part}>{part}</span>
-        ))}
-        <div className="dissolve-boundary">AGENT</div>
-      </div>
+    <section className="scene scene-focus-flow scene-focus-llm">
+      <div className="focus-main">
+        <div className="agent-dissolve" aria-hidden="true">
+          {parts.map((part, index) => (
+            <span className={`dissolve-part dissolve-part-${index + 1}`} key={part}>{part}</span>
+          ))}
+          <div className="dissolve-boundary">AGENT</div>
+        </div>
 
-      <div className="focus-pipeline">
-        <Panel label="INPUT" className="focus-input"><code>current context</code></Panel>
-        <FlowArrow />
-        <ModelNode label="LLM" className="focus-model" />
-        <FlowArrow />
-        <Panel label="OUTPUT" className="focus-output"><strong>NEXT TOKEN ?</strong></Panel>
+        <div className="focus-pipeline">
+          <Panel label="INPUT" className="focus-input"><code>current context</code></Panel>
+          <FlowArrow />
+          <ModelNode label="LLM" className="focus-model" />
+          <FlowArrow />
+          <Panel label="OUTPUT" className="focus-output"><strong>NEXT TOKEN ?</strong></Panel>
+        </div>
       </div>
 
       <SceneHeading
@@ -221,7 +223,7 @@ const tokenCandidates = [
 
 function NextTokenScene() {
   return (
-    <section className="scene scene-next-token">
+    <section className="scene scene-flow scene-next-token">
       <SceneHeading
         label="03 · NEXT TOKEN CALCULATION"
         title={<>HOW THE NEXT TOKEN<br /><em>IS CHOSEN</em></>}
@@ -285,25 +287,28 @@ const generationCycles = [
 
 function GenerationScene() {
   return (
-    <section className="scene scene-generation">
+    <section className="scene scene-flow scene-generation">
       <SceneHeading
         label="04 · AUTOREGRESSIVE GENERATION"
         title={<>PREDICT → APPEND<br /><em>→ REPEAT</em></>}
         note="One chosen Token becomes part of the next sequence."
       />
 
-      <div className="generation-loop" aria-label="Context to next-token append loop">
-        <div className="generation-loop-row">
-          <Panel label="CONTEXT" className="generation-node"><strong>CURRENT SEQUENCE</strong></Panel>
-          <FlowArrow />
-          <ModelNode label="LLM" />
-          <FlowArrow />
-          <Panel label="OUTPUT" className="generation-node"><strong>NEXT TOKEN</strong></Panel>
+      <div className="generation-main">
+        <div className="generation-loop" aria-label="Context to next-token append loop">
+          <div className="generation-loop-row">
+            <Panel label="CONTEXT" className="generation-node"><strong>CURRENT SEQUENCE</strong></Panel>
+            <FlowArrow />
+            <ModelNode label="LLM" />
+            <FlowArrow />
+            <Panel label="OUTPUT" className="generation-node"><strong>NEXT TOKEN</strong></Panel>
+          </div>
+          <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
         </div>
-        <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
+        <div className="generation-thesis">GENERATION IS REPETITION</div>
       </div>
 
-      <div className="generation-cycles">
+      <div className="scene-footer generation-cycles">
         {generationCycles.map((cycle, index) => (
           <div className="generation-cycle" style={{ "--i": index } as CSSProperties} key={cycle.number}>
             <i>{cycle.number}</i>
@@ -315,14 +320,13 @@ function GenerationScene() {
         ))}
       </div>
 
-      <div className="generation-thesis">GENERATION IS REPETITION</div>
     </section>
   );
 }
 
 function ContextGrowthScene() {
   return (
-    <section className="scene scene-context-growth">
+    <section className="scene scene-flow scene-context-growth">
       <SceneHeading
         label="05 · SUCCESSIVE MODEL CALLS"
         title={<>CONTEXT GROWS<br /><em>WITH THE TASK</em></>}
@@ -353,10 +357,12 @@ function ContextGrowthScene() {
         />
       </div>
 
-      <div className="context-growth-guardrail">
-        SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
+      <div className="scene-footer context-growth-footer">
+        <div className="context-growth-guardrail">
+          SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
+        </div>
+        <h3 className="context-growth-question">HOW DID THE NEW INFORMATION GET HERE?</h3>
       </div>
-      <h3 className="context-growth-question">HOW DID THE NEW INFORMATION GET HERE?</h3>
     </section>
   );
 }
@@ -372,7 +378,7 @@ const evidenceBlocks = [
 
 function EvidenceContextScene() {
   return (
-    <section className="scene scene-evidence-context">
+    <section className="scene scene-flow scene-evidence-context">
       <SceneHeading
         label="06 · LONG CONTEXT · CONCEPTUAL VIEW"
         title={<>EVIDENCE ACROSS<br /><em>THE CONTEXT</em></>}
@@ -394,14 +400,14 @@ function EvidenceContextScene() {
         <ModelNode label="MODEL" className="evidence-model" />
       </div>
 
-      <p className="evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
+      <p className="scene-footer evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
     </section>
   );
 }
 
 function AccessContextScene() {
   return (
-    <section className="scene scene-access-context">
+    <section className="scene scene-flow scene-access-context">
       <SceneHeading
         label="07 · REPOSITORY ACCESS"
         title={<>ACCESS <em>≠</em> CONTEXT</>}
@@ -436,14 +442,14 @@ function AccessContextScene() {
         />
       </div>
 
-      <h3 className="access-question">HOW DOES THE CODE GET IN?</h3>
+      <h3 className="scene-footer access-question">HOW DOES THE CODE GET IN?</h3>
     </section>
   );
 }
 
 function ModelRequestsScene() {
   return (
-    <section className="scene scene-model-requests">
+    <section className="scene scene-flow scene-model-requests">
       <SceneHeading
         label="08 · MODEL → REQUEST"
         title={<>THE MODEL<br /><em>REQUESTS</em></>}
@@ -473,14 +479,14 @@ function ModelRequestsScene() {
         <Panel label="ENVIRONMENT" className="request-repository"><strong>REPOSITORY</strong><span>not read yet</span></Panel>
       </div>
 
-      <div className="request-thesis">REQUEST <em>≠</em> EXECUTION</div>
+      <div className="scene-footer request-thesis">REQUEST <em>≠</em> EXECUTION</div>
     </section>
   );
 }
 
 function ExecutionActsScene() {
   return (
-    <section className="scene scene-execution-acts">
+    <section className="scene scene-flow scene-execution-acts">
       <SceneHeading
         label="09 · EXTERNAL ACTION"
         title={<>THE EXECUTION LAYER<br /><em>ACTS</em></>}
@@ -526,7 +532,7 @@ function ExecutionActsScene() {
 
 function ResultContextScene() {
   return (
-    <section className="scene scene-result-context">
+    <section className="scene scene-flow scene-result-context">
       <SceneHeading
         label="10 · LATER MODEL CALL"
         title={<>NEW RESULT →<br /><em>NEXT MODEL CONTEXT</em></>}
@@ -562,14 +568,14 @@ function ResultContextScene() {
         <ModelNode label="MODEL" className="model-not-run" />
       </div>
 
-      <p className="result-context-guardrail">NOT THE ENTIRE TOOL RESULT · NOT THE ENTIRE AGENT STATE · MODEL NOT RUN YET</p>
+      <p className="scene-footer result-context-guardrail">NOT THE ENTIRE TOOL RESULT · NOT THE ENTIRE AGENT STATE · MODEL NOT RUN YET</p>
     </section>
   );
 }
 
 function OnePassScene() {
   return (
-    <section className="scene scene-one-pass">
+    <section className="scene scene-flow scene-one-pass">
       <SceneHeading
         align="center"
         label="11 · THE QUESTION BEFORE THE LOOP"
@@ -594,7 +600,7 @@ function OnePassScene() {
         </div>
       </div>
 
-      <div className="now-what"><span>NEXT CONTEXT IS READY</span><strong>NOW WHAT?</strong></div>
+      <div className="scene-footer now-what"><span>NEXT CONTEXT IS READY</span><strong>NOW WHAT?</strong></div>
     </section>
   );
 }
@@ -603,7 +609,7 @@ const loopStages = ["MODEL", "REQUEST", "EXECUTION", "RESULT", "CONTEXT UPDATE"]
 
 function AgentLoopScene() {
   return (
-    <section className="scene scene-agent-loop">
+    <section className="scene scene-flow scene-agent-loop">
       <SceneHeading
         label="12 · THE AGENT LOOP IN MOTION"
         title={<>DECIDE → ACT → OBSERVE<br /><em>→ UPDATE → DECIDE AGAIN</em></>}
@@ -640,7 +646,7 @@ function AgentLoopScene() {
         </div>
       </div>
 
-      <div className="agent-loop-thesis">THIS IS THE AGENT LOOP</div>
+      <div className="scene-footer agent-loop-thesis">THIS IS THE AGENT LOOP</div>
     </section>
   );
 }
@@ -679,7 +685,7 @@ const npeIterations = [
 
 function NpeRunScene() {
   return (
-    <section className="scene scene-npe-run">
+    <section className="scene scene-flow scene-npe-run">
       <SceneHeading
         label="13 · REAL NPE AGENT RUN"
         title={<>THE LOOP CHANGES<br /><em>THE STATE EACH TIME</em></>}
@@ -736,42 +742,44 @@ const revisionSteps = ["PATCH #1", "NPE RESOLVED", "RUN EXISTING TEST", "FAIL", 
 
 function PatchReviseScene() {
   return (
-    <section className="scene scene-patch-revise">
+    <section className="scene scene-flow scene-patch-revise">
       <SceneHeading
         label="14 · VALIDATION CHANGES THE NEXT ACTION"
         title={<>PATCH. TEST.<br /><em>REVISE.</em></>}
         note="Failure is new evidence—not retraining."
       />
 
-      <div className="revision-timeline">
-        {revisionSteps.map((step, index) => (
-          <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
-            <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
-          </div>
-        ))}
-      </div>
-
-      <div className="revision-stage">
-        <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
-          <PatchCode />
-        </Panel>
-
-        <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
-          <strong>FAIL</strong>
-          <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
-          <span>FAILURE IS FEEDBACK</span>
-        </Panel>
-
-        <div className="revision-summary">
-          <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
-          <div><span>OBSERVATION</span><strong>NPE is gone.</strong></div>
-          <div><span>NEW EVIDENCE</span><strong>Returning null breaks expected behavior.</strong></div>
-          <div><span>NEXT ACTION</span><strong>Revise Patch.</strong></div>
+      <div className="revision-main">
+        <div className="revision-timeline">
+          {revisionSteps.map((step, index) => (
+            <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
+              <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
+            </div>
+          ))}
         </div>
 
-        <Panel label="PATCH #2" className="second-patch-card">
-          <PatchCode revised />
-        </Panel>
+        <div className="revision-stage">
+          <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
+            <PatchCode />
+          </Panel>
+
+          <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
+            <strong>FAIL</strong>
+            <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
+            <span>FAILURE IS FEEDBACK</span>
+          </Panel>
+
+          <div className="revision-summary">
+            <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
+            <div><span>OBSERVATION</span><strong>NPE is gone.</strong></div>
+            <div><span>NEW EVIDENCE</span><strong>Returning null breaks expected behavior.</strong></div>
+            <div><span>NEXT ACTION</span><strong>Revise Patch.</strong></div>
+          </div>
+
+          <Panel label="PATCH #2" className="second-patch-card">
+            <PatchCode revised />
+          </Panel>
+        </div>
       </div>
     </section>
   );
@@ -781,7 +789,7 @@ const completionSteps = ["PATCH #2", "RUN TESTS", "PASS", "VERIFY", "OBJECTIVE S
 
 function TaskCompleteScene() {
   return (
-    <section className="scene scene-task-complete">
+    <section className="scene scene-flow scene-task-complete">
       <SceneHeading
         label="15 · VALID STOP CONDITION"
         title={<>GOAL ACHIEVED<br /><em>→ STOP</em></>}
@@ -827,7 +835,7 @@ const agentParts = [
 
 function AgentSystemScene() {
   return (
-    <section className="scene scene-agent-system">
+    <section className="scene scene-split-flow scene-agent-system">
       <SceneHeading
         label="16 · STRUCTURAL INTEGRATION"
         title={<>AN AGENT<br /><em>IS A SYSTEM</em></>}
