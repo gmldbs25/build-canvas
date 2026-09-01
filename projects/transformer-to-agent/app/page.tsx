@@ -46,11 +46,6 @@ export default function Home() {
   const detailsButtonRef = useRef<HTMLButtonElement>(null);
   const detailsScrollRef = useRef<HTMLDivElement>(null);
   const scene = scenes[index];
-  const isDarkScene = [
-    "incident", "model-input", "repository-context", "boundary", "execution-layer",
-    "requests-executes", "result-returns", "agent-loop", "follow-npe", "failure-context",
-    "stop", "build-agent", "developer-questions", "incident-return", "synthesis",
-  ].includes(scene.id);
   const canGoBack = index > 0;
   const canGoForward = index < TOTAL_SCENES - 1;
   const sceneHasDetails = Boolean(scene.details?.length);
@@ -196,14 +191,14 @@ export default function Home() {
       data-motion-paused={detailsOpen || overviewOpen}
       data-ready={ready}
       data-act={scene.act ?? "artwork"}
-      data-tone={isDarkScene ? "dark" : "light"}
+      data-tone={scene.tone}
     >
       {scene.act !== null && (
         <div
           className="act-indicator"
-          aria-label={`ACT ${scene.act}, scene ${scene.actPosition}. 전체 ${TOTAL_SCENES}개 중 ${index + 1}번째`}
+          aria-label={`ACT ${scene.act}, scene ${scene.actPosition} of ${scene.actSize}. 전체 ${TOTAL_SCENES}개 중 ${index + 1}번째`}
         >
-          ACT {scene.act} <i /> {scene.actPosition}
+          ACT {scene.act} <i /> {scene.actPosition}/{scene.actSize}
           <span className="act-rail" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((act) => (
               <b key={act} data-state={act === scene.act ? "current" : act < scene.act! ? "done" : "upcoming"} />
@@ -228,15 +223,17 @@ export default function Home() {
 
       <div className="scene-viewport" aria-live="polite">
         <div className={`scene-transition scene-transition-${direction}`} key={scene.id}>
-          <Scene sceneId={scene.id} motionPaused={detailsOpen} />
+          <Scene sceneId={scene.id} motionPaused={detailsOpen || overviewOpen} />
         </div>
       </div>
 
-      <div className="scene-caption-chrome" aria-hidden="true">
-        <span>{scene.number}</span>
-        <strong>{scene.title}</strong>
-        <em>{index + 1} / {TOTAL_SCENES}</em>
-      </div>
+      {!scene.hideCaption && (
+        <div className="scene-caption-chrome" aria-hidden="true">
+          <span>{scene.number}</span>
+          <strong>{scene.title}</strong>
+          <em>{index + 1} / {TOTAL_SCENES}</em>
+        </div>
+      )}
       {scene.act === null && (
         <p className="sr-only">{`전체 ${TOTAL_SCENES}개 중 ${index + 1}번째 화면`}</p>
       )}

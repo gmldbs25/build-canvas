@@ -1,5 +1,6 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
+import { fileURLToPath } from "node:url";
 import hostingConfig from "./.openai/hosting.json";
 import { sites } from "./build/sites-vite-plugin";
 
@@ -15,6 +16,7 @@ const usePolling =
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 const pagesBasePath =
   process.env.PAGES_BASE_PATH ?? "/build-canvas/transformer-to-agent";
+const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
 
 const localBindingConfig = {
   main: "./worker/index.ts",
@@ -53,6 +55,7 @@ export default defineConfig(async () => {
     server: {
       host: "0.0.0.0",
       allowedHosts: ["terminal.local"],
+      fs: { allow: [repositoryRoot] },
       ...(usePolling
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),

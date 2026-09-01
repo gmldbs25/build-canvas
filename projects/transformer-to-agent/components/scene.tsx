@@ -1,131 +1,108 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { AgentArtwork } from "@/components/artwork";
-import { scenes } from "@/content/pages";
 
 type SceneProps = {
   sceneId: string;
   motionPaused: boolean;
 };
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
+type ContextItem = {
+  label: string;
+  value?: string;
+  accent?: boolean;
+};
+
+function Eyebrow({ children }: { children: ReactNode }) {
   return <span className="eyebrow">{children}</span>;
 }
 
-function ActLead({ sceneId }: { sceneId: string }) {
-  const scene = scenes.find((candidate) => candidate.id === sceneId);
-  if (!scene?.act || !scene.actTitle || !scene.actQuestion) return null;
-
+function SceneHeading({
+  label,
+  title,
+  note,
+  align = "left",
+}: {
+  label: string;
+  title: ReactNode;
+  note?: ReactNode;
+  align?: "left" | "center" | "right";
+}) {
   return (
-    <div className="act-lead">
-      <span>ACT {scene.act}</span>
-      <strong>{scene.actTitle}</strong>
-      <p>{scene.actQuestion}</p>
+    <header className={`scene-heading scene-heading-${align}`}>
+      <Eyebrow>{label}</Eyebrow>
+      <h2>{title}</h2>
+      {note && <p>{note}</p>}
+    </header>
+  );
+}
+
+function Panel({
+  label,
+  className = "",
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`scene-panel ${className}`.trim()}>
+      <Eyebrow>{label}</Eyebrow>
+      {children}
     </div>
   );
 }
 
-function JavaCode({ patched = false, corrected = false }: { patched?: boolean; corrected?: boolean }) {
+function FlowArrow({ label, className = "" }: { label?: string; className?: string }) {
   return (
-    <pre className="java-code" aria-label={corrected ? "수정 완료 코드" : patched ? "첫 번째 수정 코드" : "문제가 있는 Java 코드"}>
-      <code>
-        <span><i>39</i><b>public UserResponse</b> toResponse(User user) {'{'}</span>
-        {patched ? <span><i>40</i>  UserProfile profile = user.getProfile();</span> : <span><i>40</i>  return new UserResponse(</span>}
-        {patched && <span><i>41</i> </span>}
-        {patched && <span><i>42</i>  return new UserResponse(</span>}
-        <span><i>{patched ? "43" : "41"}</i>    user.getId(),</span>
-        {patched ? (
-          <>
-            <span className={corrected ? "code-success" : "code-risk"}><i>44</i>    profile != null</span>
-            <span className={corrected ? "code-success" : "code-risk"}><i>45</i>      ? profile.getDisplayName()</span>
-            <span className={corrected ? "code-success" : "code-risk"}><i>46</i>      : {corrected ? '"Unknown"' : "null"}</span>
-          </>
-        ) : (
-          <span className="code-error"><i>42</i>    user.getProfile().getDisplayName()</span>
-        )}
-        <span><i>{patched ? "47" : "43"}</i>  );</span>
-        <span><i>{patched ? "48" : "44"}</i>{'}'}</span>
-      </code>
-    </pre>
+    <div className={`flow-arrow ${className}`.trim()} aria-hidden="true">
+      {label && <span>{label}</span>}
+      <i />
+      <b>→</b>
+    </div>
   );
 }
 
-const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH", "TEST", "VERIFY"];
-
-// Observable workflow only — Tool Request, Tool Result and workspace state.
-// Never hidden reasoning. See the observable-state rule in the Work 3 specification.
-const observableWorkflow: { step: string; request: string; result: string }[] = [
-  { step: "READ LOG", request: "NPE LOG → CONTEXT", result: "UserMapper.java : 42" },
-  { step: "SEARCH CODE", request: "search_code(\"UserMapper\")", result: "2 file candidates" },
-  { step: "READ FILE", request: "read_file(\".../UserMapper.java\")", result: "line 42 in context" },
-  { step: "TRACE", request: "UPDATED CONTEXT", result: "log + file + test 계약" },
-  { step: "PATCH", request: "apply_patch(\"UserMapper.java\")", result: "workspace changed" },
-  { step: "TEST", request: "run_tests(\"UserMapperTest\")", result: "FAILED · expected \"Unknown\"" },
-  { step: "VERIFY", request: "—", result: "아직 충족되지 않음" },
-];
-
-function IncidentWorkspace({ mode = "mystery" }: { mode?: "mystery" | "follow" | "decoded" }) {
+function ContextSnapshot({
+  label,
+  meta,
+  items,
+  className = "",
+}: {
+  label: string;
+  meta?: string;
+  items: ContextItem[];
+  className?: string;
+}) {
   return (
-    <div className={`incident-workspace incident-mode-${mode}`}>
-      {mode === "mystery" ? (
-        <div className="incident-narrative">
-          <strong>운영 서버에서 NullPointerException이 발생했다.</strong>
-          <div>
-            <Eyebrow>USER REQUEST</Eyebrow>
-            <p>원인을 확인하고 수정한 뒤 테스트까지 검증해줘.</p>
-          </div>
-        </div>
-      ) : null}
-      <div className="stack-focus">
-        <Eyebrow>PRODUCTION LOG</Eyebrow>
-        <strong>NullPointerException</strong>
-        <span>UserMapper.java : 42</span>
-      </div>
-      <div className="incident-code"><JavaCode /></div>
-      <div className="incident-trace" aria-label="NPE 처리 과정">
-        {incidentSteps.map((step, index) => (
-          <div className="incident-trace-step" style={{ "--step": index } as React.CSSProperties} key={step}>
-            <i><b /></i>
-            <span>{step}</span>
-            {mode === "decoded" && (
-              <small>
-                {[
-                  "TOOL RESULT → CONTEXT",
-                  "MODEL CALL → TOOL REQUEST",
-                  "EXECUTION → TOOL RESULT",
-                  "UPDATED CONTEXT",
-                  "MODEL OUTPUT → WORKSPACE",
-                  "TEST FAILED → CONTEXT → RETRY",
-                  "VALIDATION → COMPLETE",
-                ][index]}
-              </small>
-            )}
-            {mode === "decoded" && step === "TEST" && (
-              <em className="retry-arc" aria-label="테스트 실패 결과가 다시 PATCH 단계로 돌아간다" />
-            )}
+    <div className={`context-snapshot ${className}`.trim()}>
+      <header>
+        <Eyebrow>{label}</Eyebrow>
+        {meta && <span>{meta}</span>}
+      </header>
+      <div className="context-snapshot-items">
+        {items.map((item, index) => (
+          <div
+            className={item.accent ? "context-item context-item-accent" : "context-item"}
+            style={{ "--i": index } as CSSProperties}
+            key={`${item.label}-${index}`}
+          >
+            <b>{item.label}</b>
+            {item.value && <span>{item.value}</span>}
           </div>
         ))}
       </div>
-      {mode === "mystery" && <p className="incident-question">그런데 이 모든 행동을 실제로 하는 것은 무엇일까?</p>}
-      {mode === "follow" && (
-        <div className="observable-log">
-          <Eyebrow>OBSERVABLE WORKFLOW STATE</Eyebrow>
-          <ol>
-            {observableWorkflow.map((entry, index) => (
-              <li
-                className={index === observableWorkflow.length - 1 ? "observable-pending" : undefined}
-                style={{ "--step": index } as React.CSSProperties}
-                key={entry.step}
-              >
-                <b>{entry.step}</b>
-                <code>{entry.request}</code>
-                <span>{entry.result}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
+    </div>
+  );
+}
+
+function ModelNode({ label = "MODEL", className = "" }: { label?: string; className?: string }) {
+  return (
+    <div className={`model-node ${className}`.trim()}>
+      <Eyebrow>LANGUAGE MODEL</Eyebrow>
+      <strong>{label}</strong>
     </div>
   );
 }
@@ -134,410 +111,766 @@ function IntroScene() {
   return (
     <section className="scene scene-intro">
       <AgentArtwork />
+      <div className="intro-wash" />
       <div className="intro-copy">
         <Eyebrow>WORK 03 · BUILD CANVAS</Eyebrow>
         <h1>LLM <span>to</span><br />AGENT</h1>
-        <p className="intro-subtitle"><span>다음 Token 예측에서</span><span>AGENT가 되기까지</span></p>
+        <p className="intro-subtitle">다음 Token 예측에서<br />Coding Agent가 되기까지</p>
+        <p className="intro-question">
+          How does a next-token model participate in a system<br />that reads code, edits files, and runs tests?
+        </p>
       </div>
     </section>
   );
 }
+
+const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH", "TEST", "VERIFY"];
 
 function IncidentScene() {
   return (
     <section className="scene scene-incident">
-      <ActLead sceneId="incident" />
-      <IncidentWorkspace />
+      <SceneHeading
+        label="01 · FROM INCIDENT TO AGENT"
+        title={<>A production error becomes<br /><em>an Agent workflow.</em></>}
+      />
+
+      <div className="incident-stage">
+        <Panel label="APPLICATION" className="incident-application reveal" >
+          <div className="application-toolbar"><i /><span>production · /users/42</span></div>
+          <div className="application-normal"><b>200</b><span>Application healthy</span></div>
+          <div className="application-error"><b>ERROR</b><span>Request failed</span></div>
+        </Panel>
+
+        <Panel label="LOGS / STACK TRACE" className="incident-stack reveal">
+          <strong>NullPointerException</strong>
+          <code>
+            at UserMapper.toResponse(<mark>UserMapper.java:42</mark>)<br />
+            at UserService.getUser(UserService.java:87)<br />
+            at UserController.getUser(UserController.java:51)
+          </code>
+          <pre><span>42</span> user.getProfile().getDisplayName()</pre>
+        </Panel>
+
+        <FlowArrow label="HAND OFF" className="incident-handoff" />
+
+        <Panel label="AGENT" className="incident-agent reveal">
+          <div className="agent-task">
+            <b>USER TASK</b>
+            <p>원인을 확인하고 수정한 뒤<br />테스트까지 검증해줘.</p>
+          </div>
+          <div className="agent-mini-system">
+            <span>CONTEXT</span>
+            <strong>LLM</strong>
+            <span>TOOLS</span>
+          </div>
+        </Panel>
+      </div>
+
+      <div className="incident-workflow" aria-label="Agent workflow">
+        {incidentSteps.map((step, index) => (
+          <div
+            className={index === incidentSteps.length - 1 ? "workflow-step workflow-step-final" : "workflow-step"}
+            style={{ "--i": index } as CSSProperties}
+            key={step}
+          >
+            <i>{String(index + 1).padStart(2, "0")}</i>
+            <strong>{step}</strong>
+          </div>
+        ))}
+        <span className="workflow-focus">FOCUS NEXT → LLM</span>
+      </div>
     </section>
   );
 }
 
-function StripScene() {
+function FocusLlmScene() {
+  const parts = ["CONTEXT", "TOOLS", "EXECUTION", "ENVIRONMENT"];
   return (
-    <section className="scene scene-strip">
-      <div className="strip-remnants" aria-hidden="true">
-        <span>REPOSITORY</span><span>PATCH</span><span>TEST</span><span>TOOLS</span>
+    <section className="scene scene-focus-llm">
+      <div className="agent-dissolve" aria-hidden="true">
+        {parts.map((part, index) => (
+          <span className={`dissolve-part dissolve-part-${index + 1}`} key={part}>{part}</span>
+        ))}
+        <div className="dissolve-boundary">AGENT</div>
       </div>
-      <div className="strip-pipeline" aria-label="현재 입력에서 다음 Token 예측까지의 흐름">
-        <div className="strip-input">
-          <Eyebrow>CURRENT INPUT / CONTEXT</Eyebrow>
-          <code>java.lang.NullPointer</code>
-        </div>
-        <div className="strip-arrow" aria-hidden="true"><i /><span>→</span></div>
-        <div className="strip-model">
-          <Eyebrow>LANGUAGE MODEL</Eyebrow>
-          <strong>LLM</strong>
-        </div>
-        <div className="strip-arrow" aria-hidden="true"><i /><span>→</span></div>
-        <div className="strip-next">
-          <Eyebrow>NEXT TOKEN</Eyebrow>
-          <code>Exception</code>
-        </div>
+
+      <div className="focus-pipeline">
+        <Panel label="INPUT" className="focus-input"><code>current context</code></Panel>
+        <FlowArrow />
+        <ModelNode label="LLM" className="focus-model" />
+        <FlowArrow />
+        <Panel label="OUTPUT" className="focus-output"><strong>NEXT TOKEN ?</strong></Panel>
       </div>
-      <div className="strip-statement">
-        <h2>THE MODEL PREDICTS<br /><em>THE NEXT TOKEN.</em></h2>
-        <p>LLM은 현재 입력을 바탕으로 다음 Token을 예측한다.</p>
-      </div>
+
+      <SceneHeading
+        align="center"
+        label="02 · FOCUS ON THE LLM"
+        title={<>WHAT DOES THE LLM<br /><em>ACTUALLY DO?</em></>}
+        note="주변 시스템을 잠시 치우고 Model 자체만 본다."
+      />
     </section>
   );
 }
+
+const tokenCandidates = [
+  ["Exception", "8.7", "72%"],
+  ["Error", "4.2", "15%"],
+  ["Method", "1.8", "7%"],
+  ["Object", "0.9", "3%"],
+] as const;
 
 function NextTokenScene() {
-  const candidates = [
-    ["Exception", "72%", 72],
-    ["Error", "17%", 17],
-    ["Reference", "11%", 11],
-  ] as const;
   return (
     <section className="scene scene-next-token">
-      <header>
-        <Eyebrow>NEXT TOKEN · ILLUSTRATIVE VALUES</Eyebrow>
-        <h2>다음 Token의 가능성을 계산한다.</h2>
-      </header>
-      <div className="token-prompt">java.lang.NullPointer <span>___</span></div>
-      <div className="prediction-outcome">
-        <div className="candidate-distribution" aria-label="다음 Token 후보별 예시 가능성">
-          <div className="candidate-columns" aria-hidden="true"><span>TOKEN</span><span>CANDIDATE SCORE</span><span>VALUE</span></div>
-          {candidates.map(([token, value, width], index) => (
-            <div className={index === 0 ? "candidate candidate-primary" : "candidate"} key={token}>
+      <SceneHeading
+        label="03 · NEXT TOKEN CALCULATION"
+        title={<>HOW THE NEXT TOKEN<br /><em>IS CHOSEN</em></>}
+        note="Conceptual tokenization and illustrative values"
+      />
+
+      <div className="token-calculation">
+        <Panel label="INPUT TEXT" className="token-input stage-card">
+          <code>java.lang.NullPointer</code>
+          <div className="token-chunks" aria-label="Conceptual token chunks">
+            {["java", ".", "lang", ".", "Null", "Pointer"].map((token, index) => (
+              <span style={{ "--i": index } as CSSProperties} key={`${token}-${index}`}>{token}</span>
+            ))}
+          </div>
+          <small>CONCEPTUAL TOKENS</small>
+        </Panel>
+
+        <FlowArrow />
+
+        <Panel label="MODEL CALCULATION" className="token-model stage-card">
+          <strong>CONTEXT<br />REPRESENTATION</strong>
+          <span>current sequence → next position</span>
+        </Panel>
+
+        <FlowArrow />
+
+        <div className="candidate-table stage-card">
+          <header>
+            <span>VOCABULARY LOGITS</span>
+            <i>SOFTMAX →</i>
+            <span>PROBABILITIES</span>
+          </header>
+          {tokenCandidates.map(([token, logit, probability], index) => (
+            <div className={index === 0 ? "candidate-row candidate-row-selected" : "candidate-row"} key={token}>
               <strong>{token}</strong>
-              <i><b style={{ width: `${width}%` }} /></i>
-              <span>{value}</span>
+              <code>{logit}</code>
+              <i aria-hidden="true" />
+              <b>{probability}</b>
             </div>
           ))}
+          <small>Illustrative scores and probabilities</small>
         </div>
-        <div className="decoding-result">
-          <Eyebrow>DECODING RESULT</Eyebrow>
-          <span>NEXT TOKEN</span>
-          <i aria-hidden="true">→</i>
+
+        <FlowArrow />
+
+        <Panel label="DECODING" className="token-decoding stage-card">
+          <span>SELECTED TOKEN</span>
           <strong>Exception</strong>
-        </div>
+          <code>java.lang.NullPointer<mark>Exception</mark></code>
+          <b>ONE TOKEN GENERATED</b>
+        </Panel>
       </div>
     </section>
   );
 }
+
+const generationCycles = [
+  { number: "01", context: "java.lang.NullPointer", token: "Exception", pace: "FIRST CYCLE" },
+  { number: "02", context: "java.lang.NullPointerException", token: ":", pace: "NEXT CYCLE · FASTER" },
+];
 
 function GenerationScene() {
   return (
     <section className="scene scene-generation">
-      <div className="generation-title">
-        <Eyebrow>AUTOREGRESSIVE GENERATION</Eyebrow>
-        <h2>하나가 결정되면,<br />다시 다음을 예측한다.</h2>
-      </div>
-      <div className="generation-lane">
-        <div className="generation-decision"><Eyebrow>DECIDED NEXT TOKEN</Eyebrow><strong>Exception</strong><i>↓</i></div>
-        <Eyebrow>CURRENT SEQUENCE</Eyebrow>
-        <div className="generation-sequence">
-          <span className="generation-base">java.lang.NullPointer</span>
-          <span className="generation-appended">Exception</span>
-          <span className="generation-next-state"><b>NEXT</b> ___</span>
+      <SceneHeading
+        label="04 · AUTOREGRESSIVE GENERATION"
+        title={<>PREDICT → APPEND<br /><em>→ REPEAT</em></>}
+        note="One chosen Token becomes part of the next sequence."
+      />
+
+      <div className="generation-loop" aria-label="Context to next-token append loop">
+        <div className="generation-loop-row">
+          <Panel label="CONTEXT" className="generation-node"><strong>CURRENT SEQUENCE</strong></Panel>
+          <FlowArrow />
+          <ModelNode label="LLM" />
+          <FlowArrow />
+          <Panel label="OUTPUT" className="generation-node"><strong>NEXT TOKEN</strong></Panel>
         </div>
-        <div className="generation-cycle">
-          {["PREDICT", "APPEND", "PREDICT", "APPEND"].map((step, index) => (
-            <span style={{ "--cycle-index": index } as React.CSSProperties} key={`${step}-${index}`}>{step}</span>
-          ))}
-        </div>
+        <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
       </div>
-      <p className="generation-summary">결정된 Token이 늘어난 sequence의 일부가 되고, 다음 예측의 조건이 된다.</p>
-    </section>
-  );
-}
 
-function ModelInputScene() {
-  const context = ["SYSTEM", "USER REQUEST", "NPE LOG", "CODE", "TOOL RESULT"];
-  return (
-    <section className="scene scene-model-input">
-      <ActLead sceneId="model-input" />
-      <div className="context-stream">
-        <Eyebrow>CURRENT MODEL CALL</Eyebrow>
-        {context.map((item, index) => <span style={{ "--context-index": index } as React.CSSProperties} key={item}>{item}</span>)}
-        <i className="context-flow" />
-      </div>
-      <div className="context-to-model">→</div>
-      <div className="model-core"><Eyebrow>INFERENCE</Eyebrow><strong>MODEL</strong><p>지금 보이는 정보로<br />다음 출력을 계산</p></div>
-      <p className="model-input-note">현재 Model Call에서 LLM에게 실제로 보이는 정보</p>
-      <div className="context-repository">
-        <Eyebrow>REPOSITORY</Eyebrow>
-        <strong>2,418 files</strong>
-        <span>Model 입력 바깥에 있다</span>
-      </div>
-    </section>
-  );
-}
-
-function AttentionScene() {
-  return (
-    <section className="scene scene-attention">
-      <header>
-        <Eyebrow>SELF-ATTENTION · CONCEPTUAL VIEW</Eyebrow>
-        <h2><span>멀리 떨어진 코드도</span><span>관계를 계산할 수 있다.</span></h2>
-      </header>
-      <div className="attention-code">
-        <pre><code>
-          <span><i>39</i>public UserResponse toResponse(User user) {'{'}</span>
-          <span className="attention-source"><i>40</i>  UserProfile <b>profile</b> = user.getProfile();</span>
-          <span><i>41</i></span>
-          <span><i>42</i>{"  // ..."}</span>
-          <span><i>43</i>{"  // spatial distance"}</span>
-          <span><i>44</i></span>
-          <span><i>45</i>  return new UserResponse(</span>
-          <span><i>46</i>    user.getId(),</span>
-          <span className="attention-target"><i>47</i>    <b>profile</b>.getDisplayName()</span>
-          <span><i>48</i>  );</span>
-          <span><i>49</i>{'}'}</span>
-        </code></pre>
-        <div className="attention-relation"><i /></div>
-      </div>
-    </section>
-  );
-}
-
-function RepositoryContextScene() {
-  // Column 1 holds src/ and test/ so both selected files sit clear of the fade;
-  // column 2 carries project root files. 35 rows stand in for 2,418.
-  const files: [string, number, boolean?][] = [
-    ["src/", 0], ["main/", 1], ["java/", 2],
-    ["UserController.java", 3], ["UserService.java", 3], ["UserMapper.java", 3, true],
-    ["User.java", 3], ["UserProfile.java", 3], ["UserRepository.java", 3],
-    ["resources/", 1], ["application.yml", 2], ["schema.sql", 2],
-    ["test/", 0], ["java/", 1], ["UserMapperTest.java", 2, true],
-    ["UserServiceTest.java", 2], ["OrderServiceTest.java", 2], ["MapperContractTest.java", 2],
-    ["build.gradle", 0], ["settings.gradle", 0], ["gradle.properties", 0],
-    ["Dockerfile", 0], ["compose.yaml", 0], ["README.md", 0], ["CHANGELOG.md", 0],
-    ["docs/", 0], ["architecture.md", 1], ["runbook.md", 1],
-    ["config/", 0], ["logback.xml", 1], ["flyway.conf", 1],
-    [".github/", 0], ["workflows/", 1], ["deploy.yml", 2], ["LICENSE", 0],
-  ];
-  return (
-    <section className="scene scene-repository-context">
-      <div className="repository-space">
-        <header><Eyebrow>REPOSITORY</Eyebrow><strong>2,418 files</strong></header>
-        <div className="repository-tree">
-          {files.map(([name, depth, selected], index) => (
-            <span
-              className={selected ? "selected-file" : undefined}
-              style={{ "--depth": depth } as React.CSSProperties}
-              key={`${name}-${index}`}
-            >
-              {name}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="selection-bridge"><strong>일부만 선택</strong><i>→</i><i>→</i></div>
-      <div className="model-context-space">
-        <header><Eyebrow>MODEL CONTEXT</Eyebrow><strong>현재 필요한 일부</strong></header>
-        <div className="context-items"><span>NPE LOG</span><span>USER REQUEST</span><span className="context-selected">UserMapper.java</span><span className="context-selected delayed">UserMapperTest.java</span></div>
-      </div>
-      <h2>EXISTS <em>≠</em> IN CONTEXT</h2>
-    </section>
-  );
-}
-
-function BoundaryScene() {
-  return (
-    <section className="scene scene-boundary">
-      <ActLead sceneId="boundary" />
-      <div className="boundary-side boundary-model"><Eyebrow>MODEL</Eyebrow><strong>다음 행동을<br />요청하는 출력</strong></div>
-      <div className="boundary-wall"><span>SYSTEM BOUNDARY</span></div>
-      <div className="boundary-side boundary-environment"><Eyebrow>REPOSITORY / ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><span>아직 읽히지 않음</span></div>
-      <code className="boundary-request">read_file(&quot;src/UserMapper.java&quot;)</code>
-      <h2><span>REQUESTED</span><em>≠</em><span>EXECUTED</span></h2>
-    </section>
-  );
-}
-
-function ExecutionLayerScene() {
-  const stages = ["REQUEST", "VALIDATE", "PERMISSION", "EXECUTE"];
-  return (
-    <section className="scene scene-execution-layer">
-      <div className="execution-model"><Eyebrow>MODEL REQUEST</Eyebrow><code>read_file(<br />&quot;src/UserMapper.java&quot;)</code></div>
-      <div className="execution-boundary"><span>BOUNDARY</span></div>
-      <div className="execution-path">
-        <Eyebrow>EXECUTION LAYER · RESPONSIBILITY</Eyebrow>
-        {stages.map((stage, index) => (
-          <span className="execution-stage-cell" style={{ "--execution-index": index } as React.CSSProperties} key={stage}>
-            {stage}
-          </span>
+      <div className="generation-cycles">
+        {generationCycles.map((cycle, index) => (
+          <div className="generation-cycle" style={{ "--i": index } as CSSProperties} key={cycle.number}>
+            <i>{cycle.number}</i>
+            <div><span>CURRENT CONTEXT</span><code>{cycle.context}</code></div>
+            <b>+</b>
+            <div className="cycle-token"><span>NEXT TOKEN</span><code>{cycle.token}</code></div>
+            <strong>{cycle.pace}</strong>
+          </div>
         ))}
-        <i className="execution-signal" />
       </div>
-      <div className="execution-environment"><Eyebrow>ENVIRONMENT</Eyebrow><div className="file-open"><span>UserMapper.java</span><b>OPEN / READ</b></div></div>
-      <p><strong>시스템이 요청을 실제 행동으로 연결한다.</strong><span>검증 · 권한 · 실행은 Model 밖의 책임이다.</span></p>
+
+      <div className="generation-thesis">GENERATION IS REPETITION</div>
     </section>
   );
 }
 
-function RequestsExecutesScene() {
+function ContextGrowthScene() {
   return (
-    <section className="scene scene-requests-executes">
-      <div className="statement-half statement-model"><span>MODEL</span><strong>REQUESTS</strong></div>
-      <div className="statement-divider" aria-label="System boundary"><i /></div>
-      <div className="statement-half statement-system"><span>SYSTEM</span><strong>EXECUTES</strong></div>
-      <p>Model은 행동을 요청하고, 실행 가능한 시스템이 실제 Environment의 행동으로 연결한다.</p>
+    <section className="scene scene-context-growth">
+      <SceneHeading
+        label="05 · SUCCESSIVE MODEL CALLS"
+        title={<>CONTEXT GROWS<br /><em>WITH THE TASK</em></>}
+        note="Richer snapshots—not one Prompt growing forever."
+      />
+
+      <div className="context-growth-stage">
+        <ContextSnapshot
+          label="MODEL CONTEXT #1"
+          meta="INITIAL CALL"
+          items={[
+            { label: "USER REQUEST", value: "이 NPE 원인을 찾아서 수정해줘" },
+            { label: "ERROR LOG", value: "NullPointerException · UserMapper.java:42" },
+          ]}
+        />
+        <div className="task-progress-arrow"><span>TASK PROGRESSES</span><i>→</i></div>
+        <ContextSnapshot
+          label="MODEL CONTEXT #2"
+          meta="LATER CALL · SELECTED SNAPSHOT"
+          className="later-context"
+          items={[
+            { label: "USER REQUEST" },
+            { label: "ERROR LOG" },
+            { label: "RELEVANT SOURCE", accent: true },
+            { label: "PREVIOUS RESULT", accent: true },
+            { label: "NEW EVIDENCE", accent: true },
+          ]}
+        />
+      </div>
+
+      <div className="context-growth-guardrail">
+        SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
+      </div>
+      <h3 className="context-growth-question">HOW DID THE NEW INFORMATION GET HERE?</h3>
     </section>
   );
 }
 
-function ResultReturnsScene() {
+const evidenceBlocks = [
+  ["USER REQUEST", "원인을 확인하고 수정한 뒤 테스트까지 검증"],
+  ["ERROR LOG", "NullPointerException · UserMapper.java:42"],
+  ["RELEVANT SOURCE", "user.getProfile().getDisplayName()"],
+  ["CALL SITE", "UserService.getUser(…)"],
+  ["RELATED DECLARATION", "UserProfile · displayName"],
+  ["PRIOR NEUTRAL RESULT", "Candidate implementation located"],
+] as const;
+
+function EvidenceContextScene() {
   return (
-    <section className="scene scene-result-returns">
-      <ActLead sceneId="result-returns" />
-      <div className="result-context"><Eyebrow>UPDATED CONTEXT</Eyebrow><span>USER REQUEST</span><span>MODEL TOOL REQUEST</span><span className="returned-context">TOOL RESULT · UserMapper.java</span></div>
-      <div className="result-execution"><Eyebrow>EXECUTION</Eyebrow><strong>결과를 현재<br />workflow로 반환</strong></div>
-      <div className="result-environment"><Eyebrow>ENVIRONMENT</Eyebrow><strong>UserMapper.java</strong><code>profile.getDisplayName()</code></div>
-      <div className="return-path"><i /><span>RESULT → CONTEXT</span></div>
-      <h2>결과가 돌아오면,<br /><em>Context가 달라진다.</em></h2>
+    <section className="scene scene-evidence-context">
+      <SceneHeading
+        label="06 · LONG CONTEXT · CONCEPTUAL VIEW"
+        title={<>EVIDENCE ACROSS<br /><em>THE CONTEXT</em></>}
+        note="Distant relevant blocks can jointly influence the current calculation."
+      />
+
+      <div className="evidence-stage">
+        <div className="long-context-window">
+          <header><Eyebrow>CURRENT MODEL CONTEXT</Eyebrow><span>SCROLL MOTION = PRESENTATION METAPHOR</span></header>
+          <div className="long-context-track">
+            {evidenceBlocks.map(([label, value], index) => (
+              <div className={[1, 2, 4].includes(index) ? "evidence-block evidence-relevant" : "evidence-block"} style={{ "--i": index } as CSSProperties} key={label}>
+                <b>{label}</b><code>{value}</code>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="evidence-signals" aria-hidden="true"><i /><i /><i /></div>
+        <ModelNode label="MODEL" className="evidence-model" />
+      </div>
+
+      <p className="evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
     </section>
   );
 }
+
+function AccessContextScene() {
+  return (
+    <section className="scene scene-access-context">
+      <SceneHeading
+        label="07 · REPOSITORY ACCESS"
+        title={<>ACCESS <em>≠</em> CONTEXT</>}
+        note="Capability to retrieve is not the same as information in this Model Call."
+      />
+
+      <div className="access-stage">
+        <Panel label="LARGE CODEBASE" className="repository-grid-panel">
+          <div className="repository-grid" aria-label="Large repository represented by file tiles">
+            {Array.from({ length: 42 }, (_, index) => (
+              <i className={[9, 17, 31].includes(index) ? "repo-file repo-file-selected" : "repo-file"} key={index} />
+            ))}
+          </div>
+          <strong>THOUSANDS OF FILES</strong>
+        </Panel>
+
+        <div className="access-not-equal">
+          <div className="wrong-model"><span>ENTIRE REPO</span><i>→</i></div>
+          <strong>≠</strong>
+          <span>ONLY RELEVANT PIECES</span>
+        </div>
+
+        <ContextSnapshot
+          label="MODEL CONTEXT"
+          className="access-context-card"
+          items={[
+            { label: "USER REQUEST" },
+            { label: "ERROR LOG" },
+            { label: "RELEVANT SOURCE A", accent: true },
+            { label: "RELEVANT SOURCE B", accent: true },
+          ]}
+        />
+      </div>
+
+      <h3 className="access-question">HOW DOES THE CODE GET IN?</h3>
+    </section>
+  );
+}
+
+function ModelRequestsScene() {
+  return (
+    <section className="scene scene-model-requests">
+      <SceneHeading
+        label="08 · MODEL → REQUEST"
+        title={<>THE MODEL<br /><em>REQUESTS</em></>}
+        note="A request describes an action. It does not perform it."
+      />
+
+      <div className="request-stage">
+        <ContextSnapshot
+          label="CURRENT CONTEXT"
+          className="request-context"
+          items={[{ label: "USER REQUEST" }, { label: "ERROR LOG" }]}
+        />
+        <FlowArrow />
+        <div className="request-model-stack">
+          <ModelNode />
+          <div className="model-need"><span>NEED SOURCE</span><strong>UserMapper.java</strong></div>
+        </div>
+        <div className="direct-access-rejected" aria-label="Model cannot directly read repository">
+          <span>MODEL</span><i /><b>×</b><i /><span>REPOSITORY</span>
+        </div>
+        <FlowArrow label="OUTBOUND OUTPUT" />
+        <div className="execution-gate">
+          <Eyebrow>EXECUTION LAYER</Eyebrow>
+          <div className="request-card"><span>READ</span><strong>UserMapper.java</strong></div>
+          <small>REQUEST RECEIVED · NOT YET EXECUTED</small>
+        </div>
+        <Panel label="ENVIRONMENT" className="request-repository"><strong>REPOSITORY</strong><span>not read yet</span></Panel>
+      </div>
+
+      <div className="request-thesis">REQUEST <em>≠</em> EXECUTION</div>
+    </section>
+  );
+}
+
+function ExecutionActsScene() {
+  return (
+    <section className="scene scene-execution-acts">
+      <SceneHeading
+        label="09 · EXTERNAL ACTION"
+        title={<>THE EXECUTION LAYER<br /><em>ACTS</em></>}
+        note="A conceptual responsibility—not a universal component name."
+      />
+
+      <div className="execution-stage">
+        <div className="execution-endpoint execution-request">
+          <Eyebrow>MODEL REQUEST</Eyebrow>
+          <strong>READ</strong><code>UserMapper.java</code>
+        </div>
+
+        <div className="execution-lane">
+          <span>REQUEST ↓</span>
+          <div className="execution-layer-box">
+            <Eyebrow>EXECUTION LAYER</Eyebrow>
+            <strong>CONNECT REQUEST<br />TO CAPABILITY</strong>
+          </div>
+          <span>↓ FILE READ</span>
+        </div>
+
+        <div className="execution-endpoint execution-repository">
+          <Eyebrow>REPOSITORY</Eyebrow>
+          <div className="repository-files">
+            <span>UserController.java</span>
+            <span>UserService.java</span>
+            <strong>UserMapper.java <b>READ</b></strong>
+            <span>UserProfile.java</span>
+          </div>
+        </div>
+
+        <div className="execution-return-path" aria-hidden="true"><span>RESULT</span><i /><b>↑</b></div>
+
+        <div className="execution-result">
+          <Eyebrow>TOOL RESULT / AGENT STATE</Eyebrow>
+          <code>user.getProfile().getDisplayName()</code>
+          <span>compact relevant result returned</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ResultContextScene() {
+  return (
+    <section className="scene scene-result-context">
+      <SceneHeading
+        label="10 · LATER MODEL CALL"
+        title={<>NEW RESULT →<br /><em>NEXT MODEL CONTEXT</em></>}
+        note="The returned result can be selected, summarized, or compressed."
+      />
+
+      <div className="result-context-stage">
+        <Panel label="RETURNED RESULT" className="raw-result-card">
+          <strong>UserMapper.java</strong>
+          <code>… user.getProfile().getDisplayName() …</code>
+          <span>longer raw result may exist</span>
+        </Panel>
+
+        <div className="context-construction">
+          {['FILTER', 'SELECT', 'SUMMARIZE', 'COMPRESS'].map((step, index) => (
+            <span style={{ "--i": index } as CSSProperties} key={step}>{step}</span>
+          ))}
+          <i>→</i>
+        </div>
+
+        <ContextSnapshot
+          label="NEXT MODEL CONTEXT"
+          meta="NEW SNAPSHOT"
+          className="next-context-card"
+          items={[
+            { label: "USER REQUEST" },
+            { label: "ERROR LOG" },
+            { label: "RELEVANT UserMapper.java RESULT", value: "NEW", accent: true },
+          ]}
+        />
+
+        <FlowArrow label="READY FOR A LATER CALL" />
+        <ModelNode label="MODEL" className="model-not-run" />
+      </div>
+
+      <p className="result-context-guardrail">NOT THE ENTIRE TOOL RESULT · NOT THE ENTIRE AGENT STATE · MODEL NOT RUN YET</p>
+    </section>
+  );
+}
+
+function OnePassScene() {
+  return (
+    <section className="scene scene-one-pass">
+      <SceneHeading
+        align="center"
+        label="11 · THE QUESTION BEFORE THE LOOP"
+        title={<>WHAT IF THE FIRST OUTPUT<br /><em>ISN&apos;T THE FINAL ANSWER?</em></>}
+      />
+
+      <div className="one-pass-comparison">
+        <div className="simple-pass">
+          <Eyebrow>SIMPLE EXPECTATION</Eyebrow>
+          <div><span>CONTEXT</span><i>→</i><span>MODEL</span><i>→</i><strong>FINAL ANSWER</strong></div>
+        </div>
+        <div className="agent-first-pass">
+          <Eyebrow>AGENT · FIRST PASS</Eyebrow>
+          <div className="first-pass-flow">
+            {['INITIAL CONTEXT', 'MODEL', 'REQUEST', 'EXECUTION / RESULT', 'NEXT MODEL CONTEXT'].map((step, index) => (
+              <div style={{ "--i": index } as CSSProperties} key={step}>
+                <span>{step}</span>{index < 4 && <i>→</i>}
+              </div>
+            ))}
+          </div>
+          <p>First output = NEXT ACTION / MORE CONTEXT REQUEST</p>
+        </div>
+      </div>
+
+      <div className="now-what"><span>NEXT CONTEXT IS READY</span><strong>NOW WHAT?</strong></div>
+    </section>
+  );
+}
+
+const loopStages = ["MODEL", "REQUEST", "EXECUTION", "RESULT", "CONTEXT UPDATE"];
 
 function AgentLoopScene() {
   return (
     <section className="scene scene-agent-loop">
-      <div className="loop-goal"><Eyebrow>GOAL</Eyebrow><span>NPE 원인을 확인하고 수정해줘.</span></div>
-      <div className="loop-node loop-model"><Eyebrow>01</Eyebrow><strong>MODEL</strong><code>search_code(&quot;UserMapper&quot;)</code></div>
-      <div className="loop-node loop-execution"><Eyebrow>02</Eyebrow><strong>TOOL REQUEST<br />/ EXECUTION</strong><span>Repository search</span></div>
-      <div className="loop-node loop-result"><Eyebrow>03</Eyebrow><strong>TOOL RESULT</strong><span>2 file candidates</span></div>
-      <div className="loop-node loop-context"><Eyebrow>04</Eyebrow><strong>UPDATED CONTEXT</strong><span>다음 Model Call 준비</span></div>
-      <div className="loop-border" aria-hidden="true"><i className="loop-pulse" /></div>
-      <div className="loop-center"><span>RESULT</span><i>↺</i><span>NEXT CALL</span></div>
-    </section>
-  );
-}
+      <SceneHeading
+        label="12 · THE AGENT LOOP IN MOTION"
+        title={<>DECIDE → ACT → OBSERVE<br /><em>→ UPDATE → DECIDE AGAIN</em></>}
+      />
 
-function FollowNpeScene() {
-  return <section className="scene scene-follow-npe"><IncidentWorkspace mode="follow" /></section>;
-}
-
-function FailureContextScene() {
-  const [state, setState] = useState<"fail" | "pass">("fail");
-  return (
-    <section className={`scene scene-failure scene-failure-${state}`}>
-      <div className="state-control" aria-label="Test result state">
-        <button aria-pressed={state === "fail"} onClick={() => setState("fail")}>FAIL</button>
-        <button aria-pressed={state === "pass"} onClick={() => setState("pass")}>PASS</button>
-      </div>
-      <div className="failure-patch"><Eyebrow>CURRENT PATCH</Eyebrow><JavaCode patched corrected={state === "pass"} /></div>
-      {state === "fail" ? (
-        <div className="test-result test-failed"><Eyebrow>UserMapperTest</Eyebrow><strong>FAILED</strong><p>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></p></div>
-      ) : (
-        <div className="test-result test-passed"><Eyebrow>UserMapperTest</Eyebrow><strong>TEST PASS</strong><p>VERIFY<br />COMPLETE</p></div>
-      )}
-      <div className="failure-next">
-        <Eyebrow>{state === "fail" ? "UPDATED CONTEXT → NEXT ACTION" : "VALIDATION → EXIT"}</Eyebrow>
-        <strong>{state === "fail" ? "READ TEST → PATCH → TEST" : "TEST PASS → VERIFY → COMPLETE"}</strong>
-        <p>{state === "fail" ? "실패 결과도 다음 판단을 위한 정보다." : "실제 결과가 종료 조건을 충족했다."}</p>
-      </div>
-    </section>
-  );
-}
-
-function StopScene() {
-  return (
-    <section className="scene scene-stop">
-      <header><Eyebrow>TERMINATION CONDITION</Eyebrow><h2>반복의 목적은<br />끝없이 반복하는 것이 아니다.</h2></header>
-      <div className="stop-flow">
-        <div className="stop-loop" aria-label="PATCH과 TEST를 오가는 반복">
-          <span>PATCH</span>
-          <i aria-hidden="true">↻</i>
-          <span>TEST</span>
+      <div className="agent-loop-stage">
+        <div className="linear-loop">
+          {loopStages.map((stage, index) => (
+            <div className={index === 0 ? "linear-loop-node loop-node-model" : "linear-loop-node"} style={{ "--i": index } as CSSProperties} key={stage}>
+              <i>{String(index + 1).padStart(2, "0")}</i><strong>{stage}</strong>
+              {index < loopStages.length - 1 && <b>↓</b>}
+            </div>
+          ))}
+          <div className="loop-return" aria-hidden="true"><span>DIFFERENT NEXT DECISION</span><i /><b>↖</b></div>
         </div>
-        <div className="stop-branch">
-          <i aria-hidden="true" />
-          <span>TEST PASS</span>
+
+        <div className="loop-context-state">
+          <ContextSnapshot
+            label="CURRENT / NEXT MODEL CONTEXT"
+            meta="CHANGING STATE"
+            items={[
+              { label: "USER REQUEST", value: "Fix this NPE." },
+              { label: "ERROR LOG", value: "NullPointerException · line 42" },
+              { label: "+ SOURCE RESULT", value: "UserMapper.java", accent: true },
+              { label: "+ RELATED PATH", value: "new evidence", accent: true },
+            ]}
+          />
+          <div className="iteration-cards">
+            <div><span>ITERATION 01</span><strong>READ UserMapper.java</strong></div>
+            <i>→</i>
+            <div><span>ITERATION 02</span><strong>INSPECT RELATED PATH</strong></div>
+          </div>
+          <p>NEW RESULT → CHANGED STATE → DIFFERENT NEXT DECISION</p>
         </div>
-        <div className="stop-exit"><span>VERIFY</span><i aria-hidden="true">→</i><strong>TASK COMPLETE</strong></div>
+      </div>
+
+      <div className="agent-loop-thesis">THIS IS THE AGENT LOOP</div>
+    </section>
+  );
+}
+
+const npeIterations = [
+  {
+    number: "01",
+    context: ["USER REQUEST", "ERROR LOG", "UserMapper.java:42"],
+    summaries: [
+      ["OBSERVATION", "Stack Trace points to UserMapper.java:42"],
+      ["NEXT ACTION", "Locate relevant implementation"],
+    ],
+    output: "SEARCH CODE · UserMapper",
+  },
+  {
+    number: "02",
+    context: ["USER REQUEST", "ERROR LOG", "SOURCE · user.getProfile().getDisplayName()"],
+    summaries: [
+      ["OBSERVATION", "The failing expression contains multiple dereferences."],
+      ["CURRENT ASSESSMENT", "Current evidence does not prove which value is null."],
+      ["NEXT ACTION", "Inspect related data path."],
+    ],
+    output: "INSPECT RELATED PATH",
+  },
+  {
+    number: "03",
+    context: ["USER REQUEST", "ERROR LOG", "SOURCE CODE", "REPOSITORY EVIDENCE · profile may be absent"],
+    summaries: [
+      ["OBSERVATION", "Existing user data can omit a profile."],
+      ["WORKING HYPOTHESIS", "profile == null is the likely cause"],
+      ["NEXT ACTION", "Patch null handling, then validate."],
+    ],
+    output: "PATCH NULL HANDLING",
+  },
+] as const;
+
+function NpeRunScene() {
+  return (
+    <section className="scene scene-npe-run">
+      <SceneHeading
+        label="13 · REAL NPE AGENT RUN"
+        title={<>THE LOOP CHANGES<br /><em>THE STATE EACH TIME</em></>}
+        note="Observable summaries only—not hidden reasoning."
+      />
+
+      <div className="npe-run-stage">
+        <div className="iteration-rail">
+          {npeIterations.map((iteration, index) => (
+            <div style={{ "--i": index } as CSSProperties} key={iteration.number}>
+              <i>{iteration.number}</i><span>{index === 0 ? "SEARCH" : index === 1 ? "INSPECT" : "HYPOTHESIS"}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="npe-state-stack">
+          {npeIterations.map((iteration, iterationIndex) => (
+            <div className={`npe-state npe-state-${iterationIndex + 1}`} key={iteration.number}>
+              <ContextSnapshot
+                label={`CURRENT MODEL CONTEXT · ITERATION ${iteration.number}`}
+                items={iteration.context.map((label, index) => ({ label, accent: index >= 2 }))}
+              />
+              <div className="model-assessment">
+                <header><Eyebrow>MODEL · OBSERVABLE SUMMARY</Eyebrow></header>
+                {iteration.summaries.map(([label, value]) => (
+                  <div key={label}><span>{label}</span><strong>{value}</strong></div>
+                ))}
+                <code>{iteration.output}</code>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-function BuildAgentScene() {
+function PatchCode({ revised = false }: { revised?: boolean }) {
   return (
-    <section className="scene scene-build-agent">
-      <ActLead sceneId="build-agent" />
-      <div className="agent-region agent-context"><Eyebrow>CONTEXT</Eyebrow><strong>현재 무엇을 보는가</strong><span>GOAL · CODE · RESULTS</span></div>
-      <div className="agent-region agent-tools"><Eyebrow>REPOSITORY / TOOLS</Eyebrow><strong>무엇을 할 수 있는가</strong><span>SEARCH · READ · EDIT · TEST</span></div>
-      <div className="agent-region agent-execution"><Eyebrow>EXECUTION</Eyebrow><strong>요청을 실제 행동으로</strong><span>REQUEST → RESULT</span></div>
-      <div className="agent-region agent-control"><Eyebrow>CONTROL</Eyebrow><strong>어디까지, 어떻게 검증하는가</strong><span>PERMISSION · SANDBOX · VALIDATION</span></div>
-      <div className="agent-center"><Eyebrow>CORE</Eyebrow><strong>MODEL</strong><code>read_file()</code></div>
-      <p>Tool Calling만으로 Coding Agent 전체를 설명할 수는 없다.</p>
+    <pre className={revised ? "patch-code patch-code-revised" : "patch-code"}>
+      <code>
+        <span>UserProfile profile =</span>
+        <span>  user.getProfile();</span>
+        <span>String displayName =</span>
+        <span>  profile != null</span>
+        <span>    ? profile.getDisplayName()</span>
+        <mark>    : {revised ? '"Unknown"' : "null"};</mark>
+      </code>
+    </pre>
+  );
+}
+
+const revisionSteps = ["PATCH #1", "NPE RESOLVED", "RUN EXISTING TEST", "FAIL", "FEEDBACK", "RE-EVALUATE", "PATCH #2"];
+
+function PatchReviseScene() {
+  return (
+    <section className="scene scene-patch-revise">
+      <SceneHeading
+        label="14 · VALIDATION CHANGES THE NEXT ACTION"
+        title={<>PATCH. TEST.<br /><em>REVISE.</em></>}
+        note="Failure is new evidence—not retraining."
+      />
+
+      <div className="revision-timeline">
+        {revisionSteps.map((step, index) => (
+          <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
+            <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="revision-stage">
+        <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
+          <PatchCode />
+        </Panel>
+
+        <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
+          <strong>FAIL</strong>
+          <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
+          <span>FAILURE IS FEEDBACK</span>
+        </Panel>
+
+        <div className="revision-summary">
+          <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
+          <div><span>OBSERVATION</span><strong>NPE is gone.</strong></div>
+          <div><span>NEW EVIDENCE</span><strong>Returning null breaks expected behavior.</strong></div>
+          <div><span>NEXT ACTION</span><strong>Revise Patch.</strong></div>
+        </div>
+
+        <Panel label="PATCH #2" className="second-patch-card">
+          <PatchCode revised />
+        </Panel>
+      </div>
     </section>
   );
 }
 
-function DifferentAgentScene({ motionPaused }: { motionPaused: boolean }) {
-  const [state, setState] = useState<"minimal" | "full">("full");
-  const [manual, setManual] = useState(false);
+const completionSteps = ["PATCH #2", "RUN TESTS", "PASS", "VERIFY", "OBJECTIVE SATISFIED", "FINAL RESPONSE", "STOP"];
 
-  useEffect(() => {
-    if (motionPaused || manual) return;
-    const timer = window.setInterval(() => setState((current) => current === "minimal" ? "full" : "minimal"), 5200);
-    return () => window.clearInterval(timer);
-  }, [motionPaused, manual]);
-
-  const choose = (value: "minimal" | "full") => {
-    setManual(true);
-    setState(value);
-  };
-
+function TaskCompleteScene() {
   return (
-    <section className={`scene scene-different-agent compare-${state}`}>
-      <div className="state-control compare-control" aria-label="Agent environment comparison">
-        <button aria-pressed={state === "minimal"} onClick={() => choose("minimal")}>MINIMAL</button>
-        <button aria-pressed={state === "full"} onClick={() => choose("full")}>FULL</button>
+    <section className="scene scene-task-complete">
+      <SceneHeading
+        label="15 · VALID STOP CONDITION"
+        title={<>GOAL ACHIEVED<br /><em>→ STOP</em></>}
+        note="This result satisfies the objective, so no return path activates."
+      />
+
+      <div className="completion-stage">
+        <div className="task-complete-card">
+          <Eyebrow>AGENT RUN</Eyebrow>
+          <h3>TASK COMPLETE</h3>
+          <ul>
+            <li><i>✓</i><span>NPE resolved</span></li>
+            <li><i>✓</i><span>Patch verified</span></li>
+            <li><i>✓</i><span>Tests passed</span></li>
+          </ul>
+        </div>
+
+        <div className="completion-flow">
+          {completionSteps.map((step, index) => (
+            <div className={step === "STOP" ? "completion-step completion-stop" : "completion-step"} style={{ "--i": index } as CSSProperties} key={step}>
+              <i>{String(index + 1).padStart(2, "0")}</i>
+              <strong>{step}</strong>
+              {index < completionSteps.length - 1 && <b>→</b>}
+            </div>
+          ))}
+          <p>PASS → COMPLETE <span>·</span> NO RETURN TO MODEL</p>
+        </div>
       </div>
-      <div className="shared-model"><Eyebrow>SAME UNDERLYING MODEL</Eyebrow><strong>MODEL</strong></div>
-      <div className="agent-comparison comparison-a">
-        <Eyebrow>A · MINIMAL SYSTEM</Eyebrow>
-        <h3>NPE LOG</h3>
-        <div><span>few tools</span><span>weak context</span><span>no validation</span></div>
-        <strong>PATCH GENERATED</strong>
-      </div>
-      <div className="agent-comparison comparison-b">
-        <Eyebrow>B · TASK-EQUIPPED SYSTEM</Eyebrow>
-        <h3>TARGETED CONTEXT</h3>
-        <div><span>search / read / edit</span><span>scoped permission</span><span>tests + validation</span></div>
-        <strong>PATCH VERIFIED</strong>
-      </div>
-      <p>같은 Model도 Context · Tools · Validation에 따라 결과가 달라진다.</p>
     </section>
   );
 }
 
-function DeveloperQuestionsScene() {
-  const questions = [
-    ["01", "WHAT DOES IT SEE?", "무엇을 Context로 보고 있는가?"],
-    ["02", "WHAT CAN IT DO?", "어떤 Tool을 사용할 수 있는가?"],
-    ["03", "WHAT IS IT ALLOWED TO DO?", "어디까지 실행할 수 있는가?"],
-    ["04", "HOW IS IT VERIFIED?", "결과를 어떻게 검증하는가?"],
-  ];
+const agentParts = [
+  ["CONTEXT", "What does the Model see?"],
+  ["TOOLS", "Available capabilities"],
+  ["EXECUTION", "Request → action"],
+  ["ENVIRONMENT", "Repository / workspace"],
+  ["CONTROL", "What is allowed?"],
+  ["VALIDATION", "Is the result correct?"],
+  ["RESULT / FEEDBACK", "External evidence"],
+  ["LOOP", "Decide again"],
+] as const;
+
+function AgentSystemScene() {
   return (
-    <section className="scene scene-developer-questions">
-      {questions.map(([number, question, copy]) => <div className="developer-question" key={number}><span>{number}</span><strong>{question}</strong><p>{copy}</p></div>)}
+    <section className="scene scene-agent-system">
+      <SceneHeading
+        label="16 · STRUCTURAL INTEGRATION"
+        title={<>AN AGENT<br /><em>IS A SYSTEM</em></>}
+        note="Previously separated responsibilities assemble around the Model."
+      />
+
+      <div className="agent-system-stage">
+        <div className="agent-system-grid">
+          {agentParts.map(([part, note], index) => (
+            <div className={`system-part system-part-${index + 1}`} style={{ "--i": index } as CSSProperties} key={part}>
+              <strong>{part}</strong><span>{note}</span>
+            </div>
+          ))}
+          <ModelNode label="LLM" className="system-core" />
+          <div className="system-connections" aria-hidden="true"><i /><i /><i /><i /></div>
+          <div className="agent-identity"><span>AGENT</span></div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function IncidentReturnScene() {
-  return <section className="scene scene-incident-return"><IncidentWorkspace mode="decoded" /></section>;
-}
-
-function SynthesisScene() {
-  const regions = ["CONTEXT", "TOOLS", "EXECUTION", "CONTROL", "VALIDATION", "LOOP"];
+function ConclusionScene() {
+  const flow = ["LLM", "REQUEST", "SYSTEM ACTS", "RESULT", "CONTEXT UPDATE", "LLM"];
   return (
-    <section className="scene scene-synthesis">
-      <div className="synthesis-system">
-        <div className="synthesis-model"><Eyebrow>CORE</Eyebrow><strong>LLM</strong></div>
-        {regions.map((region, index) => <span className={`synthesis-region region-${index + 1}`} style={{ "--region-index": index } as React.CSSProperties} key={region}>{region}</span>)}
-        <div className="agent-boundary"><span>CODING AGENT</span></div>
+    <section className="scene scene-conclusion">
+      <div className="conclusion-origin">
+        <span>CONTEXT</span><i>→</i><strong>LLM</strong><i>→</i><span className="origin-output"><b>TOKEN</b><em>REQUEST</em></span>
       </div>
-      <div className="synthesis-copy">
-        <h2><span>THE MODEL IS</span><em>NOT THE AGENT.</em></h2>
-        <p>Model은 Agent의 핵심이다. Context, Tools, Execution, Control, Validation과 Loop가 함께 우리가 경험하는 Coding Agent를 만든다.</p>
+
+      <div className="conclusion-flow" aria-label="One compact system cycle">
+        {flow.map((step, index) => (
+          <div style={{ "--i": index } as CSSProperties} key={`${step}-${index}`}>
+            <span>{step}</span>{index < flow.length - 1 && <i>↓</i>}
+          </div>
+        ))}
       </div>
-      <div className="final-questions"><span>What does it see?</span><span>What can it do?</span><span>What is it allowed to do?</span><span>How is it verified?</span></div>
+
+      <div className="conclusion-dim" />
+      <div className="conclusion-thesis">
+        <h2><span>LLM</span><i>→</i><strong>AGENT</strong></h2>
+        <p><span>The model predicts.</span><strong>The system turns predictions into actions.</strong></p>
+      </div>
     </section>
   );
 }
@@ -546,34 +879,30 @@ function AppendixScene() {
   return (
     <section className="scene scene-appendix">
       <AgentArtwork variant="appendix" />
-      <div className="appendix-copy"><Eyebrow>APPENDIX · A1</Eyebrow><h2>처음에는 질문이고,<br /><em>마지막에는 답이 된다.</em></h2></div>
     </section>
   );
 }
 
-export function Scene({ sceneId, motionPaused }: SceneProps) {
+export function Scene({ sceneId }: SceneProps) {
   switch (sceneId) {
     case "intro": return <IntroScene />;
     case "incident": return <IncidentScene />;
-    case "strip": return <StripScene />;
+    case "focus-llm": return <FocusLlmScene />;
     case "next-token": return <NextTokenScene />;
     case "generation": return <GenerationScene />;
-    case "model-input": return <ModelInputScene />;
-    case "attention": return <AttentionScene />;
-    case "repository-context": return <RepositoryContextScene />;
-    case "boundary": return <BoundaryScene />;
-    case "execution-layer": return <ExecutionLayerScene />;
-    case "requests-executes": return <RequestsExecutesScene />;
-    case "result-returns": return <ResultReturnsScene />;
+    case "context-growth": return <ContextGrowthScene />;
+    case "evidence-context": return <EvidenceContextScene />;
+    case "access-context": return <AccessContextScene />;
+    case "model-requests": return <ModelRequestsScene />;
+    case "execution-acts": return <ExecutionActsScene />;
+    case "result-context": return <ResultContextScene />;
+    case "one-pass": return <OnePassScene />;
     case "agent-loop": return <AgentLoopScene />;
-    case "follow-npe": return <FollowNpeScene />;
-    case "failure-context": return <FailureContextScene />;
-    case "stop": return <StopScene />;
-    case "build-agent": return <BuildAgentScene />;
-    case "different-agent": return <DifferentAgentScene motionPaused={motionPaused} />;
-    case "developer-questions": return <DeveloperQuestionsScene />;
-    case "incident-return": return <IncidentReturnScene />;
-    case "synthesis": return <SynthesisScene />;
+    case "npe-run": return <NpeRunScene />;
+    case "patch-revise": return <PatchReviseScene />;
+    case "task-complete": return <TaskCompleteScene />;
+    case "agent-system": return <AgentSystemScene />;
+    case "conclusion": return <ConclusionScene />;
     case "appendix": return <AppendixScene />;
     default: return null;
   }

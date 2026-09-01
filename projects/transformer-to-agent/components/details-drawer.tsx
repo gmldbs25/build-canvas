@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { X } from "lucide-react";
 import type { SceneDefinition } from "@/content/pages";
 
@@ -10,6 +10,31 @@ type DetailsDrawerProps = {
   scrollRef: RefObject<HTMLDivElement | null>;
   onClose: () => void;
 };
+
+function inlineMarkup(value: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  const pattern = /(\*\*.+?\*\*|`[^`]+`)/g;
+  let cursor = 0;
+
+  for (const match of value.matchAll(pattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) parts.push(value.slice(cursor, index));
+    const token = match[0];
+    if (token.startsWith("**")) {
+      parts.push(<strong key={`${index}-strong`}>{token.slice(2, -2)}</strong>);
+    } else {
+      parts.push(<code key={`${index}-code`}>{token.slice(1, -1)}</code>);
+    }
+    cursor = index + token.length;
+  }
+
+  if (cursor < value.length) parts.push(value.slice(cursor));
+  return parts;
+}
+
+function InlineMarkup({ value }: { value: string }) {
+  return <>{inlineMarkup(value)}</>;
+}
 
 export function DetailsDrawer({ open, scene, scrollRef, onClose }: DetailsDrawerProps) {
   const drawerRef = useRef<HTMLElement>(null);
@@ -56,29 +81,39 @@ export function DetailsDrawer({ open, scene, scrollRef, onClose }: DetailsDrawer
           className="details-scroll"
           tabIndex={open ? 0 : -1}
         >
-          {scene.details?.map((section, sectionIndex) => (
-            <section className="details-section" key={`${section.title}-${sectionIndex}`}>
-              <h3>{section.title}</h3>
-              {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              {section.bullets && (
-                <ul>
-                  {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-                </ul>
-              )}
-              {section.code?.map((code, index) => <pre key={`${section.title}-${index}`}><code>{code}</code></pre>)}
-            </section>
-          ))}
-
-          {scene.references && (
-            <section className="details-section details-references">
-              <h3>References</h3>
-              {scene.references.map((reference) => (
-                <a href={reference.url} target="_blank" rel="noreferrer" key={reference.url}>
-                  {reference.label}
-                </a>
-              ))}
-            </section>
-          )}
+          <article className="details-article">
+            {scene.details.map((block, blockIndex) => {
+              const key = `${scene.id}-${blockIndex}`;
+              if (block.type === "heading") {
+                return block.level === 2
+                  ? <h3 key={key}><InlineMarkup value={block.text} /></h3>
+                  : <h4 key={key}><InlineMarkup value={block.text} /></h4>;
+              }
+              if (block.type === "paragraph") {
+                return <p key={key}><InlineMarkup value={block.text} /></p>;
+              }
+              if (block.type === "quote") {
+                return <blockquote key={key}><InlineMarkup value={block.text} /></blockquote>;
+              }
+              if (block.type === "code") {
+                return (
+                  <pre data-language={block.language || undefined} key={key}>
+                    <code>{block.value}</code>
+                  </pre>
+                );
+              }
+              const List = block.ordered ? "ol" : "ul";
+              return (
+                <List key={key}>
+                  {block.items.map((item, itemIndex) => (
+                    <Fragment key={`${key}-${itemIndex}`}>
+                      <li><InlineMarkup value={item} /></li>
+                    </Fragment>
+                  ))}
+                </List>
+              );
+            })}
+          </article>
         </div>
       </aside>
     </>
