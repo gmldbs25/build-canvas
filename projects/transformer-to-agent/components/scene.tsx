@@ -219,57 +219,59 @@ const tokenCandidates = [
 function NextTokenScene() {
   return (
     <section className="scene scene-next-token">
-      <SceneHeading
-        label="03 · NEXT TOKEN"
-        title={<>다음 Token은 어떻게<br /><em>결정될까?</em></>}
-        note="개념적인 Token 분할과 예시 값을 사용한다."
-      />
+      <div className="scene-safe-stack">
+        <SceneHeading
+          label="03 · NEXT TOKEN"
+          title={<>다음 Token은 어떻게<br /><em>결정될까?</em></>}
+          note="개념적인 Token 분할과 예시 값을 사용한다."
+        />
 
-      <div className="token-calculation">
-        <Panel label="INPUT TEXT" className="token-input stage-card">
-          <code>java.lang.NullPointer</code>
-          <div className="token-chunks" aria-label="Conceptual token chunks">
-            {["java", ".", "lang", ".", "Null", "Pointer"].map((token, index) => (
-              <span style={{ "--i": index } as CSSProperties} key={`${token}-${index}`}>{token}</span>
-            ))}
-          </div>
-          <small>CONCEPTUAL TOKENS</small>
-        </Panel>
-
-        <FlowArrow />
-
-        <Panel label="MODEL CALCULATION" className="token-model stage-card">
-          <strong>CONTEXT<br />REPRESENTATION</strong>
-          <span>현재 Sequence → 다음 위치</span>
-        </Panel>
-
-        <FlowArrow />
-
-        <div className="candidate-table stage-card">
-          <header>
-            <span>VOCABULARY LOGITS</span>
-            <i>SOFTMAX →</i>
-            <span>PROBABILITIES</span>
-          </header>
-          {tokenCandidates.map(([token, logit, probability], index) => (
-            <div className={index === 0 ? "candidate-row candidate-row-selected" : "candidate-row"} key={token}>
-              <strong>{token}</strong>
-              <code>{logit}</code>
-              <i aria-hidden="true" />
-              <b>{probability}</b>
+        <div className="token-calculation header-safe-stage">
+          <Panel label="INPUT TEXT" className="token-input stage-card">
+            <code>java.lang.NullPointer</code>
+            <div className="token-chunks" aria-label="Conceptual token chunks">
+              {["java", ".", "lang", ".", "Null", "Pointer"].map((token, index) => (
+                <span style={{ "--i": index } as CSSProperties} key={`${token}-${index}`}>{token}</span>
+              ))}
             </div>
-          ))}
-          <small>예시 점수와 확률</small>
+            <small>CONCEPTUAL TOKENS</small>
+          </Panel>
+
+          <FlowArrow />
+
+          <Panel label="MODEL CALCULATION" className="token-model stage-card">
+            <strong>CONTEXT<br />REPRESENTATION</strong>
+            <span>현재 Sequence → 다음 위치</span>
+          </Panel>
+
+          <FlowArrow />
+
+          <div className="candidate-table stage-card">
+            <header>
+              <span>VOCABULARY LOGITS</span>
+              <i>SOFTMAX →</i>
+              <span>PROBABILITIES</span>
+            </header>
+            {tokenCandidates.map(([token, logit, probability], index) => (
+              <div className={index === 0 ? "candidate-row candidate-row-selected" : "candidate-row"} key={token}>
+                <strong>{token}</strong>
+                <code>{logit}</code>
+                <i aria-hidden="true" />
+                <b>{probability}</b>
+              </div>
+            ))}
+            <small>예시 점수와 확률</small>
+          </div>
+
+          <FlowArrow />
+
+          <Panel label="DECODING" className="token-decoding stage-card">
+            <span>SELECTED TOKEN</span>
+            <strong>Exception</strong>
+            <code>java.lang.<br />NullPointer<mark>Exception</mark></code>
+            <b>ONE TOKEN GENERATED</b>
+          </Panel>
         </div>
-
-        <FlowArrow />
-
-        <Panel label="DECODING" className="token-decoding stage-card">
-          <span>SELECTED TOKEN</span>
-          <strong>Exception</strong>
-          <code>java.lang.<br />NullPointer<mark>Exception</mark></code>
-          <b>ONE TOKEN GENERATED</b>
-        </Panel>
       </div>
     </section>
   );
@@ -321,34 +323,36 @@ function GenerationScene() {
 function ContextGrowthScene() {
   return (
     <section className="scene scene-context-growth">
-      <SceneHeading
-        label="05 · MODEL CONTEXT"
-        title={<>작업이 진행되며<br /><em>Context도 달라진다</em></>}
-        note="하나의 Prompt가 계속 커지는 것이 아니라, Model Call마다 Context가 달라질 수 있다."
-      />
+      <div className="scene-safe-stack">
+        <SceneHeading
+          label="05 · MODEL CONTEXT"
+          title={<>작업이 진행되며<br /><em>Context도 달라진다</em></>}
+          note="하나의 Prompt가 계속 커지는 것이 아니라, Model Call마다 Context가 달라질 수 있다."
+        />
 
-      <div className="context-growth-stage">
-        <ContextSnapshot
-          label="MODEL CONTEXT #1"
-          meta="INITIAL CALL"
-          items={[
-            { label: "USER REQUEST", value: "이 NPE 원인을 찾아서 수정해줘" },
-            { label: "ERROR LOG", value: "NullPointerException · UserMapper.java:42" },
-          ]}
-        />
-        <div className="task-progress-arrow"><span>작업 진행</span><i>→</i></div>
-        <ContextSnapshot
-          label="MODEL CONTEXT #2"
-          meta="LATER CALL · SELECTED SNAPSHOT"
-          className="later-context"
-          items={[
-            { label: "USER REQUEST" },
-            { label: "ERROR LOG" },
-            { label: "RELEVANT SOURCE", accent: true },
-            { label: "PREVIOUS RESULT", accent: true },
-            { label: "NEW EVIDENCE", accent: true },
-          ]}
-        />
+        <div className="context-growth-stage header-safe-stage">
+          <ContextSnapshot
+            label="MODEL CONTEXT #1"
+            meta="INITIAL CALL"
+            items={[
+              { label: "USER REQUEST", value: "이 NPE 원인을 찾아서 수정해줘" },
+              { label: "ERROR LOG", value: "NullPointerException · UserMapper.java:42" },
+            ]}
+          />
+          <div className="task-progress-arrow"><span>작업 진행</span><i>→</i></div>
+          <ContextSnapshot
+            label="MODEL CONTEXT #2"
+            meta="LATER CALL · SELECTED SNAPSHOT"
+            className="later-context"
+            items={[
+              { label: "USER REQUEST" },
+              { label: "ERROR LOG" },
+              { label: "RELEVANT SOURCE", accent: true },
+              { label: "PREVIOUS RESULT", accent: true },
+              { label: "NEW EVIDENCE", accent: true },
+            ]}
+          />
+        </div>
       </div>
 
       <div className="context-growth-guardrail">
@@ -371,25 +375,27 @@ const evidenceBlocks = [
 function EvidenceContextScene() {
   return (
     <section className="scene scene-evidence-context">
-      <SceneHeading
-        label="06 · LONG CONTEXT"
-        title={<>멀리 떨어진 정보도<br /><em>같은 판단에 영향을 준다</em></>}
-        note="Context 안의 관련 정보를 함께 활용한다."
-      />
+      <div className="scene-safe-stack">
+        <SceneHeading
+          label="06 · LONG CONTEXT"
+          title={<>멀리 떨어진 정보도<br /><em>같은 판단에 영향을 준다</em></>}
+          note="Context 안의 관련 정보를 함께 활용한다."
+        />
 
-      <div className="evidence-stage">
-        <div className="long-context-window">
-          <header><Eyebrow>CURRENT MODEL CONTEXT</Eyebrow><span>SCROLL MOTION = 표현을 위한 비유</span></header>
-          <div className="long-context-track">
-            {evidenceBlocks.map(([label, value], index) => (
-              <div className={[1, 2, 4].includes(index) ? "evidence-block evidence-relevant" : "evidence-block"} style={{ "--i": index } as CSSProperties} key={label}>
-                <b>{label}</b><code>{value}</code>
-              </div>
-            ))}
+        <div className="evidence-stage header-safe-stage">
+          <div className="long-context-window">
+            <header><Eyebrow>CURRENT MODEL CONTEXT</Eyebrow><span>SCROLL MOTION = 표현을 위한 비유</span></header>
+            <div className="long-context-track">
+              {evidenceBlocks.map(([label, value], index) => (
+                <div className={[1, 2, 4].includes(index) ? "evidence-block evidence-relevant" : "evidence-block"} style={{ "--i": index } as CSSProperties} key={label}>
+                  <b>{label}</b><code>{value}</code>
+                </div>
+              ))}
+            </div>
           </div>
+          <div className="evidence-signals" aria-hidden="true"><i /><i /><i /></div>
+          <ModelNode label="MODEL" className="evidence-model" />
         </div>
-        <div className="evidence-signals" aria-hidden="true"><i /><i /><i /></div>
-        <ModelNode label="MODEL" className="evidence-model" />
       </div>
 
       <p className="evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
@@ -459,9 +465,6 @@ function ModelRequestsScene() {
           <ModelNode />
           <div className="model-need"><span>NEED SOURCE</span><strong>UserMapper.java</strong></div>
         </div>
-        <div className="direct-access-rejected" aria-label="Model cannot directly read repository">
-          <span>MODEL</span><i /><b>×</b><i /><span>REPOSITORY</span>
-        </div>
         <FlowArrow label="OUTBOUND OUTPUT" />
         <div className="execution-gate">
           <Eyebrow>EXECUTION LAYER</Eyebrow>
@@ -509,8 +512,6 @@ function ExecutionActsScene() {
             <span>UserProfile.java</span>
           </div>
         </div>
-
-        <div className="execution-return-path" aria-hidden="true"><span>RESULT</span><i /><b>↑</b></div>
 
         <div className="execution-result">
           <Eyebrow>TOOL RESULT / AGENT STATE</Eyebrow>
@@ -678,37 +679,44 @@ const npeIterations = [
 function NpeRunScene() {
   return (
     <section className="scene scene-npe-run">
-      <SceneHeading
-        label="13 · NPE AGENT RUN"
-        title={<>실제 NPE를 Agent Loop로<br /><em>따라가보자</em></>}
-        note="숨겨진 추론이 아니라, 관찰 가능한 요약만 보여준다."
-      />
+      <div className="scene-safe-stack">
+        <SceneHeading
+          label="13 · NPE AGENT RUN"
+          title={
+            <>
+              <span className="scene-title-line scene-title-line-nowrap">실제 NPE를 Agent Loop로</span>
+              <span className="scene-title-line"><em>따라가보자</em></span>
+            </>
+          }
+          note="숨겨진 추론이 아니라, 관찰 가능한 요약만 보여준다."
+        />
 
-      <div className="npe-run-stage">
-        <div className="iteration-rail">
-          {npeIterations.map((iteration, index) => (
-            <div style={{ "--i": index } as CSSProperties} key={iteration.number}>
-              <i>{iteration.number}</i><span>{index === 0 ? "SEARCH" : index === 1 ? "INSPECT" : "HYPOTHESIS"}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="npe-state-stack">
-          {npeIterations.map((iteration, iterationIndex) => (
-            <div className={`npe-state npe-state-${iterationIndex + 1}`} key={iteration.number}>
-              <ContextSnapshot
-                label={`CURRENT MODEL CONTEXT · ITERATION ${iteration.number}`}
-                items={iteration.context.map((label, index) => ({ label, accent: index >= 2 }))}
-              />
-              <div className="model-assessment">
-                <header><Eyebrow>MODEL · OBSERVABLE SUMMARY</Eyebrow></header>
-                {iteration.summaries.map(([label, value]) => (
-                  <div key={label}><span>{label}</span><strong>{value}</strong></div>
-                ))}
-                <code>{iteration.output}</code>
+        <div className="npe-run-stage header-safe-stage">
+          <div className="iteration-rail">
+            {npeIterations.map((iteration, index) => (
+              <div style={{ "--i": index } as CSSProperties} key={iteration.number}>
+                <i>{iteration.number}</i><span>{index === 0 ? "SEARCH" : index === 1 ? "INSPECT" : "HYPOTHESIS"}</span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="npe-state-stack">
+            {npeIterations.map((iteration, iterationIndex) => (
+              <div className={`npe-state npe-state-${iterationIndex + 1}`} key={iteration.number}>
+                <ContextSnapshot
+                  label={`CURRENT MODEL CONTEXT · ITERATION ${iteration.number}`}
+                  items={iteration.context.map((label, index) => ({ label, accent: index >= 2 }))}
+                />
+                <div className="model-assessment">
+                  <header><Eyebrow>MODEL · OBSERVABLE SUMMARY</Eyebrow></header>
+                  {iteration.summaries.map(([label, value]) => (
+                    <div key={label}><span>{label}</span><strong>{value}</strong></div>
+                  ))}
+                  <code>{iteration.output}</code>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -735,41 +743,45 @@ const revisionSteps = ["PATCH #1", "NPE RESOLVED", "RUN EXISTING TEST", "FAIL", 
 function PatchReviseScene() {
   return (
     <section className="scene scene-patch-revise">
-      <SceneHeading
-        label="14 · VALIDATION"
-        title={<>실패가 다음<br /><em>수정을 만든다</em></>}
-        note="실패는 재학습이 아니라 새로운 근거다."
-      />
+      <div className="scene-safe-stack scene-safe-stack-with-timeline">
+        <div className="scene-safe-header-row">
+          <SceneHeading
+            label="14 · VALIDATION"
+            title={<>실패가 다음<br /><em>수정을 만든다</em></>}
+            note="실패는 재학습이 아니라 새로운 근거다."
+          />
 
-      <div className="revision-timeline">
-        {revisionSteps.map((step, index) => (
-          <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
-            <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
+          <div className="revision-timeline">
+            {revisionSteps.map((step, index) => (
+              <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
+                <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-
-      <div className="revision-stage">
-        <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
-          <PatchCode />
-        </Panel>
-
-        <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
-          <strong>FAIL</strong>
-          <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
-          <span>실패도 다음 판단을 위한 Feedback이다</span>
-        </Panel>
-
-        <div className="revision-summary">
-          <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
-          <div><span>OBSERVATION</span><strong>NPE는 해결됐다.</strong></div>
-          <div><span>NEW EVIDENCE</span><strong>null 반환은 기대 동작을 깨뜨린다.</strong></div>
-          <div><span>NEXT ACTION</span><strong>Patch를 다시 고친다.</strong></div>
         </div>
 
-        <Panel label="PATCH #2" className="second-patch-card">
-          <PatchCode revised />
-        </Panel>
+        <div className="revision-stage header-safe-stage">
+          <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
+            <PatchCode />
+          </Panel>
+
+          <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
+            <strong>FAIL</strong>
+            <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
+            <span>실패도 다음 판단을 위한 Feedback이다</span>
+          </Panel>
+
+          <div className="revision-summary">
+            <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
+            <div><span>OBSERVATION</span><strong>NPE는 해결됐다.</strong></div>
+            <div><span>NEW EVIDENCE</span><strong>null 반환은 기대 동작을 깨뜨린다.</strong></div>
+            <div><span>NEXT ACTION</span><strong>Patch를 다시 고친다.</strong></div>
+          </div>
+
+          <Panel label="PATCH #2" className="second-patch-card">
+            <PatchCode revised />
+          </Panel>
+        </div>
       </div>
     </section>
   );
@@ -780,32 +792,34 @@ const completionSteps = ["PATCH #2", "RUN TESTS", "PASS", "VERIFY", "OBJECTIVE S
 function TaskCompleteScene() {
   return (
     <section className="scene scene-task-complete">
-      <SceneHeading
-        label="15 · STOP CONDITION"
-        title={<>검증이 끝나면<br /><em>작업도 끝난다</em></>}
-        note="이 결과가 목표를 충족해, 다시 Model로 돌아가지 않는다."
-      />
+      <div className="scene-safe-stack">
+        <SceneHeading
+          label="15 · STOP CONDITION"
+          title={<>검증이 끝나면<br /><em>작업도 끝난다</em></>}
+          note="이 결과가 목표를 충족해, 다시 Model로 돌아가지 않는다."
+        />
 
-      <div className="completion-stage">
-        <div className="task-complete-card">
-          <Eyebrow>AGENT RUN</Eyebrow>
-          <h3>TASK COMPLETE</h3>
-          <ul>
-            <li><i>✓</i><span>NPE 해결</span></li>
-            <li><i>✓</i><span>Patch 검증</span></li>
-            <li><i>✓</i><span>Test 통과</span></li>
-          </ul>
-        </div>
+        <div className="completion-stage header-safe-stage">
+          <div className="task-complete-card">
+            <Eyebrow>AGENT RUN</Eyebrow>
+            <h3>TASK COMPLETE</h3>
+            <ul>
+              <li><i>✓</i><span>NPE 해결</span></li>
+              <li><i>✓</i><span>Patch 검증</span></li>
+              <li><i>✓</i><span>Test 통과</span></li>
+            </ul>
+          </div>
 
-        <div className="completion-flow">
-          {completionSteps.map((step, index) => (
-            <div className={step === "STOP" ? "completion-step completion-stop" : "completion-step"} style={{ "--i": index } as CSSProperties} key={step}>
-              <i>{String(index + 1).padStart(2, "0")}</i>
-              <strong>{step}</strong>
-              {index < completionSteps.length - 1 && <b>→</b>}
-            </div>
-          ))}
-          <p>PASS → COMPLETE <span>·</span> MODEL로 돌아가지 않음</p>
+          <div className="completion-flow">
+            {completionSteps.map((step, index) => (
+              <div className={step === "STOP" ? "completion-step completion-stop" : "completion-step"} style={{ "--i": index } as CSSProperties} key={step}>
+                <i>{String(index + 1).padStart(2, "0")}</i>
+                <strong>{step}</strong>
+                {index < completionSteps.length - 1 && <b>→</b>}
+              </div>
+            ))}
+            <p>PASS → COMPLETE <span>·</span> MODEL로 돌아가지 않음</p>
+          </div>
         </div>
       </div>
     </section>

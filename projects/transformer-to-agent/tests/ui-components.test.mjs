@@ -159,3 +159,35 @@ test("uses finite explanatory motion and a stable reduced-motion frame", () => {
   assert.match(cssSource, /\.npe-state-3 \{ opacity: 1 !important; \}/);
   assert.match(cssSource, /\.conclusion-dim, \.conclusion-thesis \{ opacity: 1 !important/);
 });
+
+test("keeps heading and visual zones structurally separated", () => {
+  for (const [name, nextName] of [
+    ["NextTokenScene", "GenerationScene"],
+    ["ContextGrowthScene", "EvidenceContextScene"],
+    ["EvidenceContextScene", "AccessContextScene"],
+    ["NpeRunScene", "PatchCode"],
+    ["PatchReviseScene", "TaskCompleteScene"],
+    ["TaskCompleteScene", "AgentSystemScene"],
+  ]) {
+    const scene = functionBlock(name, nextName);
+    assert.match(scene, /scene-safe-stack/);
+    assert.match(scene, /header-safe-stage/);
+  }
+
+  assert.match(cssSource, /\.scene-safe-stack \{[^}]*grid-template-rows: max-content minmax\(0, 1fr\)/);
+  assert.match(cssSource, /--scene-header-gap: clamp\(32px, 4vh, 44px\)/);
+});
+
+test("removes redundant request and result-path ornaments", () => {
+  assert.doesNotMatch(sceneSource, /direct-access-rejected|execution-return-path/);
+  assert.doesNotMatch(cssSource, /direct-access-rejected|execution-return-path/);
+});
+
+test("locks the NPE Agent Run title to exactly two intentional lines", () => {
+  const npeRun = functionBlock("NpeRunScene", "PatchCode");
+  assert.match(
+    npeRun,
+    /scene-title-line scene-title-line-nowrap">실제 NPE를 Agent Loop로<\/span>[\s\S]*scene-title-line"><em>따라가보자<\/em><\/span>/,
+  );
+  assert.match(cssSource, /\.scene-title-line-nowrap \{ white-space: nowrap; \}/);
+});
