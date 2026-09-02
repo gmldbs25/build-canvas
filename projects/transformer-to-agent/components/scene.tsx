@@ -115,10 +115,7 @@ function IntroScene() {
       <div className="intro-copy">
         <Eyebrow>WORK 03 · BUILD CANVAS</Eyebrow>
         <h1>LLM <span>to</span><br />AGENT</h1>
-        <p className="intro-subtitle">다음 Token 예측에서<br />Coding Agent가 되기까지</p>
-        <p className="intro-question">
-          다음 Token 예측 Model은 어떻게 코드를 읽고,<br />파일을 수정하고 테스트하는 System에 참여할까?
-        </p>
+        <p className="intro-subtitle">다음 Token 예측에서<br />AGENT가 되기까지</p>
       </div>
     </section>
   );
@@ -128,7 +125,7 @@ const incidentSteps = ["READ LOG", "SEARCH CODE", "READ FILE", "TRACE", "PATCH",
 
 function IncidentScene() {
   return (
-    <section className="scene scene-flow scene-incident">
+    <section className="scene scene-incident">
       <SceneHeading
         label="01 · INCIDENT → AGENT"
         title={<>운영 장애에서<br /><em>Agent Workflow까지</em></>}
@@ -166,7 +163,7 @@ function IncidentScene() {
         </Panel>
       </div>
 
-      <div className="scene-footer incident-workflow" aria-label="Agent workflow">
+      <div className="incident-workflow" aria-label="Agent workflow">
         {incidentSteps.map((step, index) => (
           <div
             className={index === incidentSteps.length - 1 ? "workflow-step workflow-step-final" : "workflow-step"}
@@ -186,22 +183,20 @@ function IncidentScene() {
 function FocusLlmScene() {
   const parts = ["CONTEXT", "TOOLS", "EXECUTION", "ENVIRONMENT"];
   return (
-    <section className="scene scene-focus-flow scene-focus-llm">
-      <div className="focus-main">
-        <div className="agent-dissolve" aria-hidden="true">
-          {parts.map((part, index) => (
-            <span className={`dissolve-part dissolve-part-${index + 1}`} key={part}>{part}</span>
-          ))}
-          <div className="dissolve-boundary">AGENT</div>
-        </div>
+    <section className="scene scene-focus-llm">
+      <div className="agent-dissolve" aria-hidden="true">
+        {parts.map((part, index) => (
+          <span className={`dissolve-part dissolve-part-${index + 1}`} key={part}>{part}</span>
+        ))}
+        <div className="dissolve-boundary">AGENT</div>
+      </div>
 
-        <div className="focus-pipeline">
-          <Panel label="INPUT" className="focus-input"><code>current context</code></Panel>
-          <FlowArrow />
-          <ModelNode label="LLM" className="focus-model" />
-          <FlowArrow />
-          <Panel label="OUTPUT" className="focus-output"><strong>NEXT TOKEN ?</strong></Panel>
-        </div>
+      <div className="focus-pipeline">
+        <Panel label="INPUT" className="focus-input"><code>current context</code></Panel>
+        <FlowArrow />
+        <ModelNode label="LLM" className="focus-model" />
+        <FlowArrow />
+        <Panel label="OUTPUT" className="focus-output"><strong>NEXT TOKEN ?</strong></Panel>
       </div>
 
       <SceneHeading
@@ -223,7 +218,7 @@ const tokenCandidates = [
 
 function NextTokenScene() {
   return (
-    <section className="scene scene-flow scene-next-token">
+    <section className="scene scene-next-token">
       <SceneHeading
         label="03 · NEXT TOKEN"
         title={<>다음 Token은 어떻게<br /><em>결정될까?</em></>}
@@ -272,7 +267,7 @@ function NextTokenScene() {
         <Panel label="DECODING" className="token-decoding stage-card">
           <span>SELECTED TOKEN</span>
           <strong>Exception</strong>
-          <code>java.lang.NullPointer<mark>Exception</mark></code>
+          <code>java.lang.<br />NullPointer<mark>Exception</mark></code>
           <b>ONE TOKEN GENERATED</b>
         </Panel>
       </div>
@@ -287,28 +282,25 @@ const generationCycles = [
 
 function GenerationScene() {
   return (
-    <section className="scene scene-flow scene-generation">
+    <section className="scene scene-generation">
       <SceneHeading
         label="04 · GENERATION"
         title={<>Token 생성은<br /><em>반복이다</em></>}
         note="선택된 Token은 다음 Sequence의 일부가 된다."
       />
 
-      <div className="generation-main">
-        <div className="generation-loop" aria-label="Context to next-token append loop">
-          <div className="generation-loop-row">
-            <Panel label="CONTEXT" className="generation-node"><strong>CURRENT SEQUENCE</strong></Panel>
-            <FlowArrow />
-            <ModelNode label="LLM" />
-            <FlowArrow />
-            <Panel label="OUTPUT" className="generation-node"><strong>NEXT TOKEN</strong></Panel>
-          </div>
-          <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
+      <div className="generation-loop" aria-label="Context to next-token append loop">
+        <div className="generation-loop-row">
+          <Panel label="CONTEXT" className="generation-node"><strong>CURRENT SEQUENCE</strong></Panel>
+          <FlowArrow />
+          <ModelNode label="LLM" />
+          <FlowArrow />
+          <Panel label="OUTPUT" className="generation-node"><strong>NEXT TOKEN</strong></Panel>
         </div>
-        <div className="generation-thesis">PREDICT → APPEND → REPEAT</div>
+        <div className="append-return"><span>APPEND</span><i /><b>↖</b></div>
       </div>
 
-      <div className="scene-footer generation-cycles">
+      <div className="generation-cycles">
         {generationCycles.map((cycle, index) => (
           <div className="generation-cycle" style={{ "--i": index } as CSSProperties} key={cycle.number}>
             <i>{cycle.number}</i>
@@ -320,13 +312,15 @@ function GenerationScene() {
         ))}
       </div>
 
+      <div className="generation-thesis">PREDICT → APPEND → REPEAT</div>
+
     </section>
   );
 }
 
 function ContextGrowthScene() {
   return (
-    <section className="scene scene-flow scene-context-growth">
+    <section className="scene scene-context-growth">
       <SceneHeading
         label="05 · MODEL CONTEXT"
         title={<>작업이 진행되며<br /><em>Context도 달라진다</em></>}
@@ -357,12 +351,10 @@ function ContextGrowthScene() {
         />
       </div>
 
-      <div className="scene-footer context-growth-footer">
-        <div className="context-growth-guardrail">
-          SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
-        </div>
-        <h3 className="context-growth-question">새로운 정보는 어떻게 Context에 들어왔을까?</h3>
+      <div className="context-growth-guardrail">
+        SELECTION · FILTERING · SUMMARY · COMPRESSION · OMISSION
       </div>
+      <h3 className="context-growth-question">새로운 정보는 어떻게 Context에 들어왔을까?</h3>
     </section>
   );
 }
@@ -378,7 +370,7 @@ const evidenceBlocks = [
 
 function EvidenceContextScene() {
   return (
-    <section className="scene scene-flow scene-evidence-context">
+    <section className="scene scene-evidence-context">
       <SceneHeading
         label="06 · LONG CONTEXT"
         title={<>멀리 떨어진 정보도<br /><em>같은 판단에 영향을 준다</em></>}
@@ -400,14 +392,14 @@ function EvidenceContextScene() {
         <ModelNode label="MODEL" className="evidence-model" />
       </div>
 
-      <p className="scene-footer evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
+      <p className="evidence-disclaimer">CONCEPTUAL SIGNALS · NOT A PRODUCTION ATTENTION TRACE</p>
     </section>
   );
 }
 
 function AccessContextScene() {
   return (
-    <section className="scene scene-flow scene-access-context">
+    <section className="scene scene-access-context">
       <SceneHeading
         label="07 · REPOSITORY ACCESS"
         title={<>ACCESS <em>≠</em> CONTEXT</>}
@@ -442,14 +434,14 @@ function AccessContextScene() {
         />
       </div>
 
-      <h3 className="scene-footer access-question">그럼 코드는 어떻게 Context에 들어올까?</h3>
+      <h3 className="access-question">그럼 코드는 어떻게 Context에 들어올까?</h3>
     </section>
   );
 }
 
 function ModelRequestsScene() {
   return (
-    <section className="scene scene-flow scene-model-requests">
+    <section className="scene scene-model-requests">
       <SceneHeading
         label="08 · MODEL REQUEST"
         title={<>필요한 행동은<br /><em>Model이 요청한다</em></>}
@@ -479,14 +471,14 @@ function ModelRequestsScene() {
         <Panel label="ENVIRONMENT" className="request-repository"><strong>REPOSITORY</strong><span>아직 읽지 않음</span></Panel>
       </div>
 
-      <div className="scene-footer request-thesis">REQUEST <em>≠</em> EXECUTION</div>
+      <div className="request-thesis">REQUEST <em>≠</em> EXECUTION</div>
     </section>
   );
 }
 
 function ExecutionActsScene() {
   return (
-    <section className="scene scene-flow scene-execution-acts">
+    <section className="scene scene-execution-acts">
       <SceneHeading
         label="09 · EXECUTION"
         title={<>실제 실행은<br /><em>Execution Layer가 맡는다</em></>}
@@ -532,7 +524,7 @@ function ExecutionActsScene() {
 
 function ResultContextScene() {
   return (
-    <section className="scene scene-flow scene-result-context">
+    <section className="scene scene-result-context">
       <SceneHeading
         label="10 · MODEL CONTEXT"
         title={<>Result는 다음<br /><em>Context에 반영될 수 있다</em></>}
@@ -568,14 +560,14 @@ function ResultContextScene() {
         <ModelNode label="MODEL" className="model-not-run" />
       </div>
 
-      <p className="scene-footer result-context-guardrail">MODEL CONTEXT ≠ ENTIRE AGENT STATE · TOOL RESULT 전체 아님 · MODEL 실행 전</p>
+      <p className="result-context-guardrail">MODEL CONTEXT ≠ ENTIRE AGENT STATE · TOOL RESULT 전체 아님 · MODEL 실행 전</p>
     </section>
   );
 }
 
 function OnePassScene() {
   return (
-    <section className="scene scene-flow scene-one-pass">
+    <section className="scene scene-one-pass">
       <SceneHeading
         align="center"
         label="11 · FIRST OUTPUT"
@@ -600,7 +592,7 @@ function OnePassScene() {
         </div>
       </div>
 
-      <div className="scene-footer now-what"><span>NEXT CONTEXT 준비 완료</span><strong>그다음은?</strong></div>
+      <div className="now-what"><span>NEXT CONTEXT 준비 완료</span><strong>그다음은?</strong></div>
     </section>
   );
 }
@@ -609,7 +601,7 @@ const loopStages = ["MODEL", "REQUEST", "EXECUTION", "RESULT", "CONTEXT UPDATE"]
 
 function AgentLoopScene() {
   return (
-    <section className="scene scene-flow scene-agent-loop">
+    <section className="scene scene-agent-loop">
       <SceneHeading
         label="12 · AGENT LOOP"
         title={<>이 반복이<br /><em>Agent Loop다</em></>}
@@ -646,7 +638,7 @@ function AgentLoopScene() {
         </div>
       </div>
 
-      <div className="scene-footer agent-loop-thesis">DECIDE → ACT → OBSERVE → UPDATE → DECIDE AGAIN</div>
+      <div className="agent-loop-thesis">DECIDE → ACT → OBSERVE → UPDATE → DECIDE AGAIN</div>
     </section>
   );
 }
@@ -685,7 +677,7 @@ const npeIterations = [
 
 function NpeRunScene() {
   return (
-    <section className="scene scene-flow scene-npe-run">
+    <section className="scene scene-npe-run">
       <SceneHeading
         label="13 · NPE AGENT RUN"
         title={<>실제 NPE를 Agent Loop로<br /><em>따라가보자</em></>}
@@ -742,44 +734,42 @@ const revisionSteps = ["PATCH #1", "NPE RESOLVED", "RUN EXISTING TEST", "FAIL", 
 
 function PatchReviseScene() {
   return (
-    <section className="scene scene-flow scene-patch-revise">
+    <section className="scene scene-patch-revise">
       <SceneHeading
         label="14 · VALIDATION"
         title={<>실패가 다음<br /><em>수정을 만든다</em></>}
         note="실패는 재학습이 아니라 새로운 근거다."
       />
 
-      <div className="revision-main">
-        <div className="revision-timeline">
-          {revisionSteps.map((step, index) => (
-            <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
-              <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
-            </div>
-          ))}
-        </div>
-
-        <div className="revision-stage">
-          <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
-            <PatchCode />
-          </Panel>
-
-          <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
-            <strong>FAIL</strong>
-            <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
-            <span>실패도 다음 판단을 위한 Feedback이다</span>
-          </Panel>
-
-          <div className="revision-summary">
-            <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
-            <div><span>OBSERVATION</span><strong>NPE는 해결됐다.</strong></div>
-            <div><span>NEW EVIDENCE</span><strong>null 반환은 기대 동작을 깨뜨린다.</strong></div>
-            <div><span>NEXT ACTION</span><strong>Patch를 다시 고친다.</strong></div>
+      <div className="revision-timeline">
+        {revisionSteps.map((step, index) => (
+          <div className={step === "FAIL" ? "revision-step revision-step-fail" : "revision-step"} style={{ "--i": index } as CSSProperties} key={step}>
+            <i>{String(index + 1).padStart(2, "0")}</i><strong>{step}</strong>
           </div>
+        ))}
+      </div>
 
-          <Panel label="PATCH #2" className="second-patch-card">
-            <PatchCode revised />
-          </Panel>
+      <div className="revision-stage">
+        <Panel label="PATCH #1 · NPE RESOLVED" className="first-patch-card">
+          <PatchCode />
+        </Panel>
+
+        <Panel label="EXISTING REPOSITORY TEST" className="test-failure-card">
+          <strong>FAIL</strong>
+          <code>expected: <b>&quot;Unknown&quot;</b><br />actual: <b>null</b></code>
+          <span>실패도 다음 판단을 위한 Feedback이다</span>
+        </Panel>
+
+        <div className="revision-summary">
+          <Eyebrow>NEXT MODEL CONTEXT · OBSERVABLE SUMMARY</Eyebrow>
+          <div><span>OBSERVATION</span><strong>NPE는 해결됐다.</strong></div>
+          <div><span>NEW EVIDENCE</span><strong>null 반환은 기대 동작을 깨뜨린다.</strong></div>
+          <div><span>NEXT ACTION</span><strong>Patch를 다시 고친다.</strong></div>
         </div>
+
+        <Panel label="PATCH #2" className="second-patch-card">
+          <PatchCode revised />
+        </Panel>
       </div>
     </section>
   );
@@ -789,7 +779,7 @@ const completionSteps = ["PATCH #2", "RUN TESTS", "PASS", "VERIFY", "OBJECTIVE S
 
 function TaskCompleteScene() {
   return (
-    <section className="scene scene-flow scene-task-complete">
+    <section className="scene scene-task-complete">
       <SceneHeading
         label="15 · STOP CONDITION"
         title={<>검증이 끝나면<br /><em>작업도 끝난다</em></>}
@@ -835,7 +825,7 @@ const agentParts = [
 
 function AgentSystemScene() {
   return (
-    <section className="scene scene-split-flow scene-agent-system">
+    <section className="scene scene-agent-system">
       <SceneHeading
         label="16 · AGENT SYSTEM"
         title={<>구성 요소가<br /><em>Agent를 만든다</em></>}

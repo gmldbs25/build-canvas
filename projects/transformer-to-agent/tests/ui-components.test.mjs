@@ -35,6 +35,16 @@ test("keeps one canonical 19-screen sequence", () => {
   assert.doesNotMatch(cssSource, /scene-different-agent|scene-developer-questions|scene-incident-return|scene-synthesis/);
 });
 
+test("locks the minimal Scene 00 intro and scene-specific composition", () => {
+  const intro = functionBlock("IntroScene", "IncidentScene");
+  assert.match(intro, /WORK 03 · BUILD CANVAS/);
+  assert.match(intro, /LLM <span>to<\/span><br \/>AGENT/);
+  assert.match(intro, /다음 Token 예측에서<br \/>AGENT가 되기까지/);
+  assert.doesNotMatch(intro, /Coding Agent가 되기까지|다음 Token 예측 Model은 어떻게|intro-question/);
+  assert.doesNotMatch(sceneSource, /scene-flow|scene-footer|scene-focus-flow|scene-split-flow/);
+  assert.doesNotMatch(cssSource, /\.scene-flow|\.scene-focus-flow|\.scene-split-flow/);
+});
+
 test("preserves keyboard navigation, Details scrolling, Overview, and Home", () => {
   assert.match(pageSource, /event\.key === "ArrowLeft"/);
   assert.match(pageSource, /event\.key === "ArrowRight"/);
