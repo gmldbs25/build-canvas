@@ -44,18 +44,26 @@ README.md                      # 프로젝트 개요·구조·공통 개발 규�
 
 Node.js `22.13.0` 이상을 사용합니다.
 
+직접 실행하려면:
+
 ```bash
 npm ci
 npm run dev
 ```
 
-Docker로 GitHub Pages와 가까운 통합 프리뷰를 실행하려면:
+기본 로컬 프리뷰는 다음 경로에서 열립니다.
+
+```text
+http://localhost:5173/build-canvas/
+```
+
+Docker로 실행하려면:
 
 ```bash
 docker compose up --build
 ```
 
-기본 통합 프리뷰 경로:
+Docker 프리뷰는 다음 경로를 사용합니다.
 
 ```text
 http://localhost:4173/build-canvas/
