@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work4 · 컴퓨터가 데이터를 기억하는 방식 — Scene A 시안</title>
+<link rel="stylesheet" href="scene-a.css">
+</head>
+<body>
+<main class="scene" aria-label="Work4 Scene A 디자인 초안">
+  <header class="topbar">
+    <div class="identity">build <span>_</span> canvas <i></i><span class="work-number">Work 04</span></div>
+    <nav class="hierarchy" aria-label="현재 탐험 단계">
+      <ol><li aria-current="step">SSD</li><li>NAND Package</li><li>Die</li><li>Block</li><li>Page</li><li>Cell</li></ol>
+    </nav>
+    <div class="chapter">NAND Flash</div>
+  </header>
+  <section class="intro" aria-labelledby="scene-title">
+    <p class="eyebrow"><span></span> SSD에서 시작하는 탐험</p>
+    <h1 id="scene-title">컴퓨터가 데이터를<br>기억하는 방식</h1>
+    <h2>NAND Flash의 동작 원리</h2>
+    <p class="description">SSD 내부로 들어가며<br>데이터가 실제로 저장되는 구조를 살펴봅니다.</p>
+  </section>
+  <figure class="engineering-object">
+    <img src="ssd-board.svg" alt="Controller와 세 개의 NAND Flash Package가 놓인 2.5D SSD 보드. 가운데 NAND Package가 청색으로 강조되어 있습니다." width="1920" height="1080">
+    <figcaption><span class="object-line"></span><span>SSD</span><span class="object-note">데이터를 담는 드라이브</span></figcaption>
+  </figure>
+  <!-- A frozen hover state for visual review; no animation or Scene B logic. -->
+  <aside class="nand-tooltip" aria-label="선택된 NAND Flash의 설명">
+    <div class="tooltip-title"><span></span>NAND Flash</div>
+    <p>전원이 꺼져도 데이터를<br>기억하는 메모리입니다.</p>
+  </aside>
+  <svg class="annotation" viewBox="0 0 1920 1080" aria-hidden="true"><path d="M1419 378V419L1388 450"/><circle cx="1388" cy="450" r="4"/></svg>
+  <aside class="scale" aria-label="현재 축척: cm 영역. mm, μm, nm 순서로 확대 예정">
+    <span class="scale-heading">축척</span>
+    <div class="ruler"><span class="scale-marker"></span><span class="unit active">cm</span><span class="unit">mm</span><span class="unit">μm</span><span class="unit">nm</span></div>
+  </aside>
+  <footer class="bottom-bar">
+    <div class="scene-position"><span>01</span><i></i>SSD</div>
+    <div class="scroll-cue"><svg width="17" height="25" viewBox="0 0 17 25" fill="none" aria-hidden="true"><rect x="1" y="1" width="15" height="23" rx="7.5" stroke="currentColor"/><path d="M8.5 6V10" stroke="currentColor" stroke-linecap="round"/></svg><span>스크롤하여 내부로 이동</span><span class="down-arrow">↓</span></div>
+    <div class="next-destination">다음 <span>NAND Package</span><span>↘</span></div>
+  </footer>
+</main>
+<script>
+// Fit the fixed desktop design canvas to the review window. No scene animation.
+const scene = document.querySelector('.scene');
+function fitCanvas() { scene.style.transform = `translate(-50%, -50%) scale(${Math.min(innerWidth / 1920, innerHeight / 1080)})`; }
+addEventListener('resize', fitCanvas); fitCanvas();
+</script>
+</body>
+</html>

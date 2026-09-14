@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none" role="img" aria-labelledby="title desc">
+<title id="title">SSD와 선택된 NAND Flash Package</title><desc id="desc">청회색 SSD 기판 위 Controller 하나와 NAND Flash Package 세 개. 가운데 Package에만 옅은 청색 테두리가 있습니다.</desc>
+<defs>
+ <linearGradient id="pcb-face" x1="0" y1="0" x2="880" y2="285" gradientUnits="userSpaceOnUse"><stop stop-color="#34434d"/><stop offset="1" stop-color="#293942"/></linearGradient>
+ <linearGradient id="package-face" x1="0" y1="0" x2="0.6" y2="1"><stop stop-color="#54606e"/><stop offset="1" stop-color="#424f5d"/></linearGradient>
+ <linearGradient id="selected-face" x1="0" y1="0" x2="0.7" y2="1"><stop stop-color="#567689"/><stop offset="1" stop-color="#405d70"/></linearGradient>
+ <filter id="board-shadow" x="-25%" y="-100%" width="150%" height="300%"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<g id="ssd-camera" font-family="Arial, sans-serif">
+ <path d="M702 666L1522 373L1695 546L867 842Z" fill="#050a0e" opacity=".35" filter="url(#board-shadow)"/>
+ <g id="ssd-board" transform="matrix(.99 -.34 .60 .64 661 633)">
+  <g id="pcb">
+   <path d="M0 10H874V298H0Z" fill="#19272f"/>
+   <path d="M0 285H874V298H0Z" fill="#1b2b35"/>
+   <path d="M874 0V285L874 298V13Z" fill="#53606a"/>
+   <path d="M9 0H866Q874 0 874 9V111Q850 111 850 142Q850 173 874 173V276Q874 285 865 285H9Q0 285 0 276V9Q0 0 9 0Z" fill="url(#pcb-face)" stroke="#60717b" stroke-width="1.2"/>
+   <path d="M55 11H851M59 273H851" stroke="#64737b" stroke-opacity=".26"/>
+   <path d="M49 0V285" stroke="#23313b" stroke-width="2"/>
+   <g id="connector"><rect x="0" y="18" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="35" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="52" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="69" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="86" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="103" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="120" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="137" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="154" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="171" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="205" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="222" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="239" width="39" height="10" rx="1" fill="#a19776"/><rect x="0" y="256" width="39" height="10" rx="1" fill="#a19776"/></g>
+   <path d="M0 182H25V195H0Z" fill="#111c24"/>
+   <path d="M874 112Q850 112 850 142Q850 172 874 172" stroke="#899497" stroke-width="7"/>
+   <g id="signal-traces" stroke="#728a96" stroke-width="1.15" opacity=".31"><path d="M48 55H88L110 67H141"/><path d="M48 75H88L110 87H141"/><path d="M48 95H88L110 107H141"/><path d="M48 115H88L110 127H141"/><path d="M48 175H88L110 187H141"/><path d="M48 195H88L110 207H141"/><path d="M48 215H88L110 227H141"/><path d="M48 235H88L110 247H141"/><path d="M271 74H294L310 63H352"/><path d="M271 97H297L313 86H352"/><path d="M271 120H300L316 109H352"/><path d="M271 143H303L319 132H352"/><path d="M271 166H306L322 155H352"/><path d="M271 189H309L325 178H352"/><path d="M499 74H533"/><path d="M499 99H533"/><path d="M499 184H533"/><path d="M499 209H533"/><path d="M681 74H715"/><path d="M681 99H715"/><path d="M681 184H715"/><path d="M681 209H715"/><path d="M275 245H780L805 224"/><path d="M275 252H766L791 231"/><path d="M275 259H752L777 238"/></g>
+   <g id="passive-components"><g transform="translate(91 44)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(116 44)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(90 222)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(115 222)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(290 43)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(292 216)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(361 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(389 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(543 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(571 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(725 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g><g transform="translate(753 19)"><rect width="18" height="10" rx="1.4" fill="#63717a"/><path d="M3 1v8m12-8v8" stroke="#adb2ac" stroke-width="3"/></g></g>
+   <circle cx="73" cy="18" r="4" stroke="#819198" stroke-width="2"/>
+   <circle cx="73" cy="265" r="4" stroke="#819198" stroke-width="2"/>
+  </g>
+  <g id="controller-141">
+      <rect x="136" y="72" width="140" height="152" rx="6" fill="#19252d"/>
+      <path d="M141,209h130v13q0 5 -5 5h-120q-5 0 -5 -5Z" fill="#2a3642"/>
+      <rect x="141" y="67" width="130" height="143" rx="5" fill="url(#package-face)" stroke="#657482" stroke-width=".85"/>
+      <path d="M149,68h114" stroke="#8e9aa7" stroke-opacity=".45"/>
+      <text x="206.0" y="142.5" text-anchor="middle" fill="#bdc7d0" font-size="19" font-weight="500">Controller</text>
+      <circle cx="154" cy="197" r="3.2" fill="#8998a4" opacity=".65"/>
+    </g>
+  <g id="nand-352">
+      <rect x="347" y="44" width="156" height="213" rx="6" fill="#19252d"/>
+      <path d="M352,242h146v13q0 5 -5 5h-136q-5 0 -5 -5Z" fill="#2a3642"/>
+      <rect x="352" y="39" width="146" height="204" rx="5" fill="url(#package-face)" stroke="#657482" stroke-width=".85"/>
+      <path d="M360,40h130" stroke="#8e9aa7" stroke-opacity=".45"/>
+      <text x="425.0" y="145.0" text-anchor="middle" fill="#bdc7d0" font-size="20" font-weight="500">NAND</text>
+      <circle cx="365" cy="230" r="3.2" fill="#8998a4" opacity=".65"/>
+    </g>
+  <g id="nand-target">
+      <rect x="529" y="44" width="156" height="213" rx="6" fill="#19252d"/>
+      <path d="M534,242h146v13q0 5 -5 5h-136q-5 0 -5 -5Z" fill="#355363"/>
+      <rect x="534" y="39" width="146" height="204" rx="5" fill="url(#selected-face)" stroke="#84b7ca" stroke-width="1.7"/>
+      <path d="M542,40h130" stroke="#b6d9e6" stroke-opacity=".45"/>
+      <text x="607.0" y="145.0" text-anchor="middle" fill="#e3f1f5" font-size="20" font-weight="500">NAND</text>
+      <circle cx="547" cy="230" r="3.2" fill="#a1cbd9" opacity=".65"/>
+    </g>
+  <g id="nand-716">
+      <rect x="711" y="44" width="122" height="213" rx="6" fill="#19252d"/>
+      <path d="M716,242h112v13q0 5 -5 5h-102q-5 0 -5 -5Z" fill="#2a3642"/>
+      <rect x="716" y="39" width="112" height="204" rx="5" fill="url(#package-face)" stroke="#657482" stroke-width=".85"/>
+      <path d="M724,40h96" stroke="#8e9aa7" stroke-opacity=".45"/>
+      <text x="772.0" y="145.0" text-anchor="middle" fill="#bdc7d0" font-size="20" font-weight="500">NAND</text>
+      <circle cx="729" cy="230" r="3.2" fill="#8998a4" opacity=".65"/>
+    </g>
+ </g>
+</g>
+</svg>

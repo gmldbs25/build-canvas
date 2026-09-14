@@ -34,4 +34,8 @@ cp -R projects/orca/dist-pages/. dist-pages/orca/
 cp -R projects/texas-trace/. dist-pages/texas-trace/
 cp -R projects/transformer-to-agent/dist-pages/. dist-pages/transformer-to-agent/
 
+# Work 04 is a dependency-free SVG scrollytelling experience.
+mkdir -p dist-pages/nand-flash
+cp projects/nand-flash/{index.html,style.css,main.js,model.mjs,content.mjs,diagrams.mjs} dist-pages/nand-flash/
+
 find dist-pages -name ".DS_Store" -delete

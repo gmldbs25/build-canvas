@@ -6,6 +6,7 @@
 
 ## Projects
 
+- **컴퓨터가 데이터를 기억하는 방식** — SSD부터 NAND Cell까지 탐험하고 FTL·GC·ECC를 직접 조작하는 Work 4
 - **FROM TRANSFORMER TO AGENT SYSTEMS** — LLM의 예측이 Agent Runtime의 실제 행동으로 이어지는 과정을 설명하는 인터랙티브 자료
 - **ORCA** — 월드 모델과 ORCA 논문을 설명하는 인터랙티브 프레젠테이션
 - **Texas Trace** — Austin과 Houston의 여정을 따라가는 인터랙티브 지도
@@ -14,6 +15,7 @@
 
 ```text
 app/                    # 엔트리 페이지
+projects/nand-flash/     # Work 4: NAND Flash 스크롤 탐험과 시뮬레이션
 projects/transformer-to-agent/ # Transformer → Agent Systems 소스
 projects/orca/          # ORCA 소스
 projects/texas-trace/   # Texas Trace 정적 소스
@@ -47,7 +49,7 @@ npm run build:pages
 docker compose up --build
 ```
 
-Docker는 메인 앱과 세 Work를 함께 빌드한 뒤, GitHub Pages와 같은
+Docker는 메인 앱과 네 Work를 함께 빌드한 뒤, GitHub Pages와 같은
 `/build-canvas/` 경로로 통합 프리뷰 서버를 엽니다.
 
 Local URL: `http://localhost:4173/build-canvas/`

@@ -1,6 +1,13 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
+    index: "04",
+    title: "컴퓨터가 데이터를 기억하는 방식",
+    type: "NAND FLASH · INTERACTIVE EXPLAINER",
+    year: "2026",
+    href: "./nand-flash/",
+  },
+  {
     index: "03",
     title: "FROM TRANSFORMER TO AGENT SYSTEMS",
     type: "AI · INTERACTIVE EXPLAINER",
