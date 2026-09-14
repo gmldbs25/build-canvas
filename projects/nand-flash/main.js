@@ -1,4 +1,4 @@
-import { scenes, sceneIndex, hierarchy, hierarchyScenes, articleSections, writeSteps, writeNotes, readSteps, readNotes, retrySteps, retryNotes } from './content.mjs';
+import { scenes, sceneIndex, sceneLearning, hierarchy, hierarchyScenes, articleSections, writeSteps, writeNotes, readSteps, readNotes, retrySteps, retryNotes } from './content.mjs';
 import { clamp, lerp, smooth, timeline, sceneOffsets, positionAt, distanceAt, createFlash, planWrite, programWrite, commitWrite, planGc, copyGc, mapGc, eraseGc, encode, decode, sampleBits, wearCycle } from './model.mjs';
 import { computerDiagram, dieDiagram, blockDiagram, pageDiagram, cellDiagram, densityDiagram, eraseDiagram, mappingDiagram, wearDiagram, eccDiagram, flowDiagram } from './diagrams.mjs';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -24,7 +24,7 @@ $('#article-toc').innerHTML=articleSections.map(([id,title])=>`<a href="#article
 $('#progress').max=(count-1)*100;$('.scene-count').textContent=` / ${count}`;
 const btn=(label,action,primary=false,attrs='')=>`<button data-action="${action}" class="${primary?'primary-button':'text-button'}" ${attrs}>${label}</button>`;
 const toggle=(values,key,selected,label)=>`<div class="segmented" role="group" aria-label="${label}">${values.map(([value,name])=>btn(name,`${key}:${value}`,false,`aria-pressed="${String(selected)===String(value)}"`)).join('')}</div>`;
-const range=(key,label,min,max,value,step=1)=>`<label class="control-range"><span>${label}</span><input type="range" data-range="${key}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label}"></label>`;
+const range=(key,label,min,max,value,step=1)=>`<label class="control-range"><span>${label} <output>${Number(value).toFixed(2)}</output></span><input type="range" data-range="${key}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label}"></label>`;
 function controls(id) {
   switch(id) {
     case 'question':return btn(['문서 저장하기','저장 후 정상 종료','컴퓨터 다시 켜기','다시 해보기'][state.documentPhase],'document',true)+ (state.documentPhase===3?btn('기억이 남은 곳으로 →','go:storage'): '');
@@ -36,15 +36,15 @@ function controls(id) {
     case 'block':return btn('Page로 들어가기 →','go:page',true);
     case 'page':return btn('Cell로 들어가기 →','go:cell',true)+btn('논리 Page와 Cell의 관계 ↗','article:structure');
     case 'cell':return toggle([[2,'전하가 적은 상태'],[8,'전하가 많은 상태']],'charge',state.charge,'저장 전하 상태')+btn(state.power?'전원 끄기':'전원 켜기','power',true);
-    case 'density':return toggle([[1,'SLC'],[2,'MLC'],[3,'TLC'],[4,'QLC']],'bits',state.bits,'Cell당 bit 수');
+    case 'density':return toggle([[1,'SLC · 1 bit'],[2,'MLC · 2 bit'],[3,'TLC · 3 bit'],[4,'QLC · 4 bit']],'bits',state.bits,'Cell당 bit 수');
     case 'program':return btn(state.charge>=10?'목표 상태에 도착':'Program 펄스 가하기','pulse',true,`aria-disabled="${state.charge>=10}"`)+btn('지워진 상태로 초기화','cell-reset');
     case 'read':return range('vref','기준 전압 Vref · 상대값',.05,.95,state.vref,.01)+toggle([[0,'지워진 Cell'],[10,'Program된 Cell'],...(![0,10].includes(state.readExample)?[[state.readExample,'직전 Program 상태']]:[])],'charge',state.charge,'읽을 Cell의 상태');
     case 'erase':return btn('선택한 Page Read','page-read')+btn('선택한 Page Program','page-program',true)+btn('Block 전체 Erase','block-erase')+btn('초기화','erase-reset');
     case 'address':return btn('LBA 100 수정해 보기 →','go:ftl',true);
     case 'ftl':return btn(state.busy?'수정 중…':'LBA 100의 데이터 수정','update',true)+btn('초기화','flash-reset')+btn('쓸 공간을 되찾으려면 →','go:gc');
-    case 'gc':return btn(state.busy?'GC 진행 중…':'GC 실행','gc',true)+btn('LBA 100 다시 수정','update')+btn('초기화','flash-reset');
+    case 'gc':{const ready=state.flash.blocks.some(b=>b.pages.some(p=>p.state==='invalid'));return btn(state.busy?'GC 진행 중…':ready?'GC 실행':'먼저 LBA 100 수정','gc-start',true)+btn('LBA 100 다시 수정','update')+btn('초기화','flash-reset');}
     case 'wear':return toggle([[0,'분산 끄기'],[1,'분산 켜기']],'balanced',Number(state.balanced),'Wear Leveling')+btn('P/E Cycle 6회 실행','wear',true)+btn(state.badBlock<0?'B0를 Bad Block으로 제외':'제외 해제','bad')+btn('초기화','wear-reset');
-    case 'reliability':return toggle([[0,'Retention'],[1,'Read Disturb']],'disturb',Number(state.disturb),'상태 변화 원인')+range('drift',state.disturb?'반복 읽기에 따른 변화':'시간 경과에 따른 변화',0,1,state.drift,.01);
+    case 'reliability':return toggle([[0,'시간 경과 · Retention'],[1,'반복 읽기 · Read Disturb']],'disturb',Number(state.disturb),'상태 변화 원인')+range('drift','상태 변화 정도',0,1,state.drift,.01);
     case 'ecc':return btn('ECC로 확인·복구','ecc',true)+btn('전압 판정 오류 예시','read-errors')+btn('Read Retry','retry')+btn('초기화','ecc-reset');
     case 'write':return btn(state.flowStep<0?'Write 시작':state.flowStep<writeSteps.length-1?'다음 단계 →':'Write 다시 보기','flow-next',true)+btn('처음 단계로','flow-reset');
     case 'read-flow':return btn(state.flowStep<0?'Read 시작':state.flowStep<(state.retry?retrySteps:readSteps).length-1?'다음 단계 →':'Read 다시 보기','flow-next',true)+toggle([[0,'일반 Read'],[1,'Retry 포함']],'retry-path',Number(state.retry),'읽기 경로');
@@ -56,13 +56,13 @@ function diagram(index) {
   const {id,object}=scenes[index],s={...state,sceneId:id};
   switch(object) {
     case 'computer':return computerDiagram(s,id);
-    case 'structure':return id==='die'||id==='plane'?dieDiagram(id==='plane'):id==='block'?blockDiagram():pageDiagram();
+    case 'structure':return id==='die'||id==='plane'?dieDiagram(id==='plane'):id==='block'?blockDiagram():pageDiagram(s.compact);
     case 'cell':return cellDiagram(s,id);
-    case 'density':return densityDiagram(state.bits);
+    case 'density':return densityDiagram(state.bits,0,false,state.compact);
     case 'erase':return eraseDiagram(s);
     case 'mapping':return mappingDiagram(s);
     case 'wear':return wearDiagram(s);
-    case 'reliability':return densityDiagram(3,state.drift,state.disturb);
+    case 'reliability':return densityDiagram(3,state.drift,state.disturb,state.compact);
     case 'ecc':return eccDiagram(s);
     case 'flow':return flowDiagram(id==='write'?writeSteps:state.retry?retrySteps:readSteps,state.flowStep,id==='write',s);
     default:return '';
@@ -117,10 +117,20 @@ function result() {
   if(id==='ending')message='컴퓨터 → SSD → NAND → Cell → Software → 컴퓨터';
   $('#scene-result').textContent=message;
 }
+function guidance() {
+  const id=idNow();let hint=sceneLearning[id][1];
+  if(id==='question')hint=[hint,'같은 버튼으로 정상 종료하세요. 저장한 문서는 어디에 남을까요?','컴퓨터를 다시 켜서 기억.txt가 남아 있는지 확인하세요.','문서가 돌아왔습니다. 이제 기억이 남아 있는 SSD를 따라갑니다.'][state.documentPhase];
+  if(id==='package'&&state.opened)hint='덮개 아래의 Die 또는 “Die로 들어가기” 버튼을 누르세요.';
+  if(id==='program'&&state.charge>=10)hint='목표에 도착했습니다. 초기화해 비교하거나 다음 Read 장면으로 이동하세요.';
+  if(id==='gc'&&!state.flash.blocks.some(b=>b.pages.some(p=>p.state==='invalid'))&&!state.busy)hint='아직 옛 데이터가 없습니다. 먼저 LBA 100을 수정하면 GC할 공간이 생깁니다.';
+  if(['ftl','gc'].includes(id)&&state.busy)hint='진행 중인 단계를 보세요. 밝은 Page와 주소 연결이 순서대로 바뀝니다.';
+  if(id==='ecc'&&state.eccBits.some((v,i)=>v!==encode()[i]))hint=state.eccSample?'같은 전하를 다시 읽는 Read Retry를 실행하고 결과를 비교하세요.':'오류를 만들었습니다. “ECC로 확인·복구”를 눌러 결과를 보세요.';
+  $('#guide-instruction').textContent=hint;
+}
 function refresh(replace=false) {
   if(current<0)return;
   const active=document.activeElement,focus=active?.dataset.action,restore=active?.closest('#scene-controls');
-  $('#scene-controls').innerHTML=controls(idNow());paintGraphic(replace);result();
+  $('#scene-controls').innerHTML=controls(idNow());paintGraphic(replace);result();guidance();
   if(focus&&restore)$('#scene-controls').querySelector(`[data-action="${focus}"]`)?.focus({preventScroll:true});
   if(state.busy)$('#scene-controls').querySelectorAll('button[data-action]').forEach(b=>{if(!b.dataset.action.startsWith('go:'))b.setAttribute('aria-disabled','true');});
   incoming.dataset.key='';schedule();
@@ -150,6 +160,7 @@ function setScene(index) {
   if(s.id==='write'){state.flowStep=-1;state.flowFlash=createFlash();state.flowPlan=null;}
   if(s.id==='read-flow'){if(state.flowPlan?.programmed&&!state.flowPlan.committed)commitWrite(state.flowFlash,state.flowPlan);state.flowStep=-1;}
   $('#part-label').textContent=s.part;$('#scene-title').innerHTML=s.title;$('#scene-description').innerHTML=s.body.replaceAll('<br>','<br> ');
+  $('#scene-context').textContent=sceneLearning[s.id][0];
   $('#scene-subtitle').hidden=s.id!=='question';
   $('#scene-number').textContent=String(index+1).padStart(2,'0');$('#previous').disabled=index===0;
   $('#next-label').textContent=index===count-1?'자세히 읽기':scenes[index+1].title.replaceAll('<br>',' ');
@@ -280,6 +291,7 @@ async function action(value) {
     case 'lba':state.lba=Number(val);break;
     case 'update':await update();return;
     case 'gc':await gc();return;
+    case 'gc-start':if(state.flash.blocks.some(b=>b.pages.some(p=>p.state==='invalid')))await gc();else await update();return;
     case 'flash-reset':state.flash=createFlash();state.writePlan=null;state.writePhase='idle';state.gcPhase='idle';state.gcPlan=null;state.flashMessage='초기 Mapping입니다. LBA 100을 수정해 보세요.';break;
     case 'balanced':state.balanced=Boolean(Number(val));break;
     case 'bad':state.badBlock=state.badBlock<0?0:-1;break;
@@ -309,7 +321,7 @@ async function action(value) {
   refresh();
 }
 document.addEventListener('click',event=>{const a=event.target.closest('[data-action]');if(a){action(a.dataset.action);return;}const g=event.target.closest('[data-go]');if(g){goTo(g.dataset.go);return;}if(event.target.closest('[data-article]'))goTo('article');});
-document.addEventListener('input',event=>{const el=event.target;if(!el.dataset.range)return;stopPlay();state[el.dataset.range]=Number(el.value);paintGraphic();result();incoming.dataset.key='';});
+document.addEventListener('input',event=>{const el=event.target;if(!el.dataset.range)return;stopPlay();state[el.dataset.range]=Number(el.value);el.closest('label').querySelector('output').textContent=Number(el.value).toFixed(2);paintGraphic();result();incoming.dataset.key='';});
 document.addEventListener('pointerover',event=>showTip(event.target.closest('[data-tip]')));
 document.addEventListener('pointerout',event=>{if(event.target.closest('[data-tip]')&&!event.relatedTarget?.closest?.('[data-tip]'))hideTip();});
 document.addEventListener('focusin',event=>showTip(event.target.closest('[data-tip]')));document.addEventListener('focusout',hideTip);

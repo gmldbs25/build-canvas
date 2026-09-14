@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {scenes,hierarchyScenes,articleSections,renderArticle,writeSteps,writeNotes,readSteps,readNotes,retrySteps,retryNotes} from '../content.mjs';
+import {scenes,sceneLearning,hierarchyScenes,articleSections,renderArticle,writeSteps,writeNotes,readSteps,readNotes,retrySteps,retryNotes} from '../content.mjs';
 
 test('journey and all navigation targets remain complete after scene restructuring',async()=>{
  const ids=new Set(scenes.map(s=>s.id));assert.equal(ids.size,scenes.length);
+ assert.deepEqual(new Set(Object.keys(sceneLearning)),ids);
+ for(const s of scenes)assert.ok(sceneLearning[s.id].every(text=>text.length>20),`Missing explanation or action guidance: ${s.id}`);
  assert.equal(scenes[0].object,'computer');assert.equal(scenes.at(-1).object,'computer');
  for(const id of [...hierarchyScenes,'program','read','erase','address','ftl','gc','wear','ecc','write','read-flow'])assert.ok(ids.has(id),id);
  const sources=await Promise.all(['main.js','diagrams.mjs','index.html'].map(f=>readFile(new URL(`../${f}`,import.meta.url),'utf8')));

@@ -2,6 +2,8 @@
 
 컴퓨터 → SSD → NAND → Cell → Software → 컴퓨터를 잇는 인터랙티브 학습 자료입니다. 1차 구현의 SSD 벡터와 스크롤 카메라, FTL/GC 공유 상태, ECC 모델을 유지하면서 22개 장면과 13개 Article 절로 완성했습니다. 별도 프레임워크·런타임 의존성·외부 이미지·글꼴 요청 없이 HTML/CSS/SVG/ES modules로 동작합니다.
 
+각 장면에는 입문자를 위한 배경 설명과 현재 상태에 맞는 조작 안내가 있습니다. 명확한 실행 버튼, 선택 묶음, 전압 값이 보이는 슬라이더와 도식 안의 이동 표식으로 조작을 찾을 수 있습니다. 모바일에서는 설명 → 조작 → 그림 순서로 읽습니다. 컴퓨터 내부 기판, Die의 배열·주변 회로, Page의 Cell 판정·읽기 회로 연결을 기능적 도식으로 표현합니다.
+
 ## 이야기와 실험
 
 1. `기억.txt` 저장 → 정상 종료 → 다시 켜기. RAM과 저장장치를 구분하고 SSD의 Controller / NAND 역할을 찾습니다.
@@ -50,7 +52,7 @@ node projects/nand-flash/scripts/render-article.mjs --check
 
 ## 구현
 
-- `content.mjs`: 장면 순서·문구·정착 비율·길이, 요청 흐름, 출처를 포함한 Article 원고.
+- `content.mjs`: 장면 순서·문구·정착 비율·길이, 장면별 입문 설명과 조작 안내(`sceneLearning`), 요청 흐름, 출처를 포함한 Article 원고.
 - `index.html`: sticky viewport, 원본 SSD 벡터, 목차 dialog와 사전 렌더링된 Article.
 - `diagrams.mjs`: 계층 SVG와 컴퓨터·Cell·Page·Mapping·마모·ECC·전체 흐름 오브젝트.
 - `model.mjs`: 가변 길이의 역방향 타임라인, 단계별 FTL/GC, 마모 분산, SECDED, 전압 재판정.
