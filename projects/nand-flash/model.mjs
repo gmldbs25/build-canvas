@@ -2,10 +2,21 @@
 export const clamp = (v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
 export const lerp = (a,b,t) => a+(b-a)*t;
 export const smooth = t => {t=clamp(t);return t*t*(3-2*t);};
-export function timeline(position, count) {
+export function timeline(position, count, holds = []) {
  const p=clamp(position,0,count-1), from=Math.floor(p), to=Math.min(from+1,count-1);
- const blend=smooth((p-from-.54)/.46);
+ const hold=holds[from]??.54;
+ const blend=smooth((p-from-hold)/(1-hold));
  return {from,to,blend,current:blend<.5?from:to,position:p};
+}
+export const sceneOffsets = lengths => lengths.reduce((a,n) => [...a,a.at(-1)+n], [0]);
+export function positionAt(distance, offsets) {
+ const last=offsets.length-2, d=clamp(distance,0,offsets[last]);
+ let i=0;while(i<last&&d>=offsets[i+1])i++;
+ return i+(i===last?0:(d-offsets[i])/(offsets[i+1]-offsets[i]));
+}
+export function distanceAt(position,offsets) {
+ const p=clamp(position,0,offsets.length-2),i=Math.floor(p);
+ return offsets[i]+(p-i)*(offsets[i+1]-offsets[i]);
 }
 export function createFlash() {
  const blocks=Array.from({length:4},(_,b)=>({id:b,wear:0,bad:false,pages:Array.from({length:4},(_,p)=>({ppa:`B${b}:P${p}`,state:'free',lba:null,value:null}))}));
@@ -15,13 +26,26 @@ export function createFlash() {
 }
 export const pagesOf=f=>f.blocks.flatMap(b=>b.pages);
 export const pageAt=(f,ppa)=>pagesOf(f).find(p=>p.ppa===ppa);
-export function writeLba(f,lba=100) {
+export function planWrite(f,lba=100) {
  const available=f.blocks.filter(b=>!b.bad).flatMap(b=>b.pages).find(p=>p.state==='free');
  if(!available)return {ok:false,reason:'free'};
  const old=pageAt(f,f.mapping[lba]), value=(old?.value??0)+1;
- Object.assign(available,{state:'valid',lba,value});f.mapping[lba]=available.ppa;
- if(old)old.state='invalid';f.writes++;f.version++;
- return {ok:true,from:old?.ppa,to:available.ppa,lba,value};
+ return {ok:true,version:f.version,from:old?.ppa,to:available.ppa,lba,value};
+}
+export function programWrite(f,plan) {
+ if(!plan.ok||plan.version!==f.version||pageAt(f,plan.to)?.state!=='free')throw new Error('Write state changed');
+ Object.assign(pageAt(f,plan.to),{state:'staged',lba:plan.lba,value:plan.value});
+ f.writes++;f.version++;plan.version=f.version;plan.programmed=true;
+}
+export function commitWrite(f,plan) {
+ if(!plan.programmed||plan.version!==f.version)throw new Error('Program before mapping update');
+ pageAt(f,plan.to).state='valid';f.mapping[plan.lba]=plan.to;
+ if(plan.from)pageAt(f,plan.from).state='invalid';
+ f.version++;plan.committed=true;
+}
+export function writeLba(f,lba=100) {
+ const plan=planWrite(f,lba);if(!plan.ok)return plan;
+ programWrite(f,plan);commitWrite(f,plan);return plan;
 }
 // A GC plan reserves destinations; apply migrations before erasing the victim.
 export function planGc(f) {
@@ -33,11 +57,19 @@ export function planGc(f) {
  }
  return null;
 }
-export function migrateGc(f,plan) {
+export function copyGc(f,plan) {
  if(plan.version!==f.version)throw new Error('GC state changed');
  for(const m of plan.moves){const from=pageAt(f,m.from),to=pageAt(f,m.to);if(from.state!=='valid'||to.state!=='free')throw new Error('GC invalid source/destination');}
- for(const m of plan.moves){Object.assign(pageAt(f,m.to),{state:'valid',lba:m.lba,value:m.value});pageAt(f,m.from).state='invalid';f.mapping[m.lba]=m.to;f.writes++;}
+ for(const m of plan.moves){Object.assign(pageAt(f,m.to),{state:'staged',lba:m.lba,value:m.value});f.writes++;}
+ f.version++;plan.version=f.version;plan.copied=true;
+}
+export function mapGc(f,plan) {
+ if(!plan.copied||plan.version!==f.version)throw new Error('Copy valid pages before mapping');
+ for(const m of plan.moves){pageAt(f,m.to).state='valid';pageAt(f,m.from).state='invalid';f.mapping[m.lba]=m.to;}
  f.version++;plan.version=f.version;plan.migrated=true;
+}
+export function migrateGc(f,plan) {
+ copyGc(f,plan);mapGc(f,plan);
 }
 export function eraseGc(f,plan) {
  if(!plan.migrated||plan.version!==f.version)throw new Error('Migrate valid pages before erase');

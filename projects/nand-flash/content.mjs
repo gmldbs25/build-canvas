@@ -1,41 +1,108 @@
-const scene = (id, part, title, body, object, question, understanding, interaction, next) => ({id,part,title,body,object,question,understanding,interaction,next,motion:object==='structure'?'대상 중심으로 카메라 이동, 외곽 소거, 내부 레이어 공개':'정착 후 상태 변화와 다음 개념으로 연결'});
+// Each scene has one question, one object and a generous resting interval.
+const scene = (id, part, title, body, object, next, options = {}) => ({
+  id, part, title, body, object, next, hold: .64, length: 1.15, layout: 'split', ...options,
+});
 export const scenes = [
-scene('question','컴퓨터의 기억','컴퓨터가 데이터를<br>기억하는 방식','전원을 꺼도 남아 있는 데이터.<br>그 기억은 SSD 어디에 있을까요?','structure','전원을 꺼도 어떻게 기억할까?','전원과 저장 상태는 다르다.','전원 켜기·끄기','SSD 내부에서 저장 영역 찾기'),
-scene('ssd','구조 탐험 · SSD','컴퓨터가 데이터를<br>기억하는 방식','SSD 내부로 들어가며<br>데이터가 실제로 저장되는 구조를 살펴봅니다.','structure','SSD 안에서 누가 저장을 담당할까?','Controller는 관리하고 NAND Flash는 비휘발성 저장을 담당한다.','NAND hover·확대','NAND Package'),
-scene('package','구조 탐험 · NAND Package','작은 패키지<br>안으로','NAND Package에는 하나 이상의 Die가 있습니다.<br>덮개 안의 반도체 칩을 따라 들어갑니다.','structure','Package 안에는 무엇이 있을까?','Package와 내부 Die는 다른 계층이다.','덮개 열기·Die hover','Die와 Plane'),
-scene('die','구조 탐험 · Die','칩 안에도<br>구획이 있습니다','하나의 Die는 Plane으로 나뉩니다.<br>각 Plane에는 많은 Block이 있습니다.','structure','칩 안의 공간은 어떻게 나뉠까?','Die 안에 Plane, Plane 안에 Block이 있다.','Plane·Block hover','Block'),
-scene('block','구조 탐험 · Block','지울 때는<br>한 묶음씩','Block은 여러 Page를 묶은 영역입니다.<br>Erase는 이 Block 전체에 적용됩니다.','structure','무엇을 한꺼번에 지울까?','Block이 지우는 단위다.','Page 선택·hover','Page'),
-scene('page','구조 탐험 · Page','읽고 쓰는 단위,<br>Page','많은 Cell의 상태를 함께 읽고 기록합니다.<br>Read와 Program의 기본 단위는 Page입니다.','structure','데이터는 어느 단위로 오갈까?','Page 단위 I/O와 Cell의 상태를 연결한다.','Cell hover·확대','Cell'),
-scene('cell','Cell의 물리','기억은<br>전하의 상태','절연층에 둘러싸인 저장 영역이 전하를 유지합니다.<br>이 전하가 전류가 흐르기 시작하는 전압, Vth를 바꿉니다.','cell','Cell은 무엇을 기억할까?','전하 → Vth → 구분 가능한 상태로 이어진다.','Floating Gate / Charge Trap·전원 toggle','상태 수와 bit'),
-scene('density','Cell의 물리','더 잘게 나누면,<br>더 많이 담습니다','같은 Cell에서 더 많은 Vth 상태를 구분합니다.<br>용량은 늘지만 상태 사이의 여유는 좁아집니다.','density','한 Cell에 여러 bit를 어떻게 저장할까?','SLC/MLC/TLC/QLC는 2/4/8/16개 상태를 구분한다.','SLC·MLC·TLC·QLC toggle','Program'),
-scene('program','NAND의 동작 · Program','쓴다는 것은<br>전하를 옮기는 일','Program 전압을 가하면 저장 영역으로 전하가 이동합니다.<br>반복한 펄스와 확인으로 목표 Vth에 접근합니다.','cell','기록할 때 Cell에서 무엇이 변할까?','Program이 전하 상태와 Vth를 바꾼다.','Program 펄스·초기화','Read'),
-scene('read','NAND의 동작 · Read','전자를 세지 않고,<br>전류를 봅니다','기준 전압을 가하고 전류가 흐르는지 확인합니다.<br>Vth와 기준 전압의 관계로 저장 상태를 판별합니다.','cell','저장한 상태는 어떻게 읽을까?','기준 전압이 Vth보다 높으면 채널이 도통한다.','기준 전압 slider·저장 상태 toggle','Erase와 overwrite 제약'),
-scene('erase','NAND의 동작 · Erase','한 Page만<br>다시 쓸 수는 없습니다','사용한 Page를 자유롭게 덮어쓸 수 없습니다.<br>다시 사용하려면 Block 전체를 Erase해야 합니다.','erase','파일 수정은 어떻게 가능할까?','Page 단위 Read/Program과 Block 단위 Erase의 차이다.','Page 선택·Read·Program·Block Erase','논리 주소와 물리 주소'),
-scene('address','Controller와 Software','같은 주소,<br>다른 자리','Host는 LBA를 사용합니다.<br>FTL이 LBA를 실제 NAND 위치인 PPA로 연결합니다.','mapping','Host가 아는 주소가 실제 저장 위치일까?','논리 주소와 물리 주소를 FTL Mapping이 잇는다.','LBA 선택','Out-of-place Update'),
-scene('ftl','Controller와 Software · FTL','고치는 대신,<br>새 자리에 씁니다','새 Page에 기록하고 Mapping을 옮깁니다.<br>이전 Page는 더 이상 유효하지 않은 Invalid 상태가 됩니다.','mapping','같은 LBA를 수정하면 무엇이 바뀔까?','새 Page 기록 → Mapping 갱신 → 기존 Page invalid.','LBA 100 수정·초기화','Garbage Collection'),
-scene('gc','공간 관리 · Garbage Collection','남길 것만 옮기고,<br>한꺼번에 비웁니다','Valid Page를 먼저 옮겨 보존합니다.<br>그 다음 Block을 지워 다시 쓸 공간을 확보합니다.','mapping','Invalid Page로 가득 찬 공간은 어떻게 되찾을까?','migration과 Mapping 갱신이 Erase보다 먼저다.','수정 반복·GC 실행·단계별 이동 표시','Wear Leveling'),
-scene('wear','수명 관리 · Wear Leveling','사용 횟수를<br>나누는 일','Program / Erase가 반복되면 Cell이 마모됩니다.<br>덜 사용한 Block을 선택하고 Bad Block은 제외합니다.','wear','특정 Block만 닳으면 어떻게 될까?','웨어 분산과 불량 블록 제외로 수명을 관리한다.','분산 켜기·끄기·P/E 반복·Bad Block 지정','Retention / Disturb'),
-scene('reliability','오류와 복구','기억의 경계는<br>조금씩 흔들립니다','시간이 흐르거나 주변 Cell이 반복해서 읽히면<br>Vth 분포가 달라져 읽는 값에 오류가 생길 수 있습니다.','reliability','저장 상태가 변하면 무엇이 달라질까?','Retention과 Read Disturb가 읽기 판정을 어렵게 한다.','Retention / Read Disturb·변화량 slider','ECC와 Read Retry'),
-scene('ecc','오류와 복구 · ECC','여분의 bit로<br>오류를 찾아냅니다','데이터와 함께 저장한 검사 bit로 오류를 찾습니다.<br>복구 한계를 넘으면 다시 읽거나 실패를 보고합니다.','ecc','틀린 bit를 어떻게 바로잡을까?','검사 부호의 제한된 복구 능력과 Read Retry의 역할이다.','bit 뒤집기·ECC 실행·Read Retry','전체 Write 흐름'),
-scene('write','전체 흐름 · Write','한 번의 저장에<br>많은 일이 일어납니다','Host의 요청이 FTL과 ECC를 거쳐 NAND로 갑니다.<br>새 Page 기록이 끝나면 Mapping을 확정합니다.','flow','파일 저장 요청은 어디로 갈까?','애플리케이션 요청과 NAND Program을 하나로 연결한다.','Write 단계 진행·다시 실행','전체 Read 흐름'),
-scene('read-flow','전체 흐름 · Read','읽을 때도<br>확인하며 돌아옵니다','FTL이 위치를 찾고 NAND가 Page를 읽습니다.<br>ECC 확인을 거친 데이터가 Host로 돌아옵니다.','flow','읽기 요청은 어떤 경로로 돌아올까?','Mapping·물리 읽기·ECC·필요 시 Retry가 연결된다.','Read 단계 진행·Retry 경로 toggle','SSD로 돌아가기'),
-scene('ending','탐험을 마치며','작은 전하와,<br>그것을 관리하는 기술','NAND의 물리적 제약을 Controller와 Software가 관리합니다.<br>그래서 우리는 SSD를 안정적인 저장장치처럼 사용합니다.','ending','컴퓨터는 어떻게 데이터를 기억하는가?','전하의 저장과 이를 관리하는 계층이 합쳐져 SSD가 된다.','처음으로·자세히 읽기','Article / Appendix'),
+  scene('question', '01 · 컴퓨터의 기억', '컴퓨터가<br>기억하는 방식', '문서를 저장하고, 컴퓨터를 끕니다.<br>다시 켜도 그 문서는 그대로 있습니다.', 'computer', '전기가 없어졌는데, 이 정보는 어디에 남아 있을까?', {length: 1.6, hold: .72}),
+  scene('storage', '01 · 컴퓨터의 기억', '화면이 꺼져도,<br>저장은 남습니다', '작업 중인 기억은 RAM에.<br>저장한 파일은 저장장치에 남습니다.', 'computer', '컴퓨터 속 저장장치, SSD를 따라갑니다.'),
+  scene('ssd', '01 · 저장장치 안으로', '관리하는 칩,<br>기억하는 칩', 'Controller는 저장을 관리합니다.<br>NAND Flash는 전원이 없어도 상태를 유지합니다.', 'ssd', '기판 위 NAND Package 하나를 더 가까이.', {hold: .58}),
+  scene('package', '02 · NAND Package', '작은 패키지<br>안으로', '덮개 안에는 하나 이상의 Die가 있습니다.<br>실제 반도체 칩을 따라 들어갑니다.', 'ssd', '겹쳐진 Die 중 하나를 펼쳐봅니다.', {hold: .6}),
+  scene('die', '02 · Die', '칩 안의<br>작은 구획들', '하나의 Die 안에는 Plane이 있습니다.<br>저장 공간을 나누어 동작을 관리하는 구획입니다.', 'structure', 'Plane 하나를 선택해 더 가까이.', {length: .95, hold: .56}),
+  scene('plane', '02 · Plane', '많은 Block이<br>모여 있는 곳', 'Plane 안에는 많은 Block이 있습니다.<br>그중 하나가 다음 목적지입니다.', 'structure', '이 Block은 무엇을 함께 묶을까요?', {length: .9, hold: .56}),
+  scene('block', '02 · Block', '지울 때는<br>한 묶음씩', 'Block은 함께 지워지는 Cell들의 영역입니다.<br>그 안의 데이터는 Page 단위로 읽고 씁니다.', 'structure', '그중 한 Page의 데이터를 따라갑니다.'),
+  scene('page', '02 · Page', '함께 읽고 쓰는<br>데이터의 단위', 'Page의 bit는 여러 Cell의 상태로 표현됩니다.<br>이제 그 상태를 만드는 Cell 하나로 들어갑니다.', 'structure', 'Cell 안에 0과 1이 적혀 있을까요?', {length: 1.2}),
+  scene('cell', '03 · 기억의 정체', '기억은, 전하의 상태', '절연된 저장 영역의 전하가 Vth를 바꿉니다.<br>전원 없이도 남는 이 물리적 차이를 나중에 읽습니다.', 'cell', '전하 → Vth 변화 → 구분 가능한 상태', {layout: 'lab', length: 1.45}),
+  scene('density', '04 · 한 Cell에 더 많이', '같은 공간, 더 촘촘한 경계', '상태를 더 많이 나누면 저장 밀도가 높아집니다.<br>그만큼 더 정밀하게 쓰고 읽어야 합니다.', 'density', '좁아진 목표 구간에 어떻게 기록할까요?', {layout: 'lab', length: 1.4}),
+  scene('program', '05 · Program', '목표 상태까지, 조금씩', '전압 펄스로 전하를 옮기고 Vth를 확인합니다.<br>목표 구간에 도달할 때까지 이 과정을 반복합니다.', 'cell', '다음에는 이 상태를 바꾸지 않고 읽어봅니다.', {layout: 'lab', length: 1.55, hold: .72}),
+  scene('read', '05 · Read', '전자를 세지 않고, 전류를 봅니다', '기준 전압을 가했을 때 전류가 흐르는지 봅니다.<br>Vth와 기준 전압의 관계가 읽기 판정을 만듭니다.', 'cell', '읽기는 가능하지만, 자유롭게 덮어쓸 수도 있을까요?', {layout: 'lab', length: 1.5, hold: .7}),
+  scene('erase', '05 · Erase와 수정의 모순', '파일은 고치는데, Page는?', '사용한 Page에는 자유롭게 덮어쓸 수 없습니다.<br>다시 쓰려면 Block 전체를 지워야 합니다.', 'erase', '다른 데이터까지 지우지 않고 파일을 수정하려면?', {layout: 'bench', length: 1.6, hold: .72}),
+  scene('address', '06 · 물리에서 Software로', '같은 주소, 다른 자리', '컴퓨터는 논리 주소 LBA를 사용합니다.<br>FTL이 이 주소를 NAND의 실제 위치 PPA에 연결합니다.', 'mapping', 'LBA 100의 내용을 수정해 봅시다.', {layout: 'bench', length: 1.15}),
+  scene('ftl', '06 · FTL', '수정은, 새 자리에 쓰는 일', '새 Page에 기록한 뒤 Mapping을 옮깁니다.<br>옛 Page는 더 이상 사용하지 않는 Invalid가 됩니다.', 'mapping', '수정할수록 Invalid는 늘고 Free는 줄어듭니다.', {layout: 'bench', length: 1.8, hold: .75}),
+  scene('gc', '06 · Garbage Collection', '이 공간을 다시 쓰려면', 'Valid 데이터와 Mapping을 먼저 옮깁니다.<br>그다음 원래 Block을 지워 Free 공간을 되찾습니다.', 'mapping', '그런데 이 지우기를 끝없이 반복해도 괜찮을까요?', {layout: 'bench', length: 1.8, hold: .75}),
+  scene('wear', '07 · NAND는 왜 닳는가', '한곳만 닳지 않도록', 'Program과 Erase의 반복은 Cell을 마모시킵니다.<br>Wear Leveling은 사용을 분산하고, Bad Block은 제외합니다.', 'wear', '사용량을 나눠도 기억의 상태는 조금씩 흔들릴 수 있습니다.', {layout: 'lab', length: 1.35}),
+  scene('reliability', '08 · 완벽하지 않은 기억', '기억의 경계가 흔들릴 때', '시간 경과와 반복 읽기는 Vth 분포를 바꿀 수 있습니다.<br>상태가 읽기 경계를 넘으면 다른 bit로 판정됩니다.', 'reliability', '조금 틀리게 읽은 데이터를 어떻게 되찾을까요?', {layout: 'lab', length: 1.35}),
+  scene('ecc', '08 · ECC와 Read Retry', '여분의 bit가 기억을 지킵니다', '함께 저장한 검사 bit로 오류를 찾고 복구합니다.<br>필요하면 기준 전압을 바꿔 같은 Page를 다시 읽습니다.', 'ecc', '이제 처음의 파일 저장으로 돌아갑니다.', {layout: 'lab', length: 1.8, hold: .75}),
+  scene('write', '09 · 다시, 컴퓨터로', '한 번의 저장 뒤에서', '문서의 변경이 저장 요청이 됩니다.<br>물리적 기록과 주소 갱신이 끝나야 새 데이터가 연결됩니다.', 'flow', '방금 저장한 문서를 다시 열어봅니다.', {layout: 'bench', length: 1.6, hold: .73}),
+  scene('read-flow', '09 · 다시, 컴퓨터로', '다시 여는 문서의 여정', '현재 위치를 찾아 읽고, 오류를 확인합니다.<br>필요한 복구를 거친 데이터가 컴퓨터로 돌아옵니다.', 'flow', '우리가 보는 것은 다시 열린 한 장의 문서입니다.', {layout: 'bench', length: 1.6, hold: .73}),
+  scene('ending', '탐험을 마치며', '작은 상태를 만들고,<br>함께 기억하는 일', '전하를 남기는 NAND, 오류를 고치는 ECC,<br>물리적 제약을 관리하는 Software.<br>그 협력 위에서, 우리는 파일 하나를 저장합니다.', 'computer', '컴퓨터 → SSD → NAND → Cell → Software → 컴퓨터', {length: 1.4, hold: .72}),
 ];
-export const hierarchy = ['SSD','NAND Package','Die','Block','Page','Cell'];
-export const hierarchyScenes = [1,2,3,4,5,6];
-export const writeSteps = ['Application','File System','Block I/O','NVMe Command','SSD Controller','FTL · LBA 확인','Free Page 선택','ECC · 부호화','NAND Program','Mapping 갱신','기존 Page Invalid'];
-export const writeNotes = ['애플리케이션이 데이터를 저장합니다.','파일의 변경을 블록 요청으로 바꿉니다.','논리 블록 주소와 데이터를 전달합니다.','NVMe Write 명령이 SSD에 도착합니다.','Controller가 요청을 받아 처리합니다.','LBA 100의 기존 위치를 확인합니다.','지워진 새 Page를 예약합니다.','데이터에 검사 bit를 더합니다.','새 Page에 기록하고 성공 여부를 확인합니다.','LBA가 새 Page를 가리키도록 확정합니다.','옛 Page를 Invalid로 표시합니다.'];
-export const readSteps = ['Host Read','LBA 확인','FTL Mapping','Physical Page','NAND Read','ECC Decode','Host 반환'];
-export const retrySteps = ['Host Read','LBA 확인','FTL Mapping','Physical Page','NAND Read','ECC Decode','Read Retry','ECC 재확인','Host 반환'];
-export const readNotes = ['Host가 LBA 100을 요청합니다.','논리 주소를 확인합니다.','Mapping에서 현재 PPA를 찾습니다.','해당 Block과 Page를 선택합니다.','기준 전압으로 Cell 상태를 판정합니다.','검사 bit로 오류를 확인하고 복구합니다.','검증한 데이터를 Host에 반환합니다.'];
+export const sceneIndex = id => scenes.findIndex(s => s.id === id);
+export const hierarchy = ['컴퓨터', 'SSD', 'Package', 'Die', 'Plane', 'Block', 'Page', 'Cell'];
+export const hierarchyScenes = ['question', 'ssd', 'package', 'die', 'plane', 'block', 'page', 'cell'];
+export const writeSteps = ['파일 저장', 'Storage I/O', 'FTL · 새 Page 선택', 'ECC · 검사 bit 추가', 'NAND Program', 'Mapping 갱신', '옛 Page Invalid', '저장 완료'];
+export const writeNotes = ['처음의 기억.txt를 수정합니다.', '파일 시스템과 저장장치 경로가 LBA와 데이터를 전달합니다. NVMe는 이 경로의 한 예입니다.', 'Controller의 FTL이 지워진 새 물리 Page를 선택합니다.', '데이터에 오류를 검출·복구할 검사 정보를 더합니다.', '새 Page에 기록하고 Program 성공을 확인합니다.', 'LBA 100이 새 PPA를 가리키도록 바꿉니다.', '옛 Page의 내용은 남아 있지만, 더는 현재 데이터가 아닙니다.', '정상 종료에 필요한 데이터와 메타데이터의 영속화까지 마친 예시입니다.'];
+export const readSteps = ['문서 열기', 'FTL Mapping', 'Physical Page', 'NAND Read', 'ECC 확인', 'Host 반환'];
+export const retrySteps = ['문서 열기', 'FTL Mapping', 'Physical Page', 'NAND Read', 'ECC 확인', 'Read Retry', 'ECC 재확인', 'Host 반환'];
+export const readNotes = ['Host가 LBA 100의 현재 데이터를 요청합니다.', 'FTL이 LBA 100의 현재 PPA를 찾습니다.', '해당 Block 안의 Page를 선택합니다.', '기준 전압과 전류 흐름으로 상태를 판정합니다.', '함께 읽은 검사 정보로 오류를 확인하고 가능한 범위에서 복구합니다.', '확인한 데이터로 기억.txt가 다시 열립니다.'];
+export const retryNotes = [...readNotes.slice(0, 5), '다른 기준 전압으로 같은 Page를 다시 읽습니다. 전하 자체는 바꾸지 않습니다.', '다시 읽은 데이터에 ECC를 적용합니다. 여전히 복구 불가능하면 실패를 보고합니다.', readNotes[5]];
+
+// Original explanatory prose; links point to the technical source for each section.
+const kioxiaBrief = name => `https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_${name}_Tech_Brief.pdf`;
 export const articleSections = [
-['structure','NAND Flash의 구조','SSD의 NAND Package 안에는 하나 이상의 Die가 있습니다. Die는 Plane으로, Plane은 Block으로 나뉘며 Block에는 많은 Page와 Cell이 있습니다. Page는 Read/Program의 기본 단위이고 Block은 Erase 단위입니다.','실제 3D NAND에서는 Cell이 수직으로 쌓이고 문자열(String)로 연결됩니다. 본편은 계층을 이해하기 위한 단순화된 배치입니다. Page 수, 크기, Die 수와 눈금은 특정 제품 사양을 나타내지 않습니다. TLC/QLC에서는 같은 물리 Cell 집합에 여러 논리 Page가 대응할 수 있습니다.','https://www.kioxia.com/en-jp/rd/technology/nand-flash.html'],
-['charge','전하, Floating Gate / Charge Trap, Vth','전하 저장 영역과 채널 사이의 절연층은 저장된 전하를 유지하는 데 중요합니다. Floating Gate는 전기적으로 절연된 도체에, Charge Trap은 절연막의 포획 상태에 전하를 저장합니다. 구조가 달라도 전하가 읽기 특성에 영향을 준다는 핵심은 같습니다.','Vth는 전류가 흐르기 시작하는 게이트 전압입니다. 여기서는 Program에 따라 전자 저장량과 Vth가 높아지는 직관적 모델을 사용합니다. 도식의 전자 수와 전압은 상대적인 설명값이며, 실제 3D 셀 단면·전압 파형·영구 보존을 보장하는 모델이 아닙니다.','https://www.kioxia.com/en-jp/rd/technology/nand-flash.html'],
-['density','SLC / MLC / TLC / QLC','Cell당 1, 2, 3, 4 bit를 구분하려면 각각 2, 4, 8, 16개 상태가 필요합니다. 전압 창 안에 상태를 더 많이 담으면 상태 간 간격이 좁아져 정밀한 Program과 Read, 더 강한 오류 관리가 중요해집니다.','분포 그래프는 실제 측정 데이터가 아닙니다. 동일 폭을 사용해 비교하고, 상태 번호를 표시합니다. 실제 bit 부호화는 제조사와 방식에 따라 달라지므로 상태 번호를 실제 NAND의 bit 순서로 해석하지 않습니다.','https://www.kioxia.com/en-jp/rd/technology/multi-level-cell.html'],
-['operations','Program / Read / Erase와 overwrite','Program은 저장 전하를 변화시키고 목표 상태에 접근하도록 제어합니다. Read는 기준 전압 아래에서의 전류를 감지하는 과정입니다. 본편의 SLC 예에서는 낮은 Vth의 지워진 상태를 1, 높은 Vth의 Program 상태를 0으로 표시합니다.','Read/Program은 Page, Erase는 Block 단위로 설명합니다. 실제 NAND에는 부분 Program, 순서, 여러 단계 Program 등 제품별 제약이 있으므로 임의의 Page를 자유롭게 반복 기록하는 것으로 이해하면 안 됩니다. 변경을 새 Page에 기록하는 방식은 이런 물리 제약을 상위 계층에서 숨깁니다.','https://www.micron.com/sales-support/sales/faqs'],
-['ftl','FTL, LBA / PPA와 Mapping','Host가 사용하는 LBA는 논리 블록 주소입니다. Controller의 FTL은 이 주소와 NAND의 물리 위치 사이를 연결합니다. 동일한 LBA를 수정해도 물리 위치는 달라질 수 있습니다. 새 Page 기록 후 Mapping을 바꾸고 이전 Page를 Invalid로 표시합니다.','본편은 LBA 한 개를 Page 한 개에 대응시킨 교육용 모델입니다. 실제 논리 블록과 NAND Page 크기는 다를 수 있고, Mapping의 세분성·캐시·메타데이터·전원 차단 복구 설계는 더 복잡합니다. Invalid는 데이터가 즉시 물리적으로 지워졌다는 뜻이 아닙니다.','https://www.micron.com/products/storage/nand-flash/choosing-the-right-nand'],
-['gc','Garbage Collection','Invalid Page가 있어도 그 자리만 따로 Erase하지 못합니다. GC는 대상 Block의 Valid 데이터를 다른 Free Page에 옮기고 Mapping을 갱신합니다. 남겨야 할 데이터가 없어진 뒤 대상 Block을 Erase하면 전체가 다시 Free가 됩니다.','이 추가 복사는 Host가 요청한 것보다 많은 NAND 쓰기를 유발할 수 있습니다. GC 시뮬레이션은 같은 Mapping 상태를 FTL 화면과 공유하며, 이동 전에 지우지 않도록 순서를 보장합니다. 실제 장치에는 예비 공간, 동시 요청, 정책과 시간 비용이 더해집니다.','https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_Garbage_Collection_Tech_Brief.pdf'],
-['wear','P/E Cycle, Wear Leveling, Bad Block','Program과 Erase의 반복은 셀의 절연층과 읽기 특성을 변화시킵니다. Wear Leveling은 특정 Block에 사용이 몰리는 것을 줄입니다. 동적 방식은 새 쓰기 위치를 분산하고, 정적 방식은 오래 움직이지 않은 데이터도 이동시켜 사용 편차를 줄일 수 있습니다.','본편의 막대는 수명 예측이 아닌 P/E 횟수 비교입니다. 낮은 사용 횟수 우선 선택만 간단히 보여줍니다. 불량 Block은 생산 단계부터 존재할 수도, 사용 중 생길 수도 있습니다. Bad Block은 사용 대상에서 제외하며, 마모 횟수 하나만으로 불량을 판정하는 것은 아닙니다.','https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_Wear_Leveling_Tech_Brief.pdf'],
-['ecc','Retention / Disturb, ECC와 Read Retry','Retention은 시간에 따른 저장 특성의 변화이고, Read Disturb는 반복 읽기가 주변의 읽지 않은 Cell 상태에 영향을 주는 현상입니다. ECC는 저장 시 추가한 검사 정보를 이용해 읽은 데이터의 오류를 검출·복구합니다. 복구 능력에는 한계가 있습니다.','8 bit 시뮬레이션은 확장 Hamming (8,4) SECDED를 실제 계산하여 1 bit 오류를 고치고 2 bit 오류를 검출합니다. 최신 SSD의 BCH/LDPC를 재현하지 않습니다. Read Retry는 기준 전압을 바꿔 같은 상태를 다시 판정하는 과정이며, 전하를 복원하거나 모든 오류를 보장해서 고치는 기능이 아닙니다.','https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_ECC_Tech_Brief.pdf'],
-['flow','전체 Read / Write와 Controller','Write는 Host의 LBA와 데이터를 받아 새 물리 공간을 선택하고 검사 정보를 더해 Program합니다. 성공 후 Mapping을 확정하고 이전 위치를 Invalid로 표시하는 순서를 보여줍니다. Read는 Mapping으로 위치를 찾고 읽은 데이터의 ECC를 확인한 뒤 Host로 반환합니다.','여기서는 이해를 위해 직렬 단계로 나눴습니다. 실제 Controller는 여러 채널과 Die에 요청을 병렬 처리하고, 캐시·스케줄링·메타데이터 일관성·복구·GC를 함께 관리합니다. NAND가 물리적 상태를 담고, Firmware가 그 제약을 관리한다는 것이 전체 흐름의 핵심입니다.','https://www.micron.com/products/storage/nand-flash/choosing-the-right-nand'],
+  ['computer','01. 저장한 문서는 왜 전원을 꺼도 남을까?',
+    '컴퓨터에서 문서를 편집할 때, 지금 작업하는 데이터는 보통 RAM에 있습니다. RAM은 전원 공급이 필요한 휘발성 기억입니다. 파일을 저장하면 운영체제와 저장장치가 협력해 데이터를 비휘발성 매체에 남깁니다. 이 탐험에서는 NAND Flash를 사용하는 SSD를 따라갑니다. 모든 컴퓨터의 저장장치가 SSD인 것은 아니며, HDD 등은 다른 물리 원리로 데이터를 보존합니다.',
+    '여기서 “저장 버튼을 눌렀다”와 “전원이 갑자기 끊겨도 남도록 기록을 마쳤다”는 구분해야 합니다. 운영체제나 SSD의 휘발성 캐시에 데이터가 남아 있을 수 있기 때문입니다. Flush는 앞선 쓰기를 비휘발성 저장으로 내보내도록 요청하고, FUA는 해당 쓰기의 완료 조건에 영속화를 요구하는 방식입니다. 정확한 보장은 명령과 장치의 구현에 달려 있습니다.',
+    '본편의 전원 실험은 기록과 정상 종료를 마친 상황입니다. 갑작스러운 전원 차단의 복구, 전원 손실 보호 기능, 파일 시스템의 일관성을 모두 재현하지 않습니다. NAND의 비휘발성은 이미 만들어진 소자 상태가 전원 없이도 유지된다는 성질입니다.',
+    [['Linux Kernel · 휘발성 쓰기 캐시와 Flush / FUA','https://cdn.kernel.org/doc/html/latest/block/writeback_cache_control.html']], 'question'],
+  ['structure','02. SSD, Package, Die, Plane, Block, Page',
+    'SSD는 NAND 칩 하나의 이름이 아닙니다. 컴퓨터의 저장 요청을 받아 처리하는 Controller와 실제 상태를 보존하는 NAND Flash 등이 함께 이루는 저장장치입니다. Controller에서 실행되는 Firmware는 주소를 변환하고, 동작을 스케줄링하고, 오류와 사용 가능한 공간을 관리합니다. 보드 위 NAND Package는 하나 이상의 반도체 Die를 담는 패키지입니다.',
+    'Die 내부는 Plane 같은 구획으로 조직되고, 각 Plane에 여러 Block이 있습니다. Block은 함께 Erase하는 영역입니다. Read와 Program은 보통 Page를 기본 단위로 사용합니다. 본편에서 Block 안에 종이처럼 쌓아 보여준 Page는 동작 단위를 설명하는 도식입니다. 그 모양이 실제 반도체 내부의 층 모양과 일치한다는 뜻은 아닙니다.',
+    '특히 논리 Page와 물리 Cell을 분리해서 생각해야 합니다. Page는 함께 전송·판정하는 bit들의 묶음이고, Cell은 그 정보를 상태로 표현하는 소자입니다. TLC에서는 같은 물리 Cell 집합이 여러 논리 Page의 bit를 함께 표현할 수 있습니다. “Page 한 층 아래에 그 Page 전용 Cell만 들어 있다”는 단순한 상자 관계로 해석하면 안 됩니다. 본편의 개수, 크기, 축척 눈금은 특정 제품의 사양이 아닙니다.',
+    [['KIOXIA · Garbage Collection과 Page / Block 구조',kioxiaBrief('Garbage_Collection')]], 'page'],
+  ['3d','03. 실제 3D NAND의 안쪽',
+    '3D NAND의 수직 적층과 SLC·TLC 같은 다중 상태 기술은 서로 다른 방법으로 저장 밀도를 높입니다. 수직 적층은 면적당 더 많은 Cell을 만드는 방향이고, 다중 상태 기술은 같은 Cell 하나가 더 많은 bit를 표현하도록 하는 방향입니다. 두 방법은 함께 사용할 수 있습니다.',
+    '대표적인 3D NAND 구조에서는 여러 게이트 층을 수직 채널이 관통합니다. 채널과 각 게이트 층이 만나는 위치에서 Cell을 생각할 수 있고, 수직으로 연결된 Cell들이 NAND String을 이룹니다. Wordline은 같은 게이트 층의 선택에, Bitline은 읽기와 쓰기를 위한 연결에 관여합니다. 실제 배열에는 선택 소자, 주변 회로와 여러 묶음이 더 있습니다.',
+    '본편은 이해를 위해 평면 단면과 단순한 층 묶음을 사용합니다. 실제 3D Cell의 원통형 단면이나 제조 공정을 재현하지 않습니다. 제조사·세대마다 층 수, 접합 방식과 구조가 다르므로 이 그림에서 용량이나 치수를 계산할 수는 없습니다.',
+    [['KIOXIA · BiCS FLASH의 적층 구조와 수직 채널','https://www.kioxia.com/en-jp/rd/technology/bics-flash.html']], 'block'],
+  ['charge','04. Cell은 전하를 남기고, Vth로 읽힙니다',
+    'NAND Cell은 전하 저장 영역의 상태를 바꾸어 읽기 특성에 차이를 만듭니다. Floating Gate는 전기적으로 절연된 도체에, Charge Trap은 절연막의 포획 상태에 전하를 저장합니다. 구조는 다르지만 저장 전하가 채널의 전기적 특성에 영향을 준다는 공통점이 있습니다. 절연이 전하를 유지하는 데 기여하므로 계속 전력을 공급하지 않아도 상태가 남습니다.',
+    'Vth는 문턱 전압입니다. 게이트에 가하는 전압을 높일 때 채널이 도통하기 시작하는 기준으로 이해할 수 있습니다. 본편의 단순화된 모델에서는 저장 전자가 늘수록 Vth가 높아집니다. 같은 기준 전압을 가해도 Vth가 낮은 Cell과 높은 Cell은 전류 흐름이 달라집니다.',
+    '0과 1은 이 물리적 차이를 해석한 값입니다. 소자 안에 숫자 모양을 새기거나 Read 때 전자를 하나씩 세는 것이 아닙니다. 그림의 전자 점 개수와 0.20·0.75 같은 전압은 설명용 상대값이며 실제 전자 수나 동작 전압을 뜻하지 않습니다. 절연된 상태도 시간이 지나면 변할 수 있으므로 비휘발성을 영구 보존과 혼동해서는 안 됩니다.',
+    [['KIOXIA · 전하 저장, 문턱 전압과 전류 판정','https://www.kioxia.com/en-jp/rd/technology/nand-flash.html']], 'cell'],
+  ['density','05. SLC / MLC / TLC / QLC: 같은 Cell의 다른 해상도',
+    '한 Cell이 1 bit를 표현하려면 두 상태를, 2 bit라면 네 상태를 구분해야 합니다. SLC·MLC·TLC·QLC는 보통 Cell당 1·2·3·4 bit, 즉 2·4·8·16개 상태를 뜻합니다. MLC라는 말이 넓은 의미에서 다중 bit 저장을 통칭하기도 하지만, 본편의 비교에서는 2 bit 방식을 가리킵니다.',
+    '많은 Cell에 같은 상태를 기록해도 Vth가 정확히 한 값으로 일치하지는 않습니다. 그래서 상태를 분포로 그립니다. 제한된 전압 범위 안에 더 많은 상태를 담으면 상태 간 여유가 줄어듭니다. 목표 구간에 더 정밀하게 Program하고, 여러 경계에서 Read하며, 오류 가능성을 관리해야 합니다. 높은 저장 밀도에는 이런 대가가 따릅니다.',
+    '그래프의 가로축은 Vth, 세로축은 그 Vth 부근에 있는 Cell의 수를 나타냅니다. 하나의 Cell이 동시에 여러 봉우리로 존재하는 그림이 아닙니다. 분포 폭과 경계는 비교용으로 구성했습니다. 아래 상태 번호도 실제 NAND의 bit 부호 순서가 아닙니다. 제품의 속도·내구성을 이 그림 하나로 단정할 수 없습니다.',
+    [['KIOXIA · Multi-level Cell과 상태 분포','https://www.kioxia.com/en-jp/rd/technology/multi-level-cell.html']], 'density'],
+  ['operations','06. Program, Read, Erase는 서로 다른 동작입니다',
+    'Program은 전압을 이용해 저장 전하와 Vth를 목표 상태 쪽으로 이동시키는 과정입니다. 목표를 한 번에 정확히 맞추기 어려우므로 펄스를 가하고 결과를 확인하는 과정이 반복됩니다. 본편에서 버튼을 한 번 누를 때마다 움직이는 막대는 이 반복을 확대해서 보여줍니다. 실제 펄스 수, 전압과 검증 알고리즘을 모사하지는 않습니다.',
+    'Read는 선택 Cell에 기준 전압을 가하고 전류 흐름을 감지합니다. 단순화한 SLC 예에서는 Vth보다 기준 전압이 높으면 도통하고 1로, 낮으면 비도통하고 0으로 판정합니다. Slider를 움직이는 것은 이 판정 기준을 바꾸는 일이며 저장 전하를 바꾸는 일이 아닙니다. 실제 NAND String에서는 다른 Cell을 통과시키기 위한 전압과 감지 회로도 필요합니다.',
+    'Erase는 Block의 Cell들을 지워진 상태로 되돌립니다. 이미 기록된 Page를 임의의 값으로 자유롭게 덮어쓸 수는 없습니다. 제품에 따라 부분 Program이나 여러 단계의 Program이 허용되더라도 횟수와 순서에 제약이 있습니다. 본편은 이 복잡성을 줄여 “Page 단위 Read / Program, Block 단위 Erase”를 보여줍니다. 다른 Page의 데이터까지 지워서는 안 된다는 조건이 FTL로 이어집니다.',
+    [['KIOXIA · Cell의 쓰기·읽기·지우기','https://www.kioxia.com/en-jp/rd/technology/nand-flash.html'],['KIOXIA · Block 재사용의 제약',kioxiaBrief('Garbage_Collection')]], 'erase'],
+  ['ftl','07. LBA → FTL → PPA: 같은 주소가 같은 자리는 아닙니다',
+    'Host는 저장장치에 논리 블록 주소 LBA를 전달합니다. 실제 NAND 위치를 나타내는 PPA는 Controller 쪽의 주소입니다. FTL(Flash Translation Layer)이 두 주소 사이의 Mapping을 관리하기 때문에 Host는 물리 Page가 어디로 이동했는지 매번 알 필요가 없습니다.',
+    'LBA 100을 수정하면, 먼저 비어 있는 새 Page에 새 데이터를 Program합니다. 기록 성공을 확인한 다음 Mapping을 새 위치로 전환합니다. 기존 Page는 현재 데이터로 사용하지 않는 Invalid가 됩니다. 이것이 Out-of-place Update입니다. Invalid에는 옛 전하 상태가 여전히 남아 있으며, 파일 수정이 곧바로 물리적인 데이터 삭제를 의미하지 않습니다.',
+    '본편은 순서를 보이기 위해 기록된 새 Page와 아직 이전 위치를 가리키는 Mapping을 잠깐 함께 보여줍니다. Mapping의 전환과 옛 Page의 무효화는 모델에서 일관되게 반영합니다. LBA 하나와 Page 하나를 대응시킨 것도 교육용 단순화입니다. 실제 장치는 논리 블록과 Page의 크기, Mapping 단위, 캐시, 메타데이터 기록 및 전원 차단 후 복구 전략이 더 복잡합니다.',
+    [['KIOXIA · 논리 주소와 물리 Page의 갱신',kioxiaBrief('Garbage_Collection')]], 'ftl'],
+  ['gc','08. Garbage Collection은 수정의 결과를 정리합니다',
+    '새 자리에 쓰는 수정을 반복하면 Invalid Page가 늘고 Free Page는 줄어듭니다. Invalid가 있다는 것과 당장 쓸 수 있는 Free가 있다는 것은 다릅니다. Block 단위로만 지울 수 있으므로 아직 Valid 데이터가 섞인 Block을 곧바로 Erase할 수 없습니다.',
+    'GC는 먼저 대상 Block의 Valid 데이터를 다른 위치에 복사합니다. 다음으로 Mapping을 갱신해 새 복사본을 현재 데이터로 연결합니다. 남겨야 할 데이터가 모두 이동한 뒤 원래 Block을 Erase합니다. 그러면 한 Block 전체가 Free가 됩니다. 본편의 FTL과 GC는 같은 저장 상태를 공유하므로 수정한 결과가 그대로 GC의 출발점이 됩니다.',
+    '이 보존 작업은 Host가 요청한 양보다 더 많은 NAND 쓰기를 만들 수 있으며, 이를 이해하는 개념이 Write Amplification입니다. 실제 SSD는 예비 공간과 다양한 회수 정책으로 성능과 수명을 조절합니다. 본편은 적은 Page 수와 직렬 단계로 순서를 관찰하게 만든 모델이며, 처리 시간이나 실제 공간 효율을 예측하지 않습니다.',
+    [['KIOXIA · Garbage Collection 기술 설명',kioxiaBrief('Garbage_Collection')]], 'gc'],
+  ['wear','09. 마모를 없애는 대신, 사용을 나눕니다',
+    'Program과 Erase에 필요한 반복적인 전기적 스트레스는 절연층과 읽기 특성을 변화시킵니다. P/E Cycle은 Program / Erase 사용을 이해하는 단위입니다. Cell을 똑같이 무한히 다시 사용할 수 없기 때문에 공간 관리에는 마모 관리도 포함됩니다.',
+    'Wear Leveling은 특정 Block에 사용이 몰리지 않도록 합니다. 동적 방식은 새 쓰기에 사용할 Free Block을 고를 때 사용량을 고려합니다. 정적 방식은 오래 움직이지 않는 데이터가 들어 있는 Block도 관리에 포함해 편차를 줄입니다. 본편의 분산 실험은 적게 사용한 Block을 우선 선택하는 단순한 모델이며, 막대 높이는 남은 수명이 아닌 사용 횟수입니다.',
+    'Bad Block은 사용할 수 없는 Block입니다. 생산 때부터 존재할 수도 있고 사용 중에 생길 수도 있습니다. Controller는 이를 할당 대상에서 제외하고 나머지 공간을 관리합니다. 본편의 B0 제외 버튼은 이 동작만 설명하며, 사용 횟수 하나로 실제 불량 여부를 판정한다는 뜻은 아닙니다. P/E 한계와 수명은 제품과 조건에 따라 달라집니다.',
+    [['KIOXIA · 동적·정적 Wear Leveling',kioxiaBrief('Wear_Leveling')]], 'wear'],
+  ['reliability','10. Retention과 Read Disturb: 상태의 경계는 고정되어 있지 않습니다',
+    'Retention은 시간이 지나는 동안 저장 상태를 유지하는 성질과 관련됩니다. 전하의 손실이나 이동으로 Vth가 변하면 처음 기록한 상태의 분포가 읽기 경계에 가까워질 수 있습니다. Read Disturb는 반복 읽기 과정의 전압이 선택되지 않은 Cell에도 영향을 주는 현상입니다. 읽기를 했다고 모든 Cell의 상태가 절대로 변하지 않는 것은 아닙니다.',
+    '본편에서는 Retention을 분포가 낮은 전압 쪽으로 이동하는 모습으로, Read Disturb를 높은 쪽으로 이동하는 모습으로 단순화했습니다. 실제 이동 방향과 크기, 분포 폭은 상태·구조·사용 이력·온도 등에 따라 달라집니다. Slider는 시간이나 읽기 횟수를 환산하는 계측기가 아닙니다.',
+    '중요한 것은 분포가 고정된 판정 경계를 넘으면 원래 의도와 다른 bit로 읽힐 수 있다는 점입니다. 이 오류 가능성을 줄이고 다루는 다음 계층이 ECC와 Read Retry입니다.',
+    [['Cai 외 · Read Disturb 실험 연구 (DSN 2015)','https://istc-cc.cmu.edu/publications/papers/2015/flash-read-disturb-errors_dsn15_abs.shtml'],['KIOXIA · 오류 원인과 ECC',kioxiaBrief('ECC')]], 'reliability'],
+  ['ecc','11. ECC: 여분의 정보로 잘못 읽은 bit를 찾기',
+    'ECC(Error Correcting Code)는 데이터를 쓸 때 계산한 검사 정보를 함께 저장합니다. 읽을 때는 데이터와 검사 정보 사이의 관계를 확인해 오류를 찾아내고, 부호의 능력 안에서 복구합니다. 단순히 정답 사본과 비교해 틀린 값을 되돌리는 과정은 아닙니다.',
+    '본편은 확장 Hamming (8,4) SECDED를 실제 계산합니다. 데이터 4 bit에 검사 4 bit를 더해 총 8 bit를 만들고, 1 bit 오류는 위치를 찾아 수정하며, 2 bit 오류는 검출하되 수정하지 않습니다. 3 bit 이상에서는 이 보장이 성립하지 않으므로 직접 오류를 만드는 조작은 최대 2 bit로 제한합니다. 색상 외에 검사 결과 문장으로도 상태를 표시합니다.',
+    '현대 SSD에서는 BCH나 LDPC 같은 부호와 더 복잡한 복호 과정이 사용됩니다. 이 8 bit 모델은 그 구현 전체를 재현하지 않습니다. 실제 오류 정정 능력, 검사 정보의 양과 재시도 정책은 제품마다 다르며 ECC에도 복구할 수 없는 오류가 있습니다.',
+    [['KIOXIA · NAND의 오류 정정',kioxiaBrief('ECC')],['Zhao 외 · LDPC-in-SSD (FAST 2013)','https://www.usenix.org/conference/fast13/technical-sessions/presentation/zhao']], 'ecc'],
+  ['retry','12. Read Retry는 같은 전하를 다른 기준으로 다시 읽습니다',
+    '처음 읽은 데이터가 복구하기 어려운 상태라면 다른 기준 전압으로 다시 읽어 더 나은 판정 결과를 얻을 수 있습니다. Read Retry는 저장 전하를 수리하거나 새 데이터를 쓰는 과정이 아닙니다. 같은 물리적 상태에서 관측 기준을 바꾸는 과정입니다.',
+    '“전압 판정 오류 예시”는 이동한 Cell 상태를 고정하고 기준 전압 0.50에서 두 bit가 잘못 읽히도록 만든 사례입니다. Read Retry는 같은 상태를 0.72라는 다른 상대 기준으로 다시 판정합니다. 이 예에서는 다시 읽은 부호가 ECC 검사를 통과하지만, 어떤 오류든 Retry로 복원된다는 보장은 없습니다.',
+    '본편에서 사용자가 임의로 뒤집은 bit에는 전압 변화 원인이 주어지지 않았으므로 Retry가 그것을 무조건 되돌리지는 않습니다. 실제 장치는 여러 기준을 시도하거나 추가 읽기 정보를 복호기에 전달할 수 있습니다. 끝내 복구할 수 없으면 정상 데이터처럼 반환하지 않고 읽기 실패를 보고해야 합니다.',
+    [['Park 외 · SSD Read Retry 최적화 연구','https://arxiv.org/abs/2104.09611']], 'ecc'],
+  ['flow','13. 파일 저장과 읽기를 하나로 연결하면',
+    'Write 경로에서는 애플리케이션의 변경이 파일 시스템과 Storage I/O를 거쳐 LBA와 데이터의 요청으로 전달됩니다. SSD Controller의 FTL이 기록할 새 위치를 고르고 ECC 검사 정보를 준비합니다. NAND Program이 성공하면 Mapping과 유효 상태를 갱신합니다. 본편의 마지막 “저장 완료”는 정상 종료에 필요한 영속화까지 마친 상황을 가정합니다.',
+    'Read 경로에서는 Host가 요청한 LBA를 FTL Mapping으로 현재 PPA에 연결합니다. NAND에서 해당 Page를 읽고, ECC로 확인하고 가능한 오류를 복구합니다. 필요하면 Read Retry와 ECC 재확인을 거칩니다. 검증된 데이터가 Host로 돌아오면 사용자는 다시 열린 문서를 봅니다.',
+    '이 순서는 여러 계층의 책임을 펼쳐 보여주는 개념도입니다. 실제 Controller는 여러 채널·Die에 걸쳐 병렬로 동작하고, 캐시와 요청 순서, GC, 마모, 메타데이터 일관성을 함께 관리합니다. 컴퓨터의 기억은 작은 전하 상태를 만드는 물리와 그 상태를 사용할 수 있도록 연결하고 보호하는 Software의 협력입니다.',
+    [['Linux Kernel · 완료와 영속화의 관계','https://cdn.kernel.org/doc/html/latest/block/writeback_cache_control.html'],['KIOXIA · 주소 관리와 물리 저장',kioxiaBrief('Garbage_Collection')]], 'write'],
 ];
+export const renderArticle = () => articleSections.map(([id,title,a,b,c,sources,back]) => `<section id="article-${id}" tabindex="-1" class="article-section"><h3>${title}</h3><p>${a}</p><p>${b}</p><p>${c}</p><div class="article-sources">${sources.map(([label,url])=>`<a class="source" href="${url}" target="_blank" rel="noreferrer">${label} ↗</a>`).join('')}</div><button class="article-return" data-go="${back}">관련 장면에서 다시 살펴보기 ↑</button></section>`).join('\n');

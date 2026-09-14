@@ -46,3 +46,31 @@ test('wear distribution reduces imbalance and excludes bad blocks',()=>{
  let uniform=[0,0,0,0,0,0],hot=[0,0,0,0,0,0];for(let i=0;i<30;i++){uniform=wearCycle(uniform,true,0).counts;hot=wearCycle(hot,false,0).counts;}
  assert.equal(uniform[0],0);assert.equal(hot[0],0);assert.ok(Math.max(...uniform)-Math.min(...uniform.slice(1))<=1);assert.equal(hot[1],30);
 });
+
+test('staged writes retain the old mapping until commit and reject stale plans', async()=>{
+ const {planWrite,programWrite,commitWrite}=await import('../model.mjs');
+ const f=createFlash(),old=f.mapping[100],plan=planWrite(f),stale=planWrite(f);
+ assert.throws(()=>commitWrite(f,plan),/Program before/);
+ programWrite(f,plan);
+ assert.equal(f.mapping[100],old);assert.equal(pageAt(f,old).state,'valid');
+ assert.equal(pageAt(f,plan.to).state,'staged');assertFlash(f);
+ assert.throws(()=>programWrite(f,stale),/changed/);
+ commitWrite(f,plan);assert.equal(f.mapping[100],plan.to);assert.equal(pageAt(f,old).state,'invalid');assertFlash(f);
+ assert.throws(()=>commitWrite(f,plan),/Program before/);
+});
+test('GC copy, mapping and erase preserve distinct observable stages',async()=>{
+ const {copyGc,mapGc}=await import('../model.mjs');
+ const f=createFlash();writeLba(f);writeLba(f);const p=planGc(f),before={...f.mapping};
+ assert.throws(()=>mapGc(f,p),/Copy valid/);copyGc(f,p);
+ assert.deepEqual(f.mapping,before);p.moves.forEach(m=>{assert.equal(pageAt(f,m.to).state,'staged');assert.equal(pageAt(f,m.from).state,'valid');});assertFlash(f);
+ assert.throws(()=>eraseGc(f,p),/Migrate/);mapGc(f,p);
+ p.moves.forEach(m=>{assert.equal(f.mapping[m.lba],m.to);assert.equal(pageAt(f,m.to).state,'valid');});assertFlash(f);
+ eraseGc(f,p);assert.ok(f.blocks[p.victim].pages.every(p=>p.state==='free'));assertFlash(f);
+});
+test('scene-specific scroll distances round-trip at every boundary and in reverse',async()=>{
+ const {sceneOffsets,positionAt,distanceAt}=await import('../model.mjs');
+ const {scenes}=await import('../content.mjs');const offsets=sceneOffsets(scenes.map(s=>s.length));
+ for(let i=(scenes.length-1)*100;i>=0;i--){const p=i/100;assert.ok(Math.abs(positionAt(distanceAt(p,offsets),offsets)-p)<1e-10);}
+ for(let i=0;i<scenes.length-1;i++){assert.equal(timeline(i+scenes[i].hold-.01,scenes.length,scenes.map(s=>s.hold)).blend,0);}
+ assert.equal(positionAt(-10,offsets),0);assert.equal(positionAt(999,offsets),scenes.length-1);
+});
