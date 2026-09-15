@@ -17,7 +17,7 @@ let current=-1,position=0,frameQueued=false,playRaf=0,animationToken=0,initializ
 let manual=false,paused=false,focusPaused=false,demoFrames=[],demoFrame=null,demoElapsed=0,demoLastTime=0,demoPaintTime=0,demoRaf=0;
 const visibleState=()=>!manual&&demoFrame?{...state,...demoFrame.patch}:state;
 let height=innerHeight,transaction=null,pulseTimer=0,effectTimer=0;
-const story=$('#story'),scene=$('.scene'),panel=$('#graphic-panel'),incoming=$('#incoming-panel'),dialog=$('#toc-dialog');
+const story=$('#story'),scene=$('.scene'),guide=$('.scene-guide'),panel=$('#graphic-panel'),incoming=$('#incoming-panel'),dialog=$('#toc-dialog');
 const homeUrl=new URL('../',window.location.href), idNow=()=>scenes[current]?.id;
 const indexOf=id=>typeof id==='number'?id:sceneIndex(id);
 $('.identity').href=homeUrl.href;$('.home-link').href=homeUrl.href;
@@ -136,6 +136,7 @@ function result() {
   $('#scene-result').setAttribute('aria-live',manual?'polite':'off');
 }
 function guidance() {
+  paintDemoProgress();
   $('.guide-label').textContent=manual?'직접 해보기':demoFrame?`${demoFrame.index+1} / ${demoFrame.total}`:'살펴보기';
   if(!manual){$('#guide-instruction').textContent=demoFrame?.caption||observationNotes[idNow()]||scenes[current].next;return;}
   const id=idNow();let hint=sceneLearning[id][1];
@@ -273,17 +274,20 @@ function demoCanRun() {
   return r.bottom>110&&r.top<innerHeight-95;
 }
 function wakeDemo(){if(!demoRaf&&demoCanRun())demoRaf=requestAnimationFrame(tickDemo);}
+function paintDemoProgress(){guide.style.setProperty('--loop-progress',demoFrame?String((demoFrame.index+demoFrame.progress)/demoFrame.total):'0');}
 function tickDemo(now) {
   demoRaf=0;
   if(!demoCanRun()){demoLastTime=0;return;}
   if(demoLastTime)demoElapsed+=Math.min(now-demoLastTime,120);
   demoLastTime=now;
-  if(now-demoPaintTime>=90){
-    demoPaintTime=now;const next=sampleDemo(demoFrames,demoElapsed);
-    const changed=next.index!==demoFrame?.index||Boolean(demoFrames[next.index].ramp);
-    demoFrame=next;
-    if(changed){paintGraphic();guidance();result();if(idNow()==='package')schedule();}
-    scene.style.setProperty('--loop-progress',`${(next.index+next.progress)/next.total*100}%`);
+  const next=sampleDemo(demoFrames,demoElapsed),phaseChanged=next.index!==demoFrame?.index;
+  demoFrame=next;
+  // Keep the lightweight progress transform at display cadence, independent of SVG updates.
+  paintDemoProgress();
+  if(phaseChanged||(demoFrames[next.index].ramp&&now-demoPaintTime>=90)){
+    demoPaintTime=now;paintGraphic();result();
+    if(phaseChanged)guidance();
+    if(idNow()==='package')schedule();
   }
   wakeDemo();
 }

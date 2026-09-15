@@ -9,6 +9,12 @@ function writtenFlash() {
   return flash;
 }
 export function createDemo(id) {
+  const frames=createFrames(id);
+  // Establish the starting state briefly, then show the first change promptly.
+  if(frames.length)frames[0].duration=600;
+  return frames;
+}
+function createFrames(id) {
   switch (id) {
     case 'question': return [
       frame('문서를 편집하는 동안에는 RAM이 작업을 맡습니다.', {documentPhase:0}),
