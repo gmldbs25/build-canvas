@@ -23,6 +23,13 @@ test('every scene has a watch narrative and replay preserves every flash mapping
   }
 });
 
+test('watch scenes leave enough time to read the opening explanation',()=>{
+  for(const {id} of scenes){
+    const frames=createDemo(id);
+    if(frames.length)assert.ok(frames[0].duration>=2000,id);
+  }
+});
+
 test('GC starts from the FTL result and copies valid data before erasing',()=>{
   const ftl=createDemo('ftl'),gc=createDemo('gc');
   assert.deepEqual(ftl.at(-1).patch.flash,gc[0].patch.flash);

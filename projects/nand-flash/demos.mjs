@@ -9,10 +9,7 @@ function writtenFlash() {
   return flash;
 }
 export function createDemo(id) {
-  const frames=createFrames(id);
-  // Establish the starting state briefly, then show the first change promptly.
-  if(frames.length)frames[0].duration=600;
-  return frames;
+  return createFrames(id);
 }
 function createFrames(id) {
   switch (id) {
