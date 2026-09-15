@@ -1,4 +1,4 @@
-import {pagesOf,encode} from './model.mjs';
+import {pagesOf,encode,sampleThresholds} from './model.mjs';
 const rect=(x,y,w,h,fill='#344956',stroke='#647c8d',extra='')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${fill}" stroke="${stroke}" ${extra}/>`;
 const text=(x,y,t,fill='#afc2cf',size=20,extra='')=>`<text x="${x}" y="${y}" fill="${fill}" font-size="${size}" ${extra}>${t}</text>`;
 const path=(d,stroke='#658596',extra='')=>`<path d="${d}" fill="none" stroke="${stroke}" ${extra.includes('stroke-width')?'':'stroke-width="1.5"'} ${extra}/>`;
@@ -129,6 +129,11 @@ export function mappingDiagram(s) {
 }
 
 export function wearDiagram(s) {
+  if(s.wearComparison){
+    const {plain,balanced,cycles}=s.wearComparison;
+    const bars=(counts)=>counts.map((count,i)=>`<div class="wear-column"><strong>${count}</strong><div class="wear-track"><div class="wear-fill" style="height:${count/12*100}%"></div></div><span>B${i}</span></div>`).join('');
+    return `<div class="wear-object wear-comparison"><div class="wear-caption">같은 시작 상태 · 같은 P/E ${cycles}회 <span>Block별 누적 사용 횟수</span></div><div class="wear-pair">${[[plain,'한곳에 집중'],[balanced,'덜 사용한 곳으로 분산']].map(([counts,label])=>`<section><h2>${label}</h2><div class="wear-bars">${bars(counts)}</div><p>가장 많이 쓴 곳과 적게 쓴 곳의 차이 <b>${Math.max(...counts)-Math.min(...counts)}회</b></p></section>`).join('')}</div><p class="diagram-note">이미 생긴 마모는 되돌아가지 않습니다. 다음 사용을 나누어 편차를 줄입니다.</p></div>`;
+  }
   const max=Math.max(12,...s.wearCounts);
   return `<div class="wear-object"><div class="wear-caption">Block별 P/E Cycle <span>설명용 횟수 비교</span></div><div class="wear-bars">${s.wearCounts.map((count,i)=>`<div class="wear-column ${s.badBlock===i?'bad':''} ${s.lastWear===i?'selected':''}"><strong>${s.badBlock===i?'제외':count}</strong><div class="wear-track"><div class="wear-fill" style="height:${count/max*100}%"></div></div><span>B${i}</span></div>`).join('')}</div><p class="object-message">${s.balanced?'덜 사용한 Block으로 다음 P/E를 분산합니다.':'같은 Block에 P/E가 집중됩니다.'}</p><p class="diagram-note">마모는 절연층과 읽기 특성의 변화입니다. 막대가 실제 수명을 예측하지는 않습니다.</p></div>`;
 }
@@ -136,8 +141,8 @@ export function wearDiagram(s) {
 export function eccDiagram(s) {
   const original=encode(),result=s.eccResult;
   return `<div class="ecc-object"><div class="ecc-label"><span>데이터 4 bit + 검사 4 bit</span><strong>확장 Hamming (8,4)</strong></div><div class="bit-word">${s.eccBits.map((bit,i)=>`<button data-action="flip:${i}" class="bit ${bit!==original[i]?'changed':''} ${result?.position===i?'corrected':''}" aria-label="${i+1}번 bit ${bit}, ${[2,4,5,6].includes(i)?'데이터':'검사'}, 뒤집기" aria-pressed="${bit!==original[i]}"><small>${i+1}</small><b>${bit}</b><span>${[2,4,5,6].includes(i)?'데이터':'검사'}</span></button>`).join('')}</div>
-    <div class="ecc-check ${result?.status||''}" role="status" aria-atomic="true"><span>${result?.status==='corrected'?'✓ 복구됨':result?.status==='uncorrectable'?'! 복구 한계':result?.status==='clean'?'✓ 검사 통과':'오류를 만들어 보세요'}</span><p>${s.eccMessage}</p>${result?.data?`<strong>읽은 데이터　${result.data.join(' ')}</strong>`:''}</div>
-    ${s.eccSample?`<div class="retry-reference"><span>같은 전하 상태</span><div><i style="left:${s.retried?72:50}%"></i><b style="left:61%"></b><b style="left:82%"></b></div><span>Vref ${s.retried?'0.72':'0.50'}</span></div>`:''}
+    <div class="ecc-check ${result?.status||''}" role="status" aria-atomic="true"><span>${result?.status==='corrected'?'✓ 복구됨':result?.status==='uncorrectable'?'! 복구 한계':result?.status==='clean'?'✓ 검사 통과':s.eccBits.some((bit,i)=>bit!==original[i])?'오류가 생긴 상태':'데이터와 검사 bit'}</span><p>${s.eccMessage}</p>${result?.data?`<strong>읽은 데이터　${result.data.join(' ')}</strong>`:''}</div>
+    ${s.eccSample?`<div class="retry-reference"><span>3·7번 Cell의 Vth</span><div><i style="left:${(s.retried?.72:.5)/1.25*100}%"></i><b style="left:${sampleThresholds(original,.34)[2]/1.25*100}%"></b></div><span>0.61 · Vref ${s.retried?'0.72':'0.50'}</span></div>`:''}
     <p class="diagram-note">1 bit 오류 복구 · 2 bit 오류 검출 · 현대 SSD의 BCH / LDPC 전체를 재현하지 않는 교육 모델</p></div>`;
 }
 

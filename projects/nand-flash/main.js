@@ -1,6 +1,7 @@
 import { scenes, sceneIndex, sceneLearning, hierarchy, hierarchyScenes, articleSections, writeSteps, writeNotes, readSteps, readNotes, retrySteps, retryNotes } from './content.mjs';
 import { clamp, lerp, smooth, timeline, sceneOffsets, positionAt, distanceAt, createFlash, planWrite, programWrite, commitWrite, planGc, copyGc, mapGc, eraseGc, encode, decode, sampleBits, wearCycle } from './model.mjs';
 import { computerDiagram, dieDiagram, blockDiagram, pageDiagram, cellDiagram, densityDiagram, eraseDiagram, mappingDiagram, wearDiagram, eccDiagram, flowDiagram } from './diagrams.mjs';
+import {createDemo, sampleDemo, observationNotes} from './demos.mjs';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'), compact=matchMedia('(max-width: 900px), (max-aspect-ratio: 1/1)');
 const state={
@@ -12,7 +13,9 @@ const state={
   flowStep:-1,retry:false,flowFlash:createFlash(),flowPlan:null,readExample:10,sceneId:'question',compact:compact.matches,
 };
 const count=scenes.length,offsets=sceneOffsets(scenes.map(s=>s.length)),holds=scenes.map(s=>s.hold);
-let current=-1,position=0,frameQueued=false,playRaf=0,playing=false,animationToken=0,initialized=false;
+let current=-1,position=0,frameQueued=false,playRaf=0,animationToken=0,initialized=false;
+let manual=false,paused=false,focusPaused=false,demoFrames=[],demoFrame=null,demoElapsed=0,demoLastTime=0,demoPaintTime=0,demoRaf=0;
+const visibleState=()=>!manual&&demoFrame?{...state,...demoFrame.patch}:state;
 let height=innerHeight,transaction=null,pulseTimer=0,effectTimer=0;
 const story=$('#story'),scene=$('.scene'),panel=$('#graphic-panel'),incoming=$('#incoming-panel'),dialog=$('#toc-dialog');
 const homeUrl=new URL('../',window.location.href), idNow=()=>scenes[current]?.id;
@@ -25,7 +28,7 @@ $('#progress').max=(count-1)*100;$('.scene-count').textContent=` / ${count}`;
 const btn=(label,action,primary=false,attrs='')=>`<button data-action="${action}" class="${primary?'primary-button':'text-button'}" ${attrs}>${label}</button>`;
 const toggle=(values,key,selected,label)=>`<div class="segmented" role="group" aria-label="${label}">${values.map(([value,name])=>btn(name,`${key}:${value}`,false,`aria-pressed="${String(selected)===String(value)}"`)).join('')}</div>`;
 const range=(key,label,min,max,value,step=1)=>`<label class="control-range"><span>${label} <output>${Number(value).toFixed(2)}</output></span><input type="range" data-range="${key}" min="${min}" max="${max}" step="${step}" value="${value}" aria-label="${label}"></label>`;
-function controls(id) {
+function manualControls(id) {
   switch(id) {
     case 'question':return btn(['문서 저장하기','저장 후 정상 종료','컴퓨터 다시 켜기','다시 해보기'][state.documentPhase],'document',true)+ (state.documentPhase===3?btn('기억이 남은 곳으로 →','go:storage'): '');
     case 'storage':return btn('SSD를 따라가기 →','go:ssd',true);
@@ -52,8 +55,13 @@ function controls(id) {
     default:return '';
   }
 }
+function controls(id) {
+  if(!demoFrames.length)return id==='ending'?manualControls(id):'';
+  return btn(manual?'자동으로 보기':'직접 살펴보기', 'demo-mode', false, `aria-expanded="${manual}"`)
+    +(manual?manualControls(id):'');
+}
 function diagram(index) {
-  const {id,object}=scenes[index],s={...state,sceneId:id};
+  const {id,object}=scenes[index],state=visibleState(),s={...state,sceneId:id};
   switch(object) {
     case 'computer':return computerDiagram(s,id);
     case 'structure':return id==='die'||id==='plane'?dieDiagram(id==='plane'):id==='block'?blockDiagram():pageDiagram(s.compact);
@@ -80,6 +88,7 @@ function patchNode(old,fresh) {
   previous.slice(next.length).forEach(n=>n.remove());
 }
 function drawMappingRoutes() {
+  const state=visibleState();
   const grid=panel.querySelector('.mapping-grid'),routes=panel.querySelector('.mapping-routes');
   if(!grid||!routes||compact.matches)return;
   const box=grid.getBoundingClientRect(),point=(el,side='center')=>{const r=el.getBoundingClientRect();return [(r[side==='right'?'right':side==='left'?'left':'x']+(side==='center'?r.width/2:0)-box.left)/box.width*1000,(r.y+r.height/2-box.y)/box.height*520];};
@@ -93,13 +102,21 @@ function drawMappingRoutes() {
 }
 function paintGraphic(replace=false) {
   const html=diagram(current);
-  if(replace){panel.innerHTML=html;drawMappingRoutes();return;}
+  if(replace){panel.innerHTML=html;drawMappingRoutes();prepareGraphic();return;}
   const template=document.createElement('template');template.innerHTML=html;
   if(panel.firstChild&&template.content.firstChild)patchNode(panel.firstChild,template.content.firstChild);
   else panel.innerHTML=html;
-  drawMappingRoutes();
+  drawMappingRoutes();prepareGraphic();
+}
+function prepareGraphic() {
+  // Repeated narration stays visual; manual experiments keep their live results.
+  panel.querySelectorAll('[role="status"]').forEach(el=>el.setAttribute('aria-live',manual?'polite':'off'));
+  if(!manual&&demoFrames.length)panel.querySelectorAll('[data-action]').forEach(el=>{
+    el.setAttribute('tabindex','-1');el.setAttribute('aria-disabled','true');
+  });
 }
 function result() {
+  const state=visibleState();
   const id=idNow();let message='';
   if(id==='question')message=['직접 저장하고 전원을 꺼보세요.','저장장치에 기록을 마쳤습니다. 이제 정상 종료해 보세요.','전기가 없어졌는데, 이 정보는 어디에 남아 있을까요?','전원 없이도 남는 기억을 찾아갑니다.'][state.documentPhase];
   if(id==='storage')message='저장과 정상 종료를 마친 예시입니다. 갑작스러운 전원 차단과 캐시는 Article에서 설명합니다.';
@@ -116,8 +133,11 @@ function result() {
   if(id==='read-flow'&&state.flowStep>=0)message=(state.retry?retryNotes:readNotes)[state.flowStep];
   if(id==='ending')message='컴퓨터 → SSD → NAND → Cell → Software → 컴퓨터';
   $('#scene-result').textContent=message;
+  $('#scene-result').setAttribute('aria-live',manual?'polite':'off');
 }
 function guidance() {
+  $('.guide-label').textContent=manual?'직접 해보기':demoFrame?`${demoFrame.index+1} / ${demoFrame.total}`:'살펴보기';
+  if(!manual){$('#guide-instruction').textContent=demoFrame?.caption||observationNotes[idNow()]||scenes[current].next;return;}
   const id=idNow();let hint=sceneLearning[id][1];
   if(id==='question')hint=[hint,'같은 버튼으로 정상 종료하세요. 저장한 문서는 어디에 남을까요?','컴퓨터를 다시 켜서 기억.txt가 남아 있는지 확인하세요.','문서가 돌아왔습니다. 이제 기억이 남아 있는 SSD를 따라갑니다.'][state.documentPhase];
   if(id==='package'&&state.opened)hint='덮개 아래의 Die 또는 “Die로 들어가기” 버튼을 누르세요.';
@@ -159,15 +179,19 @@ function setScene(index) {
   if(s.id==='read')state.readExample=state.charge;
   if(s.id==='write'){state.flowStep=-1;state.flowFlash=createFlash();state.flowPlan=null;}
   if(s.id==='read-flow'){if(state.flowPlan?.programmed&&!state.flowPlan.committed)commitWrite(state.flowFlash,state.flowPlan);state.flowStep=-1;}
+  manual=false;focusPaused=false;demoFrames=createDemo(s.id);demoElapsed=reduced.matches?Math.max(0,demoFrames.reduce((sum,f)=>sum+f.duration,0)-1):0;
+  demoFrame=sampleDemo(demoFrames,demoElapsed);demoLastTime=0;demoPaintTime=0;
+  scene.dataset.mode='watch';scene.dataset.hasDemo=String(demoFrames.length>0);
   $('#part-label').textContent=s.part;$('#scene-title').innerHTML=s.title;$('#scene-description').innerHTML=s.body.replaceAll('<br>','<br> ');
   $('#scene-context').textContent=sceneLearning[s.id][0];
   $('#scene-subtitle').hidden=s.id!=='question';
   $('#scene-number').textContent=String(index+1).padStart(2,'0');$('#previous').disabled=index===0;
   $('#next-label').textContent=index===count-1?'자세히 읽기':scenes[index+1].title.replaceAll('<br>',' ');
-  $('#scroll-label').textContent=index<=sceneIndex('page')?'스크롤하여 더 가까이':index===count-1?'아래에서 자세히 읽기':'조작해 보고, 스크롤로 계속';
+  $('#scroll-label').textContent=index<=sceneIndex('page')?'스크롤하여 더 가까이':index===count-1?'아래에서 자세히 읽기':'보고 나면, 스크롤로 계속';
   $('#scene-bridge').textContent=s.next;
   $$('#scene-toc button').forEach((b,i)=>{if(i===index)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
   refresh(true);
+  wakeDemo();
 }
 function schedule(){if(!frameQueued){frameQueued=true;requestAnimationFrame(render);}}
 function reveal(el,opacity){el.style.opacity=opacity;el.style.visibility=opacity<.001?'hidden':'visible';el.inert=opacity<.5;}
@@ -189,7 +213,7 @@ function render() {
   ['#pcb','#controller-141','#nand-352','#nand-716','#ground-shadow'].forEach(id=>{$(id).style.opacity=context;});
   const packageVisible=ai==='package'||bi==='package';
   $('#package-interior').style.opacity=packageVisible?1:0;
-  const lidOpen=(idNow()==='package'&&state.opened)||(ai==='package'&&u>.1);
+  const lidOpen=(idNow()==='package'&&visibleState().opened)||(ai==='package'&&u>.1);
   $('#nand-target').setAttribute('role',lidOpen?'group':'button');$('#nand-target').setAttribute('tabindex',lidOpen?'-1':'0');
   $('#package-lid').style.transform=lidOpen?'translate(89px,-102px)':'translate(0,0)';
   $('#package-lid').style.opacity=ai==='package'?1-smooth(u):1;
@@ -215,9 +239,10 @@ function render() {
   $('.scale-marker').style.transform=`translateY(${clamp((lerp(a,b,u)-2)/6)*285}px)`;
   $('#progress').value=Math.round(position*100);$('#progress').style.setProperty('--progress',`${position/(count-1)*100}%`);
   $('#progress').setAttribute('aria-valuetext',`${current+1} / ${count} · ${scenes[current].title.replaceAll('<br>',' ')}`);
-  $('#play').disabled=reduced.matches;$('#play').title=reduced.matches?'동작 줄임 설정에서는 장면 버튼으로 이동합니다.':'';
-  scene.classList.toggle('motion-paused',reduced.matches||dialog.open||document.hidden||scrollY>story.offsetHeight-height*.5);
+  updatePlayback();
+  scene.classList.toggle('motion-paused',paused||focusPaused||manual||reduced.matches||dialog.open||document.hidden||scrollY>story.offsetHeight-height*.5);
   $('.viewport').inert=scrollY>=story.offsetHeight;
+  wakeDemo();
 }
 function resize() {
   const old=initialized?position:null,oldEnd=offsets.at(-2)*height;const wasInStory=scrollY<=oldEnd;
@@ -229,18 +254,50 @@ function resize() {
   if(old!==null&&wasInStory)scrollTo(0,distanceAt(old,offsets)*height);
   initialized=true;if(current>=0)refresh(true);schedule();
 }
-function stopPlay(){cancelAnimationFrame(playRaf);playing=false;$('#play').setAttribute('aria-pressed','false');$('#play-label').textContent='자동 재생';$('#play-icon').textContent='▷';}
-function goTo(target,auto=false) {
+function stopPlay(){cancelAnimationFrame(playRaf);}
+function updatePlayback() {
+  const stopped=paused||focusPaused||reduced.matches||manual||!demoFrames.length;
+  $('#play').hidden=!demoFrames.length;
+  $('#play').disabled=reduced.matches||manual;
+  $('#play').setAttribute('aria-pressed',String(!stopped));
+  $('#play').setAttribute('aria-label',stopped?'장면 애니메이션 재생':'장면 애니메이션 일시정지');
+  $('#play-label').textContent=reduced.matches?'정지 화면':stopped?'재생':'일시정지';
+  $('#play-icon').textContent=stopped?'▷':'Ⅱ';
+  $('#play').title=reduced.matches?'동작 줄임 설정에 따라 결과를 정지 화면으로 보여줍니다. 직접 살펴보기도 사용할 수 있습니다.':'';
+}
+function demoCanRun() {
+  if(manual||paused||focusPaused||reduced.matches||document.hidden||dialog.open||!demoFrames.length||scrollY>=story.offsetHeight-height*.4)return false;
+  const t=timeline(position,count,holds);
+  if(t.blend>.02&&t.blend<.98)return false;
+  const r=(idNow()==='package'?$('#ssd-figure'):panel).getBoundingClientRect();
+  return r.bottom>110&&r.top<innerHeight-95;
+}
+function wakeDemo(){if(!demoRaf&&demoCanRun())demoRaf=requestAnimationFrame(tickDemo);}
+function tickDemo(now) {
+  demoRaf=0;
+  if(!demoCanRun()){demoLastTime=0;return;}
+  if(demoLastTime)demoElapsed+=Math.min(now-demoLastTime,120);
+  demoLastTime=now;
+  if(now-demoPaintTime>=90){
+    demoPaintTime=now;const next=sampleDemo(demoFrames,demoElapsed);
+    const changed=next.index!==demoFrame?.index||Boolean(demoFrames[next.index].ramp);
+    demoFrame=next;
+    if(changed){paintGraphic();guidance();result();if(idNow()==='package')schedule();}
+    scene.style.setProperty('--loop-progress',`${(next.index+next.progress)/next.total*100}%`);
+  }
+  wakeDemo();
+}
+function pauseDemo(){focusPaused=true;demoLastTime=0;updatePlayback();schedule();}
+function goTo(target) {
   stopPlay();hideTip();if(dialog.open)dialog.close();
   const articleTarget=target==='article'||String(target).startsWith('article-');
   const index=articleTarget?count-1:clamp(indexOf(target),0,count-1);
   const article=articleTarget?document.getElementById(target):null;
   const to=articleTarget?(article?.getBoundingClientRect().top+scrollY||story.offsetHeight):distanceAt(index,offsets)*height,from=scrollY;
-  function finish(){stopPlay();render();if(articleTarget)article?.focus({preventScroll:true});else if(!auto)$('#scene-title').focus({preventScroll:true});}
+  function finish(){stopPlay();render();if(articleTarget)article?.focus({preventScroll:true});else $('#scene-title').focus({preventScroll:true});}
   if(reduced.matches){scrollTo(0,to);finish();return;}
-  const duration=auto?Math.max(2000,Math.abs(to-from)/height*5600):Math.min(1600,650+Math.abs(to-from)/height*55),start=performance.now();
-  if(auto){playing=true;$('#play').setAttribute('aria-pressed','true');$('#play-label').textContent='일시 정지';$('#play-icon').textContent='Ⅱ';}
-  function tick(now){const p=clamp((now-start)/duration);scrollTo(0,lerp(from,to,auto?p:smooth(p)));if(p<1)playRaf=requestAnimationFrame(tick);else finish();}
+  const duration=Math.min(1600,650+Math.abs(to-from)/height*55),start=performance.now();
+  function tick(now){const p=clamp((now-start)/duration);scrollTo(0,lerp(from,to,smooth(p)));if(p<1)playRaf=requestAnimationFrame(tick);else finish();}
   playRaf=requestAnimationFrame(tick);
 }
 function showTip(el){if(!el?.dataset.tip)return;$('#tooltip').textContent=el.dataset.tip;$('#tooltip').hidden=false;el.setAttribute('aria-describedby','tooltip');}
@@ -274,6 +331,12 @@ async function action(value) {
   stopPlay();const [key,val]=value.split(':');
   if(key==='go'){goTo(val);return;}
   if(key==='article'){goTo(val?`article-${val}`:'article');return;}
+  if(key==='demo-mode'){
+    finishTransaction();manual=!manual;demoLastTime=0;scene.dataset.mode=manual?'manual':'watch';
+    if(!manual){paused=false;focusPaused=false;demoElapsed=reduced.matches?Math.max(0,demoFrames.reduce((sum,f)=>sum+f.duration,0)-1):0;demoFrame=sampleDemo(demoFrames,demoElapsed);}
+    refresh(true);updatePlayback();wakeDemo();return;
+  }
+  if(!manual&&demoFrames.length)return;
   if(state.busy)return;
   switch(key) {
     case 'document':state.documentPhase=(state.documentPhase+1)%4;break;
@@ -334,12 +397,13 @@ $('#nand-target').addEventListener('click',event=>{if(event.target.closest('[dat
 $('#nand-target').addEventListener('keydown',event=>{if(event.target.closest('[data-action]'))return;if(event.key==='Enter'||event.key===' '){event.preventDefault();if(idNow()==='package')action('lid');else goTo('package');}});
 $('#progress').addEventListener('input',event=>{stopPlay();scrollTo(0,distanceAt(Number(event.target.value)/100,offsets)*height);});
 $('#previous').addEventListener('click',()=>goTo(current-1));$('#next').addEventListener('click',()=>goTo(current===count-1?'article':current+1));
-$('#play').addEventListener('click',()=>{if(playing){stopPlay();return;}if(current===count-1)scrollTo(0,0);goTo(count-1,true);});
+$('#play').addEventListener('click',()=>{paused=!(paused||focusPaused);focusPaused=false;demoLastTime=0;updatePlayback();schedule();wakeDemo();});
 $('#contents').addEventListener('click',()=>{stopPlay();dialog.showModal();schedule();});$('#close-toc').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',schedule);
 addEventListener('keydown',event=>{
   const isEditingTarget=target=>target instanceof Element&&Boolean(target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [data-code-editor], .monaco-editor, .CodeMirror'));
   if(!event.metaKey&&!event.ctrlKey&&!event.altKey&&!event.isComposing&&!isEditingTarget(event.target)&&event.key.toLowerCase()==='h'){window.location.assign(homeUrl.href);return;}
-  if(event.key==='Escape'){stopPlay();hideTip();if(dialog.open)dialog.close();return;}
+  if(event.key==='Escape'){stopPlay();pauseDemo();hideTip();if(dialog.open)dialog.close();return;}
+  if(event.key==='Tab')pauseDemo();
   if(isEditingTarget(event.target)||event.metaKey||event.ctrlKey||event.altKey||event.isComposing)return;
   if((event.key==='Enter'||event.key===' ')&&event.target.matches('g[data-action]')){event.preventDefault();action(event.target.dataset.action);return;}
   if(event.key.toLowerCase()==='o'){event.preventDefault();if(dialog.open)dialog.close();else{stopPlay();dialog.showModal();schedule();}return;}
@@ -348,5 +412,7 @@ addEventListener('keydown',event=>{
   if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key))stopPlay();
 });
 addEventListener('scroll',schedule,{passive:true});addEventListener('wheel',stopPlay,{passive:true});addEventListener('touchstart',stopPlay,{passive:true});addEventListener('resize',resize);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPlay();schedule();});reduced.addEventListener('change',()=>{stopPlay();schedule();});
+scene.addEventListener('scroll',()=>{demoLastTime=0;wakeDemo();},{passive:true});
+document.addEventListener('visibilitychange',()=>{demoLastTime=0;if(document.hidden)stopPlay();schedule();});
+reduced.addEventListener('change',()=>{stopPlay();demoLastTime=0;if(reduced.matches){demoElapsed=Math.max(0,demoFrames.reduce((sum,f)=>sum+f.duration,0)-1);demoFrame=sampleDemo(demoFrames,demoElapsed);refresh(true);}schedule();});
 addEventListener('pageshow',schedule);resize();render();

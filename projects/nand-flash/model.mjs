@@ -96,8 +96,9 @@ export function decode(code) {
  if(position!==null)c[position]^=1;
  return {status:position!==null?'corrected':'clean',code:c,position,data:[c[2],c[4],c[5],c[6]]};
 }
+export const sampleThresholds=(original,shift=.12)=>original.map((bit,i)=>(bit?.22:.78)+shift*(i%2?.75:1.15));
 export function sampleBits(original,shift=.12,reference=.5) {
- return original.map((bit,i)=>Number((bit?.78:.22)+shift*(i%2?.75:1.15)>reference));
+ return sampleThresholds(original,shift).map(vth=>Number(reference>vth));
 }
 export function wearCycle(counts,balanced,bad=-1) {
  const next=[...counts];const eligible=next.map((v,i)=>({v,i})).filter(x=>x.i!==bad);
