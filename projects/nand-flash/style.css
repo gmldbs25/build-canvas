@@ -27,7 +27,7 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 .scene[data-layout=lab] .intro,.scene[data-layout=bench] .intro{position:static;width:auto;max-width:none}
 .scene[data-layout=lab] .eyebrow,.scene[data-layout=bench] .eyebrow{position:absolute;top:126px;left:112px;margin:0}
 .scene[data-layout=lab] h1,.scene[data-layout=bench] h1{position:absolute;top:170px;left:112px;font-size:48px;letter-spacing:-1.8px;line-height:1.25}
-.scene[data-layout=lab] .description,.scene[data-layout=bench] .description{position:absolute;top:163px;left:1040px;width:760px;margin:0;font-size:clamp(19px,calc(16px / var(--fit)),25px);line-height:1.65}
+.scene[data-layout=lab] .description,.scene[data-layout=bench] .description{position:absolute;top:163px;left:1020px;width:780px;margin:0;padding-left:18px;border-left:2px solid #496574;font-size:clamp(19px,calc(16px / var(--fit)),25px);line-height:1.65}
 .scene[data-layout=lab] .graphic-panel{top:271px;left:410px;width:1100px;height:590px}
 .scene[data-layout=bench] .graphic-panel{top:285px;left:270px;width:1380px;height:560px}
 .scene[data-layout=lab] .scene-controls,.scene[data-layout=bench] .scene-controls{position:absolute;top:877px;left:100px;width:1720px;max-width:none;margin:0;justify-content:center;gap:20px 34px}
@@ -249,6 +249,7 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 .wear-pair .wear-bars{gap:20px}.wear-pair .wear-track{height:200px!important}.wear-pair p{font-size:18px;line-height:1.6;color:#9ebecd}.wear-pair p b{white-space:nowrap;color:#d2e9f2;font-weight:500}.wear-pair section:first-child .wear-fill{background:#8f7e6a}.wear-pair section:last-child .wear-fill{background:#74a9bb}
 .scene[data-mode=watch][data-object=wear] .graphic-panel{left:250px;width:1420px}
 @media(max-width:900px), (max-aspect-ratio:1/1){
+ .scene[data-layout=lab] .description,.scene[data-layout=bench] .description{padding-left:12px}
  .scene[data-mode=watch] .description{font-size:16px;line-height:1.65}
  .scene[data-mode=watch] .scene-context{order:8;margin-top:22px;font-size:14px}
  .scene[data-mode=watch] .graphic-panel,.scene[data-mode=watch] .engineering-object{order:3;margin-top:20px}
