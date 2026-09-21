@@ -42,7 +42,7 @@ function createFrames(id) {
     case 'erase': return [
       frame('Page 3의 데이터만 고치고 싶습니다.', {selectedPage:3,erasePages:Array(8).fill('used'),eraseEffect:'',eraseMessage:'Page 하나를 선택했습니다.'}),
       frame('이미 기록한 Page에는 원하는 값을 자유롭게 덮어쓸 수 없습니다.', {selectedPage:3,erasePages:Array(8).fill('used'),eraseEffect:'blocked',eraseMessage:'Program 불가 · 먼저 지워진 공간이 필요합니다.'}, 3300),
-      frame('Erase는 Block 전체에 적용됩니다. 이웃 Page도 함께 지워집니다.', {selectedPage:3,erasePages:Array(8).fill('free'),eraseEffect:'erasing',eraseMessage:'Block 전체가 Free · 다른 데이터까지 지워졌습니다.'}, 3300),
+      frame('Erase는 Block 전체에 적용됩니다. 지워져 다시 쓸 수 있는 상태를 Free라고 합니다.', {selectedPage:3,erasePages:Array(8).fill('free'),eraseEffect:'erasing',eraseMessage:'Block 전체가 Free · 다른 데이터까지 지워졌습니다.'}, 3300),
       frame('이제 쓸 수 있지만 다른 데이터는 사라졌습니다. 그래서 새 자리에 쓰는 방법이 필요합니다.', {selectedPage:3,erasePages:Array.from({length:8},(_,i)=>i===3?'used':'free'),eraseEffect:'programming',eraseMessage:'Page 3 Program 완료 · 다음은 다른 데이터를 보존하는 방법입니다.'}, 4000),
     ];
     case 'address': return [100,101,102].map(lba=>frame(`LBA ${lba}을 따라가면 ${createFlash().mapping[lba]}에 도착합니다. FTL이 두 주소를 연결합니다.`, {flash:createFlash(),lba,writePlan:null,gcPlan:null,writePhase:'idle',gcPhase:'idle',flashMessage:`LBA ${lba} → ${createFlash().mapping[lba]}`}, 3000));
@@ -79,9 +79,9 @@ function createFrames(id) {
     }
     case 'reliability': return [
       frame('처음에는 상태 분포가 판정 경계 안에 있습니다.', {disturb:false,drift:0}),
-      frame('시간이 지나 전하가 변하면, 분포 일부가 읽기 경계를 넘을 수 있습니다.', {disturb:false,drift:0}, 4500, {drift:[0,1]}),
+      frame('시간이 지나도 상태를 유지하는 성질이 Retention입니다. 전하가 변하면 읽기 경계를 넘을 수 있습니다.', {disturb:false,drift:0}, 4500, {drift:[0,1]}),
       frame('다시 처음 상태. 이번에는 반복 읽기의 영향을 봅니다.', {disturb:true,drift:0}),
-      frame('읽기 전압의 영향으로 이웃 Cell의 분포도 변할 수 있습니다.', {disturb:true,drift:0}, 4500, {drift:[0,1]}),
+      frame('Read Disturb는 반복 읽기 전압이 선택되지 않은 Cell의 상태에도 영향을 주는 현상입니다.', {disturb:true,drift:0}, 4500, {drift:[0,1]}),
     ];
     case 'ecc': {
       const original=encode(), one=[...original];one[2]^=1;

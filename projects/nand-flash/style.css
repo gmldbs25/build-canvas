@@ -113,6 +113,7 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 
 @media(max-width:900px), (max-aspect-ratio:1/1){.viewport{transform:translateZ(0)}}
 .staged{--page-color:#a4c8cf}
+.flash-legend small{display:block;font-size:.82em;line-height:1.5;color:#a0b8c7;margin-top:3px}
 @media(max-width:900px), (max-aspect-ratio:1/1){.flash-legend:has(.staged){gap:12px;font-size:11px}}
 
 /* First-time guidance stays visible: explanation, action, observable result. */
@@ -175,6 +176,27 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
  .scene[data-scene=plane] .diagram-svg text[font-size="22"]{font-size:30px}
  .scene-controls,.scene[data-layout=lab] .scene-controls,.scene[data-layout=bench] .scene-controls{order:4}
  .graphic-panel,.scene[data-layout=lab] .graphic-panel,.scene[data-layout=bench] .graphic-panel,.engineering-object{order:5}
+}
+
+/* A short recap bridges the ending and the optional, deeper reading. */
+.journey-recap{margin-bottom:76px}
+.article .journey-recap h2{font-size:24px;letter-spacing:-.5px;margin:0 0 24px}
+.journey-recap ol{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;list-style:none;padding:0;margin:0;counter-reset:recap}
+.journey-recap li{border-top:1px solid #385363;padding:19px 0 23px;counter-increment:recap;line-height:1.75;word-break:keep-all}
+.journey-recap li>span{font-size:14px;color:#96b1c2}
+.journey-recap li>span::before{content:'0' counter(recap) ' · ';color:#bed9e6}
+.journey-recap p{font-size:17px;color:#c4dce8;margin:10px 0 0}
+.article-section .article-key{border-left:2px solid #739bab;padding:4px 0 4px 18px;color:#cee3ed}
+.article-key>span{display:block;font-size:12px;letter-spacing:.05em;color:#95b8cb;margin-bottom:5px}
+.article-depth{border-top:1px solid #334f60;border-bottom:1px solid #334f60;margin-top:24px;padding:0 16px;background:#17283366}
+.article-depth summary{cursor:pointer;min-height:48px;padding:15px 0;font-size:15px;line-height:1.75;color:#b7d4e3;word-break:keep-all}
+.article-depth summary>span{color:#8eacbf;margin-right:8px}
+.article-depth summary:focus-visible{outline:2px solid #b4dcec;outline-offset:4px}
+.article-depth p{margin:0 0 20px}
+@media(max-width:600px){
+ .journey-recap{margin-bottom:52px}.journey-recap ol{grid-template-columns:1fr}.journey-recap li{padding:15px 0 18px}.journey-recap p{font-size:16px}
+ .article-depth{padding:0 12px}.article-depth summary{font-size:14px}
+ .flash-legend{gap:8px 10px;justify-content:space-between;flex-wrap:wrap}.flash-legend>span{gap:5px;align-items:flex-start}.flash-legend i{margin-top:4px}.flash-legend small{font-size:11px}
 }
 @media(min-width:600px) and (max-width:900px), (min-width:600px) and (max-aspect-ratio:1/1){
  .scene-context,.scene[data-layout=lab] .scene-context,.scene[data-layout=bench] .scene-context{font-size:16px}.scene-guide,.scene[data-layout=lab] .scene-guide,.scene[data-layout=bench] .scene-guide{font-size:15px}
@@ -240,5 +262,7 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
  .wear-comparison .wear-caption{font-size:14px;flex-direction:column;gap:5px}.wear-comparison .wear-caption span{font-size:12px}
  .wear-pair{gap:16px}.wear-pair section+section{padding-left:13px}.wear-pair h2{font-size:14px;line-height:1.6;min-height:45px;margin-bottom:10px}.wear-pair .wear-bars{gap:5px}.wear-pair .wear-track{height:130px!important}.wear-pair .wear-column strong{font-size:16px}.wear-pair .wear-column>span{font-size:11px}.wear-pair p{font-size:12px}
  .scene[data-mode=watch] .retry-reference{flex-wrap:wrap;gap:12px}.scene[data-mode=watch] .retry-reference>div{width:110px}
+ .scene h1,.article-section h3{text-wrap:balance;word-break:keep-all}
+ .scene[data-object=mapping] .flash-page{height:49px}
  .scene[data-mode=watch][data-object=mapping] .flash-page .page-address{font-size:11px}.scene[data-mode=watch][data-object=mapping] .flash-page strong{margin-top:8px}
 }

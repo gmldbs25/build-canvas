@@ -4,6 +4,10 @@
 
 15개 동작 장면은 들어가면 설명 애니메이션이 자동 반복됩니다. 시작 상태 → 변화 → 결과를 단계별 캡션과 함께 보여주며, 장면 이동은 사용자의 스크롤에 맡깁니다. 화면에는 선택적인 `직접 살펴보기`만 남겨 실행 버튼과 슬라이더를 접어 둡니다. 모바일에서는 짧은 설명 → 그림 → 현재 단계 해설 → 선택적 조작 → 배경 설명 순서로 읽습니다. 컴퓨터 내부 기판, Die의 배열·주변 회로, Page의 Cell 판정·읽기 회로 연결을 기능적 도식으로 표현합니다.
 
+기준 독자는 RAM·SSD·bit는 알지만 NAND 내부는 처음 접하는 기술 독자입니다. Vth·Vref·LBA·PPA·ECC·Read Retry는 첫 장면의 짧은 설명에서, FTL·Mapping·P/E·Retention·Read Disturb는 배경 설명과 관찰 캡션에서 풀어 씁니다. Valid / Invalid / Free의 뜻은 주소 도식의 범례에 함께 표시합니다. 후반은 공간 문제 → 마모 문제 → 읽기 오류로 이어집니다. 기존 엔딩 뒤 Article 입구에는 네 가지 핵심 복습이 있습니다.
+
+Article 13개 절은 `핵심` 한 문장부터 읽습니다. Flush / FUA, 논리 Page·Cell 관계의 세부사항, 실제 Mapping·metadata, Write Amplification, Dynamic / Static Wear Leveling, BCH / LDPC, Controller 병렬 처리 등은 `조금 더 정확히`에서 펼칩니다. 필수 모델 한계는 기본 본문에도 남기며, 접기·펼치기는 JavaScript 없이도 키보드와 터치로 동작합니다.
+
 ## 이야기와 실험
 
 1. `기억.txt` 저장 → 정상 종료 → 다시 켜기. RAM과 저장장치를 구분하고 SSD의 Controller / NAND 역할을 찾습니다.
@@ -53,7 +57,7 @@ node projects/nand-flash/scripts/render-article.mjs --check
 
 ## 구현
 
-- `content.mjs`: 장면 순서·문구·정착 비율·길이, 장면별 입문 설명과 조작 안내(`sceneLearning`), 요청 흐름, 출처를 포함한 Article 원고.
+- `content.mjs`: 장면 순서·문구·정착 비율·길이, 장면별 입문 설명과 조작 안내(`sceneLearning`), 요청 흐름, 출처를 포함한 Article 원고와 핵심·심화 구분(`articleReading`).
 - `index.html`: sticky viewport, 원본 SSD 벡터, 목차 dialog와 사전 렌더링된 Article.
 - `diagrams.mjs`: 계층 SVG와 컴퓨터·Cell·Page·Mapping·마모·ECC·전체 흐름 오브젝트.
 - `model.mjs`: 가변 길이의 역방향 타임라인, 단계별 FTL/GC, 마모 분산, SECDED, 전압 재판정.

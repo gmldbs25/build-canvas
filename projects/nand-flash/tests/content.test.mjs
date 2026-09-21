@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {scenes,sceneLearning,hierarchyScenes,articleSections,renderArticle,writeSteps,writeNotes,readSteps,readNotes,retrySteps,retryNotes} from '../content.mjs';
+import {scenes,sceneLearning,hierarchyScenes,articleSections,articleReading,renderArticle,writeSteps,writeNotes,readSteps,readNotes,retrySteps,retryNotes} from '../content.mjs';
 
 test('journey and all navigation targets remain complete after scene restructuring',async()=>{
  const ids=new Set(scenes.map(s=>s.id));assert.equal(ids.size,scenes.length);
@@ -20,4 +20,18 @@ test('static Article is source-complete without JavaScript and every reference h
 });
 test('every write, read and retry phase has its own explanatory result',()=>{
  for(const [steps,notes] of [[writeSteps,writeNotes],[readSteps,readNotes],[retrySteps,retryNotes]]){assert.equal(steps.length,notes.length);assert.ok(notes.every(Boolean));}
+});
+test('Article reading layers keep every source paragraph once and leave core caveats visible',()=>{
+ const html=renderArticle();
+ assert.deepEqual(Object.keys(articleReading),articleSections.map(section=>section[0]));
+ for(const [id,,...rest] of articleSections){
+  const section=html.split(`id="article-${id}"`)[1].split('</section>')[0];
+  for(const paragraph of rest.slice(0,3))assert.equal(section.split(`<p>${paragraph}</p>`).length,2,`${id}: paragraph lost or repeated`);
+  assert.ok(section.includes('class="article-key"'));
+  assert.ok(!section.includes('<details open'));
+ }
+ const core=html.replace(/<details[\s\S]*?<\/details>/g,'');
+ assert.ok(!core.includes('Flush는'));
+ assert.ok(!core.includes('Dynamic Wear Leveling(동적 방식)'));
+ for(const caveat of ['저장 버튼을 누른 순간 곧바로 모든 기록이 끝난다는 뜻은 아닙니다','그 모양이 실제 반도체 내부의 층 모양과 일치한다는 뜻은 아닙니다','비휘발성을 영구 보존과 혼동해서는 안 됩니다','3 bit 이상에서는 이 보장이 성립하지 않으므로','TLC에서는 같은 Cell 집합이 여러 논리 Page를 표현할 수 있습니다','실제 SSD의 ECC 전체 구현을 재현하는 모델은 아닙니다','어떤 오류든 Retry로 복원된다는 보장은 없습니다'])assert.ok(core.includes(caveat),caveat);
 });

@@ -2,6 +2,19 @@
 
 2026-09-14. 기존 1차본을 기반으로 한 완성본. 작업 시작 전에 깨끗한 `main`의 `git status`를 확인하고 `git pull`로 원격 `e67689b`까지 fast-forward했습니다. master spec, content outline, 기존 구현 기록, 레퍼런스 이미지와 Scene A를 검토했습니다.
 
+## 2026-09-21 · 입문 독자를 위한 최종 Polish
+
+- 22개 Scene, 13개 Article, 카메라·모델·15개 자동 루프의 동작을 유지했다. 본편에서는 기존 문구를 고쳐 Vth·Vref·LBA·PPA·ECC·Read Retry를 한 문장으로 정의하고, FTL·Mapping과 P/E·Retention·Read Disturb의 배경 설명을 정리했다. 주소 도식에는 Valid / Invalid / Free의 한국어 범례를 붙였다.
+- 후반의 장 표시는 공간 문제 → 마모 문제 → 신뢰성 문제로 이어진다. 새 Page 기록 → Mapping 변경 → Invalid → Valid 보존·주소 갱신 → Block Erase → Free 확보의 순서와 자동 관찰 시간을 유지했다.
+- Article에 핵심 한 문장과 네이티브 `details` 심화 영역을 적용했다. 01절은 RAM과 NAND의 차이 및 정상 종료 가정을 먼저 읽은 다음 Flush / FUA를 펼친다. 논리 Page·Cell의 세부 관계, 실제 Mapping·metadata, Write Amplification, Dynamic / Static Wear Leveling, BCH / LDPC, 병렬 처리도 구분했다. 모든 기존 문단과 출처가 사전 렌더링 HTML에 남는다.
+- 기존 엔딩 다음 Article 입구에 전하→bit, Page/Block 단위, 수정→GC, 마모·읽기 오류의 네 가지 복습을 넣었다. 데스크톱은 2열, 모바일은 1열이다. 작은 화면에서 제목의 어절과 Page 상태 라벨이 잘리지 않도록 줄바꿈·행 높이를 조정했다.
+- Sol 독립 리뷰에서 지적한 두 모델 한계는 기본 본문에도 유지했다: TLC의 같은 Cell 집합이 여러 논리 Page를 표현할 수 있다는 점, 작은 SECDED 모델이 실제 SSD ECC 전체가 아니라는 점. 원고 보존·기본 본문 경계 조건 검증에 두 항목을 포함했다.
+- KIOXIA Cell / GC / Wear / ECC, Linux Kernel Flush / FUA, USENIX LDPC와 Read Retry 연구를 재확인했다. Read와 Retry의 `Vref > Vth → 1`, Retry의 고정 전하, 같은 초기 상태·같은 6회 P/E 비교, FTL→GC 상태 연결, SECDED 전체 1·2 bit 오류 조합은 기존 모델·루프 테스트로 재검증했다.
+
+현재 검증: Work4 20개 / 통합 Node 46개 / `npm test` 5개 통과, Article 동기화 검사·Work4 ESLint·Pages 통합 빌드 통과. 전체 `npm run lint`는 27개 오류로 실패했다. 2개는 변경하지 않은 Work3 `carousel.tsx`, `use-mobile.ts`의 기존 React hook 오류이며, 나머지 25개는 생성된 빌드 파일이다. 다른 Work와 공통 lint 설정은 이번 범위에서 수정하지 않았다.
+
+브라우저에서는 1280×720·390×844·320×568에서 22개 장면을 확인했다. 수평 넘침과 실행 오류 없음. 자동 진행·일시정지·재개, 좌우 이동·제목 포커스, O/Escape, scrubber, 입력 중 H 보호·홈 복귀, Article 왕복·키보드 펼치기, 직접 조작의 FTL/GC 공유 상태, Wear 동일 조건, ECC/Retry, 모바일 내부 스크롤·장면 변경 시 초기화, 동작 줄임 환경의 정지·직접 조작을 확인했다. Article의 심화 펼치기와 13개 본문은 JavaScript를 꺼도 읽을 수 있다. 상세한 초기 구현·검증 기록은 아래에 보존한다.
+
 ## 최종 구성
 
 대표 제목은 **컴퓨터가 기억하는 방식**, 부제는 **NAND Flash의 동작 원리**입니다. 컴퓨터의 저장 경험에서 출발하여 Cell의 물리까지 내려가고, Software의 관리와 오류 복구를 거쳐 처음의 문서로 돌아옵니다.
@@ -74,4 +87,4 @@ Article HTML을 원고에서 생성하는 도구를 추가했고, 원고와 HTML
 
 ## 배포 경로
 
-기존 GitHub Pages 빌드는 `projects/nand-flash/`의 6개 정적 파일을 `dist-pages/nand-flash/`로 복사합니다. Work4 배포 자산은 합계 약 170 KB의 비압축 HTML/CSS/JS/SVG이며 외부 런타임 요청이 없습니다. 정적 미리보기에서도 실제 `/build-canvas/nand-flash/` 경로와 ES module MIME 타입을 사용합니다.
+기존 GitHub Pages 빌드는 `projects/nand-flash/`의 7개 정적 파일(자동 설명용 `demos.mjs` 포함)을 `dist-pages/nand-flash/`로 복사합니다. 외부 런타임 요청은 없습니다. 정적 미리보기에서도 실제 `/build-canvas/nand-flash/` 경로와 ES module MIME 타입을 사용합니다.
