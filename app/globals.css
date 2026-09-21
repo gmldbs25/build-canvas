@@ -52,6 +52,7 @@ a {
   line-height: 0.95;
   letter-spacing: -0.085em;
   white-space: nowrap;
+  transform: translateX(-0.1em);
 }
 
 .cursor-mark {
