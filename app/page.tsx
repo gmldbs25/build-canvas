@@ -38,7 +38,7 @@ export default function Home() {
           build <span className="cursor-mark" aria-hidden="true">_</span> canvas
         </h1>
         <p className="statement">
-          <span>heeyoon's space</span>
+          <span>by heeyoon. ✦</span>
         </p>
       </section>
 
