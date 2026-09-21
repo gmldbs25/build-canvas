@@ -13,15 +13,20 @@ The primary agent owns planning, important implementation decisions, integration
 
 When the corresponding models are available and configured, prefer:
 
-- **Astra** for primary implementation, architecture, and context-sensitive decisions.
-- **Luna** for lightweight, mechanical, or routine delegated work.
-- **Sol** for independent review of substantial changes.
+- **Astra** as the lead for end-to-end work, architecture, integration, and context-sensitive decisions.
+- **Terra** for clearly scoped implementation that still requires normal coding judgment, such as UI changes, feature work, content integration, and ordinary bug fixes.
+- **Luna** for lightweight, mechanical, repetitive, or routine execution.
+- **Sol** for independent review or deeper analysis of substantial, ambiguous, or high-impact changes.
 
-Delegation is optional. Keep it proportional to the task and do not create subagents when direct execution is simpler.
+Delegation is optional. Keep it proportional to the task. Do not force every task through multiple agents when direct execution is simpler.
 
-## Worker Delegation
+## Delegation
 
-Prefer delegating clearly scoped, low-risk work to Luna, including:
+Astra should remain responsible for the overall task and may delegate when work can be separated cleanly.
+
+Prefer Terra when the scope and acceptance criteria are clear but the implementation still requires engineering judgment.
+
+Prefer Luna for clearly scoped, low-risk work, including:
 
 - repository exploration and file lookup
 - repetitive or mechanical edits
@@ -49,7 +54,7 @@ Do not perform destructive or history-rewriting Git operations without explicit 
 
 For substantial implementation changes, prefer an independent Sol review after implementation and basic verification.
 
-Review should focus on bugs, regressions, missed requirements, broken interactions, architectural or maintainability issues, meaningful UX problems, and missing verification.
+Review should focus on bugs, regressions, missed requirements, broken interactions, architectural or maintainability issues, meaningful UX problems, technical accuracy, and missing verification.
 
 The reviewer reports findings; the primary agent decides which findings require changes and remains responsible for the final result.
 
@@ -57,4 +62,4 @@ Do not invoke independent review for trivial changes.
 
 ## Working Principle
 
-Use strong reasoning where judgment matters. Use lightweight agents for routine execution. Keep delegation proportional to the task.
+Use Astra where overall judgment matters, Terra for normal scoped implementation, Luna for routine execution, and Sol for independent review or deeper analysis. Keep delegation proportional to the task.
