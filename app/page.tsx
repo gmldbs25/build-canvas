@@ -38,7 +38,7 @@ export default function Home() {
           build <span className="cursor-mark" aria-hidden="true">_</span> canvas
         </h1>
         <p className="statement">
-          <span>생각, 개발, 기록</span>
+          <span>heeyoon의 개발 기록 공간.</span>
         </p>
       </section>
 
