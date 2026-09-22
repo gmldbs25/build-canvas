@@ -70,37 +70,37 @@ export function cellDiagram(s, scene) {
   const conduction=s.vref>vth&&on;
   let electrons='';
   for(let i=0;i<10;i++) electrons+=`<circle class="stored-electron" cx="${320+(i%5)*46}" cy="${245+Math.floor(i/5)*30}" r="6" fill="#b4dfed" opacity="${i<q?1:.08}"/>`;
-  const channel=path('M276 365H565',conduction&&read?'#b3e2ec':'#688293',`stroke-width="${conduction&&read?5:2}" ${conduction&&read?'class="meaningful-flow" stroke-dasharray="9 12"':''}`);
+  const channel=path('M276 365H565',conduction&&read?'#b3e2ec':'#688293',`data-motion="channel" stroke-width="${conduction&&read?5:2}" ${conduction&&read?'class="meaningful-flow" stroke-dasharray="9 12"':''}`);
   const body=`${text(410,81,read?'가하는 기준 전압':program?'Program 전압 펄스':on?'전원 공급 중':'전원 꺼짐','#adc7d5',21,'text-anchor="middle"')}
     ${path('M410 98V158',on?'#9bc9db':'#3f5665',`stroke-width="2" ${program&&s.pulsing?'class="program-electrons"':''}`)}
     ${rect(212,158,400,45,'#4a6375','#8ba8b9')}${text(410,188,'Control Gate','#d5e8f1',21,'text-anchor="middle"')}
     ${rect(233,215,358,97,'#243b4b','#7596a8')}${rect(270,233,282,62,'#416176','#92b8ca')}${electrons}
     ${path('M592 264H640')}${text(654,262,'전하 저장 영역','#b8d0dd',21)}${text(654,294,'주변은 절연층','#8faab9',18)}
     ${rect(196,334,432,111,'#293f4f','#668394')}${rect(220,336,56,54,'#58788d','#8db4c7')}${rect(565,336,42,54,'#58788d','#8db4c7')}${channel}
-    ${text(410,415,read?(conduction?'도통 · 전류가 흐름':'비도통 · 전류 없음'):'Channel','#c0d6e2',21,'text-anchor="middle"')}
+    ${text(410,415,read?(conduction?'도통 · 전류가 흐름':'비도통 · 전류 없음'):'Channel','#c0d6e2',21,'text-anchor="middle" data-motion="conduction"')}
     ${program&&s.pulsing?path('M410 350V281','#b9e5ee','class="program-electrons" stroke-dasharray="3 14" stroke-width="5"'):''}
     ${text(750,372,read?'SLC 판정 예시':program?'목표 Vth':on?'전하가 만든 차이':'전하 상태 유지','#8eafc1',18,'text-anchor="middle"')}
-    ${text(750,427,read?(conduction?'1':'0'):program?`${Math.round(q/2)} / 5`:'Vth','#d8edf5',49,'text-anchor="middle"')}
+    ${text(750,427,read?(conduction?'1':'0'):program?`${Math.round(q/2)} / 5`:'Vth','#d8edf5',49,'text-anchor="middle" data-motion="verdict"')}
     ${path('M190 549H843','#637e8e')}${text(145,556,'Vth','#b2cdda',20)}
     ${program?rect(190+.72*650,510,.07*650,68,'#355463','none')+text(190+.755*650,492,'목표 구간','#accfdc',18,'text-anchor="middle"'):''}
-    ${rect(190,535,650*vth,27,'#5b8aa0','none','class="vth-bar"')}
-    ${path(`M${190+vth*650} 522v56`,'#c3e6f0','stroke-width="2" class="vth-marker"')}
-    ${read?path(`M${190+s.vref*650} 499v93`,'#d8c9a6','stroke-width="2" stroke-dasharray="5 5"')+text(190+s.vref*650,484,`Vref ${s.vref.toFixed(2)}`,'#dfd1b1',20,'text-anchor="middle"'):''}
-    ${text(190,603,'낮음','#89a7b9',18)}${text(841,603,'높음','#89a7b9',18,'text-anchor="end"')}${text(510,640,`Vth ${vth.toFixed(2)} · 전압과 전하 수는 설명용 상대값`,'#819faf',18,'text-anchor="middle"')}`;
-  if(s.compact) return `<div class="compact-cell">${svg(body,scene).replace('viewBox="0 0 1000 680"','viewBox="165 130 470 323"')}<p class="compact-cell-caption">전하 저장 영역 · 절연층 안에 유지되는 상태</p><div class="compact-voltage"><span>Vth ${vth.toFixed(2)}</span><div class="compact-voltage-track"><b style="width:${vth*100}%"></b>${read?`<i style="left:${s.vref*100}%"></i>`:''}${program?'<em></em>':''}</div><strong>${read?`판정 ${conduction?'1':'0'}`:program?`${q/2} / 5`:'상대값'}</strong></div></div>`;
+    ${rect(0,0,650,27,'#5b8aa0','none',`class="vth-bar" transform="translate(190 535) scale(${vth} 1)"`)}
+    ${path('M0 522v56','#c3e6f0',`stroke-width="2" class="vth-marker" transform="translate(${190+vth*650} 0)"`)}
+    ${read?path('M0 499v93','#d8c9a6',`data-motion="vref-marker" transform="translate(${190+s.vref*650} 0)" stroke-width="2" stroke-dasharray="5 5"`)+text(190+s.vref*650,484,`Vref ${s.vref.toFixed(2)}`,'#dfd1b1',20,'text-anchor="middle" data-motion="vref-label"'):''}
+    ${text(190,603,'낮음','#89a7b9',18)}${text(841,603,'높음','#89a7b9',18,'text-anchor="end"')}${text(510,640,`Vth ${vth.toFixed(2)} · 전압과 전하 수는 설명용 상대값`,'#819faf',18,'text-anchor="middle" data-motion="vth-label"')}`;
+  if(s.compact) return `<div class="compact-cell">${svg(body,scene).replace('viewBox="0 0 1000 680"','viewBox="165 130 470 323"')}<p class="compact-cell-caption">전하 저장 영역 · 절연층 안에 유지되는 상태</p><div class="compact-voltage"><span>Vth ${vth.toFixed(2)}</span><div class="compact-voltage-track"><b style="transform:scaleX(${vth})"></b>${read?`<i style="transform:translateX(${s.vref*100}%)"></i>`:''}${program?'<em></em>':''}</div><strong>${read?`판정 ${conduction?'1':'0'}`:program?`${q/2} / 5`:'상대값'}</strong></div></div>`;
   return svg(body,scene);
 }
 
 export function densityDiagram(bits=1,drift=0,disturb=false,compact=false) {
   const n=2**bits,left=115,width=780;let curves='';
   for(let i=0;i<n;i++) {
-    const center=left+(i+.5)*width/n,mid=center+drift*(disturb?1:-1)*(i%2?42:58),half=Math.min(68,width/n*.39)+drift*12;
-    curves+=`<path class="distribution" d="M${mid-half} 431C${mid-half*.58} 431 ${mid-half*.42} 219 ${mid} 218C${mid+half*.42} 219 ${mid+half*.58} 431 ${mid+half} 431Z" fill="${i===1?'#648da3':'#3b586c'}" stroke="${i===1?'#b1d8e6':'#7698ad'}" stroke-width="1.5" fill-opacity=".65"/>`;
+    const center=left+(i+.5)*width/n,mid=center+drift*(disturb?1:-1)*(i%2?42:58),base=Math.min(68,width/n*.39),half=base+drift*12;
+    curves+=`<path class="distribution" data-center="${center}" data-half="${base}" transform="translate(${mid} 0) scale(${half/base} 1) translate(${-center} 0)" d="M${center-base} 431C${center-base*.58} 431 ${center-base*.42} 219 ${center} 218C${center+base*.42} 219 ${center+base*.58} 431 ${center+base} 431Z" fill="${i===1?'#648da3':'#3b586c'}" stroke="${i===1?'#b1d8e6':'#7698ad'}" stroke-width="1.5" fill-opacity=".65"/>`;
     curves+=text(center,467,`${i}`,'#aec9d8',n===16?18:21,'text-anchor="middle"');
     if(i>0)curves+=path(`M${left+i*width/n} 188v249`,'#9bb9c7','stroke-dasharray="3 8" opacity=".65"');
   }
-  if(compact)return `<div class="compact-density"><div><b>${bits} bit / Cell · ${n}개 상태</b><span>높이 = Cell 수</span></div>${svg(`${path('M115 177V435H915','#647e91')}${curves}`,'density').replace('viewBox="0 0 1000 680"','viewBox="85 170 850 325"')}<p>낮은 Vth <span>문턱 전압 →</span> 높은 Vth</p><small>${drift?'분포가 점선을 넘으면 잘못 판정될 수 있습니다.':`${n-1}개의 경계로 상태를 구분합니다.`} 상대값 개념도.</small></div>`;
-  return svg(`${text(115,110,`${bits} bit / Cell`,'#d4e6ef',35)}${text(895,110,`${n}개 상태`,'#b5d0de',25,'text-anchor="end"')}${text(80,182,'Cell 수','#8ba9b9',18)}${path('M115 177V435H915','#647e91')}${curves}${text(500,526,'문턱 전압 Vth →','#b1cbd9',22,'text-anchor="middle"')}${text(500,582,drift?'분포가 읽기 경계(점선)를 넘으면 잘못 판정될 수 있습니다.':n===2?'두 상태 사이에 넓은 판정 여유가 있습니다.':`${n}개 상태를 구분하는 ${n-1}개 경계 · 상태 간 여유가 좁아집니다.`,'#aecad9',21,'text-anchor="middle"')}${text(500,632,'같은 전압 범위의 개념 비교 · 상태 번호는 실제 bit 부호가 아닙니다.','#819fae',17,'text-anchor="middle"')}`,'density');
+  if(compact)return `<div class="compact-density"><div><b>${bits} bit / Cell · ${n}개 상태</b><span>높이 = Cell 수</span></div>${svg(`${path('M115 177V435H915','#647e91')}${curves}`,'density').replace('viewBox="0 0 1000 680"','viewBox="85 170 850 325"')}<p>낮은 Vth <span>문턱 전압 →</span> 높은 Vth</p><small data-motion="density-note">${drift?'분포가 점선을 넘으면 잘못 판정될 수 있습니다.':`${n-1}개의 경계로 상태를 구분합니다.`} 상대값 개념도.</small></div>`;
+  return svg(`${text(115,110,`${bits} bit / Cell`,'#d4e6ef',35)}${text(895,110,`${n}개 상태`,'#b5d0de',25,'text-anchor="end"')}${text(80,182,'Cell 수','#8ba9b9',18)}${path('M115 177V435H915','#647e91')}${curves}${text(500,526,'문턱 전압 Vth →','#b1cbd9',22,'text-anchor="middle"')}${text(500,582,drift?'분포가 읽기 경계(점선)를 넘으면 잘못 판정될 수 있습니다.':n===2?'두 상태 사이에 넓은 판정 여유가 있습니다.':`${n}개 상태를 구분하는 ${n-1}개 경계 · 상태 간 여유가 좁아집니다.`,'#aecad9',21,'text-anchor="middle" data-motion="density-note"')}${text(500,632,'같은 전압 범위의 개념 비교 · 상태 번호는 실제 bit 부호가 아닙니다.','#819fae',17,'text-anchor="middle"')}`,'density');
 }
 
 export function eraseDiagram(s) {
@@ -131,18 +131,18 @@ export function mappingDiagram(s) {
 export function wearDiagram(s) {
   if(s.wearComparison){
     const {plain,balanced,cycles}=s.wearComparison;
-    const bars=(counts)=>counts.map((count,i)=>`<div class="wear-column"><strong>${count}</strong><div class="wear-track"><div class="wear-fill" style="height:${count/12*100}%"></div></div><span>B${i}</span></div>`).join('');
+    const bars=(counts)=>counts.map((count,i)=>`<div class="wear-column"><strong>${count}</strong><div class="wear-track"><div class="wear-fill" style="transform:scaleY(${count/12})"></div></div><span>B${i}</span></div>`).join('');
     return `<div class="wear-object wear-comparison"><div class="wear-caption">같은 시작 상태 · 같은 P/E ${cycles}회 <span>P/E = 쓰기·지우기 한 차례</span></div><div class="wear-pair">${[[plain,'한곳에 집중'],[balanced,'덜 사용한 곳으로 분산']].map(([counts,label])=>`<section><h2>${label}</h2><div class="wear-bars">${bars(counts)}</div><p>가장 많이 쓴 곳과 적게 쓴 곳의 차이 <b>${Math.max(...counts)-Math.min(...counts)}회</b></p></section>`).join('')}</div><p class="diagram-note">이미 생긴 마모는 되돌아가지 않습니다. 다음 사용을 나누어 편차를 줄입니다.</p></div>`;
   }
   const max=Math.max(12,...s.wearCounts);
-  return `<div class="wear-object"><div class="wear-caption">Block별 P/E Cycle <span>쓰기·지우기 횟수 비교</span></div><div class="wear-bars">${s.wearCounts.map((count,i)=>`<div class="wear-column ${s.badBlock===i?'bad':''} ${s.lastWear===i?'selected':''}"><strong>${s.badBlock===i?'제외':count}</strong><div class="wear-track"><div class="wear-fill" style="height:${count/max*100}%"></div></div><span>B${i}</span></div>`).join('')}</div><p class="object-message">${s.balanced?'덜 사용한 Block으로 다음 P/E를 분산합니다.':'같은 Block에 P/E가 집중됩니다.'}</p><p class="diagram-note">마모는 절연층과 읽기 특성의 변화입니다. 막대가 실제 수명을 예측하지는 않습니다.</p></div>`;
+  return `<div class="wear-object"><div class="wear-caption">Block별 P/E Cycle <span>쓰기·지우기 횟수 비교</span></div><div class="wear-bars">${s.wearCounts.map((count,i)=>`<div class="wear-column ${s.badBlock===i?'bad':''} ${s.lastWear===i?'selected':''}"><strong>${s.badBlock===i?'제외':count}</strong><div class="wear-track"><div class="wear-fill" style="transform:scaleY(${count/max})"></div></div><span>B${i}</span></div>`).join('')}</div><p class="object-message">${s.balanced?'덜 사용한 Block으로 다음 P/E를 분산합니다.':'같은 Block에 P/E가 집중됩니다.'}</p><p class="diagram-note">마모는 절연층과 읽기 특성의 변화입니다. 막대가 실제 수명을 예측하지는 않습니다.</p></div>`;
 }
 
 export function eccDiagram(s) {
   const original=encode(),result=s.eccResult;
   return `<div class="ecc-object"><div class="ecc-label"><span>데이터 4 bit + 검사 4 bit</span><strong>교육용 SECDED</strong></div><div class="bit-word">${s.eccBits.map((bit,i)=>`<button data-action="flip:${i}" class="bit ${bit!==original[i]?'changed':''} ${result?.position===i?'corrected':''}" aria-label="${i+1}번 bit ${bit}, ${[2,4,5,6].includes(i)?'데이터':'검사'}, 뒤집기" aria-pressed="${bit!==original[i]}"><small>${i+1}</small><b>${bit}</b><span>${[2,4,5,6].includes(i)?'데이터':'검사'}</span></button>`).join('')}</div>
     <div class="ecc-check ${result?.status||''}" role="status" aria-atomic="true"><span>${result?.status==='corrected'?'✓ 복구됨':result?.status==='uncorrectable'?'! 복구 한계':result?.status==='clean'?'✓ 검사 통과':s.eccBits.some((bit,i)=>bit!==original[i])?'오류가 생긴 상태':'데이터와 검사 bit'}</span><p>${s.eccMessage}</p>${result?.data?`<strong>읽은 데이터　${result.data.join(' ')}</strong>`:''}</div>
-    ${s.eccSample?`<div class="retry-reference"><span>3·7번 Cell의 Vth</span><div><i style="left:${(s.retried?.72:.5)/1.25*100}%"></i><b style="left:${sampleThresholds(original,.34)[2]/1.25*100}%"></b></div><span>0.61 · Vref ${s.retried?'0.72':'0.50'}</span></div>`:''}
+    ${s.eccSample?`<div class="retry-reference"><span>3·7번 Cell의 Vth</span><div><i style="transform:translateX(${(s.retried?.72:.5)/1.25*100}%)"></i><b style="left:${sampleThresholds(original,.34)[2]/1.25*100}%"></b></div><span data-motion="retry-label">0.61 · Vref ${(s.retryVref??(s.retried?.72:.5)).toFixed(2)}</span></div>`:''}
     <p class="diagram-note">1 bit 오류 복구 · 2 bit 오류 검출 · 실제 SSD의 ECC는 Article에서 더 살펴봅니다.</p></div>`;
 }
 
@@ -158,7 +158,7 @@ export function flowDiagram(steps,active,write,s) {
       const invalid=p.state==='invalid'&&(!write||active>=6);
       return `<div class="${p.state==='staged'||p.ppa===ppa&&active>=(write?5:2)?'programmed':''} ${invalid?'invalid':''}"><span>${p.ppa}</span><b>${p.lba===null?'Free':invalid?'Invalid':`v${p.value}`}</b></div>`;
     }).join('')}</div></div>
-    <div class="flow-connection" aria-hidden="true"><span class="flow-packet zone-${zone}">${active<0?'요청 대기':label}</span></div>
+    <div class="flow-connection" aria-hidden="true"><div class="flow-carrier" style="transform:translateX(${[0,48,100][zone]}%)"><span class="flow-packet" style="transform:translateX(${-20-zone*30}%)">${active<0?'요청 대기':label}</span></div></div>
     </div><ol class="flow-step-list">${steps.map((step,i)=>`<li class="${i===active?'active':i<active?'complete':''}"><span>${i+1}</span>${step}</li>`).join('')}</ol>
     <p class="diagram-note">${write?'처리 순서를 펼친 개념도 · 실제 SSD는 병렬 처리하며 캐시와 전원 차단 복구도 관리합니다.':'Retry는 필요할 때만 수행합니다. 재시도 후에도 복구할 수 없으면 읽기 실패를 보고합니다.'}</p></div>`;
 }

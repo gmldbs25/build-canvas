@@ -5,7 +5,7 @@ export const smooth = t => {t=clamp(t);return t*t*(3-2*t);};
 export function timeline(position, count, holds = []) {
  const p=clamp(position,0,count-1), from=Math.floor(p), to=Math.min(from+1,count-1);
  const hold=holds[from]??.54;
- const blend=smooth((p-from-hold)/(1-hold));
+ const blend=hold===0?p-from:smooth((p-from-hold)/(1-hold));
  return {from,to,blend,current:blend<.5?from:to,position:p};
 }
 export const sceneOffsets = lengths => lengths.reduce((a,n) => [...a,a.at(-1)+n], [0]);

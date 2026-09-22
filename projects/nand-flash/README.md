@@ -65,7 +65,7 @@ node projects/nand-flash/scripts/render-article.mjs --check
 - `main.js`: 카메라·스크롤·키보드·포커스·트랜잭션·최소 DOM 갱신.
 - `style.css`: 기존 청회색 디자인과 장면별 구성, 반응형 실험 화면.
 
-장면별 정착 구간은 56–75%입니다. 구조 장면은 확대와 겹침으로, 중후반은 오브젝트의 상태 변화로 설명합니다. 자동 설명은 관찰용 스냅샷만 재생하므로 반복하거나 장면을 이동해도 직접 실험의 데이터를 바꾸지 않습니다. 직접 실험 중 장면을 떠나면 시작한 트랜잭션을 일관되게 완료합니다. 직접 조작의 FTL과 GC는 같은 저장 상태를 쓰고, 마지막 전체 흐름은 재생 가능한 별도 작은 저장 모델을 사용합니다.
+설명·실험 장면의 정착 구간은 56–75%이며, SSD부터 Cell까지의 물리 탐험 연결은 정착 구간 없이 진행합니다. 구조 장면은 확대와 겹침으로, 중후반은 오브젝트의 상태 변화로 설명합니다. 자동 설명은 관찰용 스냅샷만 재생하므로 반복하거나 장면을 이동해도 직접 실험의 데이터를 바꾸지 않습니다. 직접 실험 중 장면을 떠나면 시작한 트랜잭션을 일관되게 완료합니다. 직접 조작의 FTL과 GC는 같은 저장 상태를 쓰고, 마지막 전체 흐름은 재생 가능한 별도 작은 저장 모델을 사용합니다.
 
 ## 공학적 범위
 
@@ -74,3 +74,38 @@ node projects/nand-flash/scripts/render-article.mjs --check
 ECC는 확장 Hamming (8,4) SECDED를 실제 계산하며, 현대 SSD의 BCH/LDPC 전체 구현은 아닙니다. Read Retry는 같은 Cell 상태를 다른 전압 기준으로 다시 판정합니다. 임의로 뒤집은 bit를 무조건 되돌리지 않습니다.
 
 원본 비주얼 기준과 Scene A는 `docs/nand-flash/`에 그대로 보존합니다. 기존 Work 1–3, 홈, 의존성, 통합 빌드 설정은 변경하지 않았습니다. 상세 검증 기록은 `docs/nand-flash/work4-implementation.md`에 있습니다.
+
+## 연속적인 스크롤과 데모 렌더링
+
+SSD → Package → Die → Plane → Block → Page → Cell의 물리 탐험은 정착 구간 없이 스크롤 위치에 직접 대응합니다. 설명·실험 장면은 기존 읽기 구간을 유지합니다. 두 도식은 전환 중 같은 DOM을 유지하고, 현재 장면이 바뀌는 중간점에서도 재사용합니다.
+
+`main.js`의 단일 rAF 스케줄러는 스크롤 갱신과 데모 시계를 조율합니다. 브라우저가 전달한 타임스탬프를 그대로 사용하며 고정 FPS, interval, 90ms 그래픽 제한을 두지 않습니다. `demos.mjs`는 논리 스냅샷과 별도의 시각 보간 값을 반환하고, `motion.mjs`는 캐시한 노드의 transform·opacity·SVG attribute만 갱신합니다. 그래픽 HTML 비교는 단계 전환이나 실제 판정 변경 때만 수행합니다. 진행선은 단계 수가 아니라 전체 반복의 실제 경과 시간에 비례합니다.
+
+도식의 화면 진입은 IntersectionObserver로 감지하고, 경로 좌표는 장면·단계·크기 변경 뒤 다음 프레임의 읽기 구간에서 측정합니다. 자동 모드의 CSS transition/keyframe은 데모 시계와 중복 실행하지 않습니다. 동작 줄임 설정에서는 최종 논리 상태를 표시하고 반복을 실행하지 않습니다. Program과 마모 비교의 반복 초기화는 짧은 fade로 구분하여 전하나 마모가 저절로 줄어드는 것으로 표현하지 않습니다.
+
+선택적 브라우저 회귀 검증은 별도 설치된 Playwright와 Chromium으로 실행합니다. 프로젝트 런타임 의존성은 추가하지 않습니다.
+
+```sh
+WORK4_URL=http://localhost:4175/build-canvas/nand-flash/ \
+WORK4_PLAYWRIGHT=/absolute/path/to/playwright/index.mjs \
+WORK4_CHROMIUM=/absolute/path/to/chrome \
+node projects/nand-flash/scripts/check-motion.mjs
+```
+
+이 검증은 실제 rAF 중 그래픽 갱신·DOM 재사용, 순방향/역방향 스크롤, 주요 조작, 모바일, 동작 줄임을 확인합니다. 별도의 60/120/144Hz 타임스탬프 주입 검증은 애플리케이션이 전달받은 프레임을 버리지 않는지 확인하는 회귀 테스트이며, 실제 모니터에서 그 FPS로 표시되었다는 뜻은 아닙니다. 실제 표시 주사율은 디스플레이·브라우저·GPU에 따라 달라집니다.
+
+### 2026-09-22 검증 기록
+
+Chromium headless, 1280×720, 관측 rAF 중앙값 약 16.7ms 환경에서 이전 HEAD와 같은 시나리오를 비교했습니다. 아래 수치는 계측 콜백을 포함한 해당 실행의 결과이며 기기 성능 보장이 아닙니다.
+
+| 측정 | 이전 | 개선 |
+|---|---:|---:|
+| Read ramp 2.6초: 그래픽 갱신 / rAF | 26 / 156 | 156 / 156 |
+| Read 프레임 콜백 비용 p95 | 2.6ms | 1.0ms |
+| Reliability 프레임 콜백 비용 p95 | 2.7ms | 1.0ms |
+| 물리 탐험 5초 왕복: 프레임 콜백 비용 p95 | 9.1ms | 5.2ms |
+| Read ramp의 getBoundingClientRect 호출 | 312 | 0 |
+
+개선본의 60초 Read 반복에서 3,601개 rAF 콜백, 콜백 p95 1.2ms, Long Task 0건, 새 그래픽 element 0개, getBoundingClientRect 호출 0회를 관측했습니다. DevTools trace에 script stack을 동반한 Layout은 없었습니다. SVG 위치와 숫자 갱신에 따른 일반 Layout·paint는 남아 있으며, GPU·실제 고주사율 모니터에서의 표시 성능까지 보장하는 측정은 아닙니다.
+
+Work4 Node 테스트 26개, 저장소·각 Work 통합 테스트 52개, `npm test` 5개, Work4 ESLint, Article 원고 동기화, Pages 빌드를 통과했습니다. 전체 `npm run lint`는 수정하지 않은 Work3 소스 2개와 생성 파일 25개 오류로 실패하며 이번 변경 범위에서 그대로 두었습니다. 브라우저에서는 데스크톱 22개 장면, 390×844·320×568, 양방향 스크롤과 DOM 인계, scrubber drag, wheel에 의한 자동 이동 취소, 키보드·포커스, 수동 FTL/GC, Article 왕복, 네이티브 터치, 동작 줄임 및 실행 중 설정 변경을 검증합니다. 독립 리뷰에서 지적한 Retry 전압 라벨 동기화와 분포 초기화 경계를 보완했습니다.

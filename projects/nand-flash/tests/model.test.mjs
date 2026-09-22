@@ -71,6 +71,21 @@ test('scene-specific scroll distances round-trip at every boundary and in revers
  const {sceneOffsets,positionAt,distanceAt}=await import('../model.mjs');
  const {scenes}=await import('../content.mjs');const offsets=sceneOffsets(scenes.map(s=>s.length));
  for(let i=(scenes.length-1)*100;i>=0;i--){const p=i/100;assert.ok(Math.abs(positionAt(distanceAt(p,offsets),offsets)-p)<1e-10);}
- for(let i=0;i<scenes.length-1;i++){assert.equal(timeline(i+scenes[i].hold-.01,scenes.length,scenes.map(s=>s.hold)).blend,0);}
+ for(let i=0;i<scenes.length-1;i++){if(scenes[i].hold>0)assert.equal(timeline(i+scenes[i].hold-.01,scenes.length,scenes.map(s=>s.hold)).blend,0);}
  assert.equal(positionAt(-10,offsets),0);assert.equal(positionAt(999,offsets),scenes.length-1);
+});
+
+
+test('physical exploration responds to tiny scroll deltas across the entire link in either direction',async()=>{
+ const {scenes}=await import('../content.mjs'),holds=scenes.map(s=>s.hold);
+ for(const id of ['ssd','package','die','plane','block','page']){
+  const i=scenes.findIndex(s=>s.id===id);assert.equal(holds[i],0);
+  for(const p of [.0001,.1,.499,.5,.501,.9,.9999]){
+   const t=timeline(i+p,scenes.length,holds);
+   assert.ok(Math.abs(t.blend-p)<1e-12,`${id}: ${p}`);
+   assert.ok(timeline(i+p+.00001,scenes.length,holds).blend>t.blend);
+   assert.ok(timeline(i+p-.00001,scenes.length,holds).blend<t.blend);
+  }
+ }
+ for(const id of ['program','read','ftl','gc','ecc'])assert.ok(scenes.find(s=>s.id===id).hold>=.7);
 });

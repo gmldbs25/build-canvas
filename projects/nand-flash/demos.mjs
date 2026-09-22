@@ -1,4 +1,4 @@
-import {createFlash, planWrite, programWrite, commitWrite, planGc, copyGc, mapGc, eraseGc, encode, decode, sampleBits, wearCycle, clamp, lerp, smooth} from './model.mjs';
+import {createFlash, planWrite, programWrite, commitWrite, planGc, copyGc, mapGc, eraseGc, encode, decode, sampleBits, wearCycle, lerp, smooth} from './model.mjs';
 import {writeSteps, writeNotes, readSteps, readNotes, retrySteps, retryNotes} from './content.mjs';
 
 // Immutable teaching snapshots: watching never mutates the reader's manual experiment.
@@ -17,7 +17,7 @@ function createFrames(id) {
       frame('문서를 편집하는 동안에는 RAM이 작업을 맡습니다.', {documentPhase:0}),
       frame('저장하면 문서가 SSD에 기록됩니다.', {documentPhase:1}),
       frame('정상 종료. 화면이 꺼져도 저장된 상태는 남습니다.', {documentPhase:2}, 3300),
-      frame('다시 켜면 같은 문서가 돌아옵니다. 이 과정을 반복해서 봅니다.', {documentPhase:3}, 4000),
+      frame('다시 켜면 같은 문서가 돌아옵니다. 이 과정을 반복해서 봅니다.', {documentPhase:3}, 3400),
     ];
     case 'package': return [
       frame('기판에서 보이는 것은 반도체 칩을 보호하는 패키지입니다.', {opened:false}),
@@ -31,8 +31,8 @@ function createFrames(id) {
     case 'density': return [1,2,3,4].map(bits=>frame(`${['SLC','MLC','TLC','QLC'][bits-1]}: 한 Cell에 ${bits} bit, ${2**bits}개 상태. ${bits===1?'경계 사이에 여유가 있습니다.':'상태가 많을수록 더 정밀한 판정이 필요합니다.'}`, {bits}, 3400));
     case 'program': return [
       frame('지워진 상태에서 시작합니다. 밝은 구간이 기록할 목표입니다.', {charge:0,power:true,pulsing:false}),
-      ...[2,4,6,8].map((charge,i)=>frame(`${i+1}번째 펄스 → 전하 이동 → Vth 확인. 아직 목표에 도달하지 않았습니다.`, {charge,power:true,pulsing:true}, 1500)),
-      frame('목표에 도착하면 펄스를 멈춥니다. 전하 상태가 데이터로 남습니다.', {charge:10,power:true,pulsing:false}, 4200),
+      ...[2,4,6,8,10].map((charge,i)=>frame(`${i+1}번째 펄스 → 전하 이동 → Vth 확인. ${charge===10?'목표에 도착했습니다.':'아직 목표에 도달하지 않았습니다.'}`, {charge,power:true,pulsing:true}, 1500)),
+      frame('목표에 도착하면 펄스를 멈춥니다. 전하 상태가 데이터로 남습니다.', {charge:10,power:true,pulsing:false}, 2800),
     ];
     case 'read': return [
       frame('같은 Cell을 계속 읽습니다. 저장 전하와 Vth 0.64는 그대로입니다.', {charge:8,vref:.35,power:true}),
@@ -53,7 +53,7 @@ function createFrames(id) {
       frames.push(frame('② 새 Page에 먼저 기록합니다. 주소는 아직 옛 데이터를 가리킵니다.', {...base,writePhase:'program',flashMessage:`${plan.to}에 v2 기록 완료 · 현재 주소는 ${plan.from}`}, 3400));
       commitWrite(flash,plan);
       frames.push(frame('③ 기록이 끝나면 주소표를 새 위치로 옮깁니다.', {...base,writePhase:'mapping',flashMessage:`LBA 100 → ${plan.to} · 이제 v2가 현재 데이터입니다.`}, 3200));
-      frames.push(frame('④ 옛 Page는 Invalid. 내용은 남아 있지만 더는 현재 데이터가 아닙니다.', {...base,writePhase:'done',flashMessage:'같은 논리 주소 · 달라진 물리 위치 · 옛 Page는 아직 지워지지 않았습니다.'}, 4400));
+      frames.push(frame('④ 옛 Page는 Invalid. 내용은 남아 있지만 더는 현재 데이터가 아닙니다.', {...base,writePhase:'done',flashMessage:'같은 논리 주소 · 달라진 물리 위치 · 옛 Page는 아직 지워지지 않았습니다.'}, 3600));
       return frames;
     }
     case 'gc': {
@@ -65,7 +65,7 @@ function createFrames(id) {
       frames.push(frame('③ 주소표를 갱신합니다. 이제 새 복사본을 통해 데이터를 읽습니다.', {...base,gcPhase:'mapping',flashMessage:'모든 논리 주소가 보존된 복사본에 연결되었습니다.'}, 3200));
       eraseGc(flash,plan);plan.erased=true;
       frames.push(frame('④ 원래 Block을 통째로 지웁니다. 다른 데이터는 새 위치에 안전하게 남습니다.', {...base,gcPhase:'erase',flashMessage:'Block 0 Erase 완료 · 지워진 공간은 다시 쓸 수 있습니다.'}, 2800));
-      frames.push(frame('⑤ Free 공간을 되찾았습니다. 다음 반복에서는 같은 시작 상태로 돌아갑니다.', {...base,gcPhase:'done',flashMessage:'LBA 100 · v2 보존 / Block 0의 Page 4개가 Free'}, 4000));
+      frames.push(frame('⑤ Free 공간을 되찾았습니다. 다음 반복에서는 같은 시작 상태로 돌아갑니다.', {...base,gcPhase:'done',flashMessage:'LBA 100 · v2 보존 / Block 0의 Page 4개가 Free'}, 3400));
       return frames;
     }
     case 'wear': {
@@ -91,7 +91,8 @@ function createFrames(id) {
         frame('읽은 bit 하나가 달라졌습니다. 검사 정보로 위치를 찾습니다.', {eccBits:one,eccResult:null,eccMessage:'3번 bit 오류 · ECC 검사 전',eccSample:false}),
         frame('1 bit 오류는 위치를 찾아 고칩니다. 원래 데이터를 얻었습니다.', {eccBits:corrected.code,eccResult:corrected,eccMessage:'3번 bit를 복구했습니다.',eccSample:false}, 3400),
         frame('이번에는 전압 판정으로 2 bit가 잘못 읽혔습니다.', {eccBits:errors,eccResult:failed,eccMessage:'2 bit 오류 검출 · 이 작은 ECC만으로는 복구할 수 없습니다.',eccSample:true,retried:false}, 3600),
-        frame('같은 Cell을 다른 기준으로 다시 읽습니다. 이 예시는 올바른 판정을 되찾습니다.', {eccBits:retry,eccResult:decode(retry),eccMessage:'Vref 0.50 → 0.72 · 재판정 후 ECC 검사 통과',eccSample:true,retried:true}, 4500),
+        frame('같은 Cell을 다른 기준으로 다시 읽으며, 어느 기준에서 판정이 바뀌는지 살펴봅니다.', {eccBits:errors,eccResult:failed,eccMessage:'Vref 0.50 → 0.72 · 같은 전하를 다른 기준으로 재판정합니다.',eccSample:true,retried:false,retrySweep:true,retryVref:.5}, 3600, {retryVref:[.5,.72]}),
+        frame('새 기준에서 다시 읽은 뒤 ECC 검사도 통과했습니다.', {eccBits:retry,eccResult:decode(retry),eccMessage:'Vref 0.72 · 재판정 후 ECC 검사 통과',eccSample:true,retried:true,retryVref:.72}, 2800),
       ];
     }
     case 'write': {
@@ -100,22 +101,84 @@ function createFrames(id) {
         if(flowStep===2)flowPlan=planWrite(flowFlash);
         if(flowStep===4)programWrite(flowFlash,flowPlan);
         if(flowStep===5)commitWrite(flowFlash,flowPlan);
-        return frame(writeNotes[flowStep],{flowFlash,flowPlan,flowStep},flowStep===writeSteps.length-1?4000:2400);
+        return frame(writeNotes[flowStep],{flowFlash,flowPlan,flowStep},flowStep===writeSteps.length-1?3200:2400);
       });
     }
-    case 'read-flow': return [false,true].flatMap(retry=>(retry?retrySteps:readSteps).map((_,flowStep)=>frame(`${retry?'재판정이 필요한 읽기':'일반적인 읽기'} · ${(retry?retryNotes:readNotes)[flowStep]}`, {flowFlash:writtenFlash(),flowPlan:null,flowStep,retry},flowStep===(retry?retrySteps:readSteps).length-1?3800:2300)));
+    case 'read-flow': return [false,true].flatMap(retry=>(retry?retrySteps:readSteps).map((_,flowStep)=>frame(`${retry?'재판정이 필요한 읽기':'일반적인 읽기'} · ${(retry?retryNotes:readNotes)[flowStep]}`, {flowFlash:writtenFlash(),flowPlan:null,flowStep,retry},flowStep===(retry?retrySteps:readSteps).length-1?3200:2300)));
     default: return [];
   }
 }
 
+const flowZone = patch => {
+  if(!Number.isInteger(patch.flowStep))return null;
+  if(!Object.hasOwn(patch,'retry'))return [0,0,1,1,2,1,2,0][patch.flowStep] ?? 0;
+  const length=patch.retry?retrySteps.length:readSteps.length;
+  return patch.flowStep===length-1?0:([0,1,2,2,1,2,1][patch.flowStep] ?? 0);
+};
+
+const sameFlowCycle = (previous, current) => {
+  const previousIsFlow=Number.isInteger(previous.flowStep),currentIsFlow=Number.isInteger(current.flowStep);
+  if(!previousIsFlow||!currentIsFlow)return false;
+  const previousIsRead=Object.hasOwn(previous,'retry'),currentIsRead=Object.hasOwn(current,'retry');
+  return previousIsRead===currentIsRead&&(!currentIsRead||previous.retry===current.retry);
+};
+
+const hasReplayReset = frames => {
+  const first=frames[0]?.patch,last=frames.at(-1)?.patch;
+  return Boolean(first&&last&&(
+    Number.isFinite(first.charge)&&Number.isFinite(last.charge)&&first.charge!==last.charge
+    || first.wearComparison&&last.wearComparison
+  ));
+};
+
+/**
+ * Samples a watch loop without modifying its educational snapshots.
+ *
+ * `patch` is a deep copy of the current semantic snapshot. Its only changing
+ * numeric fields are an explicit frame `ramp` (Vref or drift), eased across
+ * the complete phase. `progress` is raw phase progress and `loopProgress` is
+ * elapsed time modulo the full loop duration, divided by that duration.
+ * During the initial pass, the opening phase begins at its own snapshot so
+ * its caption and visual agree. Later loop wraps use the final snapshot.
+ * `motionProgress` is `smooth(progress)`. `motion` contains only display
+ * interpolation: `charge`, `lid`, `wearPlain`, `wearBalanced`, `packetZone`,
+ * `retryVref`, and `replayOpacity`. Missing fields are intentionally omitted.
+ */
 export function sampleDemo(frames, elapsed) {
   if(!frames.length)return null;
   const duration=frames.reduce((sum,f)=>sum+f.duration,0);
-  let time=((elapsed%duration)+duration)%duration,index=0;
-  while(index<frames.length-1&&time>=frames[index].duration)time-=frames[index++].duration;
-  const f=frames[index],patch={...f.patch};
-  for(const [key,[from,to]] of Object.entries(f.ramp||{}))patch[key]=lerp(from,to,smooth(clamp(time/(f.duration*.8))));
-  return {patch,caption:f.caption,index,total:frames.length,progress:time/f.duration,duration};
+  let phaseTime=((elapsed%duration)+duration)%duration,index=0;
+  while(index<frames.length-1&&phaseTime>=frames[index].duration)phaseTime-=frames[index++].duration;
+  const f=frames[index],resettable=hasReplayReset(frames),initialOpening=elapsed>=0&&elapsed<duration&&index===0;
+  const replayReset=resettable&&elapsed>=duration&&index===0;
+  const previous=initialOpening||replayReset?f:frames[(index-1+frames.length)%frames.length];
+  const progress=phaseTime/f.duration,motionProgress=smooth(progress),patch=structuredClone(f.patch),motion={};
+  for(const [key,[from,to]] of Object.entries(f.ramp||{}))patch[key]=lerp(from,to,motionProgress);
+
+  if(f.patch.retrySweep){
+    patch.eccBits=sampleBits(encode(),.34,patch.retryVref);
+    patch.eccResult=decode(patch.eccBits);
+    patch.retried=patch.eccResult.status==='clean';
+  }
+
+  if(Number.isFinite(previous.patch.charge)&&Number.isFinite(f.patch.charge))motion.charge=lerp(previous.patch.charge,f.patch.charge,motionProgress);
+  if(typeof previous.patch.opened==='boolean'&&typeof f.patch.opened==='boolean')motion.lid=lerp(Number(previous.patch.opened),Number(f.patch.opened),motionProgress);
+  const previousWear=previous.patch.wearComparison,currentWear=f.patch.wearComparison;
+  if(previousWear&&currentWear){
+    motion.wearPlain=currentWear.plain.map((count,i)=>lerp(previousWear.plain[i],count,motionProgress));
+    motion.wearBalanced=currentWear.balanced.map((count,i)=>lerp(previousWear.balanced[i],count,motionProgress));
+  }
+  if(sameFlowCycle(previous.patch,f.patch))motion.packetZone=lerp(flowZone(previous.patch),flowZone(f.patch),motionProgress);
+  if(f.ramp?.retryVref)motion.retryVref=patch.retryVref;
+  if(replayReset)motion.replayOpacity=smooth(Math.min(phaseTime/350,1));
+  else if(resettable&&index===frames.length-1&&phaseTime>f.duration-350)motion.replayOpacity=1-smooth((phaseTime-(f.duration-350))/350);
+
+  // Retention and Disturb are separate experiments: reset under a fade, never teleport a visible curve.
+  const prior=frames[(index-1+frames.length)%frames.length],next=frames[(index+1)%frames.length];
+  if(!initialOpening&&prior.ramp?.drift&&f.patch.drift!==prior.ramp.drift[1])motion.replayOpacity=smooth(Math.min(phaseTime/350,1));
+  if(f.ramp?.drift&&next.patch.drift!==f.ramp.drift[1]&&phaseTime>f.duration-350)motion.replayOpacity=1-smooth((phaseTime-(f.duration-350))/350);
+
+  return {patch,caption:f.caption,index,total:frames.length,progress,loopProgress:((elapsed%duration)+duration)%duration/duration,motionProgress,motion,duration};
 }
 
 export const observationNotes={

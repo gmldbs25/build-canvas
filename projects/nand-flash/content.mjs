@@ -1,16 +1,16 @@
-// Each scene has one question, one object and a generous resting interval.
+// Physical exploration follows scroll directly; reading and operation scenes retain a hold.
 const scene = (id, part, title, body, object, next, options = {}) => ({
   id, part, title, body, object, next, hold: .64, length: 1.15, layout: 'split', ...options,
 });
 export const scenes = [
   scene('question', '01 · 컴퓨터의 기억', '컴퓨터가<br>기억하는 방식', '문서를 저장하고, 컴퓨터를 끕니다.<br>다시 켜도 그 문서는 그대로 있습니다.', 'computer', '전기가 없어졌는데, 이 정보는 어디에 남아 있을까?', {length: 1.6, hold: .72}),
   scene('storage', '01 · 컴퓨터의 기억', '화면이 꺼져도,<br>저장은 남습니다', '작업 중인 기억은 RAM에.<br>저장한 파일은 저장장치에 남습니다.', 'computer', '컴퓨터 속 저장장치, SSD를 따라갑니다.'),
-  scene('ssd', '01 · 저장장치 안으로', '관리하는 칩,<br>기억하는 칩', 'Controller는 저장을 관리합니다.<br>NAND Flash는 전원이 없어도 상태를 유지합니다.', 'ssd', '기판 위 NAND Package 하나를 더 가까이.', {hold: .58}),
-  scene('package', '02 · NAND Package', '작은 패키지<br>안으로', '덮개 안에는 하나 이상의 Die가 있습니다.<br>실제 반도체 칩을 따라 들어갑니다.', 'ssd', '겹쳐진 Die 중 하나를 펼쳐봅니다.', {hold: .6}),
-  scene('die', '02 · Die', '칩 안의<br>작은 구획들', '하나의 Die 안에는 Plane이 있습니다.<br>저장 공간을 나누어 동작을 관리하는 구획입니다.', 'structure', 'Plane 하나를 선택해 더 가까이.', {length: .95, hold: .56}),
-  scene('plane', '02 · Plane', '많은 Block이<br>모여 있는 곳', 'Plane 안에는 많은 Block이 있습니다.<br>그중 하나가 다음 목적지입니다.', 'structure', '이 Block은 무엇을 함께 묶을까요?', {length: .9, hold: .56}),
-  scene('block', '02 · Block', '지울 때는<br>한 묶음씩', 'Block은 함께 지워지는 Cell들의 영역입니다.<br>그 안의 데이터는 Page 단위로 읽고 씁니다.', 'structure', '그중 한 Page의 데이터를 따라갑니다.'),
-  scene('page', '02 · Page', '함께 읽고 쓰는<br>데이터의 단위', 'Page의 bit는 여러 Cell의 상태로 표현됩니다.<br>이제 그 상태를 만드는 Cell 하나로 들어갑니다.', 'structure', 'Cell 안에 0과 1이 적혀 있을까요?', {length: 1.2}),
+  scene('ssd', '01 · 저장장치 안으로', '관리하는 칩,<br>기억하는 칩', 'Controller는 저장을 관리합니다.<br>NAND Flash는 전원이 없어도 상태를 유지합니다.', 'ssd', '기판 위 NAND Package 하나를 더 가까이.', {hold: 0}),
+  scene('package', '02 · NAND Package', '작은 패키지<br>안으로', '덮개 안에는 하나 이상의 Die가 있습니다.<br>실제 반도체 칩을 따라 들어갑니다.', 'ssd', '겹쳐진 Die 중 하나를 펼쳐봅니다.', {hold: 0}),
+  scene('die', '02 · Die', '칩 안의<br>작은 구획들', '하나의 Die 안에는 Plane이 있습니다.<br>저장 공간을 나누어 동작을 관리하는 구획입니다.', 'structure', 'Plane 하나를 선택해 더 가까이.', {length: .95, hold: 0}),
+  scene('plane', '02 · Plane', '많은 Block이<br>모여 있는 곳', 'Plane 안에는 많은 Block이 있습니다.<br>그중 하나가 다음 목적지입니다.', 'structure', '이 Block은 무엇을 함께 묶을까요?', {length: .9, hold: 0}),
+  scene('block', '02 · Block', '지울 때는<br>한 묶음씩', 'Block은 함께 지워지는 Cell들의 영역입니다.<br>그 안의 데이터는 Page 단위로 읽고 씁니다.', 'structure', '그중 한 Page의 데이터를 따라갑니다.', {hold: 0}),
+  scene('page', '02 · Page', '함께 읽고 쓰는<br>데이터의 단위', 'Page의 bit는 여러 Cell의 상태로 표현됩니다.<br>이제 그 상태를 만드는 Cell 하나로 들어갑니다.', 'structure', 'Cell 안에 0과 1이 적혀 있을까요?', {hold: 0, length: 1.2}),
   scene('cell', '03 · 기억의 정체', '기억은, 전하의 상태', 'Vth는 Cell에 전류가 흐르기 시작하는 문턱 전압입니다.<br>저장된 전하가 이 문턱을 바꾸고, 그 차이가 기억으로 남습니다.', 'cell', '전하 → Vth 변화 → 구분 가능한 상태', {layout: 'lab', length: 1.45}),
   scene('density', '04 · 한 Cell에 더 많이', '같은 공간, 더 촘촘한 경계', '상태를 더 많이 나누면 저장 밀도가 높아집니다.<br>그만큼 더 정밀하게 쓰고 읽어야 합니다.', 'density', '좁아진 목표 구간에 어떻게 기록할까요?', {layout: 'lab', length: 1.4}),
   scene('program', '05 · Program', '목표 상태까지, 조금씩', '전압 펄스로 전하를 옮기고 Vth를 확인합니다.<br>목표 구간에 도달할 때까지 이 과정을 반복합니다.', 'cell', '다음에는 이 상태를 바꾸지 않고 읽어봅니다.', {layout: 'lab', length: 1.55, hold: .72}),
