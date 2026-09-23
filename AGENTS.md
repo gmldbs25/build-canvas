@@ -9,38 +9,47 @@
 
 ## Agent Roles
 
-The primary agent owns planning, important implementation decisions, integration, final verification, and the final result.
+Use a simple three-role model when the corresponding models are available and configured:
 
-When the corresponding models are available and configured, prefer:
+- **Astra — Lead / Orchestrator**  
+  Owns planning, task decomposition, architecture, context-sensitive decisions, integration, final verification, and the final result.
 
-- **Astra** as the lead for end-to-end work, architecture, integration, and context-sensitive decisions.
-- **Terra** for clearly scoped implementation that still requires normal coding judgment, such as UI changes, feature work, content integration, and ordinary bug fixes.
-- **Luna** for lightweight, mechanical, repetitive, or routine execution.
-- **Sol** for independent review or deeper analysis of substantial, ambiguous, or high-impact changes.
+- **Luna Max — Worker**  
+  Executes clearly scoped implementation and routine work from Astra. This includes normal feature edits, UI changes, repetitive changes, repository exploration, build/test/lint commands, and routine Git operations.
 
-Delegation is optional. Keep it proportional to the task. Do not force every task through multiple agents when direct execution is simpler.
+- **Sol — Reviewer**  
+  Provides an independent review of substantial changes, focusing on bugs, regressions, missed requirements, technical accuracy, maintainability, and meaningful UX issues.
+
+Do not add another model tier unless a future task demonstrates a clear recurring need for it.
 
 ## Delegation
 
-Astra should remain responsible for the overall task and may delegate when work can be separated cleanly.
+Astra should delegate work only when the task can be scoped clearly enough that a worker can execute it without making architectural decisions.
 
-Prefer Terra when the scope and acceptance criteria are clear but the implementation still requires engineering judgment.
+When delegating to Luna Max, Astra should provide:
+- the concrete goal
+- the relevant files or area when known
+- important constraints
+- clear completion or verification criteria
 
-Prefer Luna for clearly scoped, low-risk work, including:
+Luna Max may handle implementation that requires ordinary coding judgment as long as the scope is clear.
 
-- repository exploration and file lookup
-- repetitive or mechanical edits
-- routine build, lint, test, and verification commands
-- routine Git operations when Git work is part of the task
+If Luna Max encounters ambiguity, architectural trade-offs, unexpected conflicts, or work outside the delegated scope, it should stop and return the decision to Astra rather than expanding the task on its own.
 
-Routine Git work includes `status`, `diff`, staging, routine commits, fetch, safe pull/rebase, push, remote synchronization checks, and routine post-push CI/deployment checks.
+Astra reviews important delegated results before accepting or integrating them.
 
-The primary agent must verify important delegated results before accepting them. Do not delegate architectural or context-sensitive decisions solely to a lightweight worker.
+## Git Operations
 
-## Git Safety
+Routine Git work should preferably be delegated to Luna Max when Git work is part of the task.
 
-Escalate Git work to the primary agent when it involves:
+This includes:
+- `status` and `diff`
+- staging and routine commits
+- fetch and safe pull/rebase operations
+- push and remote synchronization checks
+- routine post-push CI or deployment checks
 
+Escalate Git work to Astra when it involves:
 - meaningful merge or rebase conflicts
 - force pushes or history rewriting
 - destructive reset or clean operations
@@ -52,14 +61,16 @@ Do not perform destructive or history-rewriting Git operations without explicit 
 
 ## Independent Review
 
-For substantial implementation changes, prefer an independent Sol review after implementation and basic verification.
+For substantial implementation changes, prefer a Sol review after implementation and basic verification.
 
-Review should focus on bugs, regressions, missed requirements, broken interactions, architectural or maintainability issues, meaningful UX problems, technical accuracy, and missing verification.
+Sol should report findings rather than take ownership of the implementation. Astra evaluates the findings, decides what should change, and remains responsible for the final result.
 
-The reviewer reports findings; the primary agent decides which findings require changes and remains responsible for the final result.
-
-Do not invoke independent review for trivial changes.
+Do not invoke Sol for trivial changes where independent review adds little value.
 
 ## Working Principle
 
-Use Astra where overall judgment matters, Terra for normal scoped implementation, Luna for routine execution, and Sol for independent review or deeper analysis. Keep delegation proportional to the task.
+Astra thinks, scopes, and integrates.  
+Luna Max executes clearly defined work.  
+Sol independently reviews meaningful changes.
+
+If Luna Max cannot complete a task safely within its scope, return it directly to Astra rather than escalating through additional model tiers.
