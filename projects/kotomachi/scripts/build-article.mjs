@@ -128,6 +128,7 @@ const html = `<!doctype html>
     <meta name="theme-color" content="#f6f3ec">
     <meta name="description" content="${escapeHtml(deck)}">
     <title>${escapeHtml(title)} — KotoMachi 개발 기록 · Build Canvas</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f6f0e5'/%3E%3Cpath d='M25 6.5C17.5 7 10.4 10.1 7.4 18.9c3.9-2.8 7.2-3.8 11.5-3.7-3.6 1.5-6.7 4.2-8.8 8.6 8.9-.2 15.2-7.6 14.9-17.3Z' fill='%23d98662'/%3E%3Cpath d='M7.6 25.1c4.1-5 8.2-8.5 13.3-11.5' stroke='%2387604a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="./article.css">
     <script type="module" src="./reading.js"></script>
   </head>
