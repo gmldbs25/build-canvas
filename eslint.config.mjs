@@ -11,8 +11,17 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "**/dist/**",
+    "**/dist-pages/**",
     "next-env.d.ts",
   ]),
+  {
+    files: ["projects/transformer-to-agent/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      // Work 3's local ESLint config preserves this vendored shadcn exception.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
