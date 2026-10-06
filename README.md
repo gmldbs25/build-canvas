@@ -6,6 +6,7 @@
 
 ## Works
 
+- **Work 5 — KotoMachi를 만들며**: Agent와 함께 기획·구현하고 고쳐 간 과정을 기록한 개발 아티클
 - **Work 4 — 컴퓨터가 데이터를 기억하는 방식**: SSD부터 NAND Cell까지 탐험하고 FTL·GC·ECC를 직접 조작하는 인터랙티브 자료
 - **Work 3 — FROM TRANSFORMER TO AGENT SYSTEMS**: LLM의 예측이 Agent Runtime의 실제 행동으로 이어지는 과정을 설명하는 인터랙티브 자료
 - **Work 2 — ORCA**: 월드 모델과 ORCA를 설명하는 인터랙티브 프레젠테이션
@@ -16,6 +17,7 @@
 ```text
 app/                           # Build Canvas 홈
 projects/                      # 각 Work의 실제 소스
+  kotomachi/                   # Work 5 article, Markdown content and assets
   nand-flash/                  # Work 4
   transformer-to-agent/        # Work 3
   orca/                        # Work 2

@@ -38,4 +38,7 @@ cp -R projects/transformer-to-agent/dist-pages/. dist-pages/transformer-to-agent
 mkdir -p dist-pages/nand-flash
 cp projects/nand-flash/{index.html,style.css,main.js,model.mjs,content.mjs,diagrams.mjs,demos.mjs,motion.mjs} dist-pages/nand-flash/
 
+# Work 05 compiles its Markdown article to a self-contained static reading page.
+node projects/kotomachi/scripts/build-article.mjs --output=dist-pages/kotomachi
+
 find dist-pages -name ".DS_Store" -delete

@@ -1,6 +1,13 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
+    index: "05",
+    title: "KotoMachi를 만들며",
+    type: "DEVELOPMENT JOURNAL",
+    year: "2026.10",
+    href: "./kotomachi/",
+  },
+  {
     index: "04",
     title: "컴퓨터가 데이터를 기억하는 방식",
     type: "NAND FLASH · INTERACTIVE EXPLAINER",

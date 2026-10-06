@@ -7,6 +7,7 @@ const works = [
   ["Texas Trace", "../projects/texas-trace/assets/js/main.js"],
   ["ORCA", "../projects/orca/app/page.tsx"],
   ["LLM to AGENT", "../projects/transformer-to-agent/app/page.tsx"],
+  ["KotoMachi article", "../projects/kotomachi/reading.js"],
 ];
 
 for (const [name, relativePath] of works) {
@@ -19,7 +20,7 @@ for (const [name, relativePath] of works) {
     assert.match(source, /!event\.altKey/);
     assert.match(source, /!event\.isComposing/);
     assert.match(source, /!(?:isEditingTarget\(event\.target\)|isEditing\b)/);
-    assert.match(source, /new URL\(["']\.\.\/["'],\s*window\.location\.href\)/);
+    assert.match(source, /new URL\(["']\.\.\/["'],\s*(?:window\.location\.href|currentPage\.href)\)/);
     assert.match(source, /window\.location\.assign\(homeUrl\.href\)/);
 
     for (const editableSelector of [

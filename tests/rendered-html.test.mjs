@@ -28,6 +28,9 @@ test("renders the portfolio entry content", async () => {
   assert.match(html, /href="\.\/orca\/"/);
   assert.match(html, /href="\.\/texas-trace\/"/);
   assert.match(html, /href="\.\/nand-flash\/"/);
+  assert.match(html, /href="\.\/kotomachi\/"/);
+  assert.match(html, />05<\/span><strong>KotoMachi를 만들며<\/strong>/);
+  assert.ok(html.indexOf("KotoMachi를 만들며") < html.indexOf("컴퓨터가 데이터를 기억하는 방식"));
   assert.match(html, />04<\/span><strong>컴퓨터가 데이터를 기억하는 방식<\/strong>/);
   assert.ok(html.indexOf("컴퓨터가 데이터를 기억하는 방식") < html.indexOf("FROM TRANSFORMER"));
   assert.ok(html.indexOf("ORCA") < html.indexOf("TEXAS TRACE"));
