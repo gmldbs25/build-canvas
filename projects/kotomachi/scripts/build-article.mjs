@@ -157,7 +157,6 @@ const html = `<!doctype html>
       </div>
     </main>
     <footer class="article-footer">
-      <p>출처 링크 일부는 비공개 KotoMachi 저장소의 기록을 가리킵니다. 저장소 권한에 따라 열리지 않을 수 있습니다.</p>
       <a href="../">← Build Canvas로 돌아가기</a>
     </footer>
   </body>

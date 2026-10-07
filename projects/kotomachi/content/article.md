@@ -16,7 +16,7 @@ KotoMachi는 가을 삿포로를 걷고 일본어를 쓰는 작은 RPG로 시작
 AI 시대에서 SW는 이제 더 이상 소수의 전유물이 아니었고, 누구나 원한다면 자신만의 SW를 만들 수 있는 세상이다. 나 또한 우리 가족에게 필요한 SW를 직접 만들고자 했다. 대단한 수익 창출이나 성공을 기대하기보다는, 살면서 한 번도 접해보지 못했던 '게임 기획 및 개발'이라는 경험을 바라보며 기존 게임의 기본 콘셉트만 참고했다. 특히 기획 초기에는 어린 시절 좋아했던 포켓몬스터 게임의 경험에 일본어 공부를 더하고자 생각했었다.
 :::
 
-> 기록: [첫 시제품 · 79a625c](https://github.com/gmldbs25/kotomachi/commit/79a625c) · [초기 콘셉트 · c5e854a](https://github.com/gmldbs25/kotomachi/commit/c5e854a)
+> 기록: 첫 시제품 `79a625c` · 초기 콘셉트 `c5e854a`
 
 ## 실행 환경을 다시 고르다 {#platform}
 
@@ -33,7 +33,7 @@ AI 시대에서 SW는 이제 더 이상 소수의 전유물이 아니었고, 누
 *다시 만든 다누키코지 상점가. 작은 모바일 화면에서도 읽히는지 확인한 대표 장면이다.*
 :::
 
-> 기록: [PWA 전환 · d48a6a4](https://github.com/gmldbs25/kotomachi/commit/d48a6a4) · [설치형 PWA 구현 · 2e61b9f](https://github.com/gmldbs25/kotomachi/commit/2e61b9f) · [인프라 문서](https://github.com/gmldbs25/kotomachi/blob/main/docs/INFRASTRUCTURE.md)
+> 기록: PWA 전환 `d48a6a4` · 설치형 PWA 구현 `2e61b9f` · 인프라 문서
 
 ## 단어 도움에서 학습의 흐름으로 {#learning}
 
@@ -58,7 +58,7 @@ Chapter 1을 만들면서 대화 도움말에 연습, 대화 기록, 노트가 �
 단순 상상력으로 가능했던 스토리 기획과는 다르게 이 부분은 꽤나 어려움을 많이 겪었다. 스스로 개선하기 어렵다는 생각이 많이 들었다.
 :::
 
-> 기록: [대사 학습·노트 · d654117](https://github.com/gmldbs25/kotomachi/commit/d654117) · [학습 콘텐츠 작성 체계 · c7effa1](https://github.com/gmldbs25/kotomachi/commit/c7effa1) · [학습 경험 개선 · a2e8c7e](https://github.com/gmldbs25/kotomachi/commit/a2e8c7e) · [첫 만남과 기억 회상 보완 · 2a198c3](https://github.com/gmldbs25/kotomachi/commit/2a198c3)
+> 기록: 대사 학습·노트 `d654117` · 학습 콘텐츠 작성 체계 `c7effa1` · 학습 경험 개선 `a2e8c7e` · 첫 만남과 기억 회상 보완 `2a198c3`
 
 ## 화면의 기준을 다시 세우다 {#visuals}
 
@@ -68,7 +68,7 @@ Chapter 1을 만들면서 대화 도움말에 연습, 대화 기록, 노트가 �
 
 확장 과정에서는 터치 입력과 이미지가 겹치는 순서도 손봤다. 기념품을 얻은 상태와 집에 놓은 상태를 구분하도록 저장도 수정했다. 화면 개선은 자산 교체에서 끝나지 않았고, 이동·상호작용·저장을 함께 조정하는 작업으로 이어졌다.
 
-> 기록: [시각 방향 재설정 · 176926c](https://github.com/gmldbs25/kotomachi/commit/176926c) · [대표 장면 재구현 · fb9033f](https://github.com/gmldbs25/kotomachi/commit/fb9033f) · [챕터 전체로 확장 · 84d9505](https://github.com/gmldbs25/kotomachi/commit/84d9505) · [터치 입력 보완 · 4f69c19](https://github.com/gmldbs25/kotomachi/commit/4f69c19)
+> 기록: 시각 방향 재설정 `176926c` · 대표 장면 재구현 `fb9033f` · 챕터 전체로 확장 `84d9505` · 터치 입력 보완 `4f69c19`
 
 ## 만들었다고 끝나지 않는 것들 {#iteration}
 
@@ -93,7 +93,7 @@ v1 개발 이후 가장 아쉬웠던 것은 기획 단계에서 만들었던 비
 최근 대대적인 Visual Polish와 학습 루프 재구성을 하고 나서는, 그래도 맨 처음 기대했던 수준으로 어느 정도는 개발된 듯하다.
 :::
 
-> 기록: [저장·대화 표현 조정 · cc4da8a](https://github.com/gmldbs25/kotomachi/commit/cc4da8a) · [현재 상태](https://github.com/gmldbs25/kotomachi/blob/main/docs/CURRENT_STATUS.md) · [PWA 검증 절차](https://github.com/gmldbs25/kotomachi/blob/main/docs/PWA_VALIDATION.md)
+> 기록: 저장·대화 표현 조정 `cc4da8a` · 현재 상태 · PWA 검증 절차
 
 ## Agent와 일하는 방식도 바뀌었다 {#agents}
 
@@ -115,7 +115,7 @@ Sol이 작업을 지휘하고, Luna가 작업을 진행한다. 어려운 문제�
 그리고 나는 이런 경험을 하고 싶었다. 하네스가 중요하다, 모델 협업 구조가 중요하다는 말은 어디서든 들을 수 있다. 하지만 그걸 그냥 말로 듣는 것과 내가 몸소 경험해보는 것은 그 기억의 강도가 전혀 다르다고 생각한다.
 :::
 
-> 기록: [초기 역할 분담 · a0bac26](https://github.com/gmldbs25/kotomachi/commit/a0bac26) · [Luna-first 전환 · 1597802](https://github.com/gmldbs25/kotomachi/commit/1597802) · [Sol orchestration · f22d151](https://github.com/gmldbs25/kotomachi/commit/f22d151) · [설정 반영 · 4c5e5f4](https://github.com/gmldbs25/kotomachi/commit/4c5e5f4)
+> 기록: 초기 역할 분담 `a0bac26` · Luna-first 전환 `1597802` · Sol orchestration `f22d151` · 설정 반영 `4c5e5f4`
 
 ## 아직 남겨 둔 결정 {#open-work}
 
@@ -127,7 +127,7 @@ Sol이 작업을 지휘하고, Luna가 작업을 진행한다. 어려운 문제�
 사실 KotoMachi는 1차 개발을 완료했다고 하고 싶다. 물론 음성 Polish 작업이 남았지만, 내 안타까운 컴퓨터 리소스로 인해 잠시 미루기로 했다. 유일한 사용자가 개발 요청을 하면, 그때 가서 좀 더 생각해봐야겠다.
 :::
 
-> 기록: [오디오 제작 현황](https://github.com/gmldbs25/kotomachi/blob/main/docs/AUDIO_PRODUCTION.md) · [개발 로드맵](https://github.com/gmldbs25/kotomachi/blob/main/docs/DEVELOPMENT_ROADMAP.md) · 조사 기준 커밋 `791170e`
+> 기록: 오디오 제작 현황 · 개발 로드맵 · 조사 기준 커밋 `791170e`
 
 ## Developer Interview {#interview}
 
