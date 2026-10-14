@@ -1,6 +1,6 @@
 # KotoMachi Work 5 — Source Notes
 
-Internal fact sheet for the Work 5 development article. Statements below are grounded in the current KotoMachi tree and the commit history through `d8e8e53` (2026-10-07). This is evidence, not a reconstruction of the developer's private thoughts. The repository does not record a personal origin story or first-person reactions; those belong in later Human Notes.
+Internal fact sheet for the Work 5 development article. Statements below are grounded in the current KotoMachi tree and the commit history through `d8e8e53` (2026-10-07). This is evidence, not a reconstruction of the developer's private thoughts. The repository does not itself establish the developer's personal motivations or first-person reactions; those are provided by the developer-authored notes and interview included in Work 5.
 
 ## Project overview
 
@@ -14,7 +14,7 @@ The repository begins with a concept and learning design on 2026-09-23 (`c5e854a
 
 On 2026-09-25, the infrastructure plan changed to PWA-first (`d48a6a4`); a later commit implemented an installable Vite PWA platform proof (`2e61b9f`). On 2026-09-27, the project moved to a playable Sapporo Chapter 1 in a web runtime with local durable progress (`2dc446b`). The app continued growing through authored learning, world, story, art, and persistence milestones rather than shipping the initial one-scene proof unchanged.
 
-The sequence records product changes, but not the developer's private reasons for starting or choosing the project. The article should invite the Human to add those reasons.
+The sequence records product changes, not the developer's private reasons for starting or choosing the project. Those reasons have since been added in the developer's own note; distinguish that firsthand testimony from repository evidence.
 
 ## Milestones and decisions visible in the record
 
@@ -60,7 +60,7 @@ All 414 current assets were deployed on Vercel from GitHub main; the production 
 
 - **Initial default-voice limitation:** `6576661` and `src/services/VoiceProfiles.ts` show device-selected `ja-JP` Web Speech voice slots and rate/pitch profiles. Device variance is grounded in the user's reported iPhone/Mac observations; do not present it as an objective voice-quality benchmark.
 - **Open-model search:** `docs/review/m7/tts-feasibility.md` records AivisSpeech Engine 1.2.0 successfully installed and run on CPU, while VOICEVOX Engine 0.25.2 was researched but not installed or benchmarked. Selected models were `morioki` 1.0.0, `阿井田 茂` 1.0.0, `まお` 1.2.0, with separate engine/model/output license review (`docs/review/m7/license-ledger.json`).
-- **MacBook resource decision:** the contemporary user-authored Human Note says voice polish was deferred due to computer-resource concerns. It is a personal decision record, **not evidence of a failed MacBook CPU benchmark**. Docker was an early candidate, not the final synthesis runtime.
+- **MacBook resource decision:** the developer's contemporaneous note says voice polish was deferred due to computer-resource concerns. It is a personal decision record, **not evidence of a failed MacBook CPU benchmark**. Docker was an early candidate, not the final synthesis runtime.
 - **Codex Cloud breakthrough:** `docs/review/m7/tts-feasibility.md` records Linux x86_64, quota equivalent to 2 CPU, memory ceiling 8 GiB, no GPU, AivisSpeech `/audio_query` and `/synthesis` producing WAV. `docs/review/m7/casting.md` records approved fixed profiles; Sachiko shares morioki with Seoyeon at slower/lower settings, not a separately trained elderly voice.
 - **Production integration:** `src/content/spokenCatalog.ts` extracts actual dialogue/choices/constructions, `scripts/voice/pipeline.mjs` implements fingerprinting, retries, resumable staging, pronunciation overrides and FFmpeg conversion, `voice/pronunciation-dictionary.json` fixes 小樽→オタル, and `voice/pronunciation-overrides.json` fixes 幸子→サチコ only in synthesis input. `src/services/GeneratedAudioSpeechService.ts` falls back to Web Speech; `vite.config.ts` excludes voice from install precache and caches clips on demand.
 - **Verified delivery, not subjective acceptance:** `docs/review/m8/production-report.md` and `docs/review/m8/capacity-and-deployment.md` record 414/414, 11.48 MiB, 34/34 browser tests, plus pending human pronunciation/prosody and actual iPhone testing. Public sample MP3s are linked directly in the article's collapsible section.
