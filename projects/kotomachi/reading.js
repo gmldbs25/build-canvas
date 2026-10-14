@@ -57,6 +57,10 @@ for (const link of links) {
 
 window.addEventListener('scroll', scheduleUpdate, { passive: true });
 window.addEventListener('resize', scheduleUpdate);
+// The article becomes taller when the optional technical appendix opens.
+for (const details of document.querySelectorAll('.technical-details')) {
+  details.addEventListener('toggle', scheduleUpdate);
+}
 window.addEventListener('hashchange', scheduleUpdate);
 window.addEventListener('popstate', scheduleUpdate);
 window.addEventListener('keydown', (event) => {
