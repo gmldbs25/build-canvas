@@ -19,19 +19,21 @@ Mark an open Human Note with this block syntax:
 
 The pale green panel marks Human-authored material. Its current prose explicitly says it is a placeholder. Replace that prose only with heeyoon's own words; keep the `:::human-note` marker and do not add a first-person answer on his behalf. Use `:::human-answer` for each Developer Interview response. The renderer labels it as a Human answer space. Until heeyoon writes the answer, leave a clear placeholder in the block.
 
-A single optional technical appendix can be placed inside the article using `:::technical-details` and a closing `:::`. It renders as a native, keyboard-accessible HTML `<details>` element with the fixed label **기술 개발 과정 자세히 보기**. Use level-three headings for its five steps, and keep the narrative outside the block concise. It is collapsed by default and does not add subsections to the top-level table of contents. Avoid nesting other `:::` directives inside this block. The reader's progress indicator refreshes when it opens or closes.
+Each major development section can include **one optional technical appendix**. It uses a reusable `:::technical-details | label | subtitle` directive and closes with `:::`. Both metadata fields are plain text and must not contain the `|` separator. The old bare `:::technical-details` syntax still renders the original TTS title and subtitle for backward compatibility. Every block becomes an independent, initially closed, keyboard-accessible native HTML `<details>` element.
 
 ```md
-:::technical-details
+:::technical-details | 비주얼 재설계 과정 자세히 보기 | Pixel baseline → renderer → Golden Scene
 ### 01. The original limitation
 
-Detail paragraphs, lists, source references, and optional sample links.
+Technical explanations grounded in code, design milestones, and actual results.
 
-### 02. The next step
+### 02. Revised implementation
 
-Continue within the same expanded section.
+Continue inside the same expanded story; include compact source references.
 :::
 ```
+
+Use level-three headings for the chronology, but never nest `:::` directives inside this block. Keep main article prose concise and preserve Human Note/interview text verbatim. These headings do not create additional desktop TOC entries. The reader's progress indicator recalculates on each toggle. The current Work 5 has four technical appendices in total: platform/save architecture, visual rework, Agent orchestration, and TTS voice production; it intentionally does not expand the learning section.
 
 Add a figure with a Markdown image and one italic caption:
 
