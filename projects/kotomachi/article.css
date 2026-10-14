@@ -211,6 +211,56 @@ main { width: min(100% - 4rem, 1240px); margin: 0 auto; }
   text-align: center;
 }
 
+.article-body .technical-details {
+  margin: 2.1rem 0 2.4rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #f3efe7;
+}
+.article-body .technical-details > summary {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .23rem;
+  padding: 1.05rem 3.1rem 1.05rem 1.25rem;
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+.article-body .technical-details > summary::-webkit-details-marker { display: none; }
+.article-body .technical-details > summary:hover { background: #eee7da; }
+.article-body .technical-details > summary:focus-visible { outline: 2px solid var(--leaf); outline-offset: -3px; }
+.article-body .technical-details > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 1.35rem;
+  color: var(--accent);
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: translateY(-50%);
+  content: "+";
+}
+.article-body .technical-details[open] > summary::after { content: "−"; }
+.article-body .technical-details[open] > summary { border-bottom: 1px solid var(--line); }
+.technical-details-label { color: var(--ink); font-size: .99rem; font-weight: 650; letter-spacing: -.022em; }
+.technical-details-subtitle { color: var(--muted); font-size: .79rem; line-height: 1.6; }
+.technical-details-content { padding: .45rem 1.35rem 1.3rem; }
+.article-body .technical-details-content h3 {
+  margin: 2.1rem 0 .7rem;
+  padding-top: .15rem;
+  font: 600 1.04rem/1.5 Inter, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  letter-spacing: -.03em;
+}
+.article-body .technical-details-content h3:not(:first-child) {
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
+}
+.article-body .technical-details-content p,
+.article-body .technical-details-content li { font-size: .94rem; line-height: 1.9; }
+.article-body .technical-details-content a { text-decoration-color: var(--accent-soft); }
+.article-body .technical-details-content blockquote { margin: 1.2rem 0 .2rem; }
+
 .human-note, .human-answer {
   margin: 2rem 0 1.8rem;
   padding: 1.15rem 1.35rem 1.1rem;
@@ -266,6 +316,10 @@ main { width: min(100% - 4rem, 1240px); margin: 0 auto; }
   .article-body p, .article-body li { font-size: 1rem; line-height: 1.9; }
   .article-body figure { margin: 2rem -0.3rem 2.3rem; }
   .article-body figcaption { padding: 0 .5rem; text-align: left; }
+  .article-body .technical-details > summary { padding: 1rem 2.75rem 1rem 1rem; }
+  .technical-details-content { padding: .3rem 1rem 1rem; }
+  .technical-details-subtitle { font-size: .74rem; }
+  .article-body .technical-details-content h3 { font-size: 1rem; }
   .human-note, .human-answer { padding: 1rem 1.05rem; }
   .article-footer { width: min(100% - 2.5rem, var(--measure)); margin-top: 3.5rem; }
 }
