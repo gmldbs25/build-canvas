@@ -55,6 +55,14 @@ for (const link of links) {
   });
 }
 
+// Native controls play the shipped MP3 in the article; keep samples mutually exclusive.
+const voiceSamples = [...document.querySelectorAll('.voice-sample audio')];
+for (const player of voiceSamples) {
+  player.addEventListener('play', () => {
+    for (const other of voiceSamples) if (other !== player) other.pause();
+  });
+}
+
 window.addEventListener('scroll', scheduleUpdate, { passive: true });
 window.addEventListener('resize', scheduleUpdate);
 // The article becomes taller when the optional technical appendix opens.
