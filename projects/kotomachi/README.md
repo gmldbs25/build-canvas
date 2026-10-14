@@ -19,6 +19,20 @@ Mark an open Human Note with this block syntax:
 
 The pale green panel marks Human-authored material. Its current prose explicitly says it is a placeholder. Replace that prose only with heeyoon's own words; keep the `:::human-note` marker and do not add a first-person answer on his behalf. Use `:::human-answer` for each Developer Interview response. The renderer labels it as a Human answer space. Until heeyoon writes the answer, leave a clear placeholder in the block.
 
+A single optional technical appendix can be placed inside the article using `:::technical-details` and a closing `:::`. It renders as a native, keyboard-accessible HTML `<details>` element with the fixed label **기술 개발 과정 자세히 보기**. Use level-three headings for its five steps, and keep the narrative outside the block concise. It is collapsed by default and does not add subsections to the top-level table of contents. Avoid nesting other `:::` directives inside this block. The reader's progress indicator refreshes when it opens or closes.
+
+```md
+:::technical-details
+### 01. The original limitation
+
+Detail paragraphs, lists, source references, and optional sample links.
+
+### 02. The next step
+
+Continue within the same expanded section.
+:::
+```
+
 Add a figure with a Markdown image and one italic caption:
 
 ```md
