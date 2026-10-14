@@ -261,6 +261,29 @@ main { width: min(100% - 4rem, 1240px); margin: 0 auto; }
 .article-body .technical-details-content a { text-decoration-color: var(--accent-soft); }
 .article-body .technical-details-content blockquote { margin: 1.2rem 0 .2rem; }
 
+/* Embedded clips stay on Work 5 instead of navigating into the game's PWA. */
+.article-body .technical-details-content li:has(> .voice-sample) {
+  margin: .8rem 0 1rem;
+}
+.voice-sample {
+  display: grid;
+  gap: .4rem;
+  min-width: 0;
+}
+.voice-sample-label {
+  color: var(--ink);
+  font-weight: 550;
+  font-size: .89rem;
+  line-height: 1.65;
+}
+.voice-sample audio {
+  display: block;
+  width: min(100%, 25rem);
+  height: 2.65rem;
+  accent-color: var(--leaf);
+}
+
+
 .human-note, .human-answer {
   margin: 2rem 0 1.8rem;
   padding: 1.15rem 1.35rem 1.1rem;
