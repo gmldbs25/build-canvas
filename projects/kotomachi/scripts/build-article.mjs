@@ -50,7 +50,7 @@ function renderBlocks(source) {
       i += 1;
       const type = blockStart[1];
       if (type === 'technical-details') {
-        rendered.push(`<details class="technical-details"><summary><span class="technical-details-label">기술 개발 과정 자세히 보기</span><span class="technical-details-subtitle">Web Speech의 한계 → 오픈소스 탐색 → MacBook 보류 → Codex Cloud → 414개 음성 제작</span></summary><div class="technical-details-content">${renderBlocks(body.join('\\n'))}</div></details>`);
+        rendered.push(`<details class="technical-details"><summary><span class="technical-details-label">기술 개발 과정 자세히 보기</span><span class="technical-details-subtitle">Web Speech의 한계 → 오픈소스 탐색 → MacBook 보류 → Codex Cloud → 414개 음성 제작</span></summary><div class="technical-details-content">${renderBlocks(body.join('\n'))}</div></details>`);
       } else if (type === 'figure') {
         const img = body.find((entry) => entry.trim().startsWith('!['));
         const caption = body.find((entry) => entry.trim().startsWith('*') && entry.trim().endsWith('*'));
