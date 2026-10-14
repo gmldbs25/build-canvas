@@ -1,6 +1,6 @@
 # Work 05 · KotoMachi development journal
 
-The public article lives in [`content/article.md`](content/article.md). The byline identifies the repository-grounded prose as AI Agent narration; green panels identify the places where heeyoon can add personal context. Keep prose and Human-authored answers there; the page renderer, reading styles, and behavior are separate. `npm run build:pages` compiles the Markdown into semantic static HTML under `dist-pages/kotomachi/` and copies the images used by the article.
+The public article lives in [`content/article.md`](content/article.md). The byline identifies repository-grounded prose as AI Agent narration, while pale green panels contain the developer's own first-person notes and interview answers. Keep article prose and these developer-authored passages in the Markdown; the renderer, reading styles, and behavior are separate. `npm run build:pages` compiles the Markdown into semantic static HTML under `dist-pages/kotomachi/` and copies the images used by the article.
 
 ## Editing the article
 
@@ -8,16 +8,16 @@ Use ordinary Markdown headings and paragraphs. Level-two headings are the articl
 
 Put Agent-sourced prose in ordinary paragraphs and add a short `> 기록:` blockquote at the end of a section to link to commits or source documents. Keep these references close to the claims they support.
 
-Mark an open Human Note with this block syntax:
+Mark a developer note with the existing `:::human-note` Markdown directive (the internal marker is retained for compatibility):
 
 ```md
 :::human-note
-**Human Note · 직접 작성할 자리**  
-여기에 heeyoon이 본인의 생각이나 경험을 직접 작성합니다.
+**개발자 노트 · 직접 작성한 기록**  
+여기에 개발자가 직접 작성한 경험과 생각이 들어갑니다.
 :::
 ```
 
-The pale green panel marks Human-authored material. Its current prose explicitly says it is a placeholder. Replace that prose only with heeyoon's own words; keep the `:::human-note` marker and do not add a first-person answer on his behalf. Use `:::human-answer` for each Developer Interview response. The renderer labels it as a Human answer space. Until heeyoon writes the answer, leave a clear placeholder in the block.
+The pale green panels identify passages written by the developer, not AI Agent narration. Existing first-person notes and interview answers are complete and must not be rewritten without the developer's request. Keep the internal `:::human-note` and `:::human-answer` markers for compatibility; they render as **개발자 노트** and **개발자의 답변**. For any new, unanswered interview question, use a clear placeholder rather than inventing a first-person reply.
 
 Each major development section can include **one optional technical appendix**. It uses a reusable `:::technical-details | label | subtitle` directive and closes with `:::`. Both metadata fields are plain text and must not contain the `|` separator. The old bare `:::technical-details` syntax still renders the original TTS title and subtitle for backward compatibility. Every block becomes an independent, initially closed, keyboard-accessible native HTML `<details>` element.
 
@@ -33,7 +33,7 @@ Continue inside the same expanded story; include compact source references.
 :::
 ```
 
-Use level-three headings for the chronology, but never nest `:::` directives inside this block. Keep main article prose concise and preserve Human Note/interview text verbatim. These headings do not create additional desktop TOC entries. The reader's progress indicator recalculates on each toggle. The current Work 5 has four technical appendices in total: platform/save architecture, visual rework, Agent orchestration, and TTS voice production; it intentionally does not expand the learning section.
+Use level-three headings for the chronology, but never nest `:::` directives inside this block. Keep main article prose concise and preserve developer-authored notes and interview answers verbatim. These headings do not create additional desktop TOC entries. The reader's progress indicator recalculates on each toggle. The current Work 5 has four technical appendices in total: platform/save architecture, visual rework, Agent orchestration, and TTS voice production; it intentionally does not expand the learning section.
 
 Add a figure with a Markdown image and one italic caption:
 
