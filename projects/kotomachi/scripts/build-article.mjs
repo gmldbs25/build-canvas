@@ -26,7 +26,7 @@ function inline(text) {
   // The game's PWA can interpret a top-level MP3 navigation as an app route.
   // Render verified character voice links as embedded players instead of page links.
   source = source.replace(/\[([^\]]+)\]\((https:\/\/kotomachi-yoon\.vercel\.app\/audio\/voice\/[^\s)]+\.mp3)\)/g, (_match, label, url) =>
-    hold(`<span class="voice-sample"><span class="voice-sample-label">${label}</span><audio controls preload="none" src="${escapeHtml(url)}" aria-label="${label} 음성 재생">오디오 재생을 지원하지 않는 브라우저입니다.</audio></span>`));
+    hold(`<div class="voice-sample"><div class="voice-sample-label">${label}</div><audio controls preload="none" src="${escapeHtml(url)}" aria-label="${escapeHtml(label)} 음성 재생">오디오 재생을 지원하지 않는 브라우저입니다.</audio></div>`));
   source = source.replace(/\[([^\]]+)\]\((https?:[^\s)]+|\.\.?\/[^\s)]+|\/[^\s)]+|#[^\s)]+)\)/g, (_match, label, url) => {
     const href = escapeHtml(safeUrl(url));
     const external = /^https?:/i.test(url);
