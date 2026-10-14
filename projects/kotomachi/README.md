@@ -34,7 +34,7 @@ Store only the images used in `assets/`; keep the long edge at or below 1,280 px
 
 `article.css` owns the article layout. `reading.js` owns the progress bar, active TOC section, smooth anchor navigation, and `H` to Home shortcut. Keep the article comfortable to read on mobile; the TOC is desktop-only. The article has no Work 1–5 navigation.
 
-The local evidence record is [`docs/kotomachi/work5-source-notes.md`](../../docs/kotomachi/work5-source-notes.md). It records a KotoMachi snapshot at `791170e` on 2026-10-06. KotoMachi is private and has no license; the article's commit/document links may require repository access, so the article explains the project and technical decisions in place. Update the notes' baseline and review each factual statement against KotoMachi history when refreshing the article.
+The local evidence record is [`docs/kotomachi/work5-source-notes.md`](../../docs/kotomachi/work5-source-notes.md). It records the final Chapter 1 voice-production checkpoint at `d8e8e53` on 2026-10-07 (app 1.2.8, 414/414 eligible utterances deployed), with human/device validation limits distinguished from feature completion. KotoMachi is private and has no license; the article's commit/document links may require repository access, so the article explains the project and technical decisions in place. Update the notes' baseline and review each factual statement against KotoMachi history when refreshing the article.
 
 ## Build
 
