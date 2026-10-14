@@ -42,14 +42,16 @@ function renderBlocks(source) {
     const line = lines[i].trim();
     if (!line) { i += 1; continue; }
 
-    const blockStart = line.match(/^:::(human-note|human-answer|figure)$/);
+    const blockStart = line.match(/^:::(human-note|human-answer|figure|technical-details)$/);
     if (blockStart) {
       const body = [];
       i += 1;
       while (i < lines.length && lines[i].trim() !== ':::') body.push(lines[i++]);
       i += 1;
       const type = blockStart[1];
-      if (type === 'figure') {
+      if (type === 'technical-details') {
+        rendered.push(`<details class="technical-details"><summary><span class="technical-details-label">기술 개발 과정 자세히 보기</span><span class="technical-details-subtitle">Web Speech의 한계 → 오픈소스 탐색 → MacBook 보류 → Codex Cloud → 414개 음성 제작</span></summary><div class="technical-details-content">${renderBlocks(body.join('\\n'))}</div></details>`);
+      } else if (type === 'figure') {
         const img = body.find((entry) => entry.trim().startsWith('!['));
         const caption = body.find((entry) => entry.trim().startsWith('*') && entry.trim().endsWith('*'));
         rendered.push(`<figure>${img ? `<div class="article-figure-image">${inline(img.trim())}</div>` : ''}${caption ? `<figcaption>${inline(caption.trim().slice(1, -1))}</figcaption>` : ''}</figure>`);
@@ -89,7 +91,7 @@ function renderBlocks(source) {
     const paragraph = [line];
     i += 1;
     while (i < lines.length && lines[i].trim() &&
-      !/^(#{1,6})\s|^:::(human-note|human-answer|figure)$|^>\s?|^[-*]\s+/.test(lines[i].trim())) {
+      !/^(#{1,6})\s|^:::(human-note|human-answer|figure|technical-details)$|^>\s?|^[-*]\s+/.test(lines[i].trim())) {
       paragraph.push(lines[i++].trim());
     }
     rendered.push(`<p>${inline(paragraph.join(' '))}</p>`);
