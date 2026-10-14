@@ -63,8 +63,8 @@ function renderBlocks(source) {
         rendered.push(`<figure>${img ? `<div class="article-figure-image">${inline(img.trim())}</div>` : ''}${caption ? `<figcaption>${inline(caption.trim().slice(1, -1))}</figcaption>` : ''}</figure>`);
       } else {
         const className = type === 'human-note' ? 'human-note' : 'human-answer';
-        const label = type === 'human-note' ? 'Human Note' : 'Human의 답변';
-        const ariaLabel = type === 'human-note' ? 'Human이 작성하는 코멘트' : 'Human이 작성하는 인터뷰 답변';
+        const label = type === 'human-note' ? '개발자 노트' : '개발자의 답변';
+        const ariaLabel = type === 'human-note' ? '개발자가 직접 작성한 노트' : '개발자가 직접 작성한 인터뷰 답변';
         rendered.push(`<aside class="${className}" aria-label="${ariaLabel}"><p class="speaker-label">${label}</p>${renderBlocks(body.join('\n'))}</aside>`);
       }
       continue;
@@ -152,7 +152,7 @@ const html = `<!doctype html>
         <p class="article-eyebrow">WORK 05 <span>·</span> DEVELOPMENT JOURNAL</p>
         <h1>${escapeHtml(title)}</h1>
         <p class="article-deck">${escapeHtml(deck)}</p>
-        <p class="article-meta"><span>AI Agent의 저장소 기반 기록</span><span aria-hidden="true">/</span><span>Human Note와 인터뷰 답변은 작성 대기 중</span><span aria-hidden="true">/</span><span>2026.10.06</span></p>
+        <p class="article-meta"><span>AI Agent의 저장소 기반 기록</span><span aria-hidden="true">/</span><span>개발자 노트 · 개발자 인터뷰 수록</span><span aria-hidden="true">/</span><span>최종 수정 2026.10.14</span></p>
       </header>
       <div class="reading-layout">
         <aside class="toc-rail">
