@@ -48,6 +48,15 @@ On 2026-10-07 the owner heard an actual CPU-produced AivisSpeech morioki sample 
 
 All 414 current assets were deployed on Vercel from GitHub main; the production probe verified the manifest and each MP3 by HTTP 200, size, and hash. The final combined Playwright suite passed 34/34 tests. Generated voice is loaded on demand with bounded caching, and browser Web Speech remains the fallback. **Physical-iPhone end-to-end audio checks, subjective pronunciation listening, and broader visual/learning owner acceptance are not asserted complete.** These are follow-up validation items, distinct from shipped Chapter 1 voice production.
 
+### Evidence for the expanded technical story
+
+- **Initial default-voice limitation:** `6576661` and `src/services/VoiceProfiles.ts` show device-selected `ja-JP` Web Speech voice slots and rate/pitch profiles. Device variance is grounded in the user's reported iPhone/Mac observations; do not present it as an objective voice-quality benchmark.
+- **Open-model search:** `docs/review/m7/tts-feasibility.md` records AivisSpeech Engine 1.2.0 successfully installed and run on CPU, while VOICEVOX Engine 0.25.2 was researched but not installed or benchmarked. Selected models were `morioki` 1.0.0, `阿井田 茂` 1.0.0, `まお` 1.2.0, with separate engine/model/output license review (`docs/review/m7/license-ledger.json`).
+- **MacBook resource decision:** the contemporary user-authored Human Note says voice polish was deferred due to computer-resource concerns. It is a personal decision record, **not evidence of a failed MacBook CPU benchmark**. Docker was an early candidate, not the final synthesis runtime.
+- **Codex Cloud breakthrough:** `docs/review/m7/tts-feasibility.md` records Linux x86_64, quota equivalent to 2 CPU, memory ceiling 8 GiB, no GPU, AivisSpeech `/audio_query` and `/synthesis` producing WAV. `docs/review/m7/casting.md` records approved fixed profiles; Sachiko shares morioki with Seoyeon at slower/lower settings, not a separately trained elderly voice.
+- **Production integration:** `src/content/spokenCatalog.ts` extracts actual dialogue/choices/constructions, `scripts/voice/pipeline.mjs` implements fingerprinting, retries, resumable staging, pronunciation overrides and FFmpeg conversion, `voice/pronunciation-dictionary.json` fixes 小樽→オタル, and `voice/pronunciation-overrides.json` fixes 幸子→サチコ only in synthesis input. `src/services/GeneratedAudioSpeechService.ts` falls back to Web Speech; `vite.config.ts` excludes voice from install precache and caches clips on demand.
+- **Verified delivery, not subjective acceptance:** `docs/review/m8/production-report.md` and `docs/review/m8/capacity-and-deployment.md` record 414/414, 11.48 MiB, 34/34 browser tests, plus pending human pronunciation/prosody and actual iPhone testing. Public sample MP3s are linked directly in the article's collapsible section.
+
 Evidence: `docs/CURRENT_STATUS.md`, `docs/M7_M8_VOICE_PRODUCTION_SPEC.md`, `docs/review/m7/`, `docs/review/m8/production-report.md`, `docs/review/m8/production-ledger.json`, `public/audio/voice/`, `5bbbf05`, `2d29421`, `d8e8e53`.
 
 ## PWA, offline, deployment, and local save
