@@ -27,6 +27,8 @@ type Props = {
   heatmap: boolean; view?: 'overview' | 'network' | 'traffic'; cameraCommand?: CameraCommand;
   /** Work6 narrative gate: preserve the close-up until its intentional reveal. */
   cameraLocked?: boolean;
+  /** Work6-only visual easing for a newly registered real FOUP token. */
+  softTokenEntrance?: boolean;
   onFollowChange?: (following: boolean) => void;
   plannedTutorialIngress?: { source: string; destination: string }; tutorialStage?: TutorialStage;
   focusNodes?: string[]; routeCandidates?: { nodes: string[]; links: string[]; distance: number; cost: number; selected: boolean }[];
@@ -1212,7 +1214,7 @@ export function pickSceneTarget(world: { vehicleGroups: Map<string, { root: THRE
 }
 
 export default function ThreeFacilityScene(props: Props) {
-  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes, cameraLocked = false } = props;
+  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes, cameraLocked = false, softTokenEntrance = false } = props;
   const hostRef = useRef<HTMLDivElement>(null), rendererRef = useRef<THREE.WebGLRenderer | null>(null), sceneRef = useRef<THREE.Scene | null>(null), cameraRef = useRef<THREE.OrthographicCamera | null>(null), worldRef = useRef<ReturnType<typeof buildScene> | null>(null);
   const diagnosticRef = useRef<unknown>(null);
   const [rendererReady, setRendererReady] = useState(false), [worldRevision, setWorldRevision] = useState(0), [lodRevision, setLodRevision] = useState(0), [error, setError] = useState(''), [quality, setQuality] = useState<'high' | 'balanced' | 'low'>('high'), [graphicsInfo, setGraphicsInfo] = useState({ software: false, renderer: '' });
@@ -1247,6 +1249,8 @@ export default function ThreeFacilityScene(props: Props) {
   const prior = useRef<{ layout: Layout; state: SimulationState } | null>(null), animationRef = useRef<number | null>(null), dragRef = useRef<{ x: number; y: number; center: THREE.Vector3; target: { x: number; y: number; z: number } } | null>(null), raycaster = useMemo(() => new THREE.Raycaster(), []), pointer = useMemo(() => new THREE.Vector2(), []);
   const pinchGestureRef = useRef(false);
   const pointerPoints = useRef(new Map<number, { x: number; y: number }>()), pinchRef = useRef<{ distance: number; zoom: number; moved: boolean } | null>(null);
+  const tokenEntranceRafRef = useRef<number | null>(null);
+  const seenTokenKeysRef = useRef(new Set<string>());
   const stageRef = useRef<HTMLDivElement>(null), essentialLabelElements = useRef<Partial<Record<EssentialLabelKey, HTMLDivElement | null>>>({});
   const syncEssentialLabelBoundsRef = useRef<() => void>(() => undefined);
   const selectedRequest = trackedRequest ? state.requests.find(req => req.id === trackedRequest && req.phase !== 'completed') : undefined;
@@ -1496,7 +1500,18 @@ export default function ThreeFacilityScene(props: Props) {
   }, [layout, floor, focusNodes, focusRequest?.source, focusRequest?.destination, props.plannedTutorialIngress?.source, props.plannedTutorialIngress?.destination, selected, worldRevision, softwareLargeFleet]);
   useEffect(() => {
     const world = worldRef.current, layer = world?.tokenLayer; if (!world || !layer) return;
-    for (const child of [...layer.children]) { layer.remove(child); if (child instanceof THREE.InstancedMesh) child.dispose(); }
+    if (tokenEntranceRafRef.current !== null) {
+      cancelAnimationFrame(tokenEntranceRafRef.current);
+      tokenEntranceRafRef.current = null;
+    }
+    for (const child of [...layer.children]) {
+      layer.remove(child);
+      if (child instanceof THREE.InstancedMesh) {
+        child.dispose();
+        const fadeMaterial = child.userData.fadeMaterial;
+        if (fadeMaterial instanceof THREE.Material) fadeMaterial.dispose();
+      }
+    }
     const ports = new Map(layout.ports.map(port => [port.id, port]));
     const equipment = new Map((layout.facility?.equipment ?? []).map(item => [item.portId, item]));
     const usedSlots = new Map<string, number>();
@@ -1505,17 +1520,43 @@ export default function ThreeFacilityScene(props: Props) {
     const sourceEntries: Array<{ requestId: string; x: number; z: number; slot: number }> = [], storedEntries: Array<{ requestId: string; x: number; z: number; slot: number }> = [];
     sampledInventory.source.forEach(token => { const item = equipment.get(token.portId); if (item) sourceEntries.push({ requestId: token.requestId, x: item.dock.x, z: item.dock.y, slot: nextSlot(token.portId) }); });
     sampledInventory.stored.forEach(token => { const item = equipment.get(token.portId); if (item) storedEntries.push({ requestId: token.requestId, x: item.dock.x, z: item.dock.y, slot: nextSlot(token.portId) }); });
-    const addInstances = (entries: typeof sourceEntries, prototype: { geometry: THREE.BufferGeometry; material: THREE.Material }) => {
+    const fadingMaterials: THREE.Material[] = [];
+    const addInstances = (entries: typeof sourceEntries, prototype: { geometry: THREE.BufferGeometry; material: THREE.Material }, owner: 'source' | 'stored') => {
       if (!entries.length) return;
-      const mesh = new THREE.InstancedMesh(prototype.geometry, prototype.material, entries.length), matrix = new THREE.Matrix4();
-      entries.forEach((entry, index) => { matrix.makeTranslation(entry.x + entry.slot % 4 * 18, 8, entry.z + Math.floor(entry.slot / 4) * 18); mesh.setMatrixAt(index, matrix); });
-      mesh.instanceMatrix.needsUpdate = true; mesh.frustumCulled = false; mesh.userData.role = 'token-inventory-instances'; layer.add(mesh);
+      const newEntries = softTokenEntrance && entries.some(entry => !seenTokenKeysRef.current.has(`${owner}:${entry.requestId}`));
+      const material = newEntries ? prototype.material.clone() : prototype.material;
+      if (newEntries) { material.transparent = true; material.opacity = 0; material.depthWrite = false; fadingMaterials.push(material); }
+      const mesh = new THREE.InstancedMesh(prototype.geometry, material, entries.length), matrix = new THREE.Matrix4();
+      entries.forEach((entry, index) => {
+        matrix.makeTranslation(entry.x + entry.slot % 4 * 18, 8, entry.z + Math.floor(entry.slot / 4) * 18);
+        mesh.setMatrixAt(index, matrix);
+        seenTokenKeysRef.current.add(`${owner}:${entry.requestId}`);
+      });
+      mesh.instanceMatrix.needsUpdate = true; mesh.frustumCulled = false;
+      mesh.userData.role = 'token-inventory-instances';
+      if (newEntries) mesh.userData.fadeMaterial = material;
+      layer.add(mesh);
     };
-    addInstances(sourceEntries, world.tokenPrototypes.source); addInstances(storedEntries, world.tokenPrototypes.stored);
+    addInstances(sourceEntries, world.tokenPrototypes.source, 'source');
+    addInstances(storedEntries, world.tokenPrototypes.stored, 'stored');
+    if (fadingMaterials.length) {
+      // Fade only the actual new FOUP artwork. The 3D scene/camera and
+      // native request state stay mounted; other equipment never flashes.
+      const started = performance.now(), duration = 900;
+      const animate = (now: number) => {
+        const progress = Math.min(1, (now - started) / duration);
+        const eased = 1 - (1 - progress) ** 3;
+        for (const material of fadingMaterials) material.opacity = eased;
+        drawRef.current();
+        if (progress < 1) tokenEntranceRafRef.current = requestAnimationFrame(animate);
+        else tokenEntranceRafRef.current = null;
+      };
+      tokenEntranceRafRef.current = requestAnimationFrame(animate);
+    }
     world.tokenOwners = [...sourceEntries.map(item => ({ requestId: item.requestId, owner: 'source' as const })), ...storedEntries.map(item => ({ requestId: item.requestId, owner: 'stocker' as const }))];
     // Port labels and shelves stay stable; exact occupancy remains available on the facility details panel.
     drawRef.current();
-  }, [layout, floor, tokenSignature, trackedRequest, state.vehicles.filter(v=>v.phase==='pickup'||v.phase==='dropoff').map(v=>v.node).join('|'), worldRevision]);
+  }, [layout, floor, tokenSignature, trackedRequest, state.vehicles.filter(v=>v.phase==='pickup'||v.phase==='dropoff').map(v=>v.node).join('|'), worldRevision, softTokenEntrance]);
   useEffect(() => {
     if (cameraCommand?.kind !== 'welcome' || !activeWelcomeOwner?.vehicle) return;
     localFollowIntentRef.current = false; setFollow(true); onFollowChange?.(true);
@@ -1649,10 +1690,13 @@ export default function ThreeFacilityScene(props: Props) {
       mark.badge.visible = vehicle.failed;
       mark.waitBadge.visible = vehicle.waiting > 0 && !vehicle.parked && !vehicle.failed;
       const carried = vehicle.loaded || vehicle.phase === 'pickup'; mark.foup.visible = carried;
-      mark.foup.position.y = foupHandoffOffset(vehicle.phase, vehicle.serviceRemaining);
+      const from = oldVehicles.get(vehicle.id);
+      const currentFoupY = foupHandoffOffset(vehicle.phase, vehicle.serviceRemaining);
+      const previousFoupY = from ? foupHandoffOffset(from.phase, from.serviceRemaining) : currentFoupY;
+      mark.foup.position.y = currentFoupY;
       if (!mark.root.visible) return [];
-      const from = oldVehicles.get(vehicle.id), motion = confirmedRendererMotion(layout, from, vehicle);
-      return [{ vehicle, ...mark, motion }];
+      const motion = confirmedRendererMotion(layout, from, vehicle);
+      return [{ vehicle, ...mark, motion, previousFoupY, currentFoupY }];
     });
     const linkCounts = new Map<string, number>(), vehicleById = new Map(state.vehicles.map(vehicle => [vehicle.id, vehicle]));
     for (const vehicle of state.vehicles) if (vehicle.link) linkCounts.set(vehicle.link, (linkCounts.get(vehicle.link) ?? 0) + 1);
@@ -1850,6 +1894,9 @@ export default function ThreeFacilityScene(props: Props) {
       for (const item of animations) {
         const pose = item.motion(fraction); item.root.position.set(pose.x, 72, pose.y);
         item.physical.rotation.y = -pose.angle * Math.PI / 180;
+        // Interpolate the existing FAB FLOW hoist pose between genuine Engine
+        // service ticks. No simulated FOUP ownership/phase is modified.
+        item.foup.position.y = THREE.MathUtils.lerp(item.previousFoupY, item.currentFoupY, fraction);
         // A completed pickup is reflected at the confirmed tick boundary; during pickup service, the hoist carries its token.
         item.foup.visible = item.vehicle.loaded || item.vehicle.phase === 'pickup';
         if (camera && projected) { const point = new THREE.Vector3(pose.x, 72, pose.y).project(camera), { width, height } = viewportSizeRef.current; projected[item.vehicle.id] = { x: (point.x + 1) / 2 * width, y: (1 - point.y) / 2 * height, worldX: pose.x, worldZ: pose.y, height: 72, heading: pose.angle, floor: pose.floor, loaded: item.vehicle.loaded, foupAttached: item.vehicle.loaded || item.vehicle.phase === 'pickup', phase: item.vehicle.phase, requestId: item.vehicle.request }; }
