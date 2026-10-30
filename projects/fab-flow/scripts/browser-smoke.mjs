@@ -256,7 +256,24 @@ try {
     }
     await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 06:/}).click();
-    await expect(page.getByRole('heading',{name:'누가 이 운송을 맡고, 어느 길로 갈까?'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'멀리 있는 장비까지, 어느 길로 갈까?'})).toBeVisible();
+    await expect(page.getByRole('button',{name:'MCS가 선택한 길'})).toBeVisible({timeout:45000});
+    const nativeStudy = await page.locator('.w6-root').evaluate(node => ({
+      seed: Number(node.dataset.routeStudySeed),
+      source: node.dataset.routeStudySource,
+      destination: node.dataset.routeStudyDestination,
+    }));
+    const selectedLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
+    if(!nativeStudy.seed || !nativeStudy.source || !nativeStudy.destination ||
+        nativeStudy.source === nativeStudy.destination || selectedLongRoute.length < 12){
+      throw new Error('Scene 06 requires a real multi-Bay MCS decision and a meaningful rail route: '+JSON.stringify({nativeStudy,selectedLongRoute:selectedLongRoute.length}));
+    }
+    await page.getByRole('button',{name:'다른 가능한 길'}).click();
+    await expect(page.getByText(/실제 선택된 길과 경유하는 레일이 달라요/)).toBeVisible();
+    const alternativeLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
+    if(alternativeLongRoute.length < 8 || alternativeLongRoute.join('|') === selectedLongRoute.join('|'))
+      throw new Error('Native MCS alternative not actually shown on the directed rail network');
+    console.log('native-route-study',JSON.stringify({nativeStudy,selectedLinks:selectedLongRoute.length,alternativeLinks:alternativeLongRoute.length}));
     await page.screenshot({path:path.join(evidence, 'scene06-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 05:/}).click();
     await expect(page.getByRole('heading',{name:'차량은 아무 길로나 갈 수 없다.'})).toBeVisible();
@@ -265,9 +282,20 @@ try {
     await expect(page.getByRole('heading',{name:'운송이 많아지면 무슨 일이 생길까?'})).toBeVisible();
     await expect(page.getByText('아직 완료되지 않은 요청',{exact:true})).toBeVisible();
     const congestionBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    await page.waitForTimeout(1100);
-    const congestionAfter=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    if(congestionAfter<=congestionBefore)throw new Error('Native congestion study did not advance');
+    const pressureSamples=[congestionBefore];
+    for(let k=0;k<6;k++){
+      await page.waitForTimeout(140);
+      pressureSamples.push(Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick')));
+    }
+    const congestionAfter=pressureSamples.at(-1);
+    if(congestionAfter<=congestionBefore || pressureSamples.some((tick,i)=>i>0 && (tick<pressureSamples[i-1] || tick-pressureSamples[i-1]>2))){
+      throw new Error('Native congestion should publish successive single ticks without 3-tick jumps: '+JSON.stringify(pressureSamples));
+    }
+    console.log('native-pressure-smooth',JSON.stringify({samples:pressureSamples}));
+    await page.getByRole('button',{name:'처음부터 관찰'}).click();
+    await page.waitForTimeout(320);
+    const afterReset=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    if(afterReset<1 || afterReset>7) throw new Error('Congestion reset must restart a fresh native Engine: '+afterReset);
     await page.getByRole('button',{name:/Scene 08:/}).click();
     await expect(page.getByRole('heading',{name:'잘 움직인다는 건 무슨 뜻일까?'})).toBeVisible();
     await expect(page.getByText('실제로 완료된 운송')).toBeVisible();
