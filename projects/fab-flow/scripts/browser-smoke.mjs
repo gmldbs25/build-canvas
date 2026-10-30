@@ -264,8 +264,10 @@ try {
       destination: node.dataset.routeStudyDestination,
     }));
     const selectedLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
-    if(!nativeStudy.seed || !nativeStudy.source || !nativeStudy.destination ||
-        nativeStudy.source === nativeStudy.destination || selectedLongRoute.length < 12){
+    const fromBayNo=Number(nativeStudy.source.match(/^B(\d+)$/)?.[1]);
+    const toBayNo=Number(nativeStudy.destination.match(/^B(\d+)$/)?.[1]);
+    if(!nativeStudy.seed || !Number.isInteger(fromBayNo) || !Number.isInteger(toBayNo) ||
+        Math.abs((fromBayNo-1)%3-(toBayNo-1)%3) !== 2 || selectedLongRoute.length < 12){
       throw new Error('Scene 06 requires a real multi-Bay MCS decision and a meaningful rail route: '+JSON.stringify({nativeStudy,selectedLongRoute:selectedLongRoute.length}));
     }
     await page.getByRole('button',{name:'다른 가능한 길'}).click();
