@@ -1607,6 +1607,15 @@ export default function ThreeFacilityScene(props: Props) {
       z = frame?.z ?? (includeVehicle ? (sourceNode.y + sourceNearest.z) / 2 : sourceNode?.y) ?? area.y + area.height / 2;
       span = frame?.span ?? 320;
     }
+    if (cameraCommand.kind === 'tableau') {
+      // A genuine fixed observation window for Work6: the Native Engine keeps
+      // moving all OHTs, but the camera never tracks an individual vehicle.
+      const focal = cameraCommand.frame;
+      const firstArea = layout.areas.find(item => item.floor === floor);
+      x = focal?.x ?? (firstArea ? firstArea.x + firstArea.width * .42 : x);
+      z = focal?.z ?? (firstArea ? firstArea.y + firstArea.height * .5 : z);
+      span = focal?.span ?? 690;
+    }
     if (cameraCommand.kind === 'bay' || cameraCommand.kind === 'connected') {
       const cameraRequest = state.requests.find(item => item.id === (cameraCommand.requestId ?? trackedRequest));
       const completed = cameraRequest?.phase === 'completed';
