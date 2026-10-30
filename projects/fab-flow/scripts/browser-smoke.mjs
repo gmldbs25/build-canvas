@@ -47,6 +47,43 @@ try {
     const response = await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/', { waitUntil:'domcontentloaded' });
     await page.waitForTimeout(1100);
     console.log('initial-debug',JSON.stringify({viewport:[width,height],status:response?.status(),title:await page.title(),text:(await page.locator('body').innerText()).slice(0,350),errors:faults.slice(0,8)}));
+    await expect(page.locator('[data-camera-locked="true"]')).toBeVisible({timeout:30000});
+    const tableauStats = await page.locator('.w6-root').evaluate(node => ({
+      moving: Number(node.dataset.openingMoving), local: Number(node.dataset.openingLocalMoving),
+    }));
+    if(tableauStats.moving < 2 || tableauStats.local < 2) {
+      throw new Error('Opening needs multiple real moving OHTs in one local frame: '+JSON.stringify(tableauStats));
+    }
+    const viewBefore=await page.evaluate(() => window.__FAB_3D__ && ({
+      camera: window.__FAB_3D__.camera,
+      following: window.__FAB_3D__.following,
+      vehicles: window.__FAB_3D__.vehicles,
+      tick: window.__FAB_3D__.tick
+    }));
+    await page.waitForTimeout(1800);
+    const viewAfter=await page.evaluate(() => window.__FAB_3D__ && ({
+      camera: window.__FAB_3D__.camera,
+      following: window.__FAB_3D__.following,
+      vehicles: window.__FAB_3D__.vehicles,
+      tick: window.__FAB_3D__.tick
+    }));
+    if(!viewBefore?.camera || !viewAfter?.camera || viewBefore.following || viewAfter.following ||
+        Math.abs(viewBefore.camera.target.x-viewAfter.camera.target.x)>0.02 ||
+        Math.abs(viewBefore.camera.target.z-viewAfter.camera.target.z)>0.02 ||
+        Math.abs(viewBefore.camera.span-viewAfter.camera.span)>0.02 ||
+        viewAfter.tick<=viewBefore.tick) {
+      throw new Error('Opening camera moved or native engine stalled: '+JSON.stringify({before:viewBefore?.camera,after:viewAfter?.camera,ticks:[viewBefore?.tick,viewAfter?.tick],following:viewAfter?.following}));
+    }
+    const movingInFrame=Object.entries(viewBefore.vehicles ?? {}).filter(([id,a]) => {
+      const b=viewAfter.vehicles?.[id];
+      return b && ['empty','loaded'].includes(a.phase) &&
+        a.x >= 0 && a.x <= width && a.y >= 0 && a.y <= height &&
+        Math.hypot(b.x-a.x,b.y-a.y) > 1.3;
+    }).length;
+    if(width===1440 && movingInFrame < 2){
+      throw new Error('Opening has fewer than two visibly moving OHTs: '+JSON.stringify({movingInFrame,tableauStats,visible:Object.keys(viewBefore.vehicles||{}).length}));
+    }
+    console.log('opening-fixed-tableau',JSON.stringify({viewport:[width,height],tableauStats,movingInFrame,fromTick:viewBefore.tick,toTick:viewAfter.tick,span:viewAfter.camera.span}));
     await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
     await expect(page.getByRole('heading', {name:'공장 안에도 교통체증이?'})).toBeVisible({timeout:5000});
     await expect(page.locator('.w6-root')).toHaveAttribute('data-scene-count','11');
