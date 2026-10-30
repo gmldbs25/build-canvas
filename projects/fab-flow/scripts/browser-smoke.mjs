@@ -284,7 +284,7 @@ try {
       throw new Error('Scene 06 must use diagonal opposite Bays with meaningfully divergent genuine rail paths: '+JSON.stringify({nativeStudy,routeContrast,selectedLongRoute:selectedLongRoute.length}));
     }
     await page.getByRole('button',{name:'다른 가능한 길'}).click();
-    await expect(page.getByText(/실제 선택 경로와 달리 돌아가는 부분을 찾아보세요/)).toBeVisible();
+    await expect(page.locator('.w6-decision-copy')).toContainText('선택 경로와 달리 돌아가는 부분');
     await expect.poll(
       async () => page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links?.join('|') ?? ''),
       {timeout:9000},
