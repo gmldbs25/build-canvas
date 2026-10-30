@@ -30,6 +30,18 @@ jobs:
         run: |
           test -f projects/fab-flow/dist-pages/index.html
           test -d projects/fab-flow/dist-pages/assets
+      - name: Install browser
+        run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Browser smoke test (native WebGL and actual tutorial tick)
+        run: npm run test:browser --prefix projects/fab-flow
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-browser-evidence
+          path: projects/fab-flow/evidence/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload prototype build artifact
         uses: actions/upload-artifact@v4
         with:
