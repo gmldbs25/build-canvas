@@ -62,9 +62,14 @@ export function chooseLocalIntroDemand(layout: Layout, scenario: Pick<Scenario, 
   const ports = layout.ports;
   const nodes = new Map(layout.nodes.map(node => [node.id, node]));
   let best: LocalIntroChoice | undefined;
-  // Search seeds, not altered transport commands. The first request at time=0
-  // is required by the existing TutorialCommandLayer.
-  for (let seed = 1; seed <= 768; seed++) {
+  let bestScore = Infinity;
+  // Native V6 rails are one-way. A physically close port on the reverse lane
+  // may require a big loop: compare directed network distance with straight
+  // distance as well as checking that both tools are in the same Bay.
+  //
+  // This searches only the seeded Engine's legal input space; no path, request,
+  // edge or native movement rule is changed for the teaching presentation.
+  for (let seed = 1; seed <= 16000; seed++) {
     const random = seededRandom(seed);
     const at = Math.floor((random() * 0.8 * 60) / 0.5) * 0.5;
     if (at !== 0) continue;
@@ -73,16 +78,26 @@ export function chooseLocalIntroDemand(layout: Layout, scenario: Pick<Scenario, 
     const destination = destinations[Math.floor(random() * destinations.length)]!;
     if (source.kind !== 'tool' || destination.kind !== 'tool' || source.area !== destination.area) continue;
     const a = nodes.get(source.node), b = nodes.get(destination.node);
-    if (!a || !b || Math.hypot(a.x - b.x, a.y - b.y) > 580) continue;
-    const distance = directedDistance(layout, source.node, destination.node);
-    if (!Number.isFinite(distance) || distance < 100) continue;
-    const candidate = { seed, source: source.id, destination: destination.id, shortestDirectedDistance: distance };
-    if (!best || distance < best.shortestDirectedDistance) best = candidate;
-    // Prefer a genuinely short one-Bay example with enough movement to watch.
-    if (distance >= 240 && distance <= 780) return candidate;
+    if (!a || !b) continue;
+    const direct = Math.hypot(a.x - b.x, a.y - b.y);
+    if (direct < 180 || direct > 740) continue;
+    const directed = directedDistance(layout, source.node, destination.node);
+    if (!Number.isFinite(directed) || directed < 150) continue;
+    const detour = directed / Math.max(1, direct);
+    if (directed > 1350 || detour > 3.2) continue;
+    const candidate = { seed, source: source.id, destination: destination.id, shortestDirectedDistance: directed };
+    // The lowest score favors a clearly visible local trip that does not wrap
+    // the bay for no apparent reason. Directed geometry remains the authority.
+    const score = directed + Math.max(0, detour - 1.3) * 800 + Math.max(0, direct - 500) * 0.8;
+    if (score < bestScore) {
+      best = candidate;
+      bestScore = score;
+    }
+    // A short, near-direct route is an excellent beginner demonstration.
+    if (directed >= 210 && directed <= 580 && detour <= 1.4) return candidate;
   }
-  if (!best || best.shortestDirectedDistance > 1600) {
-    throw new Error('Could not locate a suitably short native introductory transport.');
+  if (!best) {
+    throw new Error('Could not locate a valid local Native Engine transport without a major directed-rail detour.');
   }
   return best;
 }
