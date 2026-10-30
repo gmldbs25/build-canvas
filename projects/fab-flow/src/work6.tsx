@@ -126,7 +126,7 @@ export default function Work6() {
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
   const [routeError, setRouteError] = useState('');
-  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative'>('selected');
+  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative' | 'both'>('both');
   const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
     scene.id === 6 && routeStudy ? routeStudy.engine : engineRef.current;
   const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
@@ -225,7 +225,15 @@ export default function Work6() {
           layer.step(engine);
           publish();
           if (layer.reached(engine)) {
-            complete();
+            // The final native pickup/dropoff tick still has 520 ms of visual
+            // hoist travel to interpolate. Do not set running=false in the
+            // same React batch as the final state publication: that snaps
+            // the FOUP straight onto the OHT before the animation completes.
+            if (command === 'pickup' || command === 'dropoff') {
+              timerRef.current = window.setTimeout(() => {
+                if (runId === runIdRef.current) complete();
+              }, tickPaceMs);
+            } else complete();
           } else {
             timerRef.current = window.setTimeout(tick, tickPaceMs);
           }
@@ -270,7 +278,7 @@ export default function Work6() {
   const transportFinished = stage === 'bay' && request?.phase === 'completed';
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
-  const shownRoute = routeStudy ? routeChoice === 'selected' ? routeStudy.selected : routeStudy.alternative : null;
+  const shownRoute = routeStudy ? routeChoice === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
@@ -278,7 +286,9 @@ export default function Work6() {
   const isTransportRouteVisible = scene.id === 3 &&
     (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
   const candidates = isDecision && routeStudy && shownRoute
-    ? [{ ...shownRoute, selected: true }]
+    ? routeChoice === 'both'
+      ? [{ ...routeStudy.alternative, selected: false }, { ...routeStudy.selected, selected: true }]
+      : [{ ...shownRoute, selected: true }]
     : (isNetwork || isTransportRouteVisible) && currentDecision
       ? currentDecision.candidates.filter(candidate => candidate.selected)
       : undefined;
@@ -337,7 +347,10 @@ export default function Work6() {
     data-scene-count={SCENES.length} data-current-scene={scene.id}
     data-route-study-seed={routeStudy?.seed ?? ''}
     data-route-study-source={routeStudy?.sourceBay ?? ''}
-    data-route-study-destination={routeStudy?.destinationBay ?? ''}>
+    data-route-study-destination={routeStudy?.destinationBay ?? ''}
+    data-route-study-distinct-fraction={routeStudy?.contrast.distinctFraction ?? ''}
+    data-route-study-separation={routeStudy?.contrast.maxSeparation ?? ''}
+    data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -431,22 +444,27 @@ export default function Work6() {
           </details>
         </div>}
         {scene.id === 6 && <div className="w6-inner-controls">
-          <p className="w6-context-line">앞에서는 옆 Bay까지 짧게 옮겨 봤어요. 이번에는 멀리 떨어진 장비로 보내는 실제 운송 사례입니다. 여러 갈림길 가운데 어느 길을 택해야 할까요?</p>
+          <p className="w6-context-line">앞에서는 옆 Bay로 짧게 옮겼어요. 이번에는 FAB의 대각선 반대편 장비까지 이동합니다. 같은 출발지와 도착지라도 레일을 달리 지나갈 수 있을까요?</p>
           {routeStudy && shownRoute ? <>
             <span className="w6-overline">REAL NATIVE MCS · {routeStudy.sourceBay} → {routeStudy.destinationBay}</span>
             <div className="w6-action-row" role="group" aria-label="MCS 경로 비교">
               <button className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('selected')}>MCS가 선택한 길</button>
               <button className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('alternative')}>다른 가능한 길</button>
+              <button className={routeChoice === 'both' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('both')}>두 경로 함께 보기</button>
             </div>
             <div className="w6-decision-row">
-              <span>{routeChoice === 'selected' ? '실제 선택된 운송 경로' : '비교 가능한 다른 경로'}</span>
+              <span>{routeChoice === 'selected' ? '실제 선택된 운송 경로' : routeChoice === 'alternative' ? '동일 목적지의 우회 가능 경로' : '선택 경로 (청록) · 우회 경로 (보라 점선)'}</span>
               <strong>{shownRoute.distance.toFixed(0)}</strong>
               <small>모형 거리 단위</small>
             </div>
             <p className="w6-decision-copy">{routeChoice === 'selected'
-              ? `MCS가 실제로 선택한 길이에요. ${shownRoute.links.length}개 레일 구간을 지나며 Bay 사이를 연결해요. 레일 위에 강조된 동선을 따라가 보세요.`
-              : `같은 출발지와 목적지로 갈 수 있는 다른 후보예요. ${shownRoute.links.length}개 레일 구간을 지나며, 실제 선택된 길과 경유하는 레일이 달라요.`}</p>
-            <p className="w6-microcopy">두 경로 모두 FAB FLOW의 실제 방향성 레일과 MCS 후보 계산에서 나왔어요. 경로를 바꿔 보는 것은 비교용 강조 표시이며 실제 배차·운송을 변경하지 않아요.</p>
+              ? `MCS가 실제 선택한 ${shownRoute.links.length}개 레일 구간이에요. 대각선 반대편 Bay까지 이어지는 동선을 따라가 보세요.`
+              : routeChoice === 'alternative'
+                ? `같은 출발·도착지를 연결하는 다른 ${shownRoute.links.length}개 레일 구간이에요. 선택 경로와 달리 돌아가는 부분을 찾아보세요.`
+                : `청록 실선은 실제 선택된 길, 보라 점선은 다른 가능한 길이에요. 선택 경로의 약 ${Math.round(routeStudy.contrast.distinctFraction * 100)}% 길이에 해당하는 구간이 겹치지 않아요.`}</p>
+            <p className="w6-microcopy">두 경로 모두 실제 방향성 레일을 따릅니다. ${routeStudy.alternativeKind === 'detour'
+              ? '우회 경로는 비교를 위해 선택 경로의 일부 레일을 제외하고 원본 경로 탐색기로 다시 계산한 가정이며, 실제 MCS 선택 기록은 아닙니다.'
+              : '우회 경로는 원본 MCS가 함께 계산한 후보입니다.'} 화면 전환은 실제 배차나 운송을 바꾸지 않습니다.</p>
           </> : <div className="w6-observed" role="status">
             <strong>{routeError ? '실제 경로 사례를 준비하지 못했어요.' : '여러 Bay를 지나는 경로를 계산하고 있어요.'}</strong>
             <p>{routeError || '실제 엔진에서 운송 요청과 배차를 진행한 뒤 MCS가 선택한 경로를 확인합니다.'}</p>

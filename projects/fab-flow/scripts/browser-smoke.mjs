@@ -167,21 +167,26 @@ try {
       await page.getByRole('button', {name:/빈 차량이 가지러 가는 모습 보기/}).click();
       await expect(page.getByText('이제 무엇을 실을까요?')).toBeVisible({timeout:90000});
       await page.getByRole('button', {name:/FOUP 싣는 모습 보기/}).click();
-      const pickupHeights = await page.evaluate(async () => {
-        const heights = [];
-        for (let sample = 0; sample < 26; sample++) {
+      const pickupSamples = await page.evaluate(async () => {
+        const samples = [];
+        for (let sample = 0; sample < 36; sample++) {
           const handoff = window.__FAB_3D__?.carrierHandoff;
-          if (handoff?.phase === 'pickup' && handoff.visible && Number.isFinite(handoff.centerY))
-            heights.push(handoff.centerY);
-          await new Promise(resolve => setTimeout(resolve, 100));
+          if (handoff?.visible && Number.isFinite(handoff.centerY) &&
+              (handoff.phase === 'pickup' || handoff.phase === 'loaded'))
+            samples.push({phase:handoff.phase, height:handoff.centerY});
+          await new Promise(resolve => setTimeout(resolve, 75));
         }
-        return heights;
+        return samples;
       });
-      if (pickupHeights.length < 2 || pickupHeights.some((height, i) => i > 0 && height < pickupHeights[i-1] - 0.5) ||
-          Math.min(...pickupHeights) < 7) {
-        throw new Error('Carrier pickup must rise monotonically from the native equipment Port: ' + JSON.stringify(pickupHeights));
+      const pickupHeights = pickupSamples.map(item => item.height);
+      if (pickupHeights.length < 3 ||
+          pickupHeights.some((height, i) => i > 0 && height < pickupHeights[i-1] - 0.5) ||
+          Math.min(...pickupHeights) < 7 ||
+          !pickupSamples.some(item => item.phase === 'loaded' && item.height > 28 && item.height < 38.5) ||
+          Math.abs(pickupHeights.at(-1) - 39) > 0.6) {
+        throw new Error('Native pickup must keep rendering the last hoist travel tick after Engine phase becomes loaded: ' + JSON.stringify(pickupSamples));
       }
-      console.log('native-pickup-heights',JSON.stringify(pickupHeights));
+      console.log('native-pickup-heights',JSON.stringify(pickupSamples));
       await expect(page.getByText('어떤 길로 가면 될까요?')).toBeVisible({timeout:30000});
       await page.screenshot({path:path.join(evidence, 'scene03-pickup-'+width+'.png')});
       await page.getByRole('button', {name:/이동할 길 살펴보기/}).click();
@@ -266,9 +271,17 @@ try {
     const selectedLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
     const fromBayNo=Number(nativeStudy.source.match(/^B(\d+)$/)?.[1]);
     const toBayNo=Number(nativeStudy.destination.match(/^B(\d+)$/)?.[1]);
+    const routeContrast = await page.locator('.w6-root').evaluate(node => ({
+      distinct: Number(node.dataset.routeStudyDistinctFraction),
+      separation: Number(node.dataset.routeStudySeparation),
+      alternativeKind: node.dataset.routeStudyAlternativeKind,
+    }));
     if(!nativeStudy.seed || !Number.isInteger(fromBayNo) || !Number.isInteger(toBayNo) ||
-        Math.abs((fromBayNo-1)%3-(toBayNo-1)%3) !== 2 || selectedLongRoute.length < 12){
-      throw new Error('Scene 06 requires a real multi-Bay MCS decision and a meaningful rail route: '+JSON.stringify({nativeStudy,selectedLongRoute:selectedLongRoute.length}));
+        Math.abs(Math.floor((fromBayNo-1)/3)-Math.floor((toBayNo-1)/3)) !== 2 ||
+        Math.abs((fromBayNo-1)%3-(toBayNo-1)%3) !== 2 || selectedLongRoute.length < 12 ||
+        routeContrast.distinct < .2 || routeContrast.separation < 360 ||
+        !['native','detour'].includes(routeContrast.alternativeKind)){
+      throw new Error('Scene 06 must use diagonal opposite Bays with meaningfully divergent genuine rail paths: '+JSON.stringify({nativeStudy,routeContrast,selectedLongRoute:selectedLongRoute.length}));
     }
     await page.getByRole('button',{name:'다른 가능한 길'}).click();
     await expect(page.getByText(/실제 선택된 길과 경유하는 레일이 달라요/)).toBeVisible();
@@ -279,7 +292,9 @@ try {
     const alternativeLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
     if(alternativeLongRoute.length < 8)
       throw new Error('Native MCS alternative not actually shown on the directed rail network');
-    console.log('native-route-study',JSON.stringify({nativeStudy,selectedLinks:selectedLongRoute.length,alternativeLinks:alternativeLongRoute.length}));
+    await page.getByRole('button',{name:'두 경로 함께 보기'}).click();
+    await expect.poll(async () => page.evaluate(() => window.__FAB_3D__?.routes?.length ?? 0),{timeout:9000}).toBe(2);
+    console.log('native-route-study',JSON.stringify({nativeStudy,routeContrast,selectedLinks:selectedLongRoute.length,alternativeLinks:alternativeLongRoute.length}));
     await page.screenshot({path:path.join(evidence, 'scene06-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 05:/}).click();
     await expect(page.getByRole('heading',{name:'차량은 아무 길로나 갈 수 없다.'})).toBeVisible();

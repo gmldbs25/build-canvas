@@ -15,7 +15,7 @@ export type RouteHighlightPath = {
 export const ROUTE_HIGHLIGHT_STYLE = {
   casing: { color: 0x173743, selectedWidth: 5, alternativeWidth: 3 },
   selected: { color: 0x00c7dc, width: 3, dashed: false },
-  alternatives: [0x7d94a4, 0x9b87a3, 0xa18b58],
+  alternatives: [0xab78ce, 0x9b87a3, 0xa18b58],
   alternativeWidth: 1.5,
   dashSize: 8,
   gapSize: 5,
