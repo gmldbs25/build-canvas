@@ -25,6 +25,8 @@ type Props = {
   tickMs: number; running: boolean; selected?: string; trackedVehicle?: string; trackedRequest?: string;
   analysis?: AnalysisReport; analysisMode?: 'current' | 'recent';
   heatmap: boolean; view?: 'overview' | 'network' | 'traffic'; cameraCommand?: CameraCommand;
+  /** Work6 narrative gate: preserve the close-up until its intentional reveal. */
+  cameraLocked?: boolean;
   onFollowChange?: (following: boolean) => void;
   plannedTutorialIngress?: { source: string; destination: string }; tutorialStage?: TutorialStage;
   focusNodes?: string[]; routeCandidates?: { nodes: string[]; links: string[]; distance: number; cost: number; selected: boolean }[];
@@ -1210,7 +1212,7 @@ export function pickSceneTarget(world: { vehicleGroups: Map<string, { root: THRE
 }
 
 export default function ThreeFacilityScene(props: Props) {
-  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes } = props;
+  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes, cameraLocked = false } = props;
   const hostRef = useRef<HTMLDivElement>(null), rendererRef = useRef<THREE.WebGLRenderer | null>(null), sceneRef = useRef<THREE.Scene | null>(null), cameraRef = useRef<THREE.OrthographicCamera | null>(null), worldRef = useRef<ReturnType<typeof buildScene> | null>(null);
   const diagnosticRef = useRef<unknown>(null);
   const [rendererReady, setRendererReady] = useState(false), [worldRevision, setWorldRevision] = useState(0), [lodRevision, setLodRevision] = useState(0), [error, setError] = useState(''), [quality, setQuality] = useState<'high' | 'balanced' | 'low'>('high'), [graphicsInfo, setGraphicsInfo] = useState({ software: false, renderer: '' });
@@ -1879,7 +1881,7 @@ export default function ThreeFacilityScene(props: Props) {
       cameraPresentationRef.current = () => undefined;
     };
   }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, floor, worldRevision, cameraCommand?.sequence, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointerPoints.current.size === 2) { pinchGestureRef.current = true; const [a, b] = Array.from(pointerPoints.current.values()); pinchRef.current = { distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom, moved: false }; dragRef.current = null; }
     else if (pointerPoints.current.size === 1) dragRef.current = { x: event.clientX, y: event.clientY, center: camera.position.clone(), target: { ...cameraTargetRef.current } };
     setLabel(''); };
@@ -1891,7 +1893,7 @@ export default function ThreeFacilityScene(props: Props) {
     if (changed) cameraTargetRef.current = { x: target.x, y: target.y, z: target.z };
     return changed;
   };
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => { const host = hostRef.current, camera = cameraRef.current; if (!host || !camera) return;
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; const host = hostRef.current, camera = cameraRef.current; if (!host || !camera) return;
     if (pointerPoints.current.has(event.pointerId)) pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pinchRef.current && pointerPoints.current.size >= 2) { overviewRef.current = false; cameraFrameModeRef.current = 'manual'; automaticFollowSpanRef.current = null; releaseProjection(); const [a, b] = Array.from(pointerPoints.current.values()); pinchRef.current.moved = true; setZoom(clampZoom(pinchRef.current.zoom * Math.hypot(a.x - b.x, a.y - b.y) / pinchRef.current.distance)); return; }
     if (dragRef.current) {
@@ -1919,28 +1921,28 @@ export default function ThreeFacilityScene(props: Props) {
     if (!host || !camera) return; const rect = host.getBoundingClientRect(); pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(pointer, camera);
     const info = worldRef.current ? pickSceneTarget(worldRef.current, raycaster) : undefined; if (info) onSelect(info.kind, info.id);
   };
-  const zoomBy = (scale: number) => { overviewRef.current = false; cameraFrameModeRef.current = 'manual'; automaticFollowSpanRef.current = null; releaseProjection(); setLabel(''); setZoom(value => clampZoom(value * scale)); };
+  const zoomBy = (scale: number) => { if (cameraLocked) return; overviewRef.current = false; cameraFrameModeRef.current = 'manual'; automaticFollowSpanRef.current = null; releaseProjection(); setLabel(''); setZoom(value => clampZoom(value * scale)); };
   const wheelZoomRef = useRef(zoomBy); wheelZoomRef.current = zoomBy;
   useEffect(() => {
     const host = hostRef.current; if (!host) return;
     const wheel = (event: WheelEvent) => {
       event.preventDefault();
-      if (!event.deltaY) return;
+      if (cameraLocked || !event.deltaY) return;
       const pixels = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? host.clientHeight : 1);
       wheelZoomRef.current(Math.exp(-Math.max(-200, Math.min(200, pixels)) * .002));
     };
     host.addEventListener('wheel', wheel, { passive: false });
     return () => host.removeEventListener('wheel', wheel);
-  }, [rendererReady]);
-  const centerOverview = () => { localFollowIntentRef.current = false; setFollow(false); onFollowChange?.(false); overviewRef.current = true; cameraFrameModeRef.current = 'overview'; setZoom(1); setLodRevision(value => value + 1); const b = worldRef.current?.bounds; const cam = cameraRef.current; if (b && cam) { const { width, height } = viewportSizeRef.current, x = b.x + b.width / 2, z = b.y + b.height / 2, d = rendererCameraDistance(b.width, b.height, true), aspect = width / Math.max(1, height); cameraSpanRef.current = fitProjectedOverviewSpan(b.width, b.height, aspect); cameraTargetRef.current = { x, y: 35, z }; cam.position.set(x + d * .48, d * .72, z + d * .48); cam.far = rendererCameraFar(b.width, b.height, d); if (sceneRef.current?.fog instanceof THREE.Fog) { sceneRef.current.fog.near = Math.max(1700, d * .9); sceneRef.current.fog.far = Math.max(4200, d + (b.width + b.height) * .8); } cam.updateProjectionMatrix(); cam.lookAt(x, 35, z); resizeRef.current(); } };
+  }, [rendererReady, cameraLocked]);
+  const centerOverview = () => { if (cameraLocked) return; localFollowIntentRef.current = false; setFollow(false); onFollowChange?.(false); overviewRef.current = true; cameraFrameModeRef.current = 'overview'; setZoom(1); setLodRevision(value => value + 1); const b = worldRef.current?.bounds; const cam = cameraRef.current; if (b && cam) { const { width, height } = viewportSizeRef.current, x = b.x + b.width / 2, z = b.y + b.height / 2, d = rendererCameraDistance(b.width, b.height, true), aspect = width / Math.max(1, height); cameraSpanRef.current = fitProjectedOverviewSpan(b.width, b.height, aspect); cameraTargetRef.current = { x, y: 35, z }; cam.position.set(x + d * .48, d * .72, z + d * .48); cam.far = rendererCameraFar(b.width, b.height, d); if (sceneRef.current?.fog instanceof THREE.Fog) { sceneRef.current.fog.near = Math.max(1700, d * .9); sceneRef.current.fog.far = Math.max(4200, d + (b.width + b.height) * .8); } cam.updateProjectionMatrix(); cam.lookAt(x, 35, z); resizeRef.current(); } };
   const names = useMemo(() => new Map(layout.ports.map(p => [p.id, p.name])), [layout.ports]);
   void names;
   const qualityTitle = !graphicsInfo.renderer ? '3D 품질' : softwareLargeFleet
     ? `소프트웨어 렌더러의 대규모 차량 장면은 응답성을 위해 해상도를 낮춥니다. 현재 DPR ${effectivePixelRatio.toFixed(2)}`
     : `현재 렌더 해상도 DPR ${effectivePixelRatio.toFixed(2)}`;
   if (error) return <div className="three-fallback-shell"><div className="three-status" role="status">3D 렌더러를 시작할 수 없어 접근 가능한 2D 지도를 표시합니다.</div><FacilitySceneFallback {...props} /></div>;
-  return <div ref={stageRef} className={`map-stage facility-stage three-stage${rendererReady ? ' renderer-ready' : ''}`} data-renderer="three-webgl" data-simulation-time={state.time} data-simulation-tick={state.tick} data-camera-following={follow} data-quality={quality} aria-label="Isometric FAB scene">
-    <div ref={hostRef} className="three-scene-host" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={event => { dragRef.current = null; pointerPoints.current.delete(event.pointerId); pinchRef.current = null; if (!pointerPoints.current.size) pinchGestureRef.current = false; }} onDoubleClick={centerOverview} />
+  return <div ref={stageRef} className={`map-stage facility-stage three-stage${rendererReady ? ' renderer-ready' : ''}`} data-renderer="three-webgl" data-simulation-time={state.time} data-simulation-tick={state.tick} data-camera-following={follow} data-quality={quality} aria-label="Isometric FAB scene" data-camera-locked={cameraLocked ? "true" : "false"}>
+    <div ref={hostRef} className="three-scene-host" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={event => { dragRef.current = null; pointerPoints.current.delete(event.pointerId); pinchRef.current = null; if (!pointerPoints.current.size) pinchGestureRef.current = false; }} onDoubleClick={cameraLocked ? undefined : centerOverview} />
     {softwareLargeFleet && <div className="three-essential-labels" aria-hidden="true">
       {essentialOwnerText && <div hidden className="three-essential-label owner" ref={element => { essentialLabelElements.current.owner = element; }}>{essentialOwnerText}</div>}
       {essentialEndpoints.map(endpoint => <div hidden key={endpoint.key} className={`three-essential-label ${endpoint.key}`} ref={element => { essentialLabelElements.current[endpoint.key] = element; }}>{endpoint.text}</div>)}
@@ -1948,7 +1950,7 @@ export default function ThreeFacilityScene(props: Props) {
     </div>}
     {!rendererReady && <div className="three-status" role="status">{error ? `3D 렌더러를 시작할 수 없어 기존 지도를 사용합니다. ${error}` : '3D FAB 준비 중…'}</div>}
     {label && <div className="three-hover-label" aria-live="polite">{label}</div>}
-    <div className="three-controls" aria-label="3D camera controls"><button onClick={() => zoomBy(1.2)} aria-label="확대">＋</button><button onClick={() => zoomBy(.84)} aria-label="축소">−</button><button onClick={centerOverview} aria-label="전체 보기">⌖</button><button className={follow ? 'active' : ''} disabled={!ownerId} onClick={() => { const next = !follow; if (!next) { automaticFollowSpanRef.current = null; releaseProjection(); } overviewRef.current = false; cameraFrameModeRef.current = next ? 'follow' : 'manual'; localFollowIntentRef.current = next; setFollow(next); onFollowChange?.(next); }} aria-label="선택 OHT 따라가기">◎</button><select aria-label="3D 품질" title={qualityTitle} value={quality} onChange={event => setQuality(event.target.value as typeof quality)}><option value="high">높음</option><option value="balanced">보통</option><option value="low">절전</option></select></div>
+    {!cameraLocked && <div className="three-controls" aria-label="3D camera controls"><button onClick={() => zoomBy(1.2)} aria-label="확대">＋</button><button onClick={() => zoomBy(.84)} aria-label="축소">−</button><button onClick={centerOverview} aria-label="전체 보기">⌖</button><button className={follow ? 'active' : ''} disabled={!ownerId} onClick={() => { const next = !follow; if (!next) { automaticFollowSpanRef.current = null; releaseProjection(); } overviewRef.current = false; cameraFrameModeRef.current = next ? 'follow' : 'manual'; localFollowIntentRef.current = next; setFollow(next); onFollowChange?.(next); }} aria-label="선택 OHT 따라가기">◎</button><select aria-label="3D 품질" title={qualityTitle} value={quality} onChange={event => setQuality(event.target.value as typeof quality)}><option value="high">높음</option><option value="balanced">보통</option><option value="low">절전</option></select></div>}
     {softwareLargeFleet && (sampledInventory.omittedSource + sampledInventory.omittedStored > 0 || selectedInventoryCounts) && <div className="three-inventory-note" aria-label="Port FOUP 표시 정보">
       {(sampledInventory.omittedSource + sampledInventory.omittedStored > 0) && <span>포트 FOUP 간소화 · 준비·보관 각각 포트당 최대 {inventoryDisplayLimit}개 표시 (실제 수량 유지)</span>}
       {selectedInventoryCounts && <strong>선택 {layout.ports.find(port => port.id === selectedInventoryPort)?.name ?? selectedInventoryPort} · 준비 {selectedInventoryCounts.sourceDrawn}/{selectedInventoryCounts.sourceTotal} 표시 · 보관 {selectedInventoryCounts.storedDrawn}/{selectedInventoryCounts.storedTotal} 표시</strong>}
