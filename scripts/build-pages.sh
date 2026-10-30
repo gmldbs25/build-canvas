@@ -41,8 +41,8 @@ cp projects/nand-flash/{index.html,style.css,main.js,model.mjs,content.mjs,diagr
 # Work 05 compiles its Markdown article to a self-contained static reading page.
 node projects/kotomachi/scripts/build-article.mjs --output=dist-pages/kotomachi
 
-# Work6 preview is deliberately unlisted until the 11-scene design is approved.
-# It uses the original FAB FLOW Native Engine and Three.js renderer; never a mock SVG OHT.
+# Work6 is listed on the portfolio homepage while the three-scene 3D prototype is in progress.
+# Keep the current preview URL stable for linked visitors; uses the native FAB FLOW engine and renderer.
 if [[ "$(uname -s)" == "Linux" ]]; then
   npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
 else
