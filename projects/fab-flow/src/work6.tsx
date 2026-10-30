@@ -263,6 +263,14 @@ export default function Work6() {
     const req = tutorialRequest(engineRef.current);
     const owner = tutorialVehicle(engineRef.current);
     const tracked = owner?.id, reqId = req?.id;
+    if (scene.id <= 2) {
+      // One stable camera view for the entire opening. Native OHTs keep
+      // moving underneath it; no new camera commands on request/vehicle changes.
+      setCameraCommand(previous => ({
+        sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame,
+      }));
+      return;
+    }
     if (scene.id === 3) {
       issueCamera(tracked ? 'follow' : 'opening', tracked, reqId);
       return;
@@ -283,12 +291,6 @@ export default function Work6() {
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, [scene.id, issueCamera]);
 
-  useEffect(() => {
-    if (scene.id <= 2 && ambient.vehicleId) {
-      issueCamera('follow', ambient.vehicleId, ambient.requestId);
-    }
-  }, [scene.id, ambient.vehicleId, ambient.requestId, issueCamera]);
-
   const planned = tutorialRef.current.stage === 'request' && nativeState.requests.length === 0
     ? { source: plannedIngressRef.current.source, destination: plannedIngressRef.current.destination }
     : undefined;
@@ -298,6 +300,8 @@ export default function Work6() {
     data-intro-destination-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.destination)?.area}
     data-intro-selected-seed={initial.selection.seed}
     data-intro-directed-distance={initial.selection.shortestDirectedDistance}
+    data-opening-moving={ambient.openingMovingVehicles}
+    data-opening-local-moving={ambient.openingLocalVehicles}
     data-scene-count={SCENES.length} data-current-scene={scene.id}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
@@ -313,10 +317,10 @@ export default function Work6() {
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
           running={isPressure ? !pressure.paused : isOpening ? true : busy}
-          tickMs={isPressure ? 60 : isOpening ? 73 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={isOpening ? (ambient.vehicleId ? 'vehicle:' + ambient.vehicleId : undefined) : !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={isOpening ? ambient.vehicleId : isPressure ? undefined : selectedVehicleId}
-          trackedRequest={isOpening ? ambient.requestId : isPressure || request?.phase === 'completed' ? undefined : request?.id}
+          tickMs={isPressure ? 60 : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
+          selected={!isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
+          trackedVehicle={isOpening || isPressure ? undefined : selectedVehicleId}
+          trackedRequest={isOpening || isPressure || request?.phase === 'completed' ? undefined : request?.id}
           plannedTutorialIngress={scene.id === 3 ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
@@ -329,7 +333,7 @@ export default function Work6() {
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
-        {focusMode && <div className="w6-focus-note" role="note">지금은 가까이서 운송을 관찰해요 · 전체 공장은 다음 장면에서</div>}
+        {focusMode && <div className="w6-focus-note" role="note">{isOpening ? '고정된 시야에서 여러 OHT의 실제 움직임을 관찰해요' : '지금은 한 대의 운송에 집중해요 · 전체 공장은 Scene 04에서'}</div>}
         {(scene.id === 3 || isNetwork || isDecision) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
       </div>
