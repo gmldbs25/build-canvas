@@ -1493,7 +1493,11 @@ export default function ThreeFacilityScene(props: Props) {
       updateCameraDepth(cam, scene, bounds, cameraTargetRef.current,world.root.userData.depthBounds);
     }
     resizeRef.current();
-  }, [layout, floor, fleetKey, rendererReady, quality, props.plannedTutorialIngress]);
+  // plannedTutorialIngress is presentation metadata for the initial framing,
+  // NOT a change to the physical FAB. Creating/clearing a transport request
+  // must not tear down all meshes and reset the camera before the FOUP appears.
+  // The layout/fleet/floor continue to determine genuine scene rebuilds.
+  }, [layout, floor, fleetKey, rendererReady, quality]);
   useEffect(() => { const world = worldRef.current; if (world) { setRouteLayer(layout, floor, world.routeLayer, routeCandidates); drawRef.current(); } }, [layout, floor, routeCandidates, worldRevision]);
   useEffect(() => {
     const layer = worldRef.current?.focusLayer; if (!layer) return;
