@@ -41,4 +41,19 @@ cp projects/nand-flash/{index.html,style.css,main.js,model.mjs,content.mjs,diagr
 # Work 05 compiles its Markdown article to a self-contained static reading page.
 node projects/kotomachi/scripts/build-article.mjs --output=dist-pages/kotomachi
 
+# Work6 preview is deliberately unlisted until the 11-scene design is approved.
+# It uses the original FAB FLOW Native Engine and Three.js renderer; never a mock SVG OHT.
+if [[ "$(uname -s)" == "Linux" ]]; then
+  npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+else
+  test -x projects/fab-flow/node_modules/.bin/vite || {
+    echo "Work6 preview dependencies are missing. Run npm install --prefix projects/fab-flow first." >&2
+    exit 69
+  }
+fi
+npm run typecheck --prefix projects/fab-flow
+GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build --prefix projects/fab-flow
+mkdir -p dist-pages/fab-flow-preview
+cp -R projects/fab-flow/dist-pages/. dist-pages/fab-flow-preview/
+
 find dist-pages -name ".DS_Store" -delete
