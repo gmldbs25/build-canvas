@@ -297,9 +297,9 @@ export default function Work6() {
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, [scene.id, issueCamera]);
 
-  const planned = tutorialRef.current.stage === 'request' && nativeState.requests.length === 0
-    ? { source: plannedIngressRef.current.source, destination: plannedIngressRef.current.destination }
-    : undefined;
+  // Keep the original port annotations stable through request/dispatch.
+  // Creating the FOUP should change only that model, never reframe the FAB.
+  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
 
   return <div className="w6-root" data-prototype="true"
     data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
@@ -489,7 +489,7 @@ export default function Work6() {
         </div>}
         {scene.id === 4 && <div className="w6-inner-controls">
           <p className="w6-microcopy">실제 FAB FLOW Large V6 모델 · 삼성 평택 내부 배치를 재현한 것은 아닙니다.</p>
-          <button type="button" className="w6-secondary" onClick={() => { setCameraMoment(2); issueCamera('overview', selectedVehicleId, request?.id); }}>전체 FAB 보기 ↗</button>
+          <button type="button" className="w6-primary" disabled aria-label="전체 FAB 살펴보기, 완료">전체 FAB 살펴보기 <span aria-hidden="true">↗</span></button>
         </div>}
         {error && <p className="w6-error" role="alert">{error}</p>}
       </section>
