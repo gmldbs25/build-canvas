@@ -63,41 +63,50 @@ export function chooseLocalIntroDemand(layout: Layout, scenario: Pick<Scenario, 
   const nodes = new Map(layout.nodes.map(node => [node.id, node]));
   let best: LocalIntroChoice | undefined;
   let bestScore = Infinity;
-  // Native V6 rails are one-way. A physically close port on the reverse lane
-  // may require a big loop: compare directed network distance with straight
-  // distance as well as checking that both tools are in the same Bay.
+  const areas = new Map(layout.areas.map(area => [area.id, area]));
+  const unitScale = layout.facility?.unitsPerMeter ?? 8;
+  // A genuinely *adjacent Bay* example: left Bay -> immediate right Bay,
+  // on the eastbound upper process lane. Both ports face the same travel
+  // direction, so the Native MCS should not need to circle the whole hall.
   //
-  // This searches only the seeded Engine's legal input space; no path, request,
-  // edge or native movement rule is changed for the teaching presentation.
-  for (let seed = 1; seed <= 16000; seed++) {
+  // Importantly, link.length uses graph units (world length / unitScale).
+  // The previous selector compared those values to raw world coordinates,
+  // incorrectly classifying long detours as short direct journeys.
+  for (let seed = 1; seed <= 80000; seed++) {
     const random = seededRandom(seed);
     const at = Math.floor((random() * 0.8 * 60) / 0.5) * 0.5;
     if (at !== 0) continue;
     const source = ports[Math.floor(random() * ports.length)]!;
     const destinations = ports.filter(port => port.id !== source.id);
     const destination = destinations[Math.floor(random() * destinations.length)]!;
-    if (source.kind !== 'tool' || destination.kind !== 'tool' || source.area !== destination.area) continue;
+    if (source.kind !== 'tool' || destination.kind !== 'tool' || source.area === destination.area) continue;
+    const sourceArea = areas.get(source.area), destinationArea = areas.get(destination.area);
+    if (!sourceArea || !destinationArea) continue;
+    const verticalOffset = Math.abs((sourceArea.y + sourceArea.height / 2) - (destinationArea.y + destinationArea.height / 2));
+    const horizontalOffset = (destinationArea.x + destinationArea.width / 2) - (sourceArea.x + sourceArea.width / 2);
+    if (verticalOffset > 5 || horizontalOffset <= 0 || horizontalOffset > sourceArea.width + 280) continue;
+    // V6 numbering: the first half of each Bay's tool ports is on the
+    // eastbound process rail. Never select westbound destinations here.
+    const sourceNumber = Number(source.id.match(/-P(\d+)$/)?.[1]);
+    const destinationNumber = Number(destination.id.match(/-P(\d+)$/)?.[1]);
+    const upperBankLimit = layout.ports.filter(port => port.area === source.area).length / 2;
+    if (!(sourceNumber >= 1 && sourceNumber <= upperBankLimit) ||
+        !(destinationNumber >= 1 && destinationNumber <= upperBankLimit)) continue;
     const a = nodes.get(source.node), b = nodes.get(destination.node);
     if (!a || !b) continue;
-    const direct = Math.hypot(a.x - b.x, a.y - b.y);
-    if (direct < 180 || direct > 740) continue;
-    const directed = directedDistance(layout, source.node, destination.node);
-    if (!Number.isFinite(directed) || directed < 150) continue;
-    const detour = directed / Math.max(1, direct);
-    if (directed > 1350 || detour > 3.2) continue;
-    const candidate = { seed, source: source.id, destination: destination.id, shortestDirectedDistance: directed };
-    // The lowest score favors a clearly visible local trip that does not wrap
-    // the bay for no apparent reason. Directed geometry remains the authority.
-    const score = directed + Math.max(0, detour - 1.3) * 800 + Math.max(0, direct - 500) * 0.8;
-    if (score < bestScore) {
-      best = candidate;
-      bestScore = score;
-    }
-    // A short, near-direct route is an excellent beginner demonstration.
-    if (directed >= 210 && directed <= 580 && detour <= 1.4) return candidate;
+    const directGraphUnits = Math.hypot(a.x - b.x, a.y - b.y) / unitScale;
+    const distance = directedDistance(layout, source.node, destination.node);
+    const ratio = distance / Math.max(1, directGraphUnits);
+    if (!Number.isFinite(distance) || ratio > 1.6 || distance > 850) continue;
+    const candidate = { seed, source: source.id, destination: destination.id, shortestDirectedDistance: distance };
+    const score = distance + Math.max(0, ratio - 1) * 600;
+    if (score < bestScore) { best = candidate; bestScore = score; }
+    // Choose a genuinely straightforward route without requiring the viewer
+    // to understand the complicated one-way Bay/U-turn topology yet.
+    if (ratio <= 1.22 && distance <= 475) return candidate;
   }
   if (!best) {
-    throw new Error('Could not locate a valid local Native Engine transport without a major directed-rail detour.');
+    throw new Error('No short eastbound adjacent-Bay route exists in the actual V6 rail network.');
   }
   return best;
 }
