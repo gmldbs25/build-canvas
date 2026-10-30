@@ -122,10 +122,34 @@ try {
     await expect(page.getByRole('heading',{name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible();
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     await expect(page.getByText('왜 옮겨야 할까요?')).toBeVisible();
+    await page.waitForTimeout(350);
+    const beforeRequestView = await page.evaluate(() => ({
+      worldId: window.__FAB_3D__?.worldId,
+      camera: window.__FAB_3D__?.camera,
+    }));
     await expect(page.getByText(/웨이퍼를 담은 보호 (용기|상자)/)).toBeVisible();
     await page.getByRole('button',{name:/다음 장비로 보내기/}).click();
     await expect(page.getByText('누가 옮겨 줄까요?')).toBeVisible({timeout:12000});
     await expect(page.getByText(/아직 차량은 움직이지 않았어요/)).toBeVisible({timeout:12000});
+    await page.waitForTimeout(400);
+    const afterRequestView = await page.evaluate(() => ({
+      worldId: window.__FAB_3D__?.worldId,
+      camera: window.__FAB_3D__?.camera,
+    }));
+    const beforeCamera = beforeRequestView.camera;
+    const afterCamera = afterRequestView.camera;
+    const diff = beforeCamera && afterCamera ? Math.max(
+      Math.abs(beforeCamera.span - afterCamera.span),
+      Math.abs(beforeCamera.target.x - afterCamera.target.x),
+      Math.abs(beforeCamera.target.y - afterCamera.target.y),
+      Math.abs(beforeCamera.target.z - afterCamera.target.z),
+    ) : Infinity;
+    if (!beforeRequestView.worldId || beforeRequestView.worldId !== afterRequestView.worldId ||
+        !Number.isFinite(diff) || diff > 0.05) {
+      throw new Error('Creating a FOUP must keep the same Native world and exact camera frame: ' +
+        JSON.stringify({before:beforeRequestView,after:afterRequestView,diff}));
+    }
+    console.log('request-stable-camera', JSON.stringify({worldId:afterRequestView.worldId,span:afterCamera.span,cameraDiff:diff}));
     if (await page.locator('[data-simulation-tick]').count() !== 1) throw new Error('Native engine view disappeared after first transfer request');
     const nextTick=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     if(nextTick <= startTick) throw new Error('No real Native Tick after request action');
@@ -203,6 +227,8 @@ try {
       await revealButton.click();
       await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
       await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
+      await expect(page.getByRole('button',{name:'전체 FAB 살펴보기, 완료'})).toBeDisabled();
+      await expect(page.getByRole('button',{name:/전체 FAB 보기/})).toHaveCount(0);
       await page.waitForTimeout(500);
       const earlyReveal = await page.evaluate(() => window.__FAB_3D__?.camera);
       await page.waitForTimeout(850);
@@ -225,6 +251,7 @@ try {
       await page.getByRole('button',{name:/Scene 04:/}).click();
       await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
       await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
+      await expect(page.getByRole('button',{name:'전체 FAB 살펴보기, 완료'})).toBeDisabled();
       await page.waitForTimeout(3100);
     }
     await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
