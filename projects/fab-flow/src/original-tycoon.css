@@ -1,0 +1,596 @@
+/* FAB FLOW tycoon HUD: warm cleanroom controls around a single playable scene. */
+:root{color-scheme:light;--bg:#f3f2eb;--panel:#fffef9;--panel-2:#f7f7ef;--line:#dce3d9;--muted:#71837a;--text:#253b35;--teal:#4c9a89;--cyan:#5c9f9a;--amber:#d99537;--orange:#d98247;--red:#c9594f}
+html,body{background:#f3f2eb;color:#253b35}
+.app-shell{min-height:100vh;background:radial-gradient(ellipse at 46% -38%,#ffffff 0,transparent 57%),#f3f2eb}
+.topbar{background:#fffef9;border-bottom:1px solid #dce3d9;box-shadow:0 2px 14px #53645c0b}
+.brand b,.topbar-clock{color:#234c42}.brand small{color:#83928a}.brand-mark span{border-color:#63ab93}.brand-mark span:nth-child(1):after{background:#5bac8e;box-shadow:0 0 8px #5bac8e66}
+.topbar-center{color:#6b7b72}.topbar-center i,.bottom-bar i{background:#b2c0b5}.live-dot.on{background:#62b477;box-shadow:0 0 8px #62b47755}
+.quiet-button,.icon-button{color:#52675c}.quiet-button:hover,.icon-button:hover{background:#eff4eb;border-color:#d7e3d5;color:#215c4b}.avatar{border-color:#d0e0d1;background:#e9f2e7;color:#34745c}
+.workspace{padding-top:18px}.map-toolbar{margin-bottom:10px}.eyebrow{color:#758e7f}.map-toolbar h1{color:#274138}.subtitle{color:#5e8170;border-color:#d6e4d8;background:#f5f9f3}.toolbar-right{gap:7px}.floor-switch{border-color:#dce5d8;background:#fffef9}.floor-switch button{color:#75867b}.floor-switch button.active{background:#dfeee1;color:#235d4c;box-shadow:inset 0 0 0 1px #b5d4ba}.icon-button{border-color:#dce5d8}.icon-button.active{color:#98641f;border-color:#ebd8b4;background:#fff7e7}
+.map-card,.panel,.transport-strip{background:#fffef9;border:1px solid #dce3d9;border-radius:14px;box-shadow:0 7px 24px #455a4d0d}.map-card{padding:0 14px}.map-card-top{border-bottom-color:#edf0e9}.map-caption{color:#36594c}.caption-mark{border-color:#70a98f;box-shadow:0 0 5px #8cbea04d}.muted,.map-tools-note,.setup-note{color:#7c8a81}.map-tools-note b{color:#9bb4a1}
+.panel{padding:15px}.panel-heading h2,.inspect-title,.map-area-title{color:#2e5143}.panel-heading p,.panel-subtitle,.stat span,.field>span,.field label,.field>label,.kpi-foot,.kpi-extra span,.kpi-extra b,.setup-note{color:#79887e}.field select,.field input,.dialog-input,.import-area{background:#fff;border:1px solid #d8e1d5;color:#29473c}.field select:focus,.field input:focus{border-color:#7cb596}.main-control,.primary-action{background:linear-gradient(135deg,#378b70,#28775f);color:#fff;box-shadow:0 4px 11px #31785d25}.main-control:hover,.primary-action:hover{background:#226c55}.speed-options button,.policy-switch button,.compare-button,.config-actions button,.request-chip,.focus-quick-controls button{background:#f6f7f0;border-color:#dce4d9;color:#53685d}.speed-options button.active,.policy-switch button.active,.request-chip.selected{background:#e1f0e4;border-color:#a7cbb0;color:#286146}.stat strong,.kpi-grid strong,.inspect-state strong{color:#304c40}.kpi-panel,.control-panel,.config-panel,.inspect-panel{background:#fffef9;border-color:#dce3d9}.kpi-extra{border-top-color:#e9eee6}.request-list,.candidate-list{border-color:#e2e8df}.request-chip:hover,.config-actions button:hover{background:#edf4e9}
+.experience-toolbar{background:#fffef3;border:1px solid #dde4d8;box-shadow:0 4px 16px #31443922;color:#365347}.experience-toolbar button{color:#3f6554}.experience-clock{color:#456555}.bottom-bar{border-top:1px solid #dce3d9;background:#fffef9;color:#718179}.bottom-bar b{color:#3e6a55}.footer-version{color:#86938a}.notice{background:#fffdf3;border-color:#dce4d8;color:#355749;box-shadow:0 8px 28px #33463b26}
+.guide-scrim{background:#14221b66}.guide-card,.dialog{background:#fffef9;color:#31463d;border:1px solid #d9e2d6;box-shadow:0 18px 65px #1b2c2155}.guide-card h2,.dialog h2{color:#244c3d}.guide-card>p,.dialog p{color:#728178}.guide-progress{background:#e6ece3}.guide-progress span{background:#74ad8b}.guide-tag{color:#60846e}.guide-skip,.close-button{color:#6e8075}.guide-request{background:#f5f7f0;border-color:#e0e8dc}.guide-target{color:#466a55}.dialog-input,.import-area{color:#304b40}.file-drop{background:#f4f7f0;border-color:#cfddcf;color:#577260}
+.welcome-shell{background:#15211b}.welcome-backdrop .three-stage{background:#dfe7dc!important}.welcome-vignette:has(+ .welcome-content){background:linear-gradient(90deg,#17231e 0%,#17231ef2 18%,#17231ebd 34%,#17231e25 59%,transparent 78%),linear-gradient(0deg,#17231e80 0%,transparent 34%,#17231e24 100%)}
+.three-controls,.three-floor-controls,.three-scene-key{background:#fffef2ed;border-color:#dce4d8}.three-scene-key{color:#596f61}
+.three-scene-host{touch-action:none;cursor:grab}.three-scene-host:active{cursor:grabbing}
+.three-essential-labels{position:absolute;z-index:2;overflow:hidden;pointer-events:none}
+.three-essential-label{position:absolute;display:block;transform:translate(-50%,-100%);max-width:min(280px,calc(100% - 12px));min-height:28px;padding:5px 9px;border:1px solid #f2f5e7;border-radius:7px;background:#172f29ed;color:#fffef1;box-shadow:0 2px 9px #10231e70;font-size:13px;font-weight:750;line-height:1.25;letter-spacing:.005em;text-align:center;text-shadow:0 1px 1px #10231e;white-space:nowrap}
+.three-essential-label[hidden]{display:none}
+@media(max-width:850px){.workspace{padding:12px 14px 16px;gap:12px}.topbar{padding:0 16px}.map-card,.panel{border-radius:11px}}
+
+/* Experience is a live world with a floating mission card, rather than another settings dashboard. */
+.app-shell.interactive-mode{height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:#e9eee7}
+.app-shell.interactive-mode .topbar{flex:0 0 56px;height:56px;z-index:8;padding-inline:22px}
+.app-shell.interactive-mode>.workspace{position:relative;flex:1 1 0;min-height:0;width:100%;max-width:none;margin:0;padding:0;display:block;overflow:hidden}
+.app-shell.interactive-mode .map-column{position:absolute;inset:0;display:block!important;min-height:0;height:100%;padding:0;overflow:hidden}
+.app-shell.interactive-mode .map-toolbar{display:none}
+.app-shell.interactive-mode .map-card{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;box-shadow:none}
+.app-shell.interactive-mode .map-card-top{display:none}
+.app-shell.interactive-mode .map-stage.facility-stage{position:absolute;inset:0;width:100%;height:100%;min-height:0;max-height:none;margin:0;border:0;border-radius:0;background:#e8eee8}
+.app-shell.interactive-mode .tutorial-panel{position:absolute;z-index:5;left:18px;top:16px;width:min(310px,calc(100vw - 36px));max-height:calc(100% - 112px);overflow:auto;align-self:auto}
+.app-shell.interactive-mode .tutorial-panel .guide-card{padding:15px 17px;border-radius:15px;background:#fffef3f2;border:1px solid #dce4d8;box-shadow:0 10px 32px #30443725;color:#31473b;backdrop-filter:blur(12px)}
+.app-shell.interactive-mode .tutorial-panel .guide-card h2{min-height:0;margin:8px 0;font-size:21px;line-height:1.2;color:#274e3d}
+.app-shell.interactive-mode .tutorial-panel .guide-card>p{min-height:0;margin:8px 0;font-size:12px;line-height:1.5;color:#637469}
+.app-shell.interactive-mode .tutorial-panel .guide-progress{display:block;height:4px;margin:7px 0;background:#e6ece3}.app-shell.interactive-mode .tutorial-panel .guide-card-top .eyebrow{font-size:9px;color:#778d7e}
+.app-shell.interactive-mode .tutorial-panel .tutorial-status{min-height:0;padding:9px 10px;background:#edf4e9;border-left:3px solid #77ad8d;color:#45644e;font-size:11px}
+.app-shell.interactive-mode .tutorial-panel .tutorial-details{margin-top:8px;font-size:10px;color:#718179}.app-shell.interactive-mode .tutorial-panel .tutorial-details summary{min-height:28px;color:#5b7865}.app-shell.interactive-mode .tutorial-panel .tutorial-ingress{font-size:10px;color:#718179}
+.app-shell.interactive-mode .tutorial-panel .guide-footer{margin-top:10px;padding-top:10px;border-top:1px solid #e7ece2}.app-shell.interactive-mode .tutorial-panel .guide-footer>div{flex-direction:row;align-items:center;gap:8px}.app-shell.interactive-mode .tutorial-panel .guide-footer .primary-action{min-height:38px;font-size:12px}.app-shell.interactive-mode .tutorial-panel .guide-skip{display:inline-flex;font-size:10px;color:#708078}
+.app-shell.interactive-mode .experience-toolbar{position:absolute;z-index:6;left:50%;bottom:13px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);min-height:48px;display:flex;align-items:center;gap:10px;padding:6px 13px;border:1px solid #dce4d8;border-radius:15px;background:#fffef1ed;color:#456251;box-shadow:0 6px 22px #263c2d2d;backdrop-filter:blur(14px)}
+.app-shell.interactive-mode .experience-toolbar .main-control,.app-shell.interactive-mode .experience-toolbar .primary-action{min-height:36px;border-radius:9px}.app-shell.interactive-mode .experience-toolbar .speed-options button{background:#f3f5ed;border-color:#e0e7db;color:#66776b}.app-shell.interactive-mode .experience-toolbar .speed-options button.active{background:#e1eee2;border-color:#b5d1b7;color:#33654a}.app-shell.interactive-mode .experience-toolbar .experience-clock{color:#47664f}.app-shell.interactive-mode .experience-toolbar .experience-clock small{color:#809084}
+.app-shell.interactive-mode>.bottom-bar{display:none}.app-shell.interactive-mode .side-column{display:none}
+.app-shell.interactive-mode .focus-context{position:absolute;z-index:5;right:14px;top:14px;max-width:300px;background:#fffef2e8;border:1px solid #dfe6db;border-radius:12px;color:#435a4d;box-shadow:0 4px 15px #293d3220}
+@media(max-width:850px){.app-shell.interactive-mode .topbar{flex-basis:46px;height:46px;padding-inline:12px}.app-shell.interactive-mode .tutorial-panel{left:10px;top:10px;width:min(280px,calc(100vw - 20px));max-height:calc(100% - 90px)}.app-shell.interactive-mode .tutorial-panel .guide-card{padding:11px 12px}.app-shell.interactive-mode .tutorial-panel .guide-card h2{font-size:17px}.app-shell.interactive-mode .tutorial-panel .guide-card>p{font-size:11px}.app-shell.interactive-mode .tutorial-panel .tutorial-ingress{display:none}.app-shell.interactive-mode .experience-toolbar{bottom:7px;gap:5px;padding:4px 7px;min-height:42px}.app-shell.interactive-mode .experience-toolbar .speed-options{gap:2px}.app-shell.interactive-mode .experience-toolbar .speed-options button{min-width:28px;padding:3px;font-size:9px}.app-shell.interactive-mode .experience-toolbar .primary-follow{padding-inline:7px;font-size:10px}.app-shell.interactive-mode .three-controls{top:7px;right:7px;gap:2px;padding:3px}.app-shell.interactive-mode .three-controls button{width:30px;height:30px}.app-shell.interactive-mode .three-scene-key{left:7px;bottom:58px;gap:7px;padding:6px 8px;font-size:8px}}
+@media(max-width:480px){.app-shell.interactive-mode .topbar{flex-basis:42px;height:42px}.app-shell.interactive-mode .topbar-center,.app-shell.interactive-mode .avatar{display:none}.app-shell.interactive-mode .brand{min-width:0}.app-shell.interactive-mode .brand b{font-size:12px}.app-shell.interactive-mode .brand small{font-size:6px}.app-shell.interactive-mode .topbar-actions{min-width:0}.app-shell.interactive-mode .quiet-button{height:28px;padding-inline:7px;font-size:9px}.app-shell.interactive-mode .tutorial-panel{width:min(260px,calc(100vw - 20px));max-height:calc(100% - 88px)}.app-shell.interactive-mode .tutorial-panel .guide-progress,.app-shell.interactive-mode .tutorial-panel .tutorial-details{display:none}.app-shell.interactive-mode .tutorial-panel .guide-card-top{margin-bottom:3px}.app-shell.interactive-mode .tutorial-panel .guide-card h2{margin:5px 0;font-size:16px}.app-shell.interactive-mode .tutorial-panel .guide-card>p{margin:5px 0;font-size:10px}.app-shell.interactive-mode .tutorial-panel .tutorial-status{padding:6px 8px;font-size:10px}.app-shell.interactive-mode .tutorial-panel .guide-footer{margin-top:6px;padding-top:6px}.app-shell.interactive-mode .tutorial-panel .guide-footer .primary-action{min-height:34px;font-size:11px}.app-shell.interactive-mode .tutorial-panel .guide-skip{display:none}.app-shell.interactive-mode .experience-toolbar{bottom:5px;max-width:calc(100% - 10px);min-height:38px;padding:3px 5px}.app-shell.interactive-mode .experience-toolbar .main-control{min-height:30px;padding-inline:6px;font-size:9px}.app-shell.interactive-mode .experience-toolbar .speed-options button{min-width:24px;font-size:8px}.app-shell.interactive-mode .three-controls select{max-width:55px;font-size:9px}}
+.welcome-vignette:has(+ .welcome-content){background:linear-gradient(90deg,#17231efc 0%,#17231ee8 21%,#17231ea3 35%,#17231e28 55%,transparent 73%),linear-gradient(0deg,#17231e55 0%,transparent 38%)}
+.app-shell.interactive-mode .map-toolbar{display:block;position:absolute;inset:0 0 auto;height:0;margin:0;z-index:7;pointer-events:none}
+.app-shell.interactive-mode .map-toolbar>div:first-child{display:none}
+.app-shell.interactive-mode .map-toolbar .toolbar-right{position:absolute;top:10px;right:14px;pointer-events:auto}
+.app-shell.interactive-mode .map-toolbar .focus-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-color:#d5e0d4;border-radius:11px;background:#fffef1ed;color:#456251;box-shadow:0 5px 18px #263c2d22;font-size:13px}
+.app-shell.interactive-mode .tutorial-panel .guide-card>p{font-size:15px;line-height:1.5}
+.app-shell.interactive-mode .tutorial-panel .tutorial-status{font-size:14px;line-height:1.45}
+.app-shell.interactive-mode .tutorial-panel .guide-footer .primary-action{min-height:46px;padding-inline:14px;font-size:14px}
+.app-shell.interactive-mode .three-controls button,.app-shell.interactive-mode .three-floor-controls button{min-width:44px;width:44px;height:44px;font-size:18px}
+.app-shell.interactive-mode .three-controls select{min-height:44px;font-size:13px}
+.welcome-shell{background:#e8eee5}.welcome-vignette:has(+ .welcome-content){background:linear-gradient(90deg,#f2f5e9f7 0%,#f2f5e9f2 22%,#f2f5e9bd 34%,#f2f5e942 43%,transparent 53%),linear-gradient(0deg,#f2f5e955 0%,transparent 35%)}
+.welcome-content h1,.welcome-brand b{color:#26483b}.welcome-content h1 em{color:#43876c}.welcome-content>p{color:#526b5d}.welcome-kicker,.welcome-brand small,.welcome-tags,.welcome-foot,.welcome-side-note{color:#627a6a}.welcome-tags b,.welcome-side-note b{color:#355f49}.welcome-content .welcome-cta .primary-action{min-height:48px;background:#378b70;border-color:#378b70;color:white}
+@media(max-width:850px){.app-shell.interactive-mode .map-toolbar .toolbar-right{top:6px;right:8px}.app-shell.interactive-mode .tutorial-panel .guide-card>p{font-size:15px}.app-shell.interactive-mode .three-controls button,.app-shell.interactive-mode .three-floor-controls button{width:44px;height:44px;min-width:44px}.app-shell.interactive-mode .experience-toolbar{min-height:48px}.app-shell.interactive-mode .experience-toolbar .main-control,.app-shell.interactive-mode .experience-toolbar .primary-action{min-height:44px;font-size:12px}}
+@media(max-width:480px){.app-shell.interactive-mode .tutorial-panel .guide-card>p{font-size:15px}.app-shell.interactive-mode .tutorial-panel .guide-footer .primary-action{min-height:46px;font-size:13px}.app-shell.interactive-mode .three-controls button{width:44px;height:44px}.app-shell.interactive-mode .map-toolbar .focus-toggle{min-height:44px}}
+.app-shell.interactive-mode .map-toolbar .toolbar-right{top:66px}
+.brand small{font-size:10px;letter-spacing:.055em;color:#627d6d}.welcome-brand small{font-size:12px;letter-spacing:.075em;color:#557663}
+.app-shell.interactive-mode .brand small{font-size:9px;letter-spacing:.045em;color:#627d6d}
+@media(max-width:600px){.app-shell.interactive-mode .camera-actions>div{position:fixed!important;left:auto!important;right:clamp(8px,3vw,16px)!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom))!important;width:min(230px,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - 104px)!important;overflow:auto;z-index:90}.app-shell.interactive-mode .brand small{font-size:9px;letter-spacing:.04em}}
+
+/* On phones, reserve a real camera viewport above the mission instead of covering its controls. */
+@media(max-width:850px){
+ .app-shell.interactive-mode .tutorial-panel{top:auto;bottom:78px;left:10px;right:10px;width:auto;max-width:none;max-height:252px}
+ .app-shell.interactive-mode:has(.tutorial-panel) .three-scene-host{bottom:330px}
+ .app-shell.interactive-mode:has(.tutorial-panel) .three-fallback-shell .map-stage.facility-stage{inset:0 0 330px;height:calc(100% - 330px)!important;min-height:0!important;max-height:none!important}
+ .app-shell.interactive-mode .three-scene-key{display:none}
+ .app-shell.interactive-mode .tutorial-panel .guide-card{padding:10px 13px}
+ .app-shell.interactive-mode .tutorial-panel .guide-card>p{font-size:15px;line-height:1.4;margin:6px 0}
+ .app-shell.interactive-mode .tutorial-panel .guide-card h2{font-size:18px;margin:5px 0;line-height:1.2}
+ .app-shell.interactive-mode .tutorial-panel .guide-card-top{margin-bottom:3px}
+ .app-shell.interactive-mode .tutorial-panel .tutorial-status{font-size:13px;padding:6px 9px;min-height:0}
+ .app-shell.interactive-mode .tutorial-panel .tutorial-details,.app-shell.interactive-mode .tutorial-panel .guide-progress,.app-shell.interactive-mode .tutorial-panel .tutorial-ingress{display:none}
+ .app-shell.interactive-mode .tutorial-panel .guide-footer{padding-top:7px;margin-top:7px}
+ .welcome-backdrop .app-shell.interactive-mode .three-scene-host{inset:0!important}
+}
+@media(max-width:480px){
+ .app-shell.sandbox-mode .map-toolbar .sidebar-toggle{display:inline-flex}
+ .welcome-backdrop .app-shell.interactive-mode .three-scene-host{inset:0 0 auto!important;height:40dvh}
+ .welcome-shell .welcome-content{position:absolute;margin:0;align-self:auto;top:42dvh;bottom:auto;left:22px;right:22px;width:auto;transform:none;padding:0}
+ .welcome-shell .welcome-content h1{font-size:32px;line-height:1.18;margin:17px 0 13px}
+ .welcome-shell .welcome-content>p{font-size:13px;line-height:1.6;margin:0 0 16px}
+ .welcome-shell .welcome-brand b{font-size:21px}.welcome-shell .welcome-kicker{display:none}
+ .welcome-shell .welcome-tags{margin-top:16px}.welcome-shell .welcome-side-note{display:none}
+ .welcome-shell .welcome-vignette:has(+ .welcome-content){background:linear-gradient(0deg,#f2f5e9 0%,#f2f5e9 55%,#f2f5e955 70%,transparent 85%)}
+}
+
+/* Short landscape keeps the mission beside the live facility. */
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.interactive-mode{--landscape-mission-width:min(290px,calc(100vw - 20px))}
+ .app-shell.interactive-mode .tutorial-panel{top:8px;bottom:58px;left:10px;right:auto;width:var(--landscape-mission-width);max-width:none;max-height:none;overflow:auto;overscroll-behavior:contain}
+ .app-shell.interactive-mode:has(.tutorial-panel) .three-scene-host{inset:0 0 56px calc(var(--landscape-mission-width) + 20px)!important}
+ .app-shell.interactive-mode:has(.tutorial-panel) .three-fallback-shell .map-stage.facility-stage{inset:0 0 56px calc(var(--landscape-mission-width) + 20px)!important;width:auto!important;height:auto!important;min-height:0!important;max-height:none!important}
+ .app-shell.interactive-mode .tutorial-panel .guide-card{padding:9px 11px}
+ .app-shell.interactive-mode .tutorial-panel .guide-card h2{font-size:17px;margin:4px 0}
+ .app-shell.interactive-mode .tutorial-panel .tutorial-details,.app-shell.interactive-mode .tutorial-panel .guide-progress,.app-shell.interactive-mode .tutorial-panel .tutorial-ingress{display:none}
+ .app-shell.interactive-mode .tutorial-panel .guide-footer{margin-top:6px;padding-top:6px}
+ .app-shell.interactive-mode .experience-toolbar{bottom:6px}
+ .welcome-backdrop .app-shell.interactive-mode .three-scene-host{inset:0!important}
+}
+
+/* Light cleanroom surfaces need their own foregrounds, including inherited disclosures. */
+.sandbox-mode .request-id{color:#2d5648}.sandbox-mode .request-route{color:#50695c}.sandbox-mode .request-phase{color:#536b5e}
+.sandbox-mode .policy-details>summary,.sandbox-mode .kpi-details>summary,.sandbox-mode .sandbox-settings>summary{color:#365b49}
+.sandbox-mode .sandbox-settings>summary span{color:#536b5a}.sandbox-mode .sandbox-settings>summary b{color:#345744}
+.sandbox-mode .transport-strip .muted,.sandbox-mode .map-legend{color:#64796b}.sandbox-mode .policy-badge{background:#e2efe1;color:#355a43;padding:5px 8px;border-radius:7px;font-size:11px}
+.welcome-backdrop .map-stage.facility-stage{opacity:1!important}.welcome-backdrop .map-toolbar{display:none!important}
+
+/* An open camera menu stays above transient messages and uses the game palette. */
+.app-shell.interactive-mode .experience-toolbar:has(.camera-actions[open]){z-index:40}
+.camera-actions>div{background:#fffef3;border-color:#d7e1d4;box-shadow:0 10px 28px #263c2d2d}
+.camera-actions>div>button,.camera-actions>summary{background:#f4f7ed;border-color:#d7e1d4;color:#355f49}
+
+/* Sandbox: one full-width facility with a compact HUD; experiments live in one drawer. */
+.app-shell.sandbox-mode{display:flex;height:100dvh;min-height:0;flex-direction:column;overflow:hidden;background:#e9eee7}
+.app-shell.sandbox-mode>.topbar{z-index:10;flex:0 0 54px;height:54px;padding-inline:clamp(12px,2vw,24px)}
+.app-shell.sandbox-mode>.workspace{position:relative;flex:1 1 0;display:block;width:100%;max-width:none;min-height:0;margin:0;padding:8px clamp(10px,1.5vw,22px) 10px;overflow:hidden}
+.app-shell.sandbox-mode .map-column{position:relative;display:flex;width:100%;height:100%;min-height:0;flex-direction:column;gap:6px;overflow:hidden}
+.app-shell.sandbox-mode .map-toolbar{flex:0 0 auto;min-height:38px;margin:0;align-items:center}
+.app-shell.sandbox-mode .map-toolbar h1{margin-top:1px;font-size:17px}
+.app-shell.sandbox-mode .map-toolbar .eyebrow{font-size:8px}
+.app-shell.sandbox-mode .toolbar-right{gap:5px}
+.app-shell.sandbox-mode .view-switch{gap:1px;margin-left:0;padding:2px;background:#f3f5ed}
+.app-shell.sandbox-mode .view-switch button{padding:4px 7px;color:#607468;font-size:9px}
+.app-shell.sandbox-mode .view-switch button.active{background:#dcece0;color:#286146}
+.app-shell.sandbox-mode .sidebar-toggle,.app-shell.sandbox-mode .focus-toggle{min-height:34px;padding:0 10px;border:1px solid #d2ddd2;border-radius:8px;background:#fffef1;color:#3e6351;font-size:11px}
+.app-shell.sandbox-mode .sandbox-hud-kpis{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid #d8e1d7;border-radius:10px;background:#d8e1d7;box-shadow:0 2px 8px #3144390b}
+.app-shell.sandbox-mode .sandbox-hud-kpis .stat{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;background:#fffef9}
+.app-shell.sandbox-mode .sandbox-hud-kpis .stat>span{overflow:hidden;color:#718178;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+.app-shell.sandbox-mode .sandbox-hud-kpis .stat strong{color:#2e5645;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.app-shell.sandbox-mode .sandbox-hud-kpis .stat small{margin-left:3px;color:#78877d;font-size:9px;font-weight:550}
+.app-shell.sandbox-mode .map-card{position:relative;display:flex;flex:1 1 0;min-height:0;flex-direction:column;margin:0;padding:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
+.app-shell.sandbox-mode .map-card-top,.app-shell.sandbox-mode .map-bottom,.app-shell.sandbox-mode>.bottom-bar{display:none}
+.app-shell.sandbox-mode .map-stage.facility-stage{position:relative;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;margin:0;border:1px solid #d7e0d6;border-radius:12px;background:#e8eee8;box-shadow:0 6px 18px #30443712}
+.app-shell.sandbox-mode .map-stage.facility-stage>.fab-map{position:absolute;inset:0;width:100%;height:100%}
+.app-shell.sandbox-mode .map-legend{flex:0 0 25px;height:25px;gap:16px;padding-inline:8px;border:0;color:#607469;font-size:9px}
+.app-shell.sandbox-mode .three-scene-key{display:none}
+.app-shell.sandbox-mode .sandbox-playback{position:absolute;z-index:6;left:50%;bottom:83px;display:flex;align-items:center;gap:6px;width:max-content;max-width:calc(100% - 20px);padding:6px 8px;transform:translateX(-50%);border:1px solid #d4dfd5;border-radius:12px;background:#fffef1ed;box-shadow:0 6px 20px #30443724;backdrop-filter:blur(10px)}
+.app-shell.sandbox-mode .sandbox-playback-clock{padding:0 4px;color:#395948;font-size:12px;font-variant-numeric:tabular-nums}
+.app-shell.sandbox-mode .sandbox-playback .main-control{flex:0 0 auto;min-width:88px;min-height:38px;border-radius:8px;font-size:12px}
+.app-shell.sandbox-mode .sandbox-playback .speed-options{gap:2px;margin:0}
+.app-shell.sandbox-mode .sandbox-playback .speed-options button{min-width:34px;min-height:36px;padding:0 5px;font-size:11px}
+.app-shell.sandbox-mode .sandbox-reset{display:grid;width:36px;height:36px;place-items:center;border:1px solid #dce4d9;border-radius:8px;background:#f7f7ef;color:#53685d}
+.app-shell.sandbox-mode .sandbox-reset:hover{background:#edf4e9;color:#286146}
+.app-shell.sandbox-mode .transport-strip{z-index:5;flex:0 0 auto;max-height:61px;min-height:48px;margin:0;padding:5px 9px;overflow:hidden;border-radius:10px;background:#fffef9}
+.app-shell.sandbox-mode .transport-strip .strip-heading{display:none}
+.app-shell.sandbox-mode .transport-strip .request-list{height:100%;align-items:center;gap:6px;overflow-x:auto;overflow-y:hidden;padding:0}
+.app-shell.sandbox-mode .transport-strip .request-chip{min-width:172px;grid-template-rows:11px 11px;padding:5px 7px}
+.app-shell.sandbox-mode .transport-strip .empty-requests{padding:4px 7px;color:#63786c;font-size:10px}
+.app-shell.sandbox-mode .side-column{position:absolute;z-index:12;top:62px;right:clamp(10px,1.5vw,22px);bottom:10px;display:grid;width:min(430px,calc(100% - 20px));height:auto;min-height:0;align-content:start;gap:9px;overflow:auto;overscroll-behavior:contain;padding:10px;border:1px solid #d4dfd4;border-radius:14px;background:#f5f6efed;box-shadow:0 18px 48px #24392d30;backdrop-filter:blur(12px)}
+.app-shell.sandbox-mode.sidebar-collapsed .side-column{display:none}
+.app-shell.sandbox-mode .side-column>.panel{margin:0;border-radius:10px;box-shadow:0 2px 10px #3044370c}
+.app-shell.sandbox-mode .side-column .control-panel .transport-controls,.app-shell.sandbox-mode .side-column .control-panel .speed-row{display:none}
+.app-shell.sandbox-mode .focus-context:not(.expanded){display:none}
+.app-shell.sandbox-mode .map-column:is(:fullscreen,.focus-mode:not(:fullscreen)){position:fixed;inset:0;z-index:1000;width:100vw;height:100dvh;padding:10px 14px 12px;background:#e9eee7}
+.app-shell.sandbox-mode .map-column:is(:fullscreen,.focus-mode) .sandbox-playback{position:absolute;flex:none}
+
+@media(max-width:850px){
+ .app-shell.sandbox-mode>.topbar{flex-basis:46px;height:46px;padding-inline:12px}
+ .app-shell.sandbox-mode>.workspace{padding:6px 9px 8px}
+ .app-shell.sandbox-mode .map-column{gap:4px}
+ .app-shell.sandbox-mode .map-toolbar{min-height:35px;flex-wrap:wrap;row-gap:4px}
+ .app-shell.sandbox-mode .map-toolbar>.toolbar-right{width:100%;justify-content:flex-end}
+ .app-shell.sandbox-mode .map-toolbar h1{font-size:15px}
+ .app-shell.sandbox-mode .toolbar-right{gap:3px}
+ .app-shell.sandbox-mode .toolbar-right{flex-wrap:wrap;justify-content:flex-end}
+ .app-shell.sandbox-mode .view-switch button{padding:4px 5px;font-size:8px}
+ .app-shell.sandbox-mode .sidebar-toggle,.app-shell.sandbox-mode .focus-toggle{min-height:32px;padding-inline:7px;font-size:10px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat{gap:3px;padding:5px 7px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat>span{font-size:9px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat strong{font-size:15px}
+ .app-shell.sandbox-mode .map-legend{flex-basis:22px;height:22px;gap:9px;padding-inline:4px;font-size:8px}
+ .app-shell.sandbox-mode .sandbox-playback{bottom:76px;gap:4px;padding:5px}
+ .app-shell.sandbox-mode .sandbox-playback .main-control{min-width:78px;min-height:36px;font-size:11px}
+ .app-shell.sandbox-mode .sandbox-playback .speed-options button{min-width:29px;min-height:34px}
+ .app-shell.sandbox-mode .sandbox-reset{width:34px;height:34px}
+ .app-shell.sandbox-mode .transport-strip{max-height:53px;min-height:44px;padding:4px 6px}
+ .app-shell.sandbox-mode .side-column{top:52px;right:9px;bottom:8px;width:min(410px,calc(100% - 18px));padding:8px}
+}
+@media(max-width:480px){
+ .app-shell.sandbox-mode .topbar-center,.app-shell.sandbox-mode .avatar{display:none}
+ .app-shell.sandbox-mode .topbar-actions{min-width:0;gap:2px}
+ .app-shell.sandbox-mode .quiet-button{height:30px;padding-inline:7px;font-size:10px}
+ .app-shell.sandbox-mode .map-toolbar>div:first-child{min-width:0}
+ .app-shell.sandbox-mode .map-toolbar h1{max-width:37vw;overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+ .app-shell.sandbox-mode .map-toolbar .eyebrow{font-size:7px}
+ .app-shell.sandbox-mode .toolbar-right{flex:0 0 auto}
+ .app-shell.sandbox-mode .floor-switch{padding:2px}
+ .app-shell.sandbox-mode .floor-switch button{padding:4px 6px;font-size:9px}
+ .app-shell.sandbox-mode .icon-button{height:30px;padding-inline:6px;font-size:9px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat{display:block;padding:4px 5px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat>span{display:block;font-size:8px;line-height:1.2}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat strong{display:block;font-size:14px;line-height:1.3}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat small{font-size:8px}
+ .app-shell.sandbox-mode .sandbox-playback{bottom:72px;max-width:calc(100% - 10px);gap:3px;padding:4px}
+ .app-shell.sandbox-mode .sandbox-playback-clock{font-size:10px}
+ .app-shell.sandbox-mode .sandbox-playback .main-control{min-width:68px;min-height:34px;gap:4px;padding-inline:6px;font-size:10px}
+ .app-shell.sandbox-mode .sandbox-playback .speed-options button{min-width:26px;min-height:32px;padding-inline:2px;font-size:9px}
+ .app-shell.sandbox-mode .sandbox-reset{width:31px;height:32px}
+ .app-shell.sandbox-mode .map-legend{justify-content:center;gap:7px;font-size:7px}
+ .app-shell.sandbox-mode .transport-strip .request-chip{min-width:150px}
+ .app-shell.sandbox-mode .side-column{top:49px;bottom:7px;right:7px;width:calc(100% - 14px)}
+}
+
+/* Sandbox HUD overlays the world; the scene retains the full camera viewport. */
+.app-shell.sandbox-mode>.workspace{position:relative;padding:0;overflow:hidden}
+.app-shell.sandbox-mode .map-column{position:absolute;inset:0;display:block;gap:0;padding:0}
+.app-shell.sandbox-mode .map-card{position:absolute;inset:0;display:block;overflow:hidden}
+.app-shell.sandbox-mode .map-stage.facility-stage{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:0;box-shadow:none}
+.app-shell.sandbox-mode .map-toolbar{position:absolute;z-index:8;top:12px;left:14px;right:14px;pointer-events:none}
+.app-shell.sandbox-mode .map-toolbar .toolbar-right{pointer-events:auto}
+.app-shell.sandbox-mode .sandbox-hud-kpis{position:absolute;z-index:6;top:64px;left:14px;width:min(620px,calc(100% - 28px))}
+.app-shell.sandbox-mode .sandbox-hud-kpis .stat>span{font-size:12px}
+.app-shell.sandbox-mode .three-controls{top:65px;right:14px}
+.app-shell.sandbox-mode .three-floor-controls{top:120px}
+.app-shell.sandbox-mode .map-legend{display:none}
+.app-shell.sandbox-mode .three-scene-key{display:flex;bottom:132px;font-size:11px}
+.app-shell.sandbox-mode .transport-strip{position:absolute;left:12px;right:12px;bottom:10px;display:block}
+.app-shell.sandbox-mode .focus-context.expanded{position:absolute;z-index:7;left:auto;right:14px;bottom:145px;width:min(460px,calc(100% - 28px));background:#fffef3ed}
+.app-shell.sandbox-mode .focus-transport-info>summary>span{color:#245d4b}
+.app-shell.sandbox-mode .focus-transport-info>summary>b{color:#745b21}
+.app-shell.sandbox-mode .focus-transport-info>div,.app-shell.sandbox-mode .focus-quick-controls span,.app-shell.sandbox-mode .focus-request-switch>summary{color:#365b4b}
+.app-shell.sandbox-mode .focus-transport-info>div small{color:#596f62}
+@media(min-width:851px){.app-shell.sandbox-mode:has(.three-inventory-note) .focus-context.expanded{bottom:310px}}
+.app-shell.sandbox-mode .notice{left:14px;bottom:170px;transform:none;max-width:min(320px,calc(100vw - 28px))}
+.app-shell.sandbox-mode:has(.three-fallback-shell) .map-legend{position:absolute;z-index:6;left:14px;bottom:135px;display:flex;background:#fffef3ed}
+@media(max-width:850px){
+ .app-shell.sandbox-mode .map-toolbar{top:6px;left:10px;right:10px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis{top:105px;left:10px;right:10px;width:auto}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat>span{font-size:11px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis .stat strong{font-size:16px}
+ .app-shell.sandbox-mode .three-controls{top:158px;right:10px}
+ .app-shell.sandbox-mode .three-floor-controls{top:212px}
+ .app-shell.sandbox-mode .three-scene-key{bottom:132px;left:10px;font-size:10px}
+ .app-shell.sandbox-mode .sandbox-playback .main-control{min-height:44px}
+ .app-shell.sandbox-mode .sandbox-playback .speed-options button{min-width:44px;min-height:44px}
+ .app-shell.sandbox-mode .sandbox-reset{width:44px;height:44px}
+ .app-shell.sandbox-mode .sandbox-playback-clock{padding:0 2px;font-size:10px}
+ .app-shell.sandbox-mode .side-column{top:54px;bottom:140px}
+ .app-shell.sandbox-mode .focus-context.expanded{left:10px;right:auto;top:212px;bottom:auto;width:min(280px,calc(100% - 20px))}
+}
+@media(max-width:480px){
+ .app-shell.sandbox-mode .map-toolbar>div:first-child{display:none}
+ .app-shell.sandbox-mode .map-toolbar .toolbar-right{width:100%;min-height:44px}
+ .app-shell.sandbox-mode .sandbox-hud-kpis{top:61px}
+ .app-shell.sandbox-mode .three-controls{top:114px}
+ .app-shell.sandbox-mode .three-floor-controls{top:168px}
+ .app-shell.sandbox-mode .sandbox-playback-clock{font-size:9px}
+ .app-shell.sandbox-mode .focus-context.expanded{top:168px}
+}
+
+/* Override legacy phone map heights and keep one visible tracking control. */
+.app-shell.sandbox-mode .map-stage.facility-stage{height:100%!important;min-height:0!important;max-height:none!important;inset:0!important;margin:0!important}
+.app-shell.sandbox-mode .experience-toolbar{position:absolute!important;z-index:6;left:14px;bottom:174px;display:flex;width:max-content;max-width:calc(100% - 28px);min-height:44px!important;gap:5px;padding:4px 6px!important;border:1px solid #d4dfd5;border-radius:10px;background:#fffef1ed;box-shadow:0 5px 16px #30443718}
+.app-shell.sandbox-mode .experience-toolbar .primary-follow,.app-shell.sandbox-mode .camera-actions>summary{min-height:44px;padding:0 10px;border:0;border-radius:7px;background:#eff5e9;color:#355f49;font-size:12px}
+.app-shell.sandbox-mode .three-controls button[aria-label="선택 OHT 따라가기"]{display:none}
+.app-shell.sandbox-mode .notice{bottom:240px}
+.app-shell.sandbox-mode .experience-toolbar:has(.camera-actions[open]){z-index:40}
+@media(max-width:480px){.app-shell.sandbox-mode .experience-toolbar{left:10px;bottom:174px}.app-shell.sandbox-mode .experience-toolbar .primary-follow,.app-shell.sandbox-mode .camera-actions>summary{font-size:11px}}
+.app-shell.sandbox-mode .three-fallback-shell{position:absolute;inset:0;min-height:0}
+.app-shell.sandbox-mode .three-fallback-shell>.three-status{position:absolute;z-index:5;top:auto;left:12px;bottom:230px;max-width:min(320px,calc(100% - 24px));margin:0;transform:none;font-size:12px;pointer-events:none}
+.app-shell.sandbox-mode .facility-desktop-controls{left:14px;right:auto;top:120px;z-index:7}
+@media(max-width:850px){.app-shell.sandbox-mode .facility-desktop-controls{top:158px}}
+@media(max-width:600px){
+ .app-shell.sandbox-mode .facility-mobile-controls{position:absolute;top:158px;right:10px;z-index:7;display:flex;align-items:center;justify-content:flex-end;gap:6px;min-height:44px;height:44px;padding:0}
+ .app-shell.sandbox-mode .facility-mobile-controls>span{display:none}
+ .app-shell.sandbox-mode .facility-mobile-controls button{width:44px;min-width:44px;height:44px;min-height:44px}
+}
+
+@media(max-width:480px){.app-shell.sandbox-mode .facility-mobile-controls{top:114px}}
+
+/* Scheduled Stress ingress is an actionable world HUD, above the canvas. */
+.app-shell.sandbox-mode .stress-lead-in{position:absolute;z-index:7;left:14px;bottom:260px;width:min(370px,calc(100% - 28px));margin:0;padding:12px 14px;display:flex;align-items:flex-start;flex-direction:column;gap:10px;border-color:#cbdcc9;background:#fffef1f5;color:#315344;box-shadow:0 5px 18px #30443720}
+.app-shell.sandbox-mode .stress-lead-in .eyebrow{color:#527760}
+.app-shell.sandbox-mode .stress-lead-in b{font-size:13px}
+.app-shell.sandbox-mode .stress-lead-in b small,.app-shell.sandbox-mode .stress-lead-in p{color:#5b6f61;font-size:12px}
+.app-shell.sandbox-mode .stress-lead-in .primary-action{min-height:44px;font-size:13px}
+@media(max-width:480px){.app-shell.sandbox-mode .stress-lead-in{left:10px;bottom:245px;width:calc(100% - 20px);padding:10px 12px}}
+.app-shell.sandbox-mode .three-inventory-note{position:absolute;z-index:7;right:14px;bottom:174px;display:grid;gap:4px;width:max-content;max-width:min(300px,calc(100% - 28px));padding:7px 9px;border:1px solid #d5dfd3;border-radius:9px;background:#fffef1ed;color:#435b4c;box-shadow:0 4px 14px #30443718;font-size:12px;line-height:1.35;pointer-events:none}
+.app-shell.sandbox-mode .three-inventory-note strong{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+@media(max-width:480px){.app-shell.sandbox-mode .three-inventory-note{right:10px;bottom:174px;width:max-content;max-width:calc(50% - 18px);padding:6px 7px;font-size:12px}.app-shell.sandbox-mode .three-inventory-note strong{font-size:12px}}
+@media(max-width:480px){.app-shell.sandbox-mode .notice{top:220px;bottom:auto;left:10px;max-width:calc(100% - 84px)}}
+.app-shell.sandbox-mode:has(>.modal-scrim)>.notice,.app-shell.interactive-mode:has(>.modal-scrim)>.notice{top:auto;left:14px;right:14px;bottom:16px;width:max-content;max-width:calc(100% - 28px);transform:none}
+
+/* V3.1 fresh-run setup and demand HUD. */
+.app-shell.sandbox-mode .sandbox-hud-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.app-shell.sandbox-mode .sandbox-demand-live .stat{min-height:48px}
+.app-shell.sandbox-mode .sandbox-demand-live .stat strong{font-size:15px}
+.sandbox-setup-card{position:absolute;z-index:9;top:50%;left:50%;display:flex;width:min(440px,calc(100% - 28px));flex-direction:column;gap:9px;padding:20px 22px;transform:translate(-50%,-50%);border:1px solid #d6e2d3;border-radius:16px;background:#fffef3f2;color:#2c493b;box-shadow:0 16px 46px #263b2b36;backdrop-filter:blur(14px)}
+.sandbox-setup-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.sandbox-setup-heading .eyebrow{font-size:9px;letter-spacing:.09em}.setup-ready-dot{display:flex;align-items:center;gap:6px;color:#527a5e;font-size:9px;font-weight:800;letter-spacing:.08em}.setup-ready-dot:before{width:7px;height:7px;border-radius:50%;background:#69ad74;content:"";box-shadow:0 0 7px #69ad7466}
+.sandbox-setup-card h2{margin:0;color:#294d3b;font-size:23px;letter-spacing:-.03em}.sandbox-setup-context{margin:0;color:#65786a;font-size:12px}.sandbox-demand-setting{display:grid;gap:8px;margin-top:5px;padding:12px 13px;border:1px solid #e2e9dd;border-radius:10px;background:#f8f9f1}.sandbox-demand-setting>span:first-child{display:flex;justify-content:space-between;gap:12px;color:#647568;font-size:12px}.sandbox-demand-setting>span:first-child b{color:#2f654b;font-size:14px}.sandbox-demand-setting input{width:100%;accent-color:#39866a}.sandbox-demand-bounds{display:flex;justify-content:space-between;color:#879187;font-size:10px}.sandbox-setup-hint{margin:0;color:#718075;font-size:11px;line-height:1.45}.sandbox-start-action{min-height:46px;justify-content:center;margin-top:2px;font-size:14px}
+@media(max-width:850px){.app-shell.sandbox-mode .sandbox-demand-live .stat{min-height:44px}.app-shell.sandbox-mode .sandbox-demand-live .stat>span{font-size:9px}.app-shell.sandbox-mode .sandbox-demand-live .stat strong{font-size:13px}}
+@media(max-width:600px){.sandbox-setup-card{top:auto;bottom:62px;left:10px;width:auto;right:10px;gap:7px;padding:13px 14px;transform:none;border-radius:13px}.sandbox-setup-card h2{font-size:20px}.sandbox-setup-context{font-size:11px}.sandbox-demand-setting{gap:5px;margin-top:2px;padding:9px 10px}.sandbox-setup-hint{font-size:10px}.sandbox-start-action{min-height:44px}.app-shell.sandbox-mode .sandbox-hud-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sandbox-setup-fields{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:7px}.sandbox-setup-fields>label{display:grid;min-width:0;gap:4px;color:#647568;font-size:10px}.sandbox-setup-fields select,.sandbox-setup-fields input{width:100%;min-width:0;height:34px;padding:0 8px;border:1px solid #d8e1d5;border-radius:7px;background:#fff;color:#29473c;font-size:12px}.sandbox-demand-inputs{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:10px}.sandbox-demand-inputs input[type=number]{height:34px;padding:0 7px;border:1px solid #d8e1d5;border-radius:7px;background:#fff;color:#29473c;font-size:13px;text-align:center}.sandbox-demand-inputs input[type=range]{width:100%;accent-color:#39866a}
+@media(max-width:600px){.sandbox-setup-fields{grid-template-columns:1fr 1fr 1fr;gap:5px}.sandbox-setup-fields select,.sandbox-setup-fields input{height:32px;padding-inline:5px;font-size:11px}}
+.app-shell.sandbox-mode .sandbox-demand-cell{display:grid;min-width:0;gap:2px;padding:4px 10px;background:#fffef9}.sandbox-demand-cell>.stat{display:flex;min-height:0!important;padding:0!important;background:transparent!important}.sandbox-demand-cell>.stat>span{font-size:10px!important}.sandbox-demand-cell>.stat strong{font-size:14px!important}.sandbox-demand-config,.sandbox-demand-pressure-label{overflow:hidden;color:#667a6b;font-size:9px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.sandbox-demand-config{color:#376d55;font-weight:700}.sandbox-demand-pressure{height:4px;overflow:hidden;border-radius:4px;background:#e7ece4}.sandbox-demand-pressure>span{display:block;height:100%;border-radius:inherit;background:#68a77a;transition:width .18s ease}.sandbox-demand-cell:has(.sandbox-demand-pressure-label:not(:empty)) .sandbox-demand-pressure>span{background:#68a77a}.app-shell.sandbox-mode .sandbox-demand-live .sandbox-demand-cell{justify-content:center}
+@media(max-width:850px){.app-shell.sandbox-mode .sandbox-demand-cell{padding:3px 7px}.app-shell.sandbox-mode .sandbox-demand-cell>.stat>span{font-size:8px!important}.app-shell.sandbox-mode .sandbox-demand-cell>.stat strong{font-size:12px!important}.sandbox-demand-config,.sandbox-demand-pressure-label{font-size:8px}}
+.app-shell.sandbox-mode .sandbox-hud-kpis{display:block!important;padding:0;overflow:hidden}.app-shell.sandbox-mode .sandbox-demand-live{display:grid!important;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;overflow:hidden;border-radius:9px;background:#d8e1d7}.app-shell.sandbox-mode .sandbox-demand-live>.stat{display:flex;min-width:0;min-height:48px;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;background:#fffef9}.app-shell.sandbox-mode .sandbox-demand-cell{display:grid;min-width:0;min-height:48px;align-content:center;gap:2px;padding:4px 10px;background:#fffef9}
+@media(max-width:600px){.app-shell.sandbox-mode .sandbox-demand-live{grid-template-columns:repeat(2,minmax(0,1fr))}.app-shell.sandbox-mode .sandbox-demand-live>.stat,.app-shell.sandbox-mode .sandbox-demand-cell{min-height:44px;padding:4px 7px}}
+.app-shell.sandbox-mode:has(.sandbox-setup-card) .side-column .control-panel .transport-controls{display:flex}
+@media(max-width:600px){.app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-hud-kpis,.app-shell.sandbox-mode:has(.sandbox-setup-card) .experience-toolbar,.app-shell.sandbox-mode:has(.sandbox-setup-card) .transport-strip{display:none!important}.sandbox-setup-card{bottom:14px}}
+/* V3.2 beginner preparation and measured demand progression. */
+.demand-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.demand-presets button{display:grid;gap:4px;min-height:64px;padding:9px 6px;border:1px solid #d4dfd0;border-radius:9px;background:#f6f8ee;color:#476152;text-align:left}.demand-presets button.selected{border-color:#3b8064;background:#e3f0dd;box-shadow:inset 0 0 0 1px #3b8064}.demand-presets b{font-size:12px;white-space:nowrap}.demand-presets small{font-size:10px;line-height:1.35}.sandbox-demand-summary{display:grid;gap:5px;margin:2px 0;padding:10px 12px;border-radius:9px;background:#edf3e6;color:#4e6654;font-size:11px;line-height:1.5}.sandbox-demand-summary b{font-size:13px;color:#315c47}.sandbox-manual{color:#4b6755;font-size:11px}.sandbox-manual summary{cursor:pointer;padding:5px 0}.sandbox-manual .text-button{min-height:34px}.sandbox-setup-card{width:min(490px,calc(100% - 28px));max-height:calc(100% - 32px);overflow-y:auto}.demand-progression{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 10px;background:#fffef4;color:#526e59;font-size:11px;line-height:1.4}.demand-progression button{flex-shrink:0;min-height:36px;padding:6px 10px;border:1px solid #bfd4b7;border-radius:7px;background:#e6efda;color:#315c47;font-size:11px;font-weight:700}.demand-progression button:disabled{opacity:.6;cursor:default}
+@media(max-width:600px){.sandbox-setup-card{width:auto;max-height:calc(100% - 26px);gap:6px}.demand-presets button{min-height:55px;padding:7px 5px}.demand-presets b{font-size:11px}.demand-presets small{font-size:9px}.sandbox-demand-summary{padding:7px 9px;font-size:10px}.sandbox-demand-summary b{font-size:11px}.demand-progression{gap:6px;padding:5px 7px;font-size:9px}.demand-progression button{max-width:145px;white-space:normal;font-size:10px;min-height:38px}}
+
+/* V3.3: one compact summary and a shared transport drawer. */
+.app-shell.sandbox-mode .map-toolbar>div:first-child{display:none}
+.app-shell.sandbox-mode .map-toolbar{justify-content:flex-end}
+.app-shell.sandbox-mode .toolbar-right{flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.app-shell.sandbox-mode .sidebar-toggle,.app-shell.sandbox-mode .focus-toggle{min-height:44px;font-size:12px}
+.app-shell.sandbox-mode .sandbox-hud-kpis{top:16px;width:300px;max-width:calc(100% - 28px);border-radius:12px;background:#fffef4;box-shadow:0 4px 16px #30443718}
+.app-shell.sandbox-mode .sandbox-demand-live{display:block!important;background:transparent;border-radius:0}
+.sandbox-experiment-summary{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:12px 14px 9px;color:#42624d}
+.sandbox-experiment-summary>strong{grid-column:1/-1;font-size:17px;color:#284d3b}
+.sandbox-experiment-summary>span{font-size:13px;align-self:center}
+.sandbox-experiment-summary>b{font-size:14px;color:#2d674c;font-variant-numeric:tabular-nums}
+.sandbox-summary-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 10px 10px;gap:4px}
+.app-shell.sandbox-mode .sandbox-summary-counts .stat{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:0;padding:3px;background:transparent}
+.app-shell.sandbox-mode .sandbox-summary-counts .stat>span{font-size:12px;color:#526858}
+.app-shell.sandbox-mode .sandbox-summary-counts .stat strong{font-size:23px;line-height:1.15}
+.app-shell.sandbox-mode .demand-progression{display:grid;gap:7px;padding:9px 14px;border-top:1px solid #e0e6d8;background:#f5f7eb;font-size:12px;line-height:1.5}
+.app-shell.sandbox-mode .demand-progression button{min-height:36px;max-width:none;text-align:left;font-size:12px}
+.app-shell.sandbox-mode .sandbox-playback{bottom:14px}
+.app-shell.sandbox-mode .experience-toolbar{bottom:76px}
+.app-shell.sandbox-mode .three-scene-key{bottom:130px}
+.app-shell.sandbox-mode .current-tr-panel{position:absolute;z-index:35;top:68px;right:14px;bottom:76px;width:min(350px,calc(100% - 28px));display:flex;flex-direction:column;overflow:hidden;visibility:hidden;transform:translateX(calc(100% + 20px));transition:transform .2s ease,visibility .2s;border:1px solid #c9d8c6;border-radius:12px;background:#fffef5;box-shadow:-5px 8px 24px #30443720;color:#304f3e}
+.app-shell.sandbox-mode .current-tr-panel.open{visibility:visible;transform:translateX(0)}
+.current-tr-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:14px;border-bottom:1px solid #dce5d5}
+.current-tr-heading h2{margin:0;font-size:18px}.current-tr-heading h2 span{margin-left:6px;color:#4f7756;font-size:14px;font-variant-numeric:tabular-nums}
+.current-tr-heading p{margin:6px 0 0;color:#526d59;font-size:12px;line-height:1.4}
+.current-tr-heading .close-button{flex-shrink:0;min-width:44px;min-height:44px;color:#3b5f48;background:#edf3e6;border:1px solid #cadbc4;border-radius:8px}
+.current-tr-list{display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px;scrollbar-gutter:stable}
+.current-tr-item{display:grid;grid-template-columns:1fr auto;gap:7px 10px;width:100%;min-height:94px;padding:12px;border:1px solid #d8e2d0;border-radius:9px;background:#f8f9f0;color:#36513e;text-align:left}
+.current-tr-item:hover{background:#eef5e6}.current-tr-item.selected{border-color:#42845f;background:#e5f2dc;box-shadow:inset 3px 0 #42845f}
+.current-tr-item strong{font-size:14px;font-variant-numeric:tabular-nums}.tr-oht{font-size:12px;color:#4e6954}.tr-route{grid-column:1/-1;font-size:13px;overflow-wrap:anywhere}.tr-phase{grid-column:1/-1;font-size:12px;color:#536c55;overflow-wrap:anywhere}.tr-follow-state{grid-column:1/-1;font-size:12px;font-weight:700;color:#25633e}
+.current-tr-item:focus-visible,.tr-panel-toggle:focus-visible{outline:3px solid #42845f;outline-offset:2px}
+.tr-search-controls{display:grid;gap:8px;padding:10px 14px;border-bottom:1px solid #dce5d5;flex-shrink:0}
+.tr-search-controls label{display:grid;gap:4px;font-size:12px;color:#36513e}
+.tr-search-controls input,.tr-search-controls select{width:100%;min-width:0;min-height:44px;padding:7px 9px;border:1px solid #a7bba5;border-radius:7px;background:#fffef5;color:#304f3e;font:inherit;font-size:13px}
+.tr-search-controls>div{display:flex;align-items:end;gap:8px}.tr-filter-label{flex:1}
+.tr-clear,.tr-selected-link,.tr-pagination button{min-height:44px;padding:6px 10px;border:1px solid #bccfb4;border-radius:7px;background:#edf3e6;color:#304f3e;font-size:12px}
+.tr-selected-link{text-align:left;min-height:36px}.tr-clear:disabled,.tr-pagination button:disabled{opacity:.5;cursor:default}
+.tr-pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-top:1px solid #dce5d5;flex-shrink:0;font-size:12px;font-variant-numeric:tabular-nums}
+.tr-pagination>div{display:flex;align-items:center;gap:7px}.current-tr-list{flex:1}
+.tr-search-controls :is(input,select,button):focus-visible,.tr-pagination button:focus-visible{outline:3px solid #42845f;outline-offset:2px}
+.welcome-shell .continue-action{color:#365c4c}.welcome-shell .continue-action span{color:#367b63}
+@media(min-width:851px){.app-shell.sandbox-mode .map-toolbar{left:330px}.app-shell.sandbox-mode .three-controls{top:72px}.app-shell.sandbox-mode .three-floor-controls{top:128px}}
+@media(max-width:850px){
+ .app-shell.sandbox-mode .map-toolbar{left:10px;right:10px;top:6px}
+ .app-shell.sandbox-mode .map-toolbar .toolbar-right{width:100%}
+ .app-shell.sandbox-mode .sandbox-hud-kpis{left:10px;right:auto;top:108px;width:280px;max-width:calc(100% - 78px)}
+ .app-shell.sandbox-mode .three-controls{top:108px;right:10px}
+ .app-shell.sandbox-mode .three-floor-controls{top:164px}
+ .app-shell.sandbox-mode .current-tr-panel{top:108px;right:10px;bottom:76px;width:min(350px,calc(100% - 20px))}
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat>span{font-size:11px}
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat strong{font-size:20px}
+ .sandbox-experiment-summary{padding:10px 12px 7px;gap:5px}.sandbox-experiment-summary>strong{font-size:15px}.sandbox-experiment-summary>span,.sandbox-experiment-summary>b{font-size:12px}
+ .app-shell.sandbox-mode .demand-progression{padding:8px 12px;font-size:11px}
+ .app-shell.sandbox-mode .demand-progression button{font-size:11px}
+ .app-shell.sandbox-mode .experience-toolbar{left:10px;bottom:76px}
+ .app-shell.sandbox-mode .facility-mobile-controls,.app-shell.sandbox-mode .facility-desktop-controls{top:108px;right:10px;left:auto}
+}
+@media(prefers-reduced-motion:reduce){.app-shell.sandbox-mode .current-tr-panel{transition:none}}
+.selected-tr-summary{position:absolute;z-index:6;left:14px;bottom:132px;display:grid;gap:4px;max-width:min(300px,calc(100% - 28px));padding:9px 12px;border:1px solid #cedfc6;border-radius:9px;background:#fffef4;color:#365d46;box-shadow:0 3px 12px #30443712;font-size:12px;line-height:1.4;pointer-events:none}
+.selected-tr-summary>strong{font-size:13px}.selected-tr-summary>span{overflow-wrap:anywhere}
+.app-shell.sandbox-mode:has(.selected-tr-summary) .three-scene-key{bottom:204px}
+@media(max-width:850px){.selected-tr-summary{left:10px;font-size:11px}.selected-tr-summary>strong{font-size:12px}.app-shell.sandbox-mode .map-toolbar .icon-button{display:none}.app-shell.sandbox-mode .map-toolbar .view-switch button{min-height:40px;padding:0 5px;font-size:10px}.app-shell.sandbox-mode .toolbar-right{gap:4px}.app-shell.sandbox-mode .sidebar-toggle,.app-shell.sandbox-mode .focus-toggle{padding-inline:7px;font-size:11px}}
+/* Status notices must never cover the simulation counters on narrow screens. */
+@media(max-width:850px){.app-shell.sandbox-mode>.notice{top:auto;bottom:240px;left:10px;max-width:min(300px,calc(100% - 20px))}}
+.app-shell.sandbox-mode .three-scene-key,.app-shell.sandbox-mode .map-legend{pointer-events:none}
+
+/* Keep overview framing stable when the measured-rate line appears or clears. */
+.app-shell.sandbox-mode .sandbox-playback-clock{min-height:40px}
+.app-shell.sandbox-mode .sandbox-playback-clock small{display:block;font-size:9px;line-height:1.2;white-space:nowrap}
+.experience-clock-reading{display:flex;flex-direction:column;gap:2px;white-space:nowrap}
+.app-shell.interactive-mode .tutorial-panel .guide-card>.playback-base-note{font-size:11px;color:#526f5d}
+/* Leave the narrow-screen HUD and camera buttons separate and clickable. */
+@media(max-width:600px){.app-shell.sandbox-mode .three-controls{top:56px}}
+
+/* Live interval controls stay with the living FAB; playback is a separate clock. */
+.sandbox-flow-summary{display:flex;justify-content:space-between;gap:8px;padding:0 14px 9px;color:#526858;font-size:11px;font-variant-numeric:tabular-nums}
+.sandbox-flow-summary b{color:#2d674c}
+.live-demand-controls{display:grid;gap:4px}
+.live-demand-controls label{display:flex;align-items:center;gap:8px;color:#42624d;font-weight:700}
+.live-demand-controls select{flex:1;min-width:0;min-height:44px;border:1px solid #bfd4b7;border-radius:8px;padding:6px 8px;background:#fffef4;color:#284d3b;font:inherit}
+.live-demand-controls select:focus-visible{outline:2px solid #358b77;outline-offset:2px}
+.live-demand-controls small{font-size:10px;line-height:1.4;color:#58705e}
+.demand-history>small{display:block;line-height:1.5;color:#58705e}
+
+.demand-history-pages{display:flex;align-items:center;justify-content:space-between;gap:6px}.demand-history-pages button{min-height:44px;padding:6px;border:1px solid #bfd4b7;border-radius:7px;background:#eef3e7;color:#315c47}.demand-history-pages button:disabled{opacity:.45}
+
+/* Landscape Sandbox: keep the FAB dominant and place essential actions on its edges. */
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode>.topbar{flex-basis:44px;height:44px;padding-inline:max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-right))}
+ .app-shell.sandbox-mode .map-column .map-toolbar{top:4px;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));min-height:44px;flex-wrap:nowrap}
+ .app-shell.sandbox-mode .map-column .map-toolbar .toolbar-right{width:auto;min-height:44px;flex:1 1 auto;flex-wrap:nowrap;justify-content:flex-start;gap:3px;overflow-x:auto;scrollbar-width:none}
+ .app-shell.sandbox-mode .map-column .map-toolbar .toolbar-right::-webkit-scrollbar{display:none}
+ .app-shell.sandbox-mode .map-column .toolbar-right>*{flex:0 0 auto}
+ .app-shell.sandbox-mode .map-column .floor-switch button,
+ .app-shell.sandbox-mode .map-column .view-switch button{min-width:44px;min-height:44px;padding-inline:8px;font-size:11px}
+ .app-shell.sandbox-mode .map-column .sidebar-toggle,
+ .app-shell.sandbox-mode .map-column .focus-toggle{min-height:44px;padding-inline:9px;font-size:11px;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .sandbox-hud-kpis{top:54px;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));width:auto;max-width:none;padding:0;border-radius:9px}
+ .app-shell.sandbox-mode .map-column .sandbox-demand-live{display:grid!important;grid-template-columns:minmax(150px,1.15fr) minmax(300px,2.6fr) minmax(128px,1fr);align-items:stretch}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary{display:flex;min-width:0;align-items:center;gap:6px;padding:5px 8px;overflow:hidden;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary>strong{overflow:hidden;font-size:12px;text-overflow:ellipsis}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary>span{overflow:hidden;font-size:10px;text-overflow:ellipsis}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary>b{font-size:10px;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts{grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:2px;padding:4px 3px}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat{flex-direction:row;align-items:center;justify-content:space-between;gap:3px;padding:2px 4px}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat>span{font-size:9px;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat strong{font-size:15px}
+ .app-shell.sandbox-mode .map-column .sandbox-flow-summary{display:grid;align-content:center;gap:2px;padding:3px 7px;font-size:9px;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .demand-progression{grid-template-columns:minmax(0,1fr) minmax(280px,1.2fr);align-items:center;gap:6px;padding:4px 7px}
+ .app-shell.sandbox-mode .map-column .demand-feedback-details{min-width:0;overflow:hidden}.app-shell.sandbox-mode .map-column .demand-feedback-details>summary{display:flex;min-height:44px;align-items:center;overflow:hidden;padding:2px 5px;color:#42624d;font-size:10px;font-weight:700;white-space:nowrap}.app-shell.sandbox-mode .map-column .demand-feedback-details>[data-testid="demand-feedback"]{max-height:60px;overflow:auto;padding:3px 5px;font-size:9px;line-height:1.25}
+ .app-shell.sandbox-mode .map-column .live-demand-controls{display:block;min-width:0}
+ .app-shell.sandbox-mode .map-column .live-demand-controls label{gap:6px;font-size:10px;white-space:nowrap}
+ .app-shell.sandbox-mode .map-column .live-demand-controls select{min-height:44px;padding:3px 7px;font-size:10px}
+ .app-shell.sandbox-mode .map-column .live-demand-controls small{display:none}
+ .app-shell.sandbox-mode .map-column .three-controls{top:160px;right:max(8px,env(safe-area-inset-right));left:auto;display:flex;flex-direction:row;gap:3px;padding:3px}
+ .app-shell.sandbox-mode .map-column .three-controls button{width:44px;min-width:44px;height:44px;min-height:44px}
+ .app-shell.sandbox-mode .map-column .three-controls select{min-width:64px;min-height:44px;font-size:10px}
+ .app-shell.sandbox-mode .map-column .three-floor-controls{top:212px;right:max(8px,env(safe-area-inset-right))}
+ .app-shell.sandbox-mode .map-column .sandbox-playback{right:8px;bottom:max(8px,env(safe-area-inset-bottom));left:8px;justify-content:center;gap:5px;width:max-content;max-width:calc(100% - 16px);margin-inline:auto;padding:4px 6px;transform:none}
+ .app-shell.sandbox-mode .map-column .sandbox-playback-clock{min-width:70px;padding-inline:3px;font-size:10px}
+ .app-shell.sandbox-mode .map-column .sandbox-playback-clock small{font-size:8px}
+ .app-shell.sandbox-mode .map-column .sandbox-playback .main-control{min-width:78px;min-height:44px;font-size:11px}
+ .app-shell.sandbox-mode .map-column .sandbox-playback .speed-options button{min-width:44px;min-height:44px;padding-inline:4px;font-size:11px}
+ .app-shell.sandbox-mode .map-column .sandbox-reset{width:44px;height:44px}
+ .app-shell.sandbox-mode .map-column .transport-strip{display:none}
+ .app-shell.sandbox-mode .map-column .current-tr-panel{top:56px;right:max(8px,env(safe-area-inset-right));bottom:8px;width:min(350px,calc(100% - 16px))}
+ .app-shell.sandbox-mode .map-column .experience-toolbar{bottom:64px}
+ .app-shell.sandbox-mode .map-column .three-scene-key{bottom:62px;left:max(8px,env(safe-area-inset-left));font-size:9px}
+ .app-shell.sandbox-mode>.notice{top:auto;right:8px;bottom:64px;left:8px;max-width:calc(100% - 16px)}
+ .app-shell.sandbox-mode .map-column .three-inventory-note{right:8px;bottom:64px;max-width:220px;font-size:10px}
+}
+
+/* The short portrait view keeps a four-value KPI row and the selected OHT's center clear. */
+@media(max-width:600px) and (orientation:portrait){
+ .app-shell.sandbox-mode .sandbox-hud-kpis{top:116px;left:8px;right:8px;width:auto;max-width:none}
+ .app-shell.sandbox-mode .sandbox-demand-live{grid-template-columns:minmax(0,1fr)}
+ .app-shell.sandbox-mode .sandbox-experiment-summary{display:flex;min-height:28px;align-items:center;gap:5px;padding:3px 6px;overflow:hidden;white-space:nowrap}
+ .app-shell.sandbox-mode .sandbox-experiment-summary>strong{overflow:hidden;font-size:11px;text-overflow:ellipsis}
+ .app-shell.sandbox-mode .sandbox-experiment-summary>span,.app-shell.sandbox-mode .sandbox-experiment-summary>b{overflow:hidden;font-size:9px;text-overflow:ellipsis}
+ .app-shell.sandbox-mode .sandbox-summary-counts{grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;padding:2px}
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat{min-height:38px;align-items:center;justify-content:center;gap:1px;padding:2px 1px}
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat>span{max-width:100%;font-size:8px;line-height:1.1}
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat strong{font-size:13px;line-height:1.15}
+ .app-shell.sandbox-mode .sandbox-flow-summary{display:flex;min-height:24px;align-items:center;justify-content:space-around;gap:5px;padding:2px 4px;font-size:9px;white-space:nowrap}
+ .app-shell.sandbox-mode .demand-progression{display:grid;grid-template-columns:minmax(70px,.7fr) minmax(0,1fr);gap:3px;padding:2px}
+ .app-shell.sandbox-mode .demand-feedback-details>summary{min-height:44px;justify-content:center;font-size:9px}
+ .app-shell.sandbox-mode .live-demand-controls label{gap:4px;font-size:9px}
+ .app-shell.sandbox-mode .live-demand-controls select{min-height:44px;padding:3px 4px;font-size:10px}
+ .app-shell.sandbox-mode .live-demand-controls small{display:none}
+}
+
+/* Phone tools share one scrollable edge row; zoom sits above the compact HUD. */
+@media(max-width:600px) and (orientation:portrait){
+ .app-shell.sandbox-mode .map-toolbar .toolbar-right{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:thin;min-height:44px}
+ .app-shell.sandbox-mode .map-toolbar .toolbar-right>*{flex:0 0 auto}
+ .app-shell.sandbox-mode .map-toolbar .view-switch button,.app-shell.sandbox-mode .floor-switch button{min-height:44px;min-width:44px}
+ .app-shell.sandbox-mode .three-controls{top:56px;padding:3px;gap:3px}
+ .app-shell.sandbox-mode .three-controls button{width:44px;height:44px;min-width:44px}
+ .app-shell.sandbox-mode .three-controls select{min-height:44px}
+}
+@media(max-width:850px){.app-shell.sandbox-mode>.topbar .quiet-button{height:44px;min-height:44px;min-width:44px}}
+.demand-feedback-details>summary{cursor:pointer;min-height:44px;align-content:center}
+.demand-feedback-details>[data-testid="demand-feedback"]{display:block;line-height:1.4}
+
+/* Transient messages and expanded explanations must leave operating controls free. */
+.tr-search-details{flex-shrink:0}.tr-search-details>summary{display:none;cursor:pointer}
+.demand-feedback-details>summary::before{content:'▸';margin-right:5px}.demand-feedback-details[open]>summary::before{content:'▾'}
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode>.notice{left:auto;right:max(8px,env(safe-area-inset-right));bottom:64px;width:min(300px,calc(100% - 16px));max-height:88px;overflow:auto}
+ .app-shell.sandbox-mode .map-column .sandbox-hud-kpis,.app-shell.sandbox-mode .map-column .demand-feedback-details{overflow:visible}
+ .app-shell.sandbox-mode .demand-feedback-details{position:relative}
+ .app-shell.sandbox-mode .map-column .demand-feedback-details>[data-testid="demand-feedback"]{position:absolute;z-index:10;top:calc(100% + 6px);left:0;width:280px;max-height:110px;overflow:auto;padding:10px;border:1px solid #c9d8c6;border-radius:8px;background:#fffef5;box-shadow:0 4px 12px #30443720;font-size:12px}
+ .app-shell.sandbox-mode .current-tr-heading{padding:5px 8px;align-items:center;flex-shrink:0}.app-shell.sandbox-mode .current-tr-heading p{display:none}
+ .app-shell.sandbox-mode .tr-search-details>summary{display:flex;align-items:center;min-height:44px;padding:5px 10px;border-bottom:1px solid #dce5d5;font-size:12px;font-weight:700}
+ .app-shell.sandbox-mode .tr-selected-link{min-height:44px}
+ .app-shell.sandbox-mode .current-tr-panel:has(.tr-search-details[open]){overflow-y:auto}.app-shell.sandbox-mode .current-tr-panel:has(.tr-search-details[open]) .current-tr-list{flex:none;min-height:110px;overflow:visible}
+ .app-shell.sandbox-mode .current-tr-panel:has(.tr-search-details[open]) .current-tr-heading{position:sticky;top:0;z-index:2;background:#fffef5}
+}
+@media(max-width:600px) and (orientation:portrait){
+ .app-shell.sandbox-mode>.notice{bottom:190px;max-height:90px;overflow:auto}
+ .app-shell.sandbox-mode .sandbox-hud-kpis{overflow:visible}
+ .app-shell.sandbox-mode .demand-feedback-details{position:relative}
+ .app-shell.sandbox-mode .demand-feedback-details>[data-testid="demand-feedback"]{position:absolute;bottom:calc(100% + 6px);left:0;z-index:10;width:min(280px,calc(100vw - 32px));max-height:130px;overflow:auto;padding:10px;border:1px solid #c9d8c6;border-radius:8px;background:#fffef5;box-shadow:0 4px 12px #30443720;font-size:12px}
+}
+
+.demand-feedback-details>summary{list-style:none}.demand-feedback-details>summary::-webkit-details-marker{display:none}
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat>span,.app-shell.sandbox-mode .map-column .sandbox-flow-summary,.app-shell.sandbox-mode .map-column .live-demand-controls label,.app-shell.sandbox-mode .map-column .demand-feedback-details>summary{font-size:11px}
+ .app-shell.sandbox-mode .map-column .live-demand-controls select{font-size:12px}
+}
+@media(max-width:600px) and (orientation:portrait){
+ .app-shell.sandbox-mode .sandbox-summary-counts .stat>span,.app-shell.sandbox-mode .sandbox-flow-summary,.app-shell.sandbox-mode .demand-feedback-details>summary,.app-shell.sandbox-mode .live-demand-controls label{font-size:11px}
+ .app-shell.sandbox-mode .live-demand-controls select{font-size:12px}
+}
+
+/* Keep a broad continuous region for whole-FAB framing, as well as Follow. */
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode .map-column .sandbox-hud-kpis{left:max(8px,env(safe-area-inset-left));right:auto;width:260px;max-width:calc(100% - 100px)}
+ .app-shell.sandbox-mode .map-column .sandbox-demand-live{display:block!important}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary{padding:5px 7px;gap:4px}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary>strong{flex:1;min-width:0}
+ .app-shell.sandbox-mode .map-column .sandbox-experiment-summary>span{font-size:11px;max-width:84px}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts{padding:3px;gap:2px}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat{flex-direction:column;align-items:center;gap:2px;padding:2px 1px}
+ .app-shell.sandbox-mode .map-column .sandbox-summary-counts .stat>span{font-size:11px}
+ .app-shell.sandbox-mode .map-column .sandbox-flow-summary{display:flex;justify-content:space-between;align-items:center;gap:5px;padding:5px 8px;font-size:11px}
+ .app-shell.sandbox-mode .map-column .demand-progression{grid-template-columns:64px minmax(0,1fr);padding:3px 5px;gap:4px}
+ .app-shell.sandbox-mode .map-column .live-demand-controls label{gap:3px}
+ .app-shell.sandbox-mode .map-column .live-demand-controls select{padding-inline:3px}
+ .app-shell.sandbox-mode .map-column .three-controls{top:54px;flex-direction:column;align-items:stretch;gap:3px}
+ .app-shell.sandbox-mode .map-column .three-controls button{align-self:center}
+ .app-shell.sandbox-mode>.notice{width:min(220px,calc(100% - 16px))}
+ .app-shell.sandbox-mode .map-column .three-scene-key{display:none}
+}
+
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode .selected-tr-summary{display:none}
+ .app-shell.sandbox-mode>.notice{top:46px;bottom:auto;left:auto;right:max(8px,env(safe-area-inset-right));width:min(340px,calc(100% - 450px));max-height:48px;overflow-y:auto}
+ .app-shell.sandbox-mode .map-column .demand-feedback-details>[data-testid="demand-feedback"]{top:auto;bottom:calc(100% + 6px)}
+}
+
+/* Preserve touch and extra-floor/large-fleet disclosures at the phone breakpoints. */
+@media(max-width:600px) and (orientation:portrait){.app-shell.sandbox-mode .three-controls select{min-width:44px}}
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode .map-column .three-floor-controls{display:none}
+ .app-shell.sandbox-mode>.notice{width:min(340px,calc(100% - 510px))}
+ .app-shell.sandbox-mode .map-column .three-inventory-note{left:8px;right:auto;bottom:8px;width:200px;max-width:200px;max-height:52px;overflow-y:auto;pointer-events:auto;touch-action:pan-y;overscroll-behavior:contain}
+}
+
+/* Keep transient feedback below drawers and leave a real short-portrait Fit region. */
+.app-shell.sandbox-mode>.notice{z-index:11}
+.app-shell.sandbox-mode:has(>.modal-scrim)>.notice{z-index:30}
+@media(max-width:600px) and (orientation:portrait) and (max-height:740px){
+ .app-shell.sandbox-mode>.notice{top:104px;bottom:auto;left:8px;right:auto;width:min(150px,calc(100% - 220px));max-height:48px;overflow-y:auto}
+ .app-shell.sandbox-mode .three-scene-key{display:none}
+}
+/* Live fleet controls share the existing Follow dock and open only on demand. */
+.fleet-controls{position:relative;color:#355f49}
+.app-shell.sandbox-mode .fleet-controls>summary{display:flex;align-items:center;justify-content:center;min-height:44px;min-width:76px;padding:0 9px;border-radius:7px;background:#eff5e9;font-size:12px;cursor:pointer;list-style:none}
+.fleet-controls>summary::-webkit-details-marker{display:none}
+.fleet-controls>summary:after{content:'＋';margin-left:5px}
+.fleet-controls[open]>summary:after{content:'−'}
+.app-shell.sandbox-mode .experience-toolbar:has(.fleet-controls[open]){z-index:40}
+.fleet-popover{position:absolute;left:0;bottom:calc(100% + 10px);width:min(320px,calc(100vw - 38px));max-height:min(340px,calc(100dvh - 260px));overflow:auto;overscroll-behavior:contain;padding:12px;border:1px solid #cbdcc8;border-radius:12px;background:#fffef4;box-shadow:0 8px 25px #3044372b;font-size:12px;line-height:1.5;white-space:normal;touch-action:pan-y}
+.fleet-popover>strong{display:block;font-size:14px}
+.fleet-popover small{display:block;margin:7px 0;color:#5a705f;font-size:11px;line-height:1.5}
+.fleet-live-stats{display:flex;flex-wrap:wrap;gap:4px 10px;margin:9px 0}
+.fleet-add-actions{display:flex;gap:8px}
+.app-shell.sandbox-mode .fleet-add-actions>button,.app-shell.sandbox-mode .fleet-popover nav button{min-height:44px;min-width:44px;padding:6px 9px;border:1px solid #b7cdb4;border-radius:7px;background:#e7f2de;color:#355f49;font-size:12px}
+.fleet-add-actions>button{flex:1}
+.fleet-popover button:disabled{opacity:.45;cursor:default}
+.fleet-popover details>summary{min-height:44px;align-content:center;cursor:pointer;border-top:1px solid #dce5d5}
+.fleet-popover p{margin:6px 0;overflow-wrap:anywhere}
+.fleet-popover .fleet-branch-note{padding:6px;background:#faf0d3;border-radius:6px}
+.fleet-popover table{width:100%;border-collapse:collapse;font-size:10px;text-align:left}
+.fleet-popover th,.fleet-popover td{padding:4px 2px;border-bottom:1px solid #e1e7db;white-space:nowrap}
+.fleet-popover nav{display:flex;gap:5px;align-items:center;justify-content:space-between}
+@media(max-width:850px) and (orientation:landscape) and (max-height:500px){
+ .fleet-popover{left:calc(-1 * min(91px,10vw));max-height:calc(100dvh - 190px);width:300px}
+ .app-shell.sandbox-mode .fleet-controls>summary{font-size:11px;min-width:76px;padding-inline:7px}
+}
+@media(max-width:600px) and (orientation:portrait){
+ .fleet-popover{left:-82px}
+ .app-shell.sandbox-mode .fleet-controls>summary{font-size:11px}
+}
+
+.fleet-caption{display:flex;flex-direction:column;align-items:center;line-height:1.35}
+.fleet-caption>small{font-size:10px;color:#486853}
+.staging-disclosure{margin-top:8px;padding:6px 8px;border-radius:7px;background:#edf4e7}
+
+/* New Simulation pairs a readable options card with an unobstructed right-side overview. */
+@media(min-width:601px){
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-setup-card{top:50%;right:auto;bottom:auto;left:clamp(14px,2vw,30px);width:min(490px,44%);max-height:calc(100% - 28px);transform:translateY(-50%)}
+}
+@media(orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-setup-card{top:50%;right:auto;bottom:auto;left:8px;width:46%;max-height:calc(100% - 16px);gap:5px;padding:9px 10px;transform:translateY(-50%)}
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-setup-card h2{font-size:17px}
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .demand-presets button{min-height:46px;padding:5px 4px}
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-demand-summary{padding:5px 7px}
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-start-action{min-height:44px}
+}
+
+@media(orientation:landscape) and (max-height:500px){
+ .app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-start-action{position:sticky;bottom:0;flex-shrink:0;z-index:1;box-shadow:0 -8px 0 #fffef3}
+}
+/* The ready screen has no live metrics; keep its options and preview unobstructed. */
+.app-shell.sandbox-mode:has(.sandbox-setup-card) .sandbox-hud-kpis{display:none!important}
+
+.app-shell.sandbox-mode .legacy-storage-notice{position:absolute;left:16px;right:16px;bottom:90px;z-index:12;max-width:640px;max-height:35vh;overflow:auto}
