@@ -270,8 +270,12 @@ try {
     }
     await page.getByRole('button',{name:'다른 가능한 길'}).click();
     await expect(page.getByText(/실제 선택된 길과 경유하는 레일이 달라요/)).toBeVisible();
+    await expect.poll(
+      async () => page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links?.join('|') ?? ''),
+      {timeout:9000},
+    ).not.toBe(selectedLongRoute.join('|'));
     const alternativeLongRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links ?? []);
-    if(alternativeLongRoute.length < 8 || alternativeLongRoute.join('|') === selectedLongRoute.join('|'))
+    if(alternativeLongRoute.length < 8)
       throw new Error('Native MCS alternative not actually shown on the directed rail network');
     console.log('native-route-study',JSON.stringify({nativeStudy,selectedLinks:selectedLongRoute.length,alternativeLinks:alternativeLongRoute.length}));
     await page.screenshot({path:path.join(evidence, 'scene06-'+width+'.png')});
