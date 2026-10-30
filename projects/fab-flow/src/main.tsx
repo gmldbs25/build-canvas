@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Work6 from './work6';
+import './original-tycoon.css';
 import './work6.css';
 
 const root = document.getElementById('root');
