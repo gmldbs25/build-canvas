@@ -71,7 +71,8 @@ export function buildNativeRouteStudy(): NativeRouteStudy {
       const selected = candidate?.candidates.find(path => path.selected);
       const alternative = candidate?.candidates.find(path =>
         !path.selected && path.links.length >= 8 && path.links.join('|') !== selected?.links.join('|'));
-      if (!candidate || !selected || !alternative || selected.links.length < 12) continue;
+      if (!candidate || !selected || !alternative || selected.links.length < 12 ||
+          candidate.to !== engine.layout.ports.find(port=>port.id===req.destination)?.node) continue;
       const points = selected.nodes.map(nodeId=>engine.layout.nodes.find(node=>node.id===nodeId))
         .filter((node): node is Layout['nodes'][number]=>!!node);
       const source = engine.layout.ports.find(port=>port.id===req.source);
