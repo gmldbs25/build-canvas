@@ -48,6 +48,8 @@ export type CameraCommand = {
   requestId?: string;
   vehicleId?: string;
   resetZoom?: boolean;
+  /** Optional Work6 editorial camera motion; does not mutate Native Engine state. */
+  transitionMs?: number;
 };
 
 export function clampFrame(frame: CameraFrame, bounds: WorldBounds, aspect: number): CameraFrame {
