@@ -3,14 +3,19 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const evidence = path.resolve(project, 'evidence');
 await fs.mkdir(evidence, { recursive: true });
 
-const server = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm',
-  ['exec', '--', 'vite', 'preview', '--host', '127.0.0.1', '--port', '4179', '--strictPort'],
-  { cwd: project, stdio: ['ignore','pipe','pipe'], env: { ...process.env } });
+const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-static-'));
+const deploymentDir = path.join(sandbox, 'build-canvas', 'fab-flow-preview');
+await fs.mkdir(deploymentDir, { recursive: true });
+await fs.cp(path.join(project,'dist-pages'),deploymentDir,{recursive:true});
+const server = spawn('python3',
+  ['-m','http.server','4179','--bind','127.0.0.1','--directory',sandbox],
+  { cwd: project, stdio: ['ignore','pipe','pipe'] });
 const logs = [];
 server.stdout.on('data', data => logs.push(data.toString()));
 server.stderr.on('data', data => logs.push(data.toString()));
@@ -19,7 +24,7 @@ async function ready() {
   for (let i = 0; i < 50; i++) {
     if (server.exitCode !== null) throw new Error('Vite preview exited: ' + logs.join(''));
     try {
-      const response = await fetch('http://127.0.0.1:4179/build-canvas/fab-flow/');
+      const response = await fetch('http://127.0.0.1:4179/build-canvas/fab-flow-preview/');
       if (response.ok) return;
     } catch {}
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -39,7 +44,7 @@ try {
     page.on('pageerror',e=>faults.push(String(e)));
     page.on('console',msg=>{ if(msg.type()==='error') faults.push(msg.text()); });
     page.on('response',response=>{if(response.status()>=400)faults.push('HTTP '+response.status()+' '+response.url());});
-    const response = await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow/', { waitUntil:'domcontentloaded' });
+    const response = await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/', { waitUntil:'domcontentloaded' });
     await page.waitForTimeout(1100);
     console.log('initial-debug',JSON.stringify({viewport:[width,height],status:response?.status(),title:await page.title(),text:(await page.locator('body').innerText()).slice(0,350),errors:faults.slice(0,8)}));
     await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
@@ -68,4 +73,5 @@ try {
 } finally {
   if(browser) await browser.close();
   server.kill('SIGTERM');
+  await fs.rm(sandbox, {recursive:true,force:true});
 }
