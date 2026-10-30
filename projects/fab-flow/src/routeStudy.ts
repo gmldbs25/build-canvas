@@ -34,8 +34,8 @@ function firstRequestSeed(layout: Layout): number[] {
     const destination = destinations[Math.floor(random() * destinations.length)]!;
     const a = nodes.get(source.node), b = nodes.get(destination.node);
     if (!a || !b || source.kind !== 'tool' || destination.kind !== 'tool' || source.area === destination.area) continue;
-    const sourceNo=Number(source.area.match(/^B(\\d+)$/)?.[1]);
-    const destinationNo=Number(destination.area.match(/^B(\\d+)$/)?.[1]);
+    const sourceNo=Number(source.area.match(/^B(\d+)$/)?.[1]);
+    const destinationNo=Number(destination.area.match(/^B(\d+)$/)?.[1]);
     if (!Number.isInteger(sourceNo) || !Number.isInteger(destinationNo) ||
         Math.floor((sourceNo-1)/3) !== Math.floor((destinationNo-1)/3) ||
         Math.abs((sourceNo-1)%3-(destinationNo-1)%3) !== 2) continue;
