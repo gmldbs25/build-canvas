@@ -2035,7 +2035,7 @@ export default function ThreeFacilityScene(props: Props) {
       animationRef.current = null;
       cameraPresentationRef.current = () => undefined;
     };
-  }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, floor, worldRevision, cameraCommand?.sequence, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
+  }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, floor, worldRevision, cameraCommand?.sequence, routeCandidates, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; cancelCameraTransition(); const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointerPoints.current.size === 2) { pinchGestureRef.current = true; const [a, b] = Array.from(pointerPoints.current.values()); pinchRef.current = { distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom, moved: false }; dragRef.current = null; }
     else if (pointerPoints.current.size === 1) dragRef.current = { x: event.clientX, y: event.clientY, center: camera.position.clone(), target: { ...cameraTargetRef.current } };
