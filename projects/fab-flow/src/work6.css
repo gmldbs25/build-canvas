@@ -17,6 +17,11 @@ button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.3
 .w6-viewport .three-controls{right:24px!important;top:24px!important;bottom:auto!important;z-index:6}
 .w6-viewport .three-scene-key{right:24px!important;left:auto!important;bottom:22px!important;z-index:6}
 .w6-scene-label{position:absolute;top:30px;left:clamp(20px,3.6vw,66px);font:600 11px/1.4 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.115em;color:#56685f;z-index:5;pointer-events:none}
+.w6-focus-note,.w6-route-note{position:absolute;z-index:6;pointer-events:none;right:clamp(16px,3.6vw,66px);font-size:12px;line-height:1.5;color:#395448;background:rgba(250,248,240,.92);padding:9px 13px;border:1px solid rgba(115,141,125,.25);border-radius:4px;max-width:min(280px,43vw);word-break:keep-all}
+.w6-focus-note{top:28px}
+.w6-route-note{top:82px;display:flex;align-items:center;gap:9px;font-weight:650}
+.w6-route-note span{display:block;width:24px;border-top:4px solid #00a9c2;box-shadow:0 1px 0 #193d49}
+@media(max-width:650px){.w6-focus-note,.w6-route-note{left:auto;right:12px;max-width:180px;font-size:10px;padding:7px 9px}.w6-focus-note{top:64px}.w6-route-note{top:113px}}
 .w6-reveal-note{position:absolute;right:clamp(20px,3.6vw,66px);bottom:110px;font:500 12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#536b60;z-index:5;background:rgba(249,247,240,.75);padding:8px 12px;pointer-events:none}
 .w6-narrative{position:absolute;left:clamp(20px,3.6vw,66px);bottom:clamp(36px,5vh,72px);z-index:7;max-width:min(470px,calc(100vw - 46px));padding:27px 30px 25px 0;pointer-events:none}
 .w6-narrative::before{content:"";position:absolute;z-index:-1;inset:-24px -70px -25px -45px;background:linear-gradient(90deg,rgba(244,241,234,.97) 8%,rgba(244,241,234,.88) 68%,transparent);pointer-events:none}
