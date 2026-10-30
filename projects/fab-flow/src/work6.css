@@ -50,8 +50,9 @@ button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.3
 .w6-secondary:hover{background:#e3eae1}
 .w6-microcopy{font:500 11px/1.65 ui-monospace,Menlo,Consolas,monospace;color:#69766b}
 .w6-decision-copy{margin:0;font-size:13px;line-height:1.65;color:#58685d}
-.w6-decision-row{display:flex;align-items:baseline;gap:10px}
-.w6-decision-row strong{font:600 24px ui-monospace,Menlo,Consolas,monospace;color:#32685c}
+.w6-decision-row{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.w6-decision-row strong{font:600 26px/1.15 ui-monospace,Menlo,Consolas,monospace;color:#32685c;letter-spacing:-.025em}
+.w6-decision-row strong em{font-style:normal;font-size:.7em;color:#8fa598;padding:0 5px}
 .w6-decision-row small{font:500 10px ui-monospace,Menlo,Consolas,monospace;color:#7e8d82}
 .w6-error{font-size:12px;color:#a53225;margin:12px 0 0}
 .w6-footer{background:#f4f1ea;border-top:1px solid #d8d5cc;border-bottom:0}

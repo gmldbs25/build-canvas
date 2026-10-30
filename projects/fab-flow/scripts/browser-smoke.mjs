@@ -263,6 +263,10 @@ try {
     await page.getByRole('button',{name:/Scene 06:/}).click();
     await expect(page.getByRole('heading',{name:'멀리 있는 장비까지, 어느 길로 갈까?'})).toBeVisible();
     await expect(page.getByRole('button',{name:'MCS가 선택한 길'})).toBeVisible({timeout:45000});
+    await expect(page.locator('.w6-decision-row')).toContainText('B01');
+    await expect(page.locator('.w6-decision-row')).toContainText('B09');
+    await expect(page.locator('.w6-decision-row')).toContainText('출발 Bay → 도착 Bay');
+    await expect(page.locator('.w6-decision-row')).not.toContainText('모형 거리 단위');
     const nativeStudy = await page.locator('.w6-root').evaluate(node => ({
       seed: Number(node.dataset.routeStudySeed),
       source: node.dataset.routeStudySource,
@@ -284,7 +288,8 @@ try {
       throw new Error('Scene 06 must use diagonal opposite Bays with meaningfully divergent genuine rail paths: '+JSON.stringify({nativeStudy,routeContrast,selectedLongRoute:selectedLongRoute.length}));
     }
     await page.getByRole('button',{name:'다른 가능한 길'}).click();
-    await expect(page.locator('.w6-decision-copy')).toContainText('선택 경로와 달리 돌아가는 부분');
+    await expect(page.locator('.w6-decision-row')).toContainText('우회 경로');
+    await expect(page.locator('.w6-decision-copy')).toContainText('어디에서 갈라지는지');
     await expect.poll(
       async () => page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected)?.links?.join('|') ?? ''),
       {timeout:9000},

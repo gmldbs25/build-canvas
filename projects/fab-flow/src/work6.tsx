@@ -455,25 +455,25 @@ export default function Work6() {
         {scene.id === 6 && <div className="w6-inner-controls">
           <p className="w6-context-line">앞에서는 옆 Bay로 짧게 옮겼어요. 이번에는 FAB의 대각선 반대편 장비까지 이동합니다. 같은 출발지와 도착지라도 레일을 달리 지나갈 수 있을까요?</p>
           {routeStudy && shownRoute ? <>
-            <span className="w6-overline">REAL NATIVE MCS · {routeStudy.sourceBay} → {routeStudy.destinationBay}</span>
+            <span className="w6-overline">MCS ROUTE · LARGE FAB / 9 BAY</span>
             <div className="w6-action-row" role="group" aria-label="MCS 경로 비교">
               <button className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('selected')}>MCS가 선택한 길</button>
               <button className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('alternative')}>다른 가능한 길</button>
               <button className={routeChoice === 'both' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('both')}>두 경로 함께 보기</button>
             </div>
             <div className="w6-decision-row">
-              <span>{routeChoice === 'selected' ? '실제 선택된 운송 경로' : routeChoice === 'alternative' ? '동일 목적지의 우회 가능 경로' : '선택 경로 (청록) · 우회 경로 (보라 점선)'}</span>
-              <strong>{shownRoute.distance.toFixed(0)}</strong>
-              <small>모형 거리 단위</small>
+              <span>{routeChoice === 'selected' ? 'MCS가 실제 선택한 경로' : routeChoice === 'alternative' ? '같은 목적지로 가는 우회 경로' : '하나의 목적지, 두 가지 경로'}</span>
+              <strong>{routeStudy.sourceBay} <em aria-hidden="true">→</em> {routeStudy.destinationBay}</strong>
+              <small>출발 Bay → 도착 Bay</small>
             </div>
             <p className="w6-decision-copy">{routeChoice === 'selected'
-              ? `MCS가 실제 선택한 ${shownRoute.links.length}개 레일 구간이에요. 대각선 반대편 Bay까지 이어지는 동선을 따라가 보세요.`
+              ? 'MCS가 선택한 길이에요. 청록색 레일을 따라 FAB 반대편의 목적지까지 어떻게 이어지는지 살펴보세요.'
               : routeChoice === 'alternative'
-                ? `같은 출발·도착지를 연결하는 다른 ${shownRoute.links.length}개 레일 구간이에요. 선택 경로와 달리 돌아가는 부분을 찾아보세요.`
-                : `청록 실선은 실제 선택된 길, 보라 점선은 다른 가능한 길이에요. 선택 경로의 약 ${Math.round(routeStudy.contrast.distinctFraction * 100)}% 길이에 해당하는 구간이 겹치지 않아요.`}</p>
-            <p className="w6-microcopy">두 경로 모두 실제 방향성 레일을 따릅니다. ${routeStudy.alternativeKind === 'detour'
-              ? '우회 경로는 비교를 위해 선택 경로의 일부 레일을 제외하고 원본 경로 탐색기로 다시 계산한 가정이며, 실제 MCS 선택 기록은 아닙니다.'
-              : '우회 경로는 원본 MCS가 함께 계산한 후보입니다.'} 화면 전환은 실제 배차나 운송을 바꾸지 않습니다.</p>
+                ? '같은 출발지와 목적지를 잇는 다른 길이에요. 실제 선택된 경로와 어디에서 갈라지는지 비교해 보세요.'
+                : '청록색 실선은 MCS가 선택한 길, 보라색 점선은 우회 가능한 길이에요. 두 경로가 어디서 갈라지고 만나는지 살펴보세요.'}</p>
+            <p className="w6-microcopy">실제 FAB FLOW의 방향성 레일망을 이용했어요. {routeStudy.alternativeKind === 'detour'
+              ? '우회 경로는 일부 레일을 제외하고 다시 계산한 가정으로, 실제 MCS가 선택한 경로는 아니에요.'
+              : '우회 경로도 원본 MCS가 계산한 후보 중 하나예요.'} 경로 비교는 실제 운송을 변경하지 않아요.</p>
           </> : <div className="w6-observed" role="status">
             <strong>{routeError ? '실제 경로 사례를 준비하지 못했어요.' : '여러 Bay를 지나는 경로를 계산하고 있어요.'}</strong>
             <p>{routeError || '실제 엔진에서 운송 요청과 배차를 진행한 뒤 MCS가 선택한 경로를 확인합니다.'}</p>
