@@ -81,6 +81,29 @@ try {
       throw new Error('Expected a selected native MCS path on real rail links after dispatch');
     }
     await page.screenshot({path:path.join(evidence, 'scene03-'+width+'.png')});
+    if (width === 1440) {
+      // A complete transport regression: the hoist must finish while the
+      // camera remains in the close Scene 03 framing, not auto-reveal Bay.
+      await page.getByRole('button', {name:/빈 차량이 가지러 가는 모습 보기/}).click();
+      await expect(page.getByText('이제 무엇을 실을까요?')).toBeVisible({timeout:90000});
+      await page.getByRole('button', {name:/FOUP 싣는 모습 보기/}).click();
+      await expect(page.getByText('어떤 길로 가면 될까요?')).toBeVisible({timeout:30000});
+      await page.getByRole('button', {name:/이동할 길 살펴보기/}).click();
+      await expect(page.getByText('이제 다음 장비로 출발!')).toBeVisible({timeout:12000});
+      await page.getByRole('button', {name:/운송 따라가기/}).click();
+      await expect(page.getByText('도착하면 무엇을 할까요?')).toBeVisible({timeout:90000});
+      const beforeDropoff = await page.evaluate(() => window.__FAB_3D__?.camera?.span ?? null);
+      await page.getByRole('button', {name:/FOUP 내려놓기/}).click();
+      await expect(page.getByText('한 건의 운송이 끝났어요.')).toBeVisible({timeout:30000});
+      await page.waitForTimeout(350);
+      const afterDropoff = await page.evaluate(() => window.__FAB_3D__?.camera?.span ?? null);
+      if (beforeDropoff !== null && afterDropoff !== null && afterDropoff > beforeDropoff * 1.5) {
+        throw new Error('Dropoff unexpectedly zoomed out before Scene 04 reveal');
+      }
+      await expect(page.locator('[data-camera-locked="true"]')).toBeVisible();
+      await page.screenshot({path:path.join(evidence, 'scene03-dropoff-'+width+'.png')});
+      console.log('transport-finished',JSON.stringify({viewport:[width,height],beforeDropoff,afterDropoff}));
+    }
     await page.getByRole('button',{name:/SCENE 04/}).click();
     await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
     await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
