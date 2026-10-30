@@ -38,8 +38,12 @@ try {
     const faults=[];
     page.on('pageerror',e=>faults.push(String(e)));
     page.on('console',msg=>{ if(msg.type()==='error') faults.push(msg.text()); });
-    await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow/', { waitUntil:'domcontentloaded' });
-    await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:25000});
+    page.on('response',response=>{if(response.status()>=400)faults.push('HTTP '+response.status()+' '+response.url());});
+    const response = await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow/', { waitUntil:'domcontentloaded' });
+    await page.waitForTimeout(1100);
+    console.log('initial-debug',JSON.stringify({viewport:[width,height],status:response?.status(),title:await page.title(),text:(await page.locator('body').innerText()).slice(0,350),errors:faults.slice(0,8)}));
+    await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
+    await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:5000});
     await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
     await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
