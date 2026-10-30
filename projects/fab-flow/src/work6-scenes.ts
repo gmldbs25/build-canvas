@@ -15,7 +15,7 @@ export const SCENES = [
   { id: 5, chapter: '02 / REVEAL', eyebrow: 'SCENE 05 — THE RAIL',
     title: '차량은 아무 길로나 갈 수 없다.', body: '레일에는 진행 방향이 있고, 장비와 장비를 잇는 연결 지점이 있습니다. 가까워 보여도 돌아가야 하는 이유가 여기 있어요.', format: 'editorial' },
   { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION',
-    title: '누가 이 운송을 맡고, 어느 길로 갈까?', body: '어떤 차량이 옮길지, 어느 길로 갈지 누군가 결정해야 합니다. 그 역할을 맡은 시스템을 만나봅니다.', format: 'interactive' },
+    title: '멀리 있는 장비까지, 어느 길로 갈까?', body: '짧은 운송을 넘어 여러 Bay를 지나는 길을 살펴봅니다. 물류 제어 시스템(MCS)은 방향이 정해진 레일과 여러 후보 경로를 계산해 이동할 길을 선택합니다.', format: 'interactive' },
   { id: 7, chapter: '03 / PRESSURE', eyebrow: 'SCENE 07 — THE CONGESTION',
     title: '운송이 많아지면 무슨 일이 생길까?', body: '같은 레일을 동시에 무한히 사용할 수는 없어요. 실제 엔진에 운송 요청을 연달아 보내고, 차량과 대기의 변화를 관찰합니다.', format: 'cinematic' },
   { id: 8, chapter: '03 / PRESSURE', eyebrow: 'SCENE 08 — THE MEASURE',
