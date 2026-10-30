@@ -3,7 +3,7 @@ const works = [
   {
     index: "06",
     title: "FAB FLOW",
-    type: "SEMICONDUCTOR LOGISTICS · 3D PROTOTYPE",
+    type: "SEMICONDUCTOR LOGISTICS · INTERACTIVE DOCUMENTARY",
     year: "2026.10",
     href: "./fab-flow-preview/",
   },
