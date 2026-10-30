@@ -189,10 +189,44 @@ try {
       await page.screenshot({path:path.join(evidence, 'scene03-dropoff-'+width+'.png')});
       console.log('transport-finished',JSON.stringify({viewport:[width,height],beforeDropoff,afterDropoff}));
     }
-    await page.getByRole('button',{name:/Scene 04:/}).click();
-    await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
-    await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
-    await page.waitForTimeout(4500);
+    if (width === 1440) {
+      const revealButton = page.getByRole('button', {name:/전체 FAB 살펴보기/});
+      await expect(revealButton).toBeEnabled();
+      const cameraBeforeReveal = await page.evaluate(() => window.__FAB_3D__?.camera);
+      const originalCanvas = await page.locator('.three-scene-host canvas').evaluate(node => {
+        node.dataset.work6CanvasIdentity = 'preserved-native-world';
+        return node.dataset.work6CanvasIdentity;
+      });
+      if (!cameraBeforeReveal || originalCanvas !== 'preserved-native-world') {
+        throw new Error('Could not capture close-up before the editorial reveal');
+      }
+      await revealButton.click();
+      await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
+      await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
+      await page.waitForTimeout(500);
+      const earlyReveal = await page.evaluate(() => window.__FAB_3D__?.camera);
+      await page.waitForTimeout(850);
+      const middleReveal = await page.evaluate(() => window.__FAB_3D__?.camera);
+      await page.waitForTimeout(2000);
+      const finalReveal = await page.evaluate(() => window.__FAB_3D__?.camera);
+      const canvasPreserved = await page.locator('.three-scene-host canvas').getAttribute('data-work6-canvas-identity');
+      if (!earlyReveal || !middleReveal || !finalReveal ||
+          !(cameraBeforeReveal.span < earlyReveal.span && earlyReveal.span < middleReveal.span && middleReveal.span < finalReveal.span) ||
+          !(finalReveal.span >= cameraBeforeReveal.span * 5) ||
+          canvasPreserved !== 'preserved-native-world') {
+        throw new Error('Scene 03 -> 04 must be a monotone smooth zoom on the same native canvas: '+
+          JSON.stringify({before:cameraBeforeReveal?.span,early:earlyReveal?.span,middle:middleReveal?.span,final:finalReveal?.span,canvasPreserved}));
+      }
+      console.log('native-cinematic-reveal',JSON.stringify({
+        before:cameraBeforeReveal.span, early:earlyReveal.span,
+        middle:middleReveal.span, final:finalReveal.span, preserved:true,
+      }));
+    } else {
+      await page.getByRole('button',{name:/Scene 04:/}).click();
+      await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
+      await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
+      await page.waitForTimeout(3100);
+    }
     await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 06:/}).click();
     await expect(page.getByRole('heading',{name:'누가 이 운송을 맡고, 어느 길로 갈까?'})).toBeVisible();
