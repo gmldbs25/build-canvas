@@ -369,7 +369,7 @@ export default function Work6() {
           floor={0}
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? !pressure.paused : isOpening ? true : busy}
+          running={isPressure ? scene.id === 7 && !pressure.paused : isOpening ? true : busy}
           tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
           selected={isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
             : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
@@ -516,7 +516,7 @@ export default function Work6() {
             </div>
           </>}
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
-        </div>
+        </div>}
         {scene.id === 9 && <div className="w6-inner-controls">
           <p className="w6-context-line">동일한 요청 순서·난수 시드·관찰 시간으로 두 번 실행해요. 한 번에 한 조건만 바꿔 차이를 관찰합니다.</p>
           <label className="w6-field">운영에서 바꿀 것
