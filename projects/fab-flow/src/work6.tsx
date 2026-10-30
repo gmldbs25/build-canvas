@@ -5,6 +5,7 @@ import ThreeFacilityScene from './components/ThreeFacilityScene';
 import { Engine } from './sim/engine';
 import { SCENES } from './work6-scenes';
 import { usePressureWorld } from './usePressureWorld';
+import { useAmbientIntro } from './useAmbientIntro';
 import { operationalScenario } from './sim/experiments';
 import { chooseLocalIntroDemand } from './introScenario';
 import { publicationCopy } from './sim/publication';
@@ -120,8 +121,10 @@ export default function Work6() {
   const scene = SCENES[sceneIndex];
   const isPressure = scene.id >= 7 && scene.id <= 9;
   const pressure = usePressureWorld(isPressure);
-  const activeEngine = isPressure ? pressure.engine : engineRef.current;
-  const activeState = isPressure ? pressure.state : nativeState;
+  const isOpening = scene.id <= 2;
+  const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
+  const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine : engineRef.current;
+  const activeState = isPressure ? pressure.state : isOpening ? ambient.state : nativeState;
   const [mcsView, setMcsView] = useState<'dispatch' | 'route'>('dispatch');
 
   const publish = useCallback(() => {
@@ -280,6 +283,12 @@ export default function Work6() {
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, [scene.id, issueCamera]);
 
+  useEffect(() => {
+    if (scene.id <= 2 && ambient.vehicleId) {
+      issueCamera('follow', ambient.vehicleId, ambient.requestId);
+    }
+  }, [scene.id, ambient.vehicleId, ambient.requestId, issueCamera]);
+
   const planned = tutorialRef.current.stage === 'request' && nativeState.requests.length === 0
     ? { source: plannedIngressRef.current.source, destination: plannedIngressRef.current.destination }
     : undefined;
@@ -303,12 +312,12 @@ export default function Work6() {
           floor={0}
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? !pressure.paused : busy}
-          tickMs={isPressure ? 60 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={!isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={isPressure ? undefined : selectedVehicleId}
-          trackedRequest={isPressure || request?.phase === 'completed' ? undefined : request?.id}
-          plannedTutorialIngress={focusMode ? planned : undefined}
+          running={isPressure ? !pressure.paused : isOpening ? true : busy}
+          tickMs={isPressure ? 60 : isOpening ? 73 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
+          selected={isOpening ? (ambient.vehicleId ? 'vehicle:' + ambient.vehicleId : undefined) : !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
+          trackedVehicle={isOpening ? ambient.vehicleId : isPressure ? undefined : selectedVehicleId}
+          trackedRequest={isOpening ? ambient.requestId : isPressure || request?.phase === 'completed' ? undefined : request?.id}
+          plannedTutorialIngress={scene.id === 3 ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
