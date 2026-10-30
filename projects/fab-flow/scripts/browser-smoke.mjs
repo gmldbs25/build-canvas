@@ -50,6 +50,19 @@ try {
     await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
     await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:5000});
     await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
+    const intro = await page.locator('.w6-root').evaluate(node => ({
+      source: node.dataset.introSourceBay,
+      destination: node.dataset.introDestinationBay,
+      seed: Number(node.dataset.introSelectedSeed),
+      distance: Number(node.dataset.introDirectedDistance),
+    }));
+    const sourceIndex = Number(intro.source?.match(/^B(\d+)$/)?.[1]);
+    const targetIndex = Number(intro.destination?.match(/^B(\d+)$/)?.[1]);
+    if (!Number.isInteger(sourceIndex) || targetIndex !== sourceIndex+1 || sourceIndex % 3 === 0 ||
+        intro.distance < 130 || intro.distance > 850) {
+      throw new Error('Intro trip must use adjacent left-to-right Bays, not same-Bay U-turn: ' + JSON.stringify(intro));
+    }
+    console.log('intro-native-neighbor', JSON.stringify(intro));
     // Work6 keeps its initial teaching scene close-up. Wheel/overview must
     // not spoil the intentional first full-FAB reveal in Scene 04.
     await expect(page.locator('[data-camera-locked="true"]')).toBeVisible();
@@ -87,9 +100,28 @@ try {
       await page.getByRole('button', {name:/빈 차량이 가지러 가는 모습 보기/}).click();
       await expect(page.getByText('이제 무엇을 실을까요?')).toBeVisible({timeout:90000});
       await page.getByRole('button', {name:/FOUP 싣는 모습 보기/}).click();
+      const pickupHeights = await page.evaluate(async () => {
+        const heights = [];
+        for (let sample = 0; sample < 26; sample++) {
+          const handoff = window.__FAB_3D__?.carrierHandoff;
+          if (handoff?.phase === 'pickup' && handoff.visible && Number.isFinite(handoff.centerY))
+            heights.push(handoff.centerY);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return heights;
+      });
+      if (pickupHeights.length < 2 || pickupHeights.some((height, i) => i > 0 && height < pickupHeights[i-1] - 0.5) ||
+          Math.min(...pickupHeights) < 7) {
+        throw new Error('Carrier pickup must rise monotonically from the native equipment Port: ' + JSON.stringify(pickupHeights));
+      }
+      console.log('native-pickup-heights',JSON.stringify(pickupHeights));
       await expect(page.getByText('어떤 길로 가면 될까요?')).toBeVisible({timeout:30000});
+      await page.screenshot({path:path.join(evidence, 'scene03-pickup-'+width+'.png')});
       await page.getByRole('button', {name:/이동할 길 살펴보기/}).click();
       await expect(page.getByText('이제 다음 장비로 출발!')).toBeVisible({timeout:12000});
+      const chosenRoute = await page.evaluate(() => (window.__FAB_3D__?.routes ?? []).find(route => route.selected));
+      if (!chosenRoute?.links?.length) throw new Error('Adjacent-Bay transport has no genuine MCS path');
+      console.log('native-loaded-route',JSON.stringify({links:chosenRoute.links.length,bays:[intro.source,intro.destination]}));
       await page.getByRole('button', {name:/운송 따라가기/}).click();
       await expect(page.getByText('도착하면 무엇을 할까요?')).toBeVisible({timeout:90000});
       const beforeDropoff = await page.evaluate(() => window.__FAB_3D__?.camera?.span ?? null);
@@ -101,6 +133,16 @@ try {
         throw new Error('Dropoff unexpectedly zoomed out before Scene 04 reveal');
       }
       await expect(page.locator('[data-camera-locked="true"]')).toBeVisible();
+      const finalFoup = await page.evaluate(() => ({
+        colors: window.__FAB_3D__?.portFoupColor,
+        owners: window.__FAB_3D__?.physicalFoups
+      }));
+      if (!finalFoup.colors?.source || !finalFoup.colors?.stored ||
+          finalFoup.colors.source.some((part, index) => Math.abs(part - finalFoup.colors.stored[index]) > .00001) ||
+          !finalFoup.owners?.some(token => token.owner === 'stocker')) {
+        throw new Error('Delivered FOUP must remain the same amber model at its Port: ' + JSON.stringify(finalFoup));
+      }
+      console.log('native-delivered-foup',JSON.stringify({colors:finalFoup.colors,stored:finalFoup.owners.filter(token => token.owner === 'stocker').length}));
       await page.screenshot({path:path.join(evidence, 'scene03-dropoff-'+width+'.png')});
       console.log('transport-finished',JSON.stringify({viewport:[width,height],beforeDropoff,afterDropoff}));
     }
