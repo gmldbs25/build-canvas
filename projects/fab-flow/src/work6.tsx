@@ -6,7 +6,7 @@ import { Engine } from './sim/engine';
 import { operationalScenario } from './sim/experiments';
 import { publicationCopy } from './sim/publication';
 import {
-  TutorialCommandLayer, TUTORIAL_REQUEST_ID, TUTORIAL_STEPS, tutorialRequest, tutorialVehicle,
+  TutorialCommandLayer, TUTORIAL_REQUEST_ID, tutorialRequest, tutorialVehicle,
   type TutorialCommand, type TutorialStage,
 } from './sim/tutorial';
 import type { SimulationState } from './sim/types';
@@ -14,11 +14,64 @@ import type { CameraCommand } from './components/fabCamera';
 
 type PrototypeScene = 3 | 4 | 6;
 const SCENES: Array<{ id: PrototypeScene; chapter: string; eyebrow: string; title: string; body: string }> = [
-  { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT', title: '하나의 운송은 어떻게 완성될까?', body: '운송을 요청하고, OHT가 FOUP를 인계받아 목적지에 도착하기까지 실제 과정을 따라가 보세요.' },
+  { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT', title: '하나의 운송은 어떻게 완성될까?', body: '반도체를 만드는 동안 웨이퍼는 여러 장비를 거칩니다. 이 이동이 어떻게 이루어지는지 한 단계씩 살펴보세요.' },
   { id: 4, chapter: '02 / REVEAL', eyebrow: 'SCENE 04 — THE NETWORK', title: '지금까지 본 건 공장의 극히 일부였다.', body: '한 대의 OHT에서 하나의 Bay로, 다시 여러 Bay가 연결된 물류망으로 시야를 확장합니다.' },
-  { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION', title: '누가 이 운송을 맡고, 어느 길로 갈까?', body: '배차와 경로 탐색은 다른 결정입니다. 실제 MCS가 고른 차량과 경로를 확인해 보세요.' }
+  { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION', title: '누가 이 운송을 맡고, 어느 길로 갈까?', body: '어떤 차량이 옮길지, 어느 길로 갈지 누군가 결정해야 합니다. 그 역할을 맡은 시스템을 만나봅니다.' }
 ];
 const STEP_ORDER: TutorialCommand[] = ['request', 'dispatch', 'empty-travel', 'pickup', 'route', 'loaded-travel', 'dropoff'];
+
+/**
+ * Presentation-only explanatory language: the underlying Native transport commands
+ * are unchanged. FAB FLOW simulates transport logistics, not wafer fabrication.
+ * Each completed command remains visible until the user triggers the next one.
+ */
+const BEGINNER_STEPS: Record<TutorialCommand, { question: string; explanation: string; button: string }> = {
+  request: {
+    question: '왜 옮겨야 할까요?',
+    explanation: '반도체는 한 장비에서 완성되지 않아요. 다음 장비에서 작업할 수 있도록 웨이퍼를 담은 보호 용기(FOUP)를 보내야 한다고 가정해 볼게요. 먼저 물류 시스템에 이동을 부탁합니다.',
+    button: '다음 장비로 보내기',
+  },
+  dispatch: {
+    question: '누가 옮겨 줄까요?',
+    explanation: '옮겨 달라는 요청이 접수됐어요. 하지만 아직 담당 차량은 없어요. 천장 레일을 달리는 운반 차량(OHT) 중 한 대를 골라 볼까요?',
+    button: '담당 차량 정하기',
+  },
+  'empty-travel': {
+    question: '차량은 어디로 가야 할까요?',
+    explanation: '운반 차량 한 대가 배정됐어요. 이렇게 담당 차량을 고르는 일을 배차라고 해요. 아직 FOUP를 싣지 않았으니 빈 차량이 출발 장비로 찾아가야 해요.',
+    button: '빈 차량이 가지러 가는 모습 보기',
+  },
+  pickup: {
+    question: '이제 무엇을 실을까요?',
+    explanation: '빈 OHT가 출발 장비에 도착했어요. 웨이퍼가 담긴 FOUP는 아직 장비의 물건을 주고받는 자리(Port)에 있어요. 이제 직접 들어 올릴 차례예요.',
+    button: 'FOUP 싣는 모습 보기',
+  },
+  route: {
+    question: '어떤 길로 가면 될까요?',
+    explanation: 'FOUP를 실었어요. 목적지까지 가는 길은 천장 레일로 연결돼 있어요. 물류 시스템이 지금 가능한 경로를 계산하도록 해볼까요?',
+    button: '이동할 길 살펴보기',
+  },
+  'loaded-travel': {
+    question: '이제 다음 장비로 출발!',
+    explanation: '운송 경로가 정해졌어요. OHT가 FOUP를 싣고 실제로 계산한 레일 경로를 따라 목적지까지 이동하는 모습을 지켜보세요.',
+    button: '운송 따라가기',
+  },
+  dropoff: {
+    question: '도착하면 무엇을 할까요?',
+    explanation: '목적지 장비 앞에 도착했어요. FOUP를 다음 장비가 주고받는 자리(Port)에 내려놓으면 이번 운송은 끝나요.',
+    button: 'FOUP 내려놓기',
+  },
+};
+const OBSERVED_RESULTS: Record<TutorialCommand, string> = {
+  request: '물류 시스템에 “이 FOUP를 다음 장비로 옮겨 주세요”라는 요청이 등록됐어요. 아직 차량은 움직이지 않았어요.',
+  dispatch: '여러 OHT 중 한 대가 이번 운송을 맡게 됐어요. 이 결정이 바로 배차예요.',
+  'empty-travel': '선택된 OHT가 빈 상태로 출발 장비까지 이동했어요. FOUP는 아직 장비에 있습니다.',
+  pickup: '출발 장비에 있던 FOUP가 OHT에 실렸어요. 이제 목적지까지 이동할 준비가 됐습니다.',
+  route: '물류 제어 시스템이 실제 레일망에서 목적지로 갈 길을 선택했어요.',
+  'loaded-travel': 'FOUP를 실은 OHT가 목적지 장비 앞에 도착했어요. 아직 내려놓는 과정이 남아 있어요.',
+  dropoff: 'FOUP를 목적지 장비에 내려놓았어요. 한 건의 물류 운송이 실제 엔진에서 완료됐습니다.',
+};
+
 
 function createWork6Tutorial() {
   // The same native Engine/TutorialCommandLayer used by FAB FLOW, with its Large V6
@@ -51,6 +104,7 @@ export default function Work6() {
   const runIdRef = useRef(0);
   const [nativeState, setNativeState] = useState<SimulationState>(() => freezeState(initial.engine));
   const [stage, setStage] = useState<TutorialStage>('request');
+  const [lastCompleted, setLastCompleted] = useState<TutorialCommand | null>(null);
   const [sceneIndex, setSceneIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -90,6 +144,7 @@ export default function Work6() {
     engineRef.current = next.engine;
     tutorialRef.current = new TutorialCommandLayer();
     setStage('request');
+    setLastCompleted(null);
     setSelectedVehicleId(undefined);
     setDecision(undefined);
     setError('');
@@ -109,6 +164,7 @@ export default function Work6() {
     setError('');
     const complete = () => {
       const next = layer.finish(engine);
+      setLastCompleted(command);
       setStage(next);
       publish();
       setBusy(false);
@@ -173,6 +229,7 @@ export default function Work6() {
   const request = nativeState.requests.find(item => item.id === TUTORIAL_REQUEST_ID);
   const vehicle = nativeState.vehicles.find(item => item.id === request?.vehicle);
   const currentDecision = decision ?? (vehicle && request?.phase !== 'completed' ? engineRef.current.inspectDecision(vehicle.id) : undefined);
+  const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
   const shouldShowPath = isDecision && !!currentDecision;
@@ -237,27 +294,43 @@ export default function Work6() {
         <h1>{scene.title}</h1>
         <p className="w6-description">{scene.body}</p>
         {scene.id === 3 && <div className="w6-inner-controls">
-          <div className="w6-step"><span>NATIVE TRANSPORT</span><b>{TUTORIAL_STEPS[stage]?.title ?? stage}</b></div>
+          {lastCompleted && <div className="w6-observed" role="status" aria-live="polite">
+            <strong>방금 무슨 일이 일어났나요?</strong>
+            <p>{OBSERVED_RESULTS[lastCompleted]}</p>
+          </div>}
+          {beginner ? <>
+            <div className="w6-step">
+              <span>운송 과정 {STEP_ORDER.indexOf(stage as TutorialCommand) + 1} / 7</span>
+              <b>{beginner.question}</b>
+            </div>
+            <p className="w6-step-explanation">{beginner.explanation}</p>
+          </> : <div className="w6-observed">
+            <strong>한 건의 운송이 끝났어요.</strong>
+            <p>이동이 필요하다는 요청부터 차량 선택, FOUP를 싣고 내려놓는 과정까지 실제로 살펴봤습니다.</p>
+          </div>}
           <div className="w6-action-row">
-            <button type="button" className="w6-primary" disabled={busy || !STEP_ORDER.includes(stage as TutorialCommand)} onClick={runNext}>
-              {busy ? '실제 운송 진행 중…' : (TUTORIAL_STEPS[stage]?.action || '운송 완료')} <span aria-hidden="true">↗</span>
+            <button type="button" className="w6-primary" disabled={busy || !beginner} onClick={runNext}>
+              {busy ? '실제 차량 움직임을 계산하고 있어요…' : beginner?.button ?? '운송 완료'} <span aria-hidden="true">↗</span>
             </button>
-            <button type="button" className="w6-secondary" onClick={reset}>처음부터</button>
+            <button type="button" className="w6-secondary" onClick={reset}>처음부터 보기</button>
           </div>
-          <span className="w6-microcopy">{nativeState.time.toFixed(1)} sim s · {nativeState.tick} native ticks · 요청 {request?.phase ?? '준비'}</span>
+          <details className="w6-native-details">
+            <summary>실제 시뮬레이션 정보 보기</summary>
+            <p>{nativeState.time.toFixed(1)}초 · {nativeState.tick}번의 엔진 계산 · 요청 상태: {request?.phase ?? '아직 없음'}</p>
+          </details>
         </div>}
         {scene.id === 6 && <div className="w6-inner-controls">
           {currentDecision ? <>
             <span className="w6-overline">LIVE MCS / {currentDecision.policy?.toUpperCase?.() ?? 'ROUTING'}</span>
-            <p className="w6-decision-copy">실제 엔진이 계산한 경로 후보 {currentDecision.candidates.length}개 중 선택된 경로를 강조합니다.</p>
+            <p className="w6-decision-copy">물류 제어 시스템(MCS)이 가능한 길을 비교하고 실제로 선택한 경로를 레일 위에 보여줘요. ({currentDecision.candidates.length}개 후보)</p>
             <div className="w6-decision-row">
-              <span>SELECTED ROUTE</span>
+              <span>실제로 선택된 이동 거리</span>
               <strong>{currentDecision.candidates.find(item => item.selected)?.distance.toFixed(0) ?? '—'}</strong>
               <small>graph units</small>
             </div>
           </> : <>
-            <p className="w6-decision-copy">현재 운송에서 선택된 차량과 경로를 확인할 수 있도록 먼저 실제 운송을 진행해야 합니다.</p>
-            <button type="button" className="w6-primary" onClick={() => setSceneIndex(0)}>운송 장면으로 이동 ↗</button>
+            <p className="w6-decision-copy">아직 차량과 이동 경로를 정하지 않았어요. 앞의 운송 장면에서 먼저 실제 차량을 선택하고 움직여 보세요.</p>
+            <button type="button" className="w6-primary" onClick={() => setSceneIndex(0)}>한 건의 운송 살펴보기 ↗</button>
           </>}
         </div>}
         {scene.id === 4 && <div className="w6-inner-controls">
