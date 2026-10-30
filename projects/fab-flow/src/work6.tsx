@@ -14,7 +14,7 @@ import type { CameraCommand } from './components/fabCamera';
 
 type PrototypeScene = 3 | 4 | 6;
 const SCENES: Array<{ id: PrototypeScene; chapter: string; eyebrow: string; title: string; body: string }> = [
-  { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT', title: '하나의 운송은 어떻게 완성될까?', body: '반도체를 만드는 동안 웨이퍼는 여러 장비를 거칩니다. 이 이동이 어떻게 이루어지는지 한 단계씩 살펴보세요.' },
+  { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT', title: '하나의 운송은 어떻게 완성될까?', body: '반도체 회로가 만들어지는 얇은 원판, ‘웨이퍼’는 여러 장비를 거칩니다. 그 이동 과정을 하나씩 따라가 보세요.' },
   { id: 4, chapter: '02 / REVEAL', eyebrow: 'SCENE 04 — THE NETWORK', title: '지금까지 본 건 공장의 극히 일부였다.', body: '한 대의 OHT에서 하나의 Bay로, 다시 여러 Bay가 연결된 물류망으로 시야를 확장합니다.' },
   { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION', title: '누가 이 운송을 맡고, 어느 길로 갈까?', body: '어떤 차량이 옮길지, 어느 길로 갈지 누군가 결정해야 합니다. 그 역할을 맡은 시스템을 만나봅니다.' }
 ];
@@ -28,7 +28,7 @@ const STEP_ORDER: TutorialCommand[] = ['request', 'dispatch', 'empty-travel', 'p
 const BEGINNER_STEPS: Record<TutorialCommand, { question: string; explanation: string; button: string }> = {
   request: {
     question: '왜 옮겨야 할까요?',
-    explanation: '반도체는 한 장비에서 완성되지 않아요. 다음 장비에서 작업할 수 있도록 웨이퍼를 담은 보호 용기(FOUP)를 보내야 한다고 가정해 볼게요. 먼저 물류 시스템에 이동을 부탁합니다.',
+    explanation: '반도체는 한 장비에서 완성되지 않아요. 다음 장비에서 작업할 수 있도록 웨이퍼를 담은 보호 상자(FOUP)를 보내야 하는 상황을 상상해 볼게요. 먼저 물류 시스템에 이동을 부탁합니다.',
     button: '다음 장비로 보내기',
   },
   dispatch: {
