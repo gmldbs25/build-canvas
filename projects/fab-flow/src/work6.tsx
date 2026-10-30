@@ -247,6 +247,7 @@ export default function Work6() {
   const vehicle = nativeState.vehicles.find(item => item.id === request?.vehicle);
   const currentDecision = decision ?? (vehicle && request?.phase !== 'completed' ? engineRef.current.inspectDecision(vehicle.id) : undefined);
   const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
+  const transportFinished = stage === 'bay' && request?.phase === 'completed';
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
   const isNetwork = scene.id === 5;
@@ -284,10 +285,15 @@ export default function Work6() {
       issueCamera(scene.id <= 3 ? 'opening' : 'overview', undefined, undefined);
       return;
     }
+    // Scene 03's final close-up is the *first frame* of the reveal.
+    // One continuous editorial camera move, not three discontinuous jumps.
     setCameraMoment(0);
-    issueCamera(tracked ? 'follow' : 'opening', tracked, reqId);
-    const a = window.setTimeout(() => { setCameraMoment(1); issueCamera('bay', tracked, reqId); }, 1700);
-    const b = window.setTimeout(() => { setCameraMoment(2); issueCamera('overview', tracked, reqId); }, 3700);
+    setCameraCommand(previous => ({
+      sequence: previous.sequence + 1, kind: 'overview', vehicleId: tracked,
+      requestId: reqId, transitionMs: 2700,
+    }));
+    const a = window.setTimeout(() => setCameraMoment(1), 850);
+    const b = window.setTimeout(() => setCameraMoment(2), 2000);
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
   }, [scene.id, issueCamera]);
 
@@ -381,11 +387,11 @@ export default function Work6() {
             <p className="w6-step-explanation">{beginner.explanation}</p>
           </> : <div className="w6-observed">
             <strong>한 건의 운송이 끝났어요.</strong>
-            <p>이동이 필요하다는 요청부터 차량 선택, FOUP를 싣고 내려놓는 과정까지 실제로 살펴봤습니다.</p>
+            <p>운송 요청부터 하역까지 끝났어요. 이제 이 작은 이동이 전체 FAB 안에서 얼마나 작은 부분인지 살펴볼까요?</p>
           </div>}
           <div className="w6-action-row">
-            <button type="button" className="w6-primary" disabled={busy || !beginner} onClick={runNext}>
-              {busy ? '실제 차량 움직임을 계산하고 있어요…' : beginner?.button ?? '운송 완료'} <span aria-hidden="true">↗</span>
+            <button type="button" className="w6-primary" disabled={busy || (!beginner && !transportFinished)} onClick={() => transportFinished ? nextScene(1) : runNext()}>
+              {busy ? '실제 차량 움직임을 계산하고 있어요…' : transportFinished ? '전체 FAB 살펴보기' : beginner?.button ?? '운송 진행 중'} <span aria-hidden="true">↗</span>
             </button>
             <button type="button" className="w6-secondary" onClick={reset}>처음부터 보기</button>
           </div>
