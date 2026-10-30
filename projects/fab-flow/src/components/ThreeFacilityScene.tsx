@@ -479,7 +479,10 @@ export function polylineTubeGeometry(points: { x: number; y: number }[], height:
 }
 
 export const FOUP_CARRIED_CENTER_Y = -33;
-export const FOUP_HANDOFF_HEIGHT = 23;
+// The FOUP center in the carried mark is 72 + (-33) = 39; the Port
+// token center is at Y=8. Use that exact physical difference so the same
+// yellow carrier starts/ends its vertical handoff at the equipment height.
+export const FOUP_HANDOFF_HEIGHT = 72 + FOUP_CARRIED_CENTER_Y - 8;
 const LOW_OHT = makeLowVehiclePrototype();
 const LOW_CARRIED_FOUP = makeLowFoupPrototype(FOUP_CARRIED_CENTER_Y);
 const LOW_SOURCE_FOUP_TOKEN = makeLowFoupPrototype(8, false, true);
