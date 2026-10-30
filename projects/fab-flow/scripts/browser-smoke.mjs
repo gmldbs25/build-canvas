@@ -52,8 +52,12 @@ try {
     await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
     await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    await page.getByRole('button',{name:/운송 요청하기/}).click();
-    await expect(page.getByText('OHT 배차', {exact:true}).first()).toBeVisible({timeout:12000});
+    await expect(page.getByText('왜 옮겨야 할까요?')).toBeVisible();
+    await expect(page.getByText(/웨이퍼를 담은 보호 용기/)).toBeVisible();
+    await page.getByRole('button',{name:/다음 장비로 보내기/}).click();
+    await expect(page.getByText('누가 옮겨 줄까요?')).toBeVisible({timeout:12000});
+    await expect(page.getByText(/아직 차량은 움직이지 않았어요/)).toBeVisible({timeout:12000});
+    if (await page.locator('[data-simulation-tick]').count() !== 1) throw new Error('Native engine view disappeared after first transfer request');
     const nextTick=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     if(nextTick <= startTick) throw new Error('No real Native Tick after request action');
     await page.screenshot({path:path.join(evidence, 'scene03-'+width+'.png')});
