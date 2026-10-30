@@ -1,0 +1,38 @@
+name: Work6 3D prototype validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/fab-flow/**'
+      - '.github/workflows/work6-prototype.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-work6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install prototype dependencies
+        run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - name: TypeScript check (original FAB FLOW runtime + Work6)
+        run: npm run typecheck --prefix projects/fab-flow
+      - name: Vite production build (Github Pages base path)
+        run: GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow npm run build --prefix projects/fab-flow
+      - name: Verify static output
+        run: |
+          test -f projects/fab-flow/dist-pages/index.html
+          test -d projects/fab-flow/dist-pages/assets
+      - name: Upload prototype build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-3d-prototype
+          path: projects/fab-flow/dist-pages/
+          retention-days: 7
