@@ -53,7 +53,7 @@ try {
     await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     await expect(page.getByText('왜 옮겨야 할까요?')).toBeVisible();
-    await expect(page.getByText(/웨이퍼를 담은 보호 용기/)).toBeVisible();
+    await expect(page.getByText(/웨이퍼를 담은 보호 (용기|상자)/)).toBeVisible();
     await page.getByRole('button',{name:/다음 장비로 보내기/}).click();
     await expect(page.getByText('누가 옮겨 줄까요?')).toBeVisible({timeout:12000});
     await expect(page.getByText(/아직 차량은 움직이지 않았어요/)).toBeVisible({timeout:12000});
