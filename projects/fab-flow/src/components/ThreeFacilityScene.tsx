@@ -307,7 +307,9 @@ export function updatePresentedVehicleMatrices(root: THREE.Group) {
 function makeLowFoupPrototype(centerY: number, stored = false, stationary = false) {
   const group = new THREE.Group();
   const geometry = stationary ? positiveFacesBoxGeometry([16, 16, 16]) : new THREE.BoxGeometry(16, 16, 16);
-  const token = new THREE.Mesh(geometry, mat(stored ? 0x88b7a3 : palette.amber)); token.position.y = centerY; group.add(token);
+  // Work6: a FOUP is the same amber physical carrier at the source, on the OHT
+  // and after delivery. Stored is a logistics state, not a different object.
+  const token = new THREE.Mesh(geometry, mat(palette.amber)); token.position.y = centerY; group.add(token);
   mergeVehiclePart(group, undefined, LOW_DETAIL_VERTEX_MATERIAL, true);
   return group.children.find(child => child.userData.role === 'vehicle-merged') as THREE.Mesh;
 }
@@ -1692,7 +1694,15 @@ export default function ThreeFacilityScene(props: Props) {
       const carried = vehicle.loaded || vehicle.phase === 'pickup'; mark.foup.visible = carried;
       const from = oldVehicles.get(vehicle.id);
       const currentFoupY = foupHandoffOffset(vehicle.phase, vehicle.serviceRemaining);
-      const previousFoupY = from ? foupHandoffOffset(from.phase, from.serviceRemaining) : currentFoupY;
+      // On the first pickup tick the carrier changes ownership from the Port
+      // to the hoist. Start the displayed carried mesh at the *lower* height:
+      // interpolating from the prior empty-OHT offset (zero) makes it visibly
+      // descend from the cab before ascending again.
+      const previousFoupY = from
+        ? vehicle.phase === 'pickup' && from.phase !== 'pickup'
+          ? -FOUP_HANDOFF_HEIGHT
+          : foupHandoffOffset(from.phase, from.serviceRemaining)
+        : currentFoupY;
       mark.foup.position.y = currentFoupY;
       if (!mark.root.visible) return [];
       const motion = confirmedRendererMotion(layout, from, vehicle);
