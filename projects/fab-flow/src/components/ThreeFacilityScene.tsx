@@ -304,7 +304,7 @@ export function updatePresentedVehicleMatrices(root: THREE.Group) {
   root.updateWorldMatrix(true, true);
 }
 
-function makeLowFoupPrototype(centerY: number, stored = false, stationary = false) {
+function makeLowFoupPrototype(centerY: number, stationary = false) {
   const group = new THREE.Group();
   const geometry = stationary ? positiveFacesBoxGeometry([16, 16, 16]) : new THREE.BoxGeometry(16, 16, 16);
   // Work6: a FOUP is the same amber physical carrier at the source, on the OHT
@@ -485,8 +485,8 @@ export const FOUP_CARRIED_CENTER_Y = -33;
 export const FOUP_HANDOFF_HEIGHT = 72 + FOUP_CARRIED_CENTER_Y - 8;
 const LOW_OHT = makeLowVehiclePrototype();
 const LOW_CARRIED_FOUP = makeLowFoupPrototype(FOUP_CARRIED_CENTER_Y);
-const LOW_SOURCE_FOUP_TOKEN = makeLowFoupPrototype(8, false, true);
-const LOW_STORED_FOUP_TOKEN = makeLowFoupPrototype(8, true, true);
+const LOW_SOURCE_FOUP_TOKEN = makeLowFoupPrototype(8, true);
+const LOW_STORED_FOUP_TOKEN = makeLowFoupPrototype(8, true);
 const SOURCE_FOUP_TOKEN = LOW_SOURCE_FOUP_TOKEN, STORED_FOUP_TOKEN = LOW_STORED_FOUP_TOKEN;
 export function foupHandoffOffset(phase: Vehicle['phase'], serviceRemaining: number) {
   const remaining = Math.max(0, Math.min(1, serviceRemaining / 1.5));
