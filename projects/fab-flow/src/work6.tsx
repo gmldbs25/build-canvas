@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ThreeFacilityScene from './components/ThreeFacilityScene';
 import { Engine } from './sim/engine';
+import { SCENES } from './work6-scenes';
+import { usePressureWorld } from './usePressureWorld';
 import { operationalScenario } from './sim/experiments';
 import { chooseLocalIntroDemand } from './introScenario';
 import { publicationCopy } from './sim/publication';
@@ -13,12 +15,6 @@ import {
 import type { Scenario, SimulationState } from './sim/types';
 import type { CameraCommand } from './components/fabCamera';
 
-type PrototypeScene = 3 | 4 | 6;
-const SCENES: Array<{ id: PrototypeScene; chapter: string; eyebrow: string; title: string; body: string }> = [
-  { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT', title: '하나의 운송은 어떻게 완성될까?', body: '반도체 회로가 만들어지는 얇은 원판, ‘웨이퍼’는 여러 장비를 거칩니다. 그 이동 과정을 하나씩 따라가 보세요.' },
-  { id: 4, chapter: '02 / REVEAL', eyebrow: 'SCENE 04 — THE NETWORK', title: '지금까지 본 건 공장의 극히 일부였다.', body: '한 대의 OHT에서 하나의 Bay로, 다시 여러 Bay가 연결된 물류망으로 시야를 확장합니다.' },
-  { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION', title: '누가 이 운송을 맡고, 어느 길로 갈까?', body: '어떤 차량이 옮길지, 어느 길로 갈지 누군가 결정해야 합니다. 그 역할을 맡은 시스템을 만나봅니다.' }
-];
 const STEP_ORDER: TutorialCommand[] = ['request', 'dispatch', 'empty-travel', 'pickup', 'route', 'loaded-travel', 'dropoff'];
 
 /**
@@ -122,6 +118,11 @@ export default function Work6() {
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ sequence: 1, kind: 'opening' });
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
+  const isPressure = scene.id >= 7 && scene.id <= 9;
+  const pressure = usePressureWorld(isPressure);
+  const activeEngine = isPressure ? pressure.engine : engineRef.current;
+  const activeState = isPressure ? pressure.state : nativeState;
+  const [mcsView, setMcsView] = useState<'dispatch' | 'route'>('dispatch');
 
   const publish = useCallback(() => {
     const engine = engineRef.current;
@@ -245,11 +246,13 @@ export default function Work6() {
   const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
+  const isNetwork = scene.id === 5;
+  const focusMode = scene.id <= 3;
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
     (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
-  const candidates = (isDecision || isTransportRouteVisible) && currentDecision
+  const candidates = (isDecision || isNetwork || isTransportRouteVisible) && currentDecision
     ? currentDecision.candidates.filter(candidate => candidate.selected)
     : undefined;
 
@@ -263,6 +266,11 @@ export default function Work6() {
     }
     if (scene.id === 6) {
       issueCamera(tracked ? 'follow' : 'overview', tracked, reqId);
+      return;
+    }
+    if (scene.id !== 4) {
+      setCameraMoment(0);
+      issueCamera(scene.id <= 3 ? 'opening' : 'overview', undefined, undefined);
       return;
     }
     setCameraMoment(0);
@@ -280,45 +288,73 @@ export default function Work6() {
     data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
     data-intro-destination-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.destination)?.area}
     data-intro-selected-seed={initial.selection.seed}
-    data-intro-directed-distance={initial.selection.shortestDirectedDistance}>
+    data-intro-directed-distance={initial.selection.shortestDirectedDistance}
+    data-scene-count={SCENES.length} data-current-scene={scene.id}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
-      <span className="w6-prototype">3D INTEGRATION STUDY</span>
+      <span className="w6-prototype">INTERACTIVE ENGINE DOCUMENTARY</span>
     </header>
     <main className="w6-stage">
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
         <ThreeFacilityScene
-          layout={engineRef.current.layout}
-          state={nativeState}
+          layout={activeEngine.layout}
+          state={activeState}
           floor={0}
-          failures={engineRef.current.scenario.failures}
-          storageCapacity={engineRef.current.scenario.storageCapacity}
-          running={busy}
-          tickMs={busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={selectedVehicleId}
-          trackedRequest={request?.phase === 'completed' ? undefined : request?.id}
-          plannedTutorialIngress={planned}
+          failures={activeEngine.scenario.failures}
+          storageCapacity={activeEngine.scenario.storageCapacity}
+          running={isPressure ? !pressure.paused : busy}
+          tickMs={isPressure ? 60 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
+          selected={!isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
+          trackedVehicle={isPressure ? undefined : selectedVehicleId}
+          trackedRequest={isPressure || request?.phase === 'completed' ? undefined : request?.id}
+          plannedTutorialIngress={focusMode ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
-          cameraLocked={scene.id === 3}
-          heatmap={false}
-          view={isDecision ? 'network' : 'overview'}
+          cameraLocked={focusMode}
+          heatmap={isPressure}
+          view={isPressure ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
           routeCandidates={candidates}
           onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
-        {scene.id === 3 && <div className="w6-focus-note" role="note">지금은 가까이서 운송을 관찰해요 · 전체 공장은 다음 장면에서</div>}
-        {scene.id === 3 && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
+        {focusMode && <div className="w6-focus-note" role="note">지금은 가까이서 운송을 관찰해요 · 전체 공장은 다음 장면에서</div>}
+        {(scene.id === 3 || isNetwork || isDecision) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
       </div>
-      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '')} aria-label="장면 설명">
+      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 7 && scene.id <= 10 ? ' w6-narrative-data' : '')} aria-label="장면 설명">
         <p className="w6-chapter">{scene.chapter}</p>
         <h1>{scene.title}</h1>
         <p className="w6-description">{scene.body}</p>
+
+        {scene.id === 1 && <div className="w6-inner-controls">
+          <p className="w6-context-line">하나의 장비에서 다음 장비로. 필요한 것은 운송의 연결이에요.</p>
+          <button type="button" className="w6-primary" onClick={() => setSceneIndex(1)}>무엇을 옮기는지 살펴보기 <span aria-hidden="true">↗</span></button>
+        </div>}
+        {scene.id === 2 && <div className="w6-inner-controls">
+          <div className="w6-terms">
+            <p><strong>웨이퍼</strong><span>반도체 회로가 만들어지는 얇은 원판</span></p>
+            <p><strong>FOUP</strong><span>웨이퍼를 보호하며 이동하는 전용 용기</span></p>
+            <p><strong>OHT</strong><span>FOUP를 옮기는 천장 운반 차량</span></p>
+            <p><strong>Port</strong><span>장비와 차량이 FOUP를 주고받는 자리</span></p>
+          </div>
+          <button type="button" className="w6-primary" onClick={() => setSceneIndex(2)}>직접 한 건을 옮겨보기 <span aria-hidden="true">↗</span></button>
+          <p className="w6-microcopy">이 화면은 실제 FAB FLOW의 3D 장비·레일 모델입니다. 공정 가공 자체를 시뮬레이션하지는 않습니다.</p>
+        </div>}
+        {scene.id === 5 && <div className="w6-inner-controls">
+          <p className="w6-context-line">출발지와 목적지의 거리가 가까워도, 일방통행 레일을 거슬러 갈 수는 없어요. 레일이 만나는 곳에서 다른 길로 갈아타야 할 수도 있죠.</p>
+          <div className="w6-terms">
+            <p><strong>Bay</strong><span>공정 장비가 모여 있는 작업 구역</span></p>
+            <p><strong>Rail</strong><span>OHT가 이동하는 정해진 선로</span></p>
+            <p><strong>Port</strong><span>FOUP를 건네는 장비 앞 자리</span></p>
+          </div>
+          {currentDecision?.candidates.some(candidate => candidate.selected)
+            ? <p className="w6-microcopy">현재 운송에서 실제로 선택한 레일 경로를 함께 표시했어요.</p>
+            : <p className="w6-microcopy">실제 V6 레일망의 방향·교차로를 보여줘요. 경로 강조는 앞 장면에서 운송을 진행한 뒤에 나타납니다.</p>}
+        </div>}
+
         {scene.id === 3 && <div className="w6-inner-controls">
           {lastCompleted && <div className="w6-observed" role="status" aria-live="polite">
             <strong>방금 무슨 일이 일어났나요?</strong>
@@ -347,6 +383,11 @@ export default function Work6() {
         </div>}
         {scene.id === 6 && <div className="w6-inner-controls">
           {currentDecision ? <>
+            <div className="w6-action-row" role="group" aria-label="MCS 결정 살펴보기">
+              <button className={mcsView === 'dispatch' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setMcsView('dispatch')}>차량 선택</button>
+              <button className={mcsView === 'route' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setMcsView('route')}>길 선택</button>
+            </div>
+            {mcsView === 'dispatch' ? <p className="w6-decision-copy">OHT <strong>{vehicle?.id ?? '—'}</strong>가 이 운송에 배정됐어요. 어떤 차량이 맡을지 고르는 결정이 <strong>배차</strong>예요.</p> : <p className="w6-decision-copy">선택된 경로는 실제 MCS가 레일 연결과 운행 조건을 바탕으로 계산했어요. 아래 숫자는 모형의 경로 거리입니다.</p>}
             <span className="w6-overline">LIVE MCS / {currentDecision.policy?.toUpperCase?.() ?? 'ROUTING'}</span>
             <p className="w6-decision-copy">물류 제어 시스템(MCS)이 가능한 길을 비교하고 실제로 선택한 경로를 레일 위에 보여줘요. ({currentDecision.candidates.length}개 후보)</p>
             <div className="w6-decision-row">
@@ -359,6 +400,74 @@ export default function Work6() {
             <button type="button" className="w6-primary" onClick={() => setSceneIndex(0)}>한 건의 운송 살펴보기 ↗</button>
           </>}
         </div>}
+        {(scene.id === 7 || scene.id === 8) && <div className="w6-inner-controls">
+          <p className="w6-overline">LIVE NATIVE ENGINE · SMALL 2-BAY STUDY</p>
+          {scene.id === 7 ? <>
+            <p className="w6-context-line">아래 수치는 연출용 숫자가 아니에요. 실제 요청이 만들어지고, 차량이 점유한 레일이 막힐 때 대기가 누적되는 결과예요.</p>
+            <div className="w6-stat-pair">
+              <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
+              <div><span>레일 또는 차량에서 대기</span><strong>{pressure.engine.getDiagnostics().blockedVehicles}</strong><small>대</small></div>
+            </div>
+          </> : <>
+            <p className="w6-context-line">운송을 끝내는 속도와 미완료 요청은 다른 지표입니다. 완료량이 늘어도 요청이 더 빨리 쌓이면 병목은 남을 수 있어요.</p>
+            <div className="w6-stat-pair">
+              <div><span>실제로 완료된 운송</span><strong>{pressure.metrics.completed}</strong><small>건</small></div>
+              <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
+            </div>
+            <div className="w6-meter" aria-label="실제 완료와 미완료 요청 비율">
+              <div style={{width:(pressure.metrics.created ? (pressure.metrics.completed / pressure.metrics.created)*100 : 0)+'%'}}/>
+            </div>
+            <p className="w6-microcopy">평균 운송 소요 {pressure.metrics.completed ? pressure.metrics.averageTransport.toFixed(1) + '초' : '완료 사례 없음'} · 경과 {Math.round(pressure.state.time)}초</p>
+          </>}
+          <div className="w6-action-row">
+            <button type="button" className="w6-secondary" onClick={() => pressure.setPaused(!pressure.paused)}>{pressure.paused ? '다시 관찰하기' : '관찰 잠시 멈추기'}</button>
+            <button type="button" className="w6-secondary" onClick={pressure.reset}>처음부터 관찰</button>
+          </div>
+          <p className="w6-microcopy">교육용 2-Bay 구역 · 실제 FAB FLOW 엔진 상태 · {Math.round(pressure.state.time)} 시뮬레이션 초</p>
+          {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
+        </div>}
+        {scene.id === 9 && <div className="w6-inner-controls">
+          <p className="w6-context-line">동일한 요청 순서·난수 시드·관찰 시간으로 두 번 실행해요. 한 번에 한 조건만 바꿔 차이를 관찰합니다.</p>
+          <label className="w6-field">운영에서 바꿀 것
+            <select disabled={pressure.comparing} value={pressure.compareMode} onChange={e => pressure.changeMode(e.target.value as 'fleet' | 'policy')}>
+              <option value="fleet">OHT 8대 → 13대</option><option value="policy">경로 정책 DBR → CBR</option>
+            </select>
+          </label>
+          <label className="w6-field">운송 요청 수준
+            <select disabled={pressure.comparing} value={pressure.compareDemand} onChange={e => pressure.changeDemand(Number(e.target.value) as 8 | 14)}>
+              <option value={8}>낮음 · 분당 8건</option><option value={14}>높음 · 분당 14건</option>
+            </select>
+          </label>
+          <button type="button" className="w6-primary" disabled={pressure.comparing} onClick={pressure.compare}>{pressure.comparing ? '실제 엔진으로 비교 중…' : '같은 조건으로 두 번 실행하기'} <span aria-hidden="true">↗</span></button>
+          {pressure.comparing && <div role="status" className="w6-microcopy">시뮬레이션 계산 {Math.round(pressure.progress*100)}%</div>}
+          {pressure.result && <div className="w6-comparison" role="status">
+            <div className="w6-comparison-header"><span>실제 실험 결과 · {pressure.result.duration}초 관찰</span><span>동일 seed {pressure.result.seed}</span></div>
+            <table><thead><tr><th>측정</th><th>기준</th><th>변경 후</th></tr></thead>
+              <tbody>
+                <tr><th>완료 운송</th><td>{pressure.result.baseline.completed}건</td><td>{pressure.result.changed.completed}건</td></tr>
+                <tr><th>미완료 요청</th><td>{pressure.result.baseline.unfinished}건</td><td>{pressure.result.changed.unfinished}건</td></tr>
+                <tr><th>평균 운송 시간</th><td>{pressure.result.baseline.completed ? pressure.result.baseline.averageTransport.toFixed(1)+'초' : '—'}</td><td>{pressure.result.changed.completed ? pressure.result.changed.averageTransport.toFixed(1)+'초' : '—'}</td></tr>
+              </tbody></table>
+            <p className="w6-microcopy">바꾼 조건: {pressure.compareMode === 'fleet' ? '차량 5대 추가' : '경로 정책 CBR'} · 수요·시간·시드 동일. 이 한 번의 관찰로 모든 상황을 일반화할 수는 없어요.</p>
+          </div>}
+          {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
+        </div>}
+        {scene.id === 10 && <div className="w6-inner-controls">
+          <div className="w6-architecture" aria-label="실제 실행 구조">
+            <div><small>01 / COMMAND</small><strong>운송 요청·설정</strong><span>관람자의 선택 또는 실제 수요</span></div>
+            <div><small>02 / ENGINE</small><strong>0.5초마다 상태 계산</strong><span>배차·경로·레일 점유·차량·FOUP</span></div>
+            <div><small>03 / RENDER</small><strong>Three.js 3D 화면</strong><span>계산된 상태를 끊김 없이 표현</span></div>
+          </div>
+          <details className="w6-native-details"><summary>기술 구현 자세히 보기</summary>
+            <p>실제 FAB FLOW의 Engine.step()은 0.5 시뮬레이션 초 단위로 상태를 진행합니다. ThreeFacilityScene은 계산된 차량 위치와 FOUP 상태를 받아 표현합니다. 모델의 결정성과 실제 공장의 정밀한 재현은 다릅니다.</p>
+          </details>
+        </div>}
+        {scene.id === 11 && <div className="w6-inner-controls">
+          <p className="w6-context-line">Work6에서 본 물류는 정적인 그림이 아니라 실제로 작동하는 시뮬레이터에서 왔습니다. 이제 직접 공장 크기와 OHT 대수, 운송 요청량을 바꿀 수 있어요.</p>
+          <span className="w6-overline">FAB FLOW · 반도체 물류 세상</span>
+          <p className="w6-microcopy">원본 FAB FLOW 앱의 공개 접속 주소는 현재 확인되지 않아 잘못된 링크 대신 연결을 보류했습니다.</p>
+          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>처음부터 다시 보기 ↗</button>
+        </div>}
         {scene.id === 4 && <div className="w6-inner-controls">
           <p className="w6-microcopy">실제 FAB FLOW Large V6 모델 · 삼성 평택 내부 배치를 재현한 것은 아닙니다.</p>
           <button type="button" className="w6-secondary" onClick={() => { setCameraMoment(2); issueCamera('overview', selectedVehicleId, request?.id); }}>전체 FAB 보기 ↗</button>
@@ -367,8 +476,8 @@ export default function Work6() {
       </section>
     </main>
     <footer className="w6-footer">
-      <div className="w6-scene-pager" aria-label="대표 장면 탐색">
-        {SCENES.map((part, index) => <button key={part.id} type="button" className={index === sceneIndex ? 'active' : ''} onClick={() => setSceneIndex(index)} aria-current={index === sceneIndex ? 'step' : undefined}>SCENE {String(part.id).padStart(2,'0')}</button>)}
+      <div className="w6-scene-pager" aria-label="전체 장면 탐색">
+        {SCENES.map((part, index) => <button key={part.id} type="button" className={index === sceneIndex ? 'active' : ''} onClick={() => setSceneIndex(index)} aria-label={'Scene '+String(part.id).padStart(2,'0')+': '+part.title} aria-current={index === sceneIndex ? 'step' : undefined}>{String(part.id).padStart(2,'0')}</button>)}
       </div>
       <div className="w6-navigation">
         <button type="button" onClick={() => nextScene(-1)} disabled={sceneIndex === 0} aria-label="이전 장면">←</button>
@@ -376,6 +485,6 @@ export default function Work6() {
         <button type="button" onClick={() => nextScene(1)} disabled={sceneIndex === SCENES.length-1} aria-label="다음 장면">→</button>
       </div>
     </footer>
-    <div className="w6-prototype-disclaimer">Prototype: 03 · 04 · 06 only. Original FAB FLOW native renderer + Engine. Other scenes are not implemented yet.</div>
+    <div className="w6-prototype-disclaimer">WORK 06 · 11 SCENES · ORIGINAL FAB FLOW NATIVE ENGINE & THREE.JS · EDUCATIONAL MODEL, NOT A REAL FAB DIGITAL TWIN</div>
   </div>;
 }
