@@ -1297,6 +1297,16 @@ export default function ThreeFacilityScene(props: Props) {
   const worldScopeRef = useRef<{ layout: Layout; floor: number; fleetKey: string } | null>(null);
   const tokenSignature = useMemo(() => JSON.stringify({ sources: sampledInventory.source, stored: sampledInventory.stored }), [sampledInventory]);
   const cameraSpanRef = useRef(740), cameraTargetRef = useRef({ x: 0, y: 34, z: 0 }), overviewRef = useRef(false);
+  // Animation is camera-only: the OHT/FOUP Native Engine remains frozen during
+  // the Scene 03 -> Scene 04 editorial scale reveal.
+  const cameraTransitionRef = useRef<number | null>(null);
+  const cancelCameraTransition = () => {
+    if (cameraTransitionRef.current !== null) cancelAnimationFrame(cameraTransitionRef.current);
+    cameraTransitionRef.current = null;
+  };
+  useEffect(() => () => {
+    if (cameraTransitionRef.current !== null) cancelAnimationFrame(cameraTransitionRef.current);
+  }, []);
   const cameraFrameModeRef = useRef<'overview' | 'follow' | 'rail' | 'manual'>('manual');
   const automaticFollowSpanRef = useRef<{ requested: number; fitted: number } | null>(null);
   const viewportSizeRef = useRef({ width: 1, height: 1 });
@@ -1581,6 +1591,12 @@ export default function ThreeFacilityScene(props: Props) {
     if (fleetRebuild && fleetRebuild.sequence === cameraCommand.sequence) return;
     if (localFollowIntentRef.current && appliedCommandSequenceRef.current === cameraCommand.sequence) return;
     appliedCommandSequenceRef.current = cameraCommand.sequence;
+    cancelCameraTransition();
+    const transitionMs = !reducedMotion && cameraCommand.kind === 'overview'
+      ? Math.max(0, Math.min(4200, cameraCommand.transitionMs ?? 0)) : 0;
+    const fromPosition = transitionMs ? cam.position.clone() : null;
+    const fromTarget = transitionMs ? { ...cameraTargetRef.current } : null;
+    const fromSpan = transitionMs ? cameraSpanRef.current / Math.max(.001, zoom) : 0;
     const restored = cameraRestoreRef.current;
     if (restored && restored.sequence === cameraCommand.sequence) { cameraRestoreRef.current = null; return; }
     cameraRestoreRef.current = null;
@@ -1651,6 +1667,56 @@ export default function ThreeFacilityScene(props: Props) {
     }
     automaticFollowSpanRef.current = null; cameraSpanRef.current = span; cameraTargetRef.current = { x, y: pose ? 72 : 35, z }; const distance = rendererCameraDistance(bounds.width, bounds.height, cameraCommand.kind !== 'follow' && cameraCommand.kind !== 'welcome'); cam.position.set(x + distance * .48, distance * .72, z + distance * .48); cam.lookAt(x, pose ? 72 : 35, z); if (sceneRef.current) updateCameraDepth(cam, sceneRef.current, bounds, cameraTargetRef.current,world.root.userData.depthBounds); setZoom(1); resizeRef.current();
     if (cameraCommand.kind === 'follow') { setFollow(true); onFollowChange?.(true); }
+    if (transitionMs && fromPosition && fromTarget && worldRef.current) {
+      // The standard overview fitter above is the source of truth for the
+      // destination. Capture it, then restore the *visible* close-up before
+      // the next paint; a hard snap to overview would spoil the scale reveal.
+      const toPosition = cam.position.clone();
+      const toTarget = { ...cameraTargetRef.current };
+      const toSpan = cameraSpanRef.current;
+      const startSpan = Math.max(1, fromSpan);
+      const endSpan = Math.max(startSpan, toSpan);
+      const boundsForDepth = worldRef.current.bounds;
+      const depthBounds = worldRef.current.root.userData.depthBounds;
+      overviewRef.current = false;
+      cameraFrameModeRef.current = 'manual';
+      cam.position.copy(fromPosition);
+      cameraTargetRef.current = { ...fromTarget };
+      cameraSpanRef.current = startSpan;
+      cam.lookAt(fromTarget.x, fromTarget.y, fromTarget.z);
+      const started = performance.now();
+      const move = (now: number) => {
+        const t = Math.min(1, Math.max(0, (now - started) / transitionMs));
+        // Quintic smoothstep keeps both ends at rest; logarithmic span makes
+        // a 320 -> full-facility orthographic reveal read as a steady pullback.
+        const eased = t * t * t * (t * (6 * t - 15) + 10);
+        const target = {
+          x: fromTarget.x + (toTarget.x - fromTarget.x) * eased,
+          y: fromTarget.y + (toTarget.y - fromTarget.y) * eased,
+          z: fromTarget.z + (toTarget.z - fromTarget.z) * eased,
+        };
+        cameraTargetRef.current = target;
+        cameraSpanRef.current = Math.exp(Math.log(startSpan) + (Math.log(endSpan) - Math.log(startSpan)) * eased);
+        cam.position.copy(fromPosition).lerp(toPosition, eased);
+        cam.lookAt(target.x, target.y, target.z);
+        const { width, height } = viewportSizeRef.current;
+        setCameraFrustum(cam, cameraSpanRef.current, width, height, { x: 0, y: 0 });
+        if (sceneRef.current) updateCameraDepth(cam, sceneRef.current, boundsForDepth, target, depthBounds);
+        // Keep original equipment, vehicle and FOUP meshes on the same world.
+        updateStaticLod(worldRef.current!, cameraSpanRef.current, 1, height);
+        cameraPresentationRef.current();
+        drawRef.current();
+        if (t < 1) cameraTransitionRef.current = requestAnimationFrame(move);
+        else {
+          cameraTransitionRef.current = null;
+          overviewRef.current = true;
+          cameraFrameModeRef.current = 'overview';
+          resizeRef.current();
+          cameraPresentationRef.current();
+        }
+      };
+      cameraTransitionRef.current = requestAnimationFrame(move);
+    }
   }, [cameraCommand?.sequence, worldRevision]);
   useEffect(() => { resize(); }, [resize]);
   useEffect(() => {
@@ -1966,7 +2032,7 @@ export default function ThreeFacilityScene(props: Props) {
       cameraPresentationRef.current = () => undefined;
     };
   }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, floor, worldRevision, cameraCommand?.sequence, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; cancelCameraTransition(); const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointerPoints.current.size === 2) { pinchGestureRef.current = true; const [a, b] = Array.from(pointerPoints.current.values()); pinchRef.current = { distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom, moved: false }; dragRef.current = null; }
     else if (pointerPoints.current.size === 1) dragRef.current = { x: event.clientX, y: event.clientY, center: camera.position.clone(), target: { ...cameraTargetRef.current } };
     setLabel(''); };
@@ -2006,7 +2072,7 @@ export default function ThreeFacilityScene(props: Props) {
     if (!host || !camera) return; const rect = host.getBoundingClientRect(); pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(pointer, camera);
     const info = worldRef.current ? pickSceneTarget(worldRef.current, raycaster) : undefined; if (info) onSelect(info.kind, info.id);
   };
-  const zoomBy = (scale: number) => { if (cameraLocked) return; overviewRef.current = false; cameraFrameModeRef.current = 'manual'; automaticFollowSpanRef.current = null; releaseProjection(); setLabel(''); setZoom(value => clampZoom(value * scale)); };
+  const zoomBy = (scale: number) => { if (cameraLocked) return; cancelCameraTransition(); overviewRef.current = false; cameraFrameModeRef.current = 'manual'; automaticFollowSpanRef.current = null; releaseProjection(); setLabel(''); setZoom(value => clampZoom(value * scale)); };
   const wheelZoomRef = useRef(zoomBy); wheelZoomRef.current = zoomBy;
   useEffect(() => {
     const host = hostRef.current; if (!host) return;
@@ -2019,7 +2085,7 @@ export default function ThreeFacilityScene(props: Props) {
     host.addEventListener('wheel', wheel, { passive: false });
     return () => host.removeEventListener('wheel', wheel);
   }, [rendererReady, cameraLocked]);
-  const centerOverview = () => { if (cameraLocked) return; localFollowIntentRef.current = false; setFollow(false); onFollowChange?.(false); overviewRef.current = true; cameraFrameModeRef.current = 'overview'; setZoom(1); setLodRevision(value => value + 1); const b = worldRef.current?.bounds; const cam = cameraRef.current; if (b && cam) { const { width, height } = viewportSizeRef.current, x = b.x + b.width / 2, z = b.y + b.height / 2, d = rendererCameraDistance(b.width, b.height, true), aspect = width / Math.max(1, height); cameraSpanRef.current = fitProjectedOverviewSpan(b.width, b.height, aspect); cameraTargetRef.current = { x, y: 35, z }; cam.position.set(x + d * .48, d * .72, z + d * .48); cam.far = rendererCameraFar(b.width, b.height, d); if (sceneRef.current?.fog instanceof THREE.Fog) { sceneRef.current.fog.near = Math.max(1700, d * .9); sceneRef.current.fog.far = Math.max(4200, d + (b.width + b.height) * .8); } cam.updateProjectionMatrix(); cam.lookAt(x, 35, z); resizeRef.current(); } };
+  const centerOverview = () => { if (cameraLocked) return; cancelCameraTransition(); localFollowIntentRef.current = false; setFollow(false); onFollowChange?.(false); overviewRef.current = true; cameraFrameModeRef.current = 'overview'; setZoom(1); setLodRevision(value => value + 1); const b = worldRef.current?.bounds; const cam = cameraRef.current; if (b && cam) { const { width, height } = viewportSizeRef.current, x = b.x + b.width / 2, z = b.y + b.height / 2, d = rendererCameraDistance(b.width, b.height, true), aspect = width / Math.max(1, height); cameraSpanRef.current = fitProjectedOverviewSpan(b.width, b.height, aspect); cameraTargetRef.current = { x, y: 35, z }; cam.position.set(x + d * .48, d * .72, z + d * .48); cam.far = rendererCameraFar(b.width, b.height, d); if (sceneRef.current?.fog instanceof THREE.Fog) { sceneRef.current.fog.near = Math.max(1700, d * .9); sceneRef.current.fog.far = Math.max(4200, d + (b.width + b.height) * .8); } cam.updateProjectionMatrix(); cam.lookAt(x, 35, z); resizeRef.current(); } };
   const names = useMemo(() => new Map(layout.ports.map(p => [p.id, p.name])), [layout.ports]);
   void names;
   const qualityTitle = !graphicsInfo.renderer ? '3D 품질' : softwareLargeFleet
