@@ -25,7 +25,7 @@ jobs:
       - name: TypeScript check (original FAB FLOW runtime + Work6)
         run: npm run typecheck --prefix projects/fab-flow
       - name: Vite production build (Github Pages base path)
-        run: GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow npm run build --prefix projects/fab-flow
+        run: GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build --prefix projects/fab-flow
       - name: Verify static output
         run: |
           test -f projects/fab-flow/dist-pages/index.html
