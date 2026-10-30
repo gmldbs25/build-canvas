@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Engine, getKpis } from './sim/engine';
 import { operationalScenario } from './sim/experiments';
+import { presetScenario } from './sim/demand-presets';
 import { publicationCopy } from './sim/publication';
 import type { Policy, Scenario, SimulationState } from './sim/types';
 
@@ -22,12 +23,25 @@ function snapshot(engine: Engine): SimulationState {
   return publicationCopy({ version: 1, scenario: engine.scenario, state: engine.state }).state;
 }
 
-// Isolated 2-Bay native view for the congestion chapter; never a mock counter.
-// A limited observation area contrasts with the actual 9-Bay scale reveal.
+// Short, deterministic guided observation using the same Large V6 native
+// facility and live interval-demand API as the standalone FAB FLOW application.
+// All vehicle movement, request history and counts still come from Engine.step.
 function pressureScenario(): Scenario {
-  return { ...operationalScenario('small'), fleet: 8, demand: 12,
-    pattern: 'steady', distribution: 'balanced', seed: 31,
-    duration: 360, demandWindow: 300, policy: 'DBR' };
+  return {
+    ...presetScenario('large', 'active', 31, 'DBR', 48),
+    duration: 360, demandWindow: 300,
+  };
+}
+
+// The cinema has only three editorial beats. These are simulated timestamps,
+// not a claim of a real factory's response times. At the original one-tick
+// playback cadence the entire story takes ~20 wall-clock seconds.
+export const PRESSURE_STORY = { surgeAt: 10, observeAt: 70, endAt: 85 } as const;
+export type PressureBeat = 'normal' | 'surge' | 'observe' | 'complete';
+export function pressureBeat(time: number): PressureBeat {
+  return time < PRESSURE_STORY.surgeAt ? 'normal'
+    : time < PRESSURE_STORY.observeAt ? 'surge'
+      : time < PRESSURE_STORY.endAt ? 'observe' : 'complete';
 }
 
 // Keep the renderer's transition duration equal to the Native Engine
@@ -49,15 +63,24 @@ export function usePressureWorld(active: boolean) {
   const epoch = useRef(0);
 
   useEffect(() => {
-    if (!active || paused || engine.state.time >= 300) return;
+    if (!active || paused || engine.state.time >= PRESSURE_STORY.endAt) return;
     const interval = window.setInterval(() => {
       try {
         // 1 native 0.5s tick = 1 publication = 1 3D interpolation.
         // The authentic demand, dispatch, congestion and route logic remains.
+        // One deliberate intervention, made through FAB FLOW's actual native
+        // demand control. Never replace OHT positions with scripted poses.
+        if (engine.state.time >= PRESSURE_STORY.surgeAt &&
+            !(engine.scenario.demandChanges?.length)) {
+          engine.setDemandInterval(1, 'congested');
+        }
         engine.step(1);
         setState(snapshot(engine));
         setMetrics(getKpis(engine));
-        if (engine.state.time >= 300) window.clearInterval(interval);
+        if (engine.state.time >= PRESSURE_STORY.endAt) {
+          window.clearInterval(interval);
+          setPaused(true);
+        }
       } catch (e) {
         window.clearInterval(interval);
         setError(e instanceof Error ? e.message : '실제 엔진 관찰 중 오류');
@@ -130,6 +153,6 @@ export function usePressureWorld(active: boolean) {
     epoch.current++; setComparing(false); setResult(null); setProgress(0); setCompareDemand(next);
   }, []);
 
-  return { engine, state, metrics, tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
+  return { engine, state, metrics, beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
     compareMode, changeMode, compareDemand, changeDemand, compare, comparing, progress, result };
 }

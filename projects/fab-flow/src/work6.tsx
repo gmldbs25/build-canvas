@@ -121,7 +121,8 @@ export default function Work6() {
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
   const isPressure = scene.id >= 7 && scene.id <= 9;
-  const pressure = usePressureWorld(isPressure);
+  // Scene 07 runs the timed native story; Scenes 08–09 keep its final frame.
+  const pressure = usePressureWorld(scene.id === 7);
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -281,6 +282,7 @@ export default function Work6() {
   const shownRoute = routeStudy ? routeChoice === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
+  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 밀리는 운송';
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
@@ -350,7 +352,10 @@ export default function Work6() {
     data-route-study-destination={routeStudy?.destinationBay ?? ''}
     data-route-study-distinct-fraction={routeStudy?.contrast.distinctFraction ?? ''}
     data-route-study-separation={routeStudy?.contrast.maxSeparation ?? ''}
-    data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}>
+    data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}
+    data-pressure-beat={scene.id === 7 || scene.id === 8 ? pressure.beat : ''}
+    data-pressure-layout={isPressure ? pressure.engine.layout.id : ''}
+    data-pressure-demand-changes={isPressure ? pressure.engine.scenario.demandChanges?.length ?? 0 : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -385,6 +390,10 @@ export default function Work6() {
         {focusMode && <div className="w6-focus-note" role="note">{isOpening ? '고정된 시야에서 여러 OHT의 실제 움직임을 관찰해요' : '지금은 한 대의 운송에 집중해요 · 전체 공장은 Scene 04에서'}</div>}
         {(scene.id === 3 || isNetwork || isDecision) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
+        {scene.id === 7 && <div className="w6-pressure-caption" aria-live="off">
+          <span className={pressure.beat === 'normal' ? 'is-calm' : 'is-busy'} aria-hidden="true"/>
+          {pressureBeatLabel}
+        </div>}
       </div>
       <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 7 && scene.id <= 10 ? ' w6-narrative-data' : '')} aria-label="장면 설명">
         <p className="w6-chapter">{scene.chapter}</p>
@@ -471,15 +480,29 @@ export default function Work6() {
           </div>}
         </div>}
         {(scene.id === 7 || scene.id === 8) && <div className="w6-inner-controls">
-          <p className="w6-overline">LIVE NATIVE ENGINE · SMALL 2-BAY STUDY</p>
+          <p className="w6-overline">NATIVE FAB FLOW · LARGE 9-BAY</p>
           {scene.id === 7 ? <>
-            <p className="w6-context-line">아래 수치는 연출용 숫자가 아니에요. 실제 요청이 만들어지고, 차량이 점유한 레일이 막힐 때 대기가 누적되는 결과예요.</p>
+            <p className="w6-context-line">{pressure.beat === 'normal'
+              ? '평소에는 운송 요청이 천천히 발생해요. 잠시 뒤, 같은 FAB에 요청이 한꺼번에 몰립니다.'
+              : pressure.beat === 'surge'
+                ? '실제 엔진의 요청 발생 간격을 10초에서 1초로 높였어요. 차량이 움직여도 미완료 운송이 어떻게 쌓이는지 보세요.'
+                : '요청이 빠르게 들어온 뒤의 결과예요. 진행 중인 운송과 아직 처리하지 못한 요청을 함께 살펴보세요.'}</p>
+            <div className="w6-story-steps" aria-label="운송 요청 증가 관찰 순서">
+              <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 평상시</span>
+              <span className={pressure.beat === 'surge' ? 'current' : pressure.beat === 'normal' ? '' : 'past'}>02 요청 증가</span>
+              <span className={pressure.beat === 'observe' || pressure.beat === 'complete' ? 'current' : ''}>03 결과 관찰</span>
+            </div>
             <div className="w6-stat-pair">
               <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
-              <div><span>레일 또는 차량에서 대기</span><strong>{pressure.engine.getDiagnostics().blockedVehicles}</strong><small>대</small></div>
+              <div><span>현재 대기 중인 OHT</span><strong>{pressure.state.vehicles.filter(vehicle => vehicle.waiting > 0 && !vehicle.parked).length}</strong><small>대</small></div>
             </div>
+            <div className="w6-action-row">
+              <button type="button" className="w6-secondary" onClick={pressure.reset}>처음부터 다시 보기</button>
+              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>이 결과를 어떻게 볼까? <span aria-hidden="true">↗</span></button>
+            </div>
+            <p className="w6-microcopy">{pressure.beat === 'complete' ? '관찰 완료' : '자동 관찰 진행 중'} · 실제 엔진 0.5초 Tick · {Math.round(pressure.state.time)} 시뮬레이션 초</p>
           </> : <>
-            <p className="w6-context-line">운송을 끝내는 속도와 미완료 요청은 다른 지표입니다. 완료량이 늘어도 요청이 더 빨리 쌓이면 병목은 남을 수 있어요.</p>
+            <p className="w6-context-line">앞 장면에서 같은 Large FAB에 운송 요청을 빠르게 보냈어요. 차량이 바쁘게 움직인다고 운송이 모두 끝나는 건 아니에요.</p>
             <div className="w6-stat-pair">
               <div><span>실제로 완료된 운송</span><strong>{pressure.metrics.completed}</strong><small>건</small></div>
               <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
@@ -487,15 +510,13 @@ export default function Work6() {
             <div className="w6-meter" aria-label="실제 완료와 미완료 요청 비율">
               <div style={{width:(pressure.metrics.created ? (pressure.metrics.completed / pressure.metrics.created)*100 : 0)+'%'}}/>
             </div>
-            <p className="w6-microcopy">평균 운송 소요 {pressure.metrics.completed ? pressure.metrics.averageTransport.toFixed(1) + '초' : '완료 사례 없음'} · 경과 {Math.round(pressure.state.time)}초</p>
+            <p className="w6-microcopy">평균 운송 소요 {pressure.metrics.completed ? pressure.metrics.averageTransport.toFixed(1) + '초' : '완료 사례 없음'} · 경과 {Math.round(pressure.state.time)} 시뮬레이션 초 · Scene 07의 실제 운영 상태</p>
+            <div className="w6-action-row">
+              <button type="button" className="w6-secondary" onClick={() => { pressure.reset(); nextScene(-1); }}>운송 증가 다시 보기</button>
+            </div>
           </>}
-          <div className="w6-action-row">
-            <button type="button" className="w6-secondary" onClick={() => pressure.setPaused(!pressure.paused)}>{pressure.paused ? '다시 관찰하기' : '관찰 잠시 멈추기'}</button>
-            <button type="button" className="w6-secondary" onClick={pressure.reset}>처음부터 관찰</button>
-          </div>
-          <p className="w6-microcopy">교육용 2-Bay 구역 · 실제 FAB FLOW 엔진 상태 · {Math.round(pressure.state.time)} 시뮬레이션 초</p>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
-        </div>}
+        </div>
         {scene.id === 9 && <div className="w6-inner-controls">
           <p className="w6-context-line">동일한 요청 순서·난수 시드·관찰 시간으로 두 번 실행해요. 한 번에 한 조건만 바꿔 차이를 관찰합니다.</p>
           <label className="w6-field">운영에서 바꿀 것

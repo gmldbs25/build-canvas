@@ -120,3 +120,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
   .w6-stat-pair strong{font-size:28px}
   .w6-architecture>div{padding-bottom:15px}
 }
+
+/* Scene 07: a restrained, three-beat native-engine documentary, not a dashboard. */
+.w6-story-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.w6-story-steps span{border-top:2px solid #ccd4c9;padding-top:7px;color:#899489;font:600 10px/1.4 ui-monospace,Menlo,Consolas,monospace;transition:color .2s,border-color .2s}
+.w6-story-steps span.current{border-color:#387d6b;color:#235e4d}
+.w6-story-steps span.past{border-color:#91b3a2;color:#648575}
+.w6-pressure-caption{position:absolute;right:clamp(20px,3.6vw,66px);bottom:96px;z-index:5;display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(251,249,241,.91);border:1px solid #d6ded4;color:#345548;font:600 11px/1.4 ui-monospace,Menlo,Consolas,monospace;pointer-events:none}
+.w6-pressure-caption>span{display:block;width:8px;height:8px;border-radius:50%;background:#4b9d81}
+.w6-pressure-caption>span.is-busy{background:#c98643}
+@media(max-width:650px){.w6-pressure-caption{right:12px;bottom:380px;font-size:10px}.w6-story-steps span{font-size:9px}}

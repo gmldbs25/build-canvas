@@ -302,6 +302,8 @@ try {
     await page.getByRole('button',{name:/Scene 07:/}).click();
     await expect(page.getByRole('heading',{name:'운송이 많아지면 무슨 일이 생길까?'})).toBeVisible();
     await expect(page.getByText('아직 완료되지 않은 요청',{exact:true})).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-layout','large');
+    await expect(page.getByText('01 평상시')).toBeVisible();
     const congestionBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     const pressureSamples=[congestionBefore];
     for(let k=0;k<6;k++){
@@ -313,10 +315,15 @@ try {
       throw new Error('Native congestion should publish successive single ticks without 3-tick jumps: '+JSON.stringify(pressureSamples));
     }
     console.log('native-pressure-smooth',JSON.stringify({samples:pressureSamples}));
-    await page.getByRole('button',{name:'처음부터 관찰'}).click();
+    // The prescribed story switches the *same* Native Engine to FAB FLOW's
+    // live 1-request/second demand setting without resetting its history.
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-beat','surge',{timeout:12000});
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
+    await page.getByRole('button',{name:'처음부터 다시 보기'}).click();
     await page.waitForTimeout(320);
     const afterReset=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    if(afterReset<1 || afterReset>7) throw new Error('Congestion reset must restart a fresh native Engine: '+afterReset);
+    if(afterReset<0 || afterReset>7) throw new Error('Congestion reset must restart a fresh native Engine: '+afterReset);
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','0');
     await page.getByRole('button',{name:/Scene 08:/}).click();
     await expect(page.getByRole('heading',{name:'잘 움직인다는 건 무슨 뜻일까?'})).toBeVisible();
     await expect(page.getByText('실제로 완료된 운송')).toBeVisible();

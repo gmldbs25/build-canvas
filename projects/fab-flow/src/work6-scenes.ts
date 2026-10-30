@@ -17,7 +17,7 @@ export const SCENES = [
   { id: 6, chapter: '02 / REVEAL', eyebrow: 'SCENE 06 — THE DECISION',
     title: '멀리 있는 장비까지, 어느 길로 갈까?', body: '짧은 운송을 넘어 여러 Bay를 지나는 길을 살펴봅니다. 물류 제어 시스템(MCS)은 방향이 정해진 레일과 여러 후보 경로를 계산해 이동할 길을 선택합니다.', format: 'interactive' },
   { id: 7, chapter: '03 / PRESSURE', eyebrow: 'SCENE 07 — THE CONGESTION',
-    title: '운송이 많아지면 무슨 일이 생길까?', body: '같은 레일을 동시에 무한히 사용할 수는 없어요. 실제 엔진에 운송 요청을 연달아 보내고, 차량과 대기의 변화를 관찰합니다.', format: 'cinematic' },
+    title: '운송이 많아지면 무슨 일이 생길까?', body: '넓은 FAB에서 운송 요청이 갑자기 늘어나면 어떤 변화가 생길까요? 실제 FAB FLOW 엔진으로 평상시부터 요청 급증까지 짧게 살펴봅니다.', format: 'cinematic' },
   { id: 8, chapter: '03 / PRESSURE', eyebrow: 'SCENE 08 — THE MEASURE',
     title: '잘 움직인다는 건 무슨 뜻일까?', body: '바쁘게 달리는 차량이 많다고 반드시 물류가 원활한 건 아니에요. 끝낸 운송과 아직 남은 운송을 함께 살펴봐야 합니다.', format: 'editorial' },
   { id: 9, chapter: '03 / PRESSURE', eyebrow: 'SCENE 09 — THE EXPERIMENT',
