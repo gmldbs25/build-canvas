@@ -10,7 +10,7 @@ import {
   TutorialCommandLayer, TUTORIAL_REQUEST_ID, tutorialRequest, tutorialVehicle,
   type TutorialCommand, type TutorialStage,
 } from './sim/tutorial';
-import type { SimulationState } from './sim/types';
+import type { Scenario, SimulationState } from './sim/types';
 import type { CameraCommand } from './components/fabCamera';
 
 type PrototypeScene = 3 | 4 | 6;
@@ -77,7 +77,7 @@ const OBSERVED_RESULTS: Record<TutorialCommand, string> = {
 function createWork6Tutorial() {
   // The same native Engine/TutorialCommandLayer used by FAB FLOW, with its Large V6
   // facility to make the scale reveal meaningful. No synthetic OHT path or tween.
-  const scenario = {
+  const scenario: Scenario = {
     ...operationalScenario('large'),
     fleet: 9,
     demand: 1,
