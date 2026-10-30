@@ -30,10 +30,13 @@ function pressureScenario(): Scenario {
     duration: 360, demandWindow: 300, policy: 'DBR' };
 }
 
+// Keep the renderer's transition duration equal to the Native Engine
+// publication cadence. Previously each React update skipped three 0.5s
+// native ticks, which made OHTs jump before the next interpolation began.
+export const PRESSURE_PLAYBACK_MS = 115;
+
 export function usePressureWorld(active: boolean) {
-  const native = useRef<Engine | null>(null);
-  if (native.current === null) native.current = new Engine(pressureScenario());
-  const engine = native.current;
+  const [engine, setEngine] = useState(() => new Engine(pressureScenario()));
   const [state, setState] = useState<SimulationState>(() => snapshot(engine));
   const [metrics, setMetrics] = useState<NativeMetrics>(() => getKpis(engine));
   const [paused, setPaused] = useState(false);
@@ -49,7 +52,9 @@ export function usePressureWorld(active: boolean) {
     if (!active || paused || engine.state.time >= 300) return;
     const interval = window.setInterval(() => {
       try {
-        engine.step(3); // three genuine 0.5 second native ticks
+        // 1 native 0.5s tick = 1 publication = 1 3D interpolation.
+        // The authentic demand, dispatch, congestion and route logic remains.
+        engine.step(1);
         setState(snapshot(engine));
         setMetrics(getKpis(engine));
         if (engine.state.time >= 300) window.clearInterval(interval);
@@ -57,7 +62,7 @@ export function usePressureWorld(active: boolean) {
         window.clearInterval(interval);
         setError(e instanceof Error ? e.message : '실제 엔진 관찰 중 오류');
       }
-    }, 180);
+    }, PRESSURE_PLAYBACK_MS);
     return () => window.clearInterval(interval);
   }, [active, engine, paused]);
 
@@ -65,7 +70,7 @@ export function usePressureWorld(active: boolean) {
 
   const reset = useCallback(() => {
     const next = new Engine(pressureScenario());
-    native.current = next;
+    setEngine(next);
     setState(snapshot(next));
     setMetrics(getKpis(next));
     setPaused(false);
@@ -125,6 +130,6 @@ export function usePressureWorld(active: boolean) {
     epoch.current++; setComparing(false); setResult(null); setProgress(0); setCompareDemand(next);
   }, []);
 
-  return { engine, state, metrics, paused, setPaused, reset, error,
+  return { engine, state, metrics, tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
     compareMode, changeMode, compareDemand, changeDemand, compare, comparing, progress, result };
 }
