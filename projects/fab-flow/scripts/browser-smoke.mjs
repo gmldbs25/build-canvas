@@ -1,0 +1,67 @@
+import { chromium, expect } from '@playwright/test';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const evidence = path.resolve(project, 'evidence');
+await fs.mkdir(evidence, { recursive: true });
+
+const server = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm',
+  ['exec', '--', 'vite', 'preview', '--host', '127.0.0.1', '--port', '4179', '--strictPort'],
+  { cwd: project, stdio: ['ignore','pipe','pipe'], env: { ...process.env } });
+const logs = [];
+server.stdout.on('data', data => logs.push(data.toString()));
+server.stderr.on('data', data => logs.push(data.toString()));
+
+async function ready() {
+  for (let i = 0; i < 50; i++) {
+    if (server.exitCode !== null) throw new Error('Vite preview exited: ' + logs.join(''));
+    try {
+      const response = await fetch('http://127.0.0.1:4179/build-canvas/fab-flow/');
+      if (response.ok) return;
+    } catch {}
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+  throw new Error('Vite preview did not start: ' + logs.join(''));
+}
+let browser;
+try {
+  await ready();
+  browser = await chromium.launch({
+    headless: true,
+    args: ['--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader','--disable-dev-shm-usage']
+  });
+  for (const [width,height] of [[1440,900],[390,844]]) {
+    const page = await browser.newPage({ viewport: { width,height }, deviceScaleFactor: 1 });
+    const faults=[];
+    page.on('pageerror',e=>faults.push(String(e)));
+    page.on('console',msg=>{ if(msg.type()==='error') faults.push(msg.text()); });
+    await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow/', { waitUntil:'domcontentloaded' });
+    await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:25000});
+    await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
+    await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
+    const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    await page.getByRole('button',{name:/운송 요청하기/}).click();
+    await expect(page.getByText('OHT 배차', {exact:true}).first()).toBeVisible({timeout:12000});
+    const nextTick=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    if(nextTick <= startTick) throw new Error('No real Native Tick after request action');
+    await page.screenshot({path:path.join(evidence, 'scene03-'+width+'.png')});
+    await page.getByRole('button',{name:/SCENE 04/}).click();
+    await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
+    await page.waitForTimeout(4500);
+    await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
+    await page.getByRole('button',{name:/SCENE 06/}).click();
+    await expect(page.getByRole('heading',{name:'누가 이 운송을 맡고, 어느 길로 갈까?'})).toBeVisible();
+    await page.screenshot({path:path.join(evidence, 'scene06-'+width+'.png')});
+    const renderer=await page.locator('[data-renderer="three-webgl"]').count();
+    if(renderer!==1) throw new Error('Native 3D renderer unexpectedly unmounted');
+    if(faults.length) throw new Error('Browser JS/console errors: '+faults.join('\n').slice(0,3000));
+    console.log(JSON.stringify({viewport:[width,height],nativeTick:nextTick,renderer:'three-webgl',scenes:[3,4,6],errors:0}));
+    await page.close();
+  }
+} finally {
+  if(browser) await browser.close();
+  server.kill('SIGTERM');
+}
