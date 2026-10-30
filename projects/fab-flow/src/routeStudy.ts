@@ -37,8 +37,10 @@ function firstRequestSeed(layout: Layout): number[] {
     const xDistance = Math.abs(a.x-b.x), yDistance = Math.abs(a.y-b.y);
     // Different parts of the full FAB, far enough for junctions and choices
     // to be legible. Avoid the tiny one-Bay teaching transport from Scene03.
-    if (xDistance < 2200 || xDistance > 4600 || yDistance > 1250) continue;
-    const score = Math.abs(xDistance-3000) + yDistance * .4;
+    // Choose a demonstrably longer inter-Bay transport (roughly two
+    // columns apart), not another adjacent-Bay delivery as in Scene03.
+    if (xDistance < 3300 || xDistance > 5500 || yDistance > 1250) continue;
+    const score = Math.abs(xDistance-4200) + yDistance * .4;
     choices.push({seed,score});
     if (choices.length >= 18) break;
   }
