@@ -50,6 +50,19 @@ try {
     await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
     await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:5000});
     await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
+    // Work6 keeps its initial teaching scene close-up. Wheel/overview must
+    // not spoil the intentional first full-FAB reveal in Scene 04.
+    await expect(page.locator('[data-camera-locked="true"]')).toBeVisible();
+    await expect(page.getByRole('button', {name:'전체 보기'})).toHaveCount(0);
+    const lockedSpan = await page.evaluate(() => window.__FAB_3D__?.camera?.span ?? null);
+    await page.locator('.three-scene-host').hover();
+    await page.mouse.wheel(0, 720);
+    await page.waitForTimeout(300);
+    const lockedAfterWheel = await page.evaluate(() => window.__FAB_3D__?.camera?.span ?? null);
+    if (lockedSpan !== null && lockedAfterWheel !== null && Math.abs(lockedSpan-lockedAfterWheel) > 1e-2) {
+      throw new Error('Initial close-up camera zoom changed on mouse wheel');
+    }
+
     await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     await expect(page.getByText('왜 옮겨야 할까요?')).toBeVisible();
@@ -60,9 +73,17 @@ try {
     if (await page.locator('[data-simulation-tick]').count() !== 1) throw new Error('Native engine view disappeared after first transfer request');
     const nextTick=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     if(nextTick <= startTick) throw new Error('No real Native Tick after request action');
+    await page.getByRole('button',{name:/담당 차량 정하기/}).click();
+    await expect(page.getByText('차량은 어디로 가야 할까요?')).toBeVisible({timeout:12000});
+    await expect(page.getByText('실제 OHT 이동 경로')).toBeVisible({timeout:12000});
+    const nativeRoute=await page.evaluate(() => (window.__FAB_3D__?.routes || []).filter(route=>route.selected));
+    if(nativeRoute.length===0 || nativeRoute.some(route=>route.links.length===0)) {
+      throw new Error('Expected a selected native MCS path on real rail links after dispatch');
+    }
     await page.screenshot({path:path.join(evidence, 'scene03-'+width+'.png')});
     await page.getByRole('button',{name:/SCENE 04/}).click();
     await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
+    await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
     await page.waitForTimeout(4500);
     await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
     await page.getByRole('button',{name:/SCENE 06/}).click();
