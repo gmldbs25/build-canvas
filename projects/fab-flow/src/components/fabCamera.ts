@@ -41,7 +41,9 @@ export function fitProjectedFacility(bounds: ProjectedBounds, width: number, hei
 export type CameraLod = 'close' | 'mid' | 'overview';
 export type CameraCommand = {
   sequence: number;
-  kind: 'welcome' | 'opening' | 'follow' | 'request' | 'bay' | 'connected' | 'overview' | 'cancel' | 'rail';
+  kind: 'welcome' | 'opening' | 'tableau' | 'follow' | 'request' | 'bay' | 'connected' | 'overview' | 'cancel' | 'rail';
+  /** Fixed educational close-up: world coordinates, never bound to an OHT. */
+  frame?: { x: number; z: number; span: number };
   railId?: string;
   requestId?: string;
   vehicleId?: string;
