@@ -1,6 +1,13 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
+    index: "06",
+    title: "FAB FLOW",
+    type: "SEMICONDUCTOR LOGISTICS · 3D PROTOTYPE",
+    year: "2026.10",
+    href: "./fab-flow-preview/",
+  },
+  {
     index: "05",
     title: "KotoMachi를 만들며",
     type: "DEVELOPMENT JOURNAL",
