@@ -6,6 +6,7 @@ import { Engine } from './sim/engine';
 import { SCENES } from './work6-scenes';
 import { usePressureWorld } from './usePressureWorld';
 import { useAmbientIntro } from './useAmbientIntro';
+import { buildNativeRouteStudy, type NativeRouteStudy } from './routeStudy';
 import { operationalScenario } from './sim/experiments';
 import { chooseLocalIntroDemand } from './introScenario';
 import { publicationCopy } from './sim/publication';
@@ -123,9 +124,28 @@ export default function Work6() {
   const pressure = usePressureWorld(isPressure);
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
-  const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine : engineRef.current;
-  const activeState = isPressure ? pressure.state : isOpening ? ambient.state : nativeState;
-  const [mcsView, setMcsView] = useState<'dispatch' | 'route'>('dispatch');
+  const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
+    scene.id === 6 && routeStudy ? routeStudy.engine : engineRef.current;
+  const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
+    scene.id === 6 && routeStudy ? routeStudy.state : nativeState;
+  const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
+  const [routeError, setRouteError] = useState('');
+  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative'>('selected');
+  useEffect(() => {
+    if (scene.id !== 6 || routeStudy || routeError) return;
+    // Compute a real, separate long-range native case once on entry. Scene03
+    // keeps its short route and completed FOUP intact.
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      try {
+        const study = buildNativeRouteStudy();
+        if (!cancelled) setRouteStudy(study);
+      } catch (cause) {
+        if (!cancelled) setRouteError(cause instanceof Error ? cause.message : '경로 사례를 계산할 수 없어요.');
+      }
+    }, 30);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [scene.id, routeStudy, routeError]);
 
   const publish = useCallback(() => {
     const engine = engineRef.current;
@@ -250,15 +270,18 @@ export default function Work6() {
   const transportFinished = stage === 'bay' && request?.phase === 'completed';
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
+  const shownRoute = routeStudy ? routeChoice === 'selected' ? routeStudy.selected : routeStudy.alternative : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
     (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
-  const candidates = (isDecision || isNetwork || isTransportRouteVisible) && currentDecision
-    ? currentDecision.candidates.filter(candidate => candidate.selected)
-    : undefined;
+  const candidates = isDecision && routeStudy && shownRoute
+    ? [{ ...shownRoute, selected: true }]
+    : (isNetwork || isTransportRouteVisible) && currentDecision
+      ? currentDecision.candidates.filter(candidate => candidate.selected)
+      : undefined;
 
   useEffect(() => {
     const req = tutorialRequest(engineRef.current);
@@ -277,7 +300,10 @@ export default function Work6() {
       return;
     }
     if (scene.id === 6) {
-      issueCamera(tracked ? 'follow' : 'overview', tracked, reqId);
+      if (routeStudy) setCameraCommand(previous => ({
+        sequence: previous.sequence + 1, kind: 'tableau', frame: routeStudy.frame,
+      }));
+      else issueCamera('overview');
       return;
     }
     if (scene.id !== 4) {
@@ -295,7 +321,7 @@ export default function Work6() {
     const a = window.setTimeout(() => setCameraMoment(1), 850);
     const b = window.setTimeout(() => setCameraMoment(2), 2000);
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
-  }, [scene.id, issueCamera]);
+  }, [scene.id, issueCamera, routeStudy?.seed]);
 
   // Keep the original port annotations stable through request/dispatch.
   // Creating the FOUP should change only that model, never reframe the FAB.
@@ -308,7 +334,10 @@ export default function Work6() {
     data-intro-directed-distance={initial.selection.shortestDirectedDistance}
     data-opening-moving={ambient.openingMovingVehicles}
     data-opening-local-moving={ambient.openingLocalVehicles}
-    data-scene-count={SCENES.length} data-current-scene={scene.id}>
+    data-scene-count={SCENES.length} data-current-scene={scene.id}
+    data-route-study-seed={routeStudy?.seed ?? ''}
+    data-route-study-source={routeStudy?.sourceBay ?? ''}
+    data-route-study-destination={routeStudy?.destinationBay ?? ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -323,17 +352,18 @@ export default function Work6() {
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
           running={isPressure ? !pressure.paused : isOpening ? true : busy}
-          tickMs={isPressure ? 60 : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={!isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={isOpening || isPressure ? undefined : selectedVehicleId}
-          trackedRequest={isOpening || isPressure || request?.phase === 'completed' ? undefined : request?.id}
+          tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
+          selected={isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
+            : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
+          trackedVehicle={isDecision && routeStudy ? routeStudy.vehicleId : isOpening || isPressure ? undefined : selectedVehicleId}
+          trackedRequest={isOpening || isPressure || isDecision || request?.phase === 'completed' ? undefined : request?.id}
           plannedTutorialIngress={scene.id === 3 ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
           cameraLocked={focusMode}
-          heatmap={isPressure}
-          view={isPressure ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
+          heatmap={scene.id === 8}
+          view={scene.id === 8 ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
           routeCandidates={candidates}
           onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
           onFloorChange={() => {}}
@@ -401,23 +431,26 @@ export default function Work6() {
           </details>
         </div>}
         {scene.id === 6 && <div className="w6-inner-controls">
-          {currentDecision ? <>
-            <div className="w6-action-row" role="group" aria-label="MCS 결정 살펴보기">
-              <button className={mcsView === 'dispatch' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setMcsView('dispatch')}>차량 선택</button>
-              <button className={mcsView === 'route' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setMcsView('route')}>길 선택</button>
+          <p className="w6-context-line">앞에서는 옆 Bay까지 짧게 옮겨 봤어요. 이번에는 멀리 떨어진 장비로 보내는 실제 운송 사례입니다. 여러 갈림길 가운데 어느 길을 택해야 할까요?</p>
+          {routeStudy && shownRoute ? <>
+            <span className="w6-overline">REAL NATIVE MCS · {routeStudy.sourceBay} → {routeStudy.destinationBay}</span>
+            <div className="w6-action-row" role="group" aria-label="MCS 경로 비교">
+              <button className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('selected')}>MCS가 선택한 길</button>
+              <button className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('alternative')}>다른 가능한 길</button>
             </div>
-            {mcsView === 'dispatch' ? <p className="w6-decision-copy">OHT <strong>{vehicle?.id ?? '—'}</strong>가 이 운송에 배정됐어요. 어떤 차량이 맡을지 고르는 결정이 <strong>배차</strong>예요.</p> : <p className="w6-decision-copy">선택된 경로는 실제 MCS가 레일 연결과 운행 조건을 바탕으로 계산했어요. 아래 숫자는 모형의 경로 거리입니다.</p>}
-            <span className="w6-overline">LIVE MCS / {currentDecision.policy?.toUpperCase?.() ?? 'ROUTING'}</span>
-            <p className="w6-decision-copy">물류 제어 시스템(MCS)이 가능한 길을 비교하고 실제로 선택한 경로를 레일 위에 보여줘요. ({currentDecision.candidates.length}개 후보)</p>
             <div className="w6-decision-row">
-              <span>실제로 선택된 이동 거리</span>
-              <strong>{currentDecision.candidates.find(item => item.selected)?.distance.toFixed(0) ?? '—'}</strong>
-              <small>graph units</small>
+              <span>{routeChoice === 'selected' ? '실제 선택된 운송 경로' : '비교 가능한 다른 경로'}</span>
+              <strong>{shownRoute.distance.toFixed(0)}</strong>
+              <small>모형 거리 단위</small>
             </div>
-          </> : <>
-            <p className="w6-decision-copy">아직 차량과 이동 경로를 정하지 않았어요. 앞의 운송 장면에서 먼저 실제 차량을 선택하고 움직여 보세요.</p>
-            <button type="button" className="w6-primary" onClick={() => setSceneIndex(0)}>한 건의 운송 살펴보기 ↗</button>
-          </>}
+            <p className="w6-decision-copy">{routeChoice === 'selected'
+              ? `MCS가 실제로 선택한 길이에요. ${shownRoute.links.length}개 레일 구간을 지나며 Bay 사이를 연결해요. 레일 위에 강조된 동선을 따라가 보세요.`
+              : `같은 출발지와 목적지로 갈 수 있는 다른 후보예요. ${shownRoute.links.length}개 레일 구간을 지나며, 실제 선택된 길과 경유하는 레일이 달라요.`}</p>
+            <p className="w6-microcopy">두 경로 모두 FAB FLOW의 실제 방향성 레일과 MCS 후보 계산에서 나왔어요. 경로를 바꿔 보는 것은 비교용 강조 표시이며 실제 배차·운송을 변경하지 않아요.</p>
+          </> : <div className="w6-observed" role="status">
+            <strong>{routeError ? '실제 경로 사례를 준비하지 못했어요.' : '여러 Bay를 지나는 경로를 계산하고 있어요.'}</strong>
+            <p>{routeError || '실제 엔진에서 운송 요청과 배차를 진행한 뒤 MCS가 선택한 경로를 확인합니다.'}</p>
+          </div>}
         </div>}
         {(scene.id === 7 || scene.id === 8) && <div className="w6-inner-controls">
           <p className="w6-overline">LIVE NATIVE ENGINE · SMALL 2-BAY STUDY</p>
