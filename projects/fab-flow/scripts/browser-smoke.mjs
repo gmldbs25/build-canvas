@@ -48,7 +48,8 @@ try {
     await page.waitForTimeout(1100);
     console.log('initial-debug',JSON.stringify({viewport:[width,height],status:response?.status(),title:await page.title(),text:(await page.locator('body').innerText()).slice(0,350),errors:faults.slice(0,8)}));
     await page.screenshot({path:path.join(evidence,'initial-'+width+'.png')});
-    await expect(page.getByRole('heading', {name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible({timeout:5000});
+    await expect(page.getByRole('heading', {name:'공장 안에도 교통체증이?'})).toBeVisible({timeout:5000});
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-scene-count','11');
     await expect(page.locator('[data-renderer="three-webgl"]')).toBeVisible({timeout:30000});
     const intro = await page.locator('.w6-root').evaluate(node => ({
       source: node.dataset.introSourceBay,
@@ -77,6 +78,11 @@ try {
     }
 
     await expect(page.locator('.three-scene-host canvas')).toBeVisible({timeout:30000});
+    await page.getByRole('button',{name:/Scene 02:/}).click();
+    await expect(page.getByRole('heading',{name:'무엇을 옮기는 걸까?'})).toBeVisible();
+    await expect(page.getByText('웨이퍼를 보호하며 이동하는 전용 용기')).toBeVisible();
+    await page.getByRole('button',{name:/Scene 03:/}).click();
+    await expect(page.getByRole('heading',{name:'하나의 운송은 어떻게 완성될까?'})).toBeVisible();
     const startTick = Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     await expect(page.getByText('왜 옮겨야 할까요?')).toBeVisible();
     await expect(page.getByText(/웨이퍼를 담은 보호 (용기|상자)/)).toBeVisible();
@@ -146,14 +152,41 @@ try {
       await page.screenshot({path:path.join(evidence, 'scene03-dropoff-'+width+'.png')});
       console.log('transport-finished',JSON.stringify({viewport:[width,height],beforeDropoff,afterDropoff}));
     }
-    await page.getByRole('button',{name:/SCENE 04/}).click();
+    await page.getByRole('button',{name:/Scene 04:/}).click();
     await expect(page.getByRole('heading',{name:'지금까지 본 건 공장의 극히 일부였다.'})).toBeVisible();
     await expect(page.locator('[data-camera-locked="false"]')).toBeVisible();
     await page.waitForTimeout(4500);
     await page.screenshot({path:path.join(evidence, 'scene04-'+width+'.png')});
-    await page.getByRole('button',{name:/SCENE 06/}).click();
+    await page.getByRole('button',{name:/Scene 06:/}).click();
     await expect(page.getByRole('heading',{name:'누가 이 운송을 맡고, 어느 길로 갈까?'})).toBeVisible();
     await page.screenshot({path:path.join(evidence, 'scene06-'+width+'.png')});
+    await page.getByRole('button',{name:/Scene 05:/}).click();
+    await expect(page.getByRole('heading',{name:'차량은 아무 길로나 갈 수 없다.'})).toBeVisible();
+    await expect(page.getByText('OHT가 이동하는 정해진 선로')).toBeVisible();
+    await page.getByRole('button',{name:/Scene 07:/}).click();
+    await expect(page.getByRole('heading',{name:'운송이 많아지면 무슨 일이 생길까?'})).toBeVisible();
+    await expect(page.getByText('아직 완료되지 않은 요청',{exact:true})).toBeVisible();
+    const congestionBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    await page.waitForTimeout(1100);
+    const congestionAfter=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    if(congestionAfter<=congestionBefore)throw new Error('Native congestion study did not advance');
+    await page.getByRole('button',{name:/Scene 08:/}).click();
+    await expect(page.getByRole('heading',{name:'잘 움직인다는 건 무슨 뜻일까?'})).toBeVisible();
+    await expect(page.getByText('실제로 완료된 운송')).toBeVisible();
+    await page.getByRole('button',{name:/Scene 09:/}).click();
+    await expect(page.getByRole('heading',{name:'차량을 더 넣으면 빨라질까?'})).toBeVisible();
+    if(width===1440){
+      await page.getByRole('button',{name:/같은 조건으로 두 번 실행하기/}).click();
+      await expect(page.getByText(/실제 실험 결과/)).toBeVisible({timeout:120000});
+      await expect(page.getByRole('table')).toBeVisible();
+      await page.screenshot({path:path.join(evidence, 'scene09-compare-'+width+'.png')});
+    }
+    await page.getByRole('button',{name:/Scene 10:/}).click();
+    await expect(page.getByRole('heading',{name:'화면 뒤에서는 무슨 일이 일어날까?'})).toBeVisible();
+    await expect(page.getByText('0.5초마다 상태 계산')).toBeVisible();
+    await page.getByRole('button',{name:/Scene 11:/}).click();
+    await expect(page.getByRole('heading',{name:'이제 직접 운영해 볼 차례.'})).toBeVisible();
+    await page.screenshot({path:path.join(evidence, 'scene11-'+width+'.png')});
     const renderer=await page.locator('[data-renderer="three-webgl"]').count();
     if(renderer!==1) throw new Error('Native 3D renderer unexpectedly unmounted');
     if(faults.length) throw new Error('Browser JS/console errors: '+faults.join('\n').slice(0,3000));
