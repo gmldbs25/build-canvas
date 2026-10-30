@@ -5,7 +5,7 @@
  */
 export const SCENES = [
   { id: 1, chapter: '01 / FOLLOW', eyebrow: 'SCENE 01 — THE QUESTION',
-    title: '공장 안에도 교통체증이?', body: '반도체는 한 번의 작업으로 완성되지 않습니다. 여러 장비 사이를 오가는 작은 차량 한 대에서 이야기를 시작해 볼까요?', format: 'cinematic' },
+    title: '공장 안에도 교통체증이?', body: '반도체 공장에는 여러 작업 장비가 있고, 그 사이를 운반 차량들이 분주하게 오갑니다. 먼저 한 구역의 움직임을 함께 관찰해 볼까요?', format: 'cinematic' },
   { id: 2, chapter: '01 / FOLLOW', eyebrow: 'SCENE 02 — THE CARRIER',
     title: '무엇을 옮기는 걸까?', body: '반도체 회로를 만드는 얇은 원판이 웨이퍼입니다. 이를 보호하는 전용 상자(FOUP)를 운반 차량(OHT)이 다음 장비로 옮깁니다.', format: 'editorial' },
   { id: 3, chapter: '01 / FOLLOW', eyebrow: 'SCENE 03 — THE TRANSPORT',
