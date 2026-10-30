@@ -124,13 +124,13 @@ export default function Work6() {
   const pressure = usePressureWorld(isPressure);
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
+  const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
+  const [routeError, setRouteError] = useState('');
+  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative'>('selected');
   const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
     scene.id === 6 && routeStudy ? routeStudy.engine : engineRef.current;
   const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
     scene.id === 6 && routeStudy ? routeStudy.state : nativeState;
-  const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
-  const [routeError, setRouteError] = useState('');
-  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative'>('selected');
   useEffect(() => {
     if (scene.id !== 6 || routeStudy || routeError) return;
     // Compute a real, separate long-range native case once on entry. Scene03
