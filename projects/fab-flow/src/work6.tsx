@@ -170,6 +170,9 @@ export default function Work6() {
     if (!STEP_ORDER.includes(command)) return;
     if (!layer.begin(command)) return;
     const runId = ++runIdRef.current;
+    // Let people actually watch the hoist lower and raise the FOUP.
+    // Engine ticks still represent 0.5 simulated seconds; only playback pacing changes.
+    const tickPaceMs = command === 'pickup' || command === 'dropoff' ? 520 : 32;
     setBusy(true);
     setError('');
     const complete = () => {
@@ -181,7 +184,7 @@ export default function Work6() {
       timerRef.current = null;
       const req = tutorialRequest(engine), vehicle = tutorialVehicle(engine);
       if (next === 'empty-travel' && vehicle) issueCamera('follow', vehicle.id, req?.id);
-      if (next === 'bay') issueCamera('bay', vehicle?.id, req?.id);
+      // Keep the same close camera after dropoff; only Scene 04 may reveal the whole Bay.
     };
     try {
       if (command === 'route') {
@@ -200,7 +203,7 @@ export default function Work6() {
           if (layer.reached(engine)) {
             complete();
           } else {
-            timerRef.current = window.setTimeout(tick, 25);
+            timerRef.current = window.setTimeout(tick, tickPaceMs);
           }
         } catch (cause) {
           layer.fail();
@@ -288,12 +291,13 @@ export default function Work6() {
           failures={engineRef.current.scenario.failures}
           storageCapacity={engineRef.current.scenario.storageCapacity}
           running={busy}
-          tickMs={25}
+          tickMs={busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
           selected={selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
           trackedVehicle={selectedVehicleId}
-          trackedRequest={request?.id}
+          trackedRequest={request?.phase === 'completed' ? undefined : request?.id}
           plannedTutorialIngress={planned}
           tutorialStage={scene.id === 3 ? stage : undefined}
+          softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
           cameraLocked={scene.id === 3}
           heatmap={false}
