@@ -1,6 +1,6 @@
 # Work 6 — FAB FLOW / 콘텐츠·디자인 마스터 플랜
 
-> Status: PLANNING · v0.3 · 2026-10-30
+> Status: 11-SCENE FIRST-PASS IMPLEMENTATION · v0.4 · 2026-10-30
 >
 > 이 문서는 Build Canvas Work6의 현재 합의 사항을 누적 관리한다. 구현·배포 승인 문서는 아니다. 내용/디자인/기술 결정의 **확정/제안/미결정** 상태를 혼동하지 않는다.
 
@@ -132,6 +132,18 @@
 4. **Scene 06**: 실제 MCS 판단과 같은 레일의 경로 하이라이트 검증.
 5. 세 대표 장면의 실제 화면 디자인·가독성·성능을 사용자 검토 후 본편으로 확장.
 6. 11개 Scene 통합, Build Canvas 등록/빌드/GitHub Pages 배포, 전체 반응형·기능 검증.
+
+## 7A. 11개 Scene 1차 구현 스냅샷 (2026-10-30)
+
+- `projects/fab-flow/src/work6-scenes.ts`: 4 Chapter / 11 Scene의 초보자 중심 카피 및 페이지 순서. 메인 Works 06에서 접근 가능.
+- `src/work6.tsx`: 01/02 네이티브 운송 근접 관찰, 03 기존 7단계 실제 튜토리얼, 04 Close→Bay→Whole 규모 공개, 05 방향성 레일, 06 실제 MCS 선택 설명, 07~09 운영 관찰/실험, 10 엔진/렌더러 구조, 11 본편 마무리.
+- `src/useAmbientIntro.ts`: Scene01/02에서 실제 FAB FLOW 엔진의 자율 운송을 실행. Scene03은 *별도의 일시정지된 튜토리얼 엔진*으로 항상 처음부터 한 건을 조작할 수 있다. 장면 사이의 엔진 문맥이 같다고 오인시키지 않으며, 3D 모델/네트워크는 동일한 Large V6.
+- `src/usePressureWorld.ts`: Scene07/08/09의 명시적 교육 실험은 Large 원본 전체 재현이 아니라 **실제 Native Small V6 2-Bay 엔진**을 사용한다. 대기/처리량 등 숫자는 `getKpis`/`getDiagnostics`에서 실시간 생성한다. Scene09 비교는 두 Engine에 **같은 seed, demand, duration**을 주고 Fleet 혹은 Policy **한 변수만 변경**, 동일 시작 요청을 검증하고 결과를 계산한다.
+- 편집형 설명/미니 그래프/구조 다이어그램은 HTML/CSS이지만, OHT·FOUP·레일·공장 설비와 주행은 기존 FAB FLOW Native 3D로 표시한다. 원본 `gmldbs25/fab_flow`는 이번 Work6 확장에서 변경하지 않았다.
+- `scripts/browser-smoke.mjs`는 1440px/390px 화면, 11 Scene 탐색, 03 실제 운송 전 과정, 04 연출, 07/08 실시간 Tick/KPI, 09 짝지은 엔진 실행, 10/11 안내, JS 예외를 검증한다.
+- **남은 검수:** 사람이 실제 디바이스에서 카메라 구도, 경로 가시성, 3D 성능, 서사 리듬을 살펴야 한다. 자동 테스트 통과를 시각 디자인 승인으로 표시하지 않는다.
+- **별도 구조 과제:** 현재 FAB FLOW 원본 OHT가 현수형으로 표현되지 않은 점은 원본 앱의 3D 렌더러부터 재설계·검증한 후 Work6와 동기화한다. 본편 텍스트 개발을 위해 이 작업을 선행 조건으로 두지 않는다.
+- **Scene11 외부 링크 미연결:** FAB FLOW의 정확한 공개 앱 URL을 확인할 수 없어 임의 `vercel.app` 주소를 사용하지 않았다. 공식 주소 확인 후 진입 CTA를 연결할 것.
 
 ## 8. 결정 로그
 
