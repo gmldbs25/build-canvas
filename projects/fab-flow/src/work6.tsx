@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ThreeFacilityScene from './components/ThreeFacilityScene';
 import { Engine } from './sim/engine';
 import { operationalScenario } from './sim/experiments';
+import { chooseLocalIntroDemand } from './introScenario';
 import { publicationCopy } from './sim/publication';
 import {
   TutorialCommandLayer, TUTORIAL_REQUEST_ID, tutorialRequest, tutorialVehicle,
@@ -76,17 +77,24 @@ const OBSERVED_RESULTS: Record<TutorialCommand, string> = {
 function createWork6Tutorial() {
   // The same native Engine/TutorialCommandLayer used by FAB FLOW, with its Large V6
   // facility to make the scale reveal meaningful. No synthetic OHT path or tween.
-  const engine = new Engine({
+  const scenario = {
     ...operationalScenario('large'),
-    fleet: 4,
+    fleet: 9,
     demand: 1,
     duration: 1800,
     demandWindow: 60,
     seed: 1,
     pattern: 'steady',
-    distribution: 'balanced',
-  });
+    distribution: 'balanced' as const,
+  };
+  // Only the seeded demand is selected; FAB FLOW's own Engine still generates
+  // the request and makes every dispatch, routing and movement decision.
+  const selection = chooseLocalIntroDemand(new Engine({ ...scenario, seed: 1 }, { analysis: false }).layout, scenario);
+  const engine = new Engine({ ...scenario, seed: selection.seed });
   const plannedIngress = engine.getNextDemand();
+  if (plannedIngress?.source !== selection.source || plannedIngress?.destination !== selection.destination) {
+    throw new Error('Native demand generation changed: local tutorial selection must be revalidated.');
+  }
   if (!plannedIngress || plannedIngress.at !== 0) throw new Error('The native tutorial needs an initial demand at time zero.');
   engine.enableTutorialControl();
   return { engine, plannedIngress };
@@ -99,6 +107,7 @@ function freezeState(engine: Engine): SimulationState {
 export default function Work6() {
   const initial = useMemo(() => createWork6Tutorial(), []);
   const engineRef = useRef(initial.engine);
+  const plannedIngressRef = useRef(initial.plannedIngress);
   const tutorialRef = useRef(new TutorialCommandLayer());
   const timerRef = useRef<number | null>(null);
   const runIdRef = useRef(0);
@@ -142,6 +151,7 @@ export default function Work6() {
     cancelRunning();
     const next = createWork6Tutorial();
     engineRef.current = next.engine;
+    plannedIngressRef.current = next.plannedIngress;
     tutorialRef.current = new TutorialCommandLayer();
     setStage('request');
     setLastCompleted(null);
@@ -232,8 +242,13 @@ export default function Work6() {
   const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
   const isReveal = scene.id === 4;
   const isDecision = scene.id === 6;
-  const shouldShowPath = isDecision && !!currentDecision;
-  const candidates = shouldShowPath ? currentDecision.candidates : undefined;
+  // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
+  // leg. Do not draw a speculative route before the Engine has selected it.
+  const isTransportRouteVisible = scene.id === 3 &&
+    (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
+  const candidates = (isDecision || isTransportRouteVisible) && currentDecision
+    ? currentDecision.candidates.filter(candidate => candidate.selected)
+    : undefined;
 
   useEffect(() => {
     const req = tutorialRequest(engineRef.current);
@@ -255,7 +270,7 @@ export default function Work6() {
   }, [scene.id, issueCamera]);
 
   const planned = tutorialRef.current.stage === 'request' && nativeState.requests.length === 0
-    ? { source: initial.plannedIngress.source, destination: initial.plannedIngress.destination }
+    ? { source: plannedIngressRef.current.source, destination: plannedIngressRef.current.destination }
     : undefined;
 
   return <div className="w6-root" data-prototype="true">
@@ -280,6 +295,7 @@ export default function Work6() {
           plannedTutorialIngress={planned}
           tutorialStage={scene.id === 3 ? stage : undefined}
           cameraCommand={cameraCommand}
+          cameraLocked={scene.id === 3}
           heatmap={false}
           view={isDecision ? 'network' : 'overview'}
           routeCandidates={candidates}
@@ -287,6 +303,8 @@ export default function Work6() {
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
+        {scene.id === 3 && <div className="w6-focus-note" role="note">지금은 가까이서 운송을 관찰해요 · 전체 공장은 다음 장면에서</div>}
+        {scene.id === 3 && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
       </div>
       <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '')} aria-label="장면 설명">
