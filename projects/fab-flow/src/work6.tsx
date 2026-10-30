@@ -97,7 +97,7 @@ function createWork6Tutorial() {
   }
   if (!plannedIngress || plannedIngress.at !== 0) throw new Error('The native tutorial needs an initial demand at time zero.');
   engine.enableTutorialControl();
-  return { engine, plannedIngress };
+  return { engine, plannedIngress, selection };
 }
 
 function freezeState(engine: Engine): SimulationState {
@@ -276,7 +276,11 @@ export default function Work6() {
     ? { source: plannedIngressRef.current.source, destination: plannedIngressRef.current.destination }
     : undefined;
 
-  return <div className="w6-root" data-prototype="true">
+  return <div className="w6-root" data-prototype="true"
+    data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
+    data-intro-destination-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.destination)?.area}
+    data-intro-selected-seed={initial.selection.seed}
+    data-intro-directed-distance={initial.selection.shortestDirectedDistance}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
