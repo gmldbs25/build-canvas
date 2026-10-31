@@ -529,7 +529,7 @@ export default function Work6() {
           </> : <div className="w6-observed" role="status" aria-live="polite">
             <strong>같은 운송 결과를 계산하고 있어요.</strong>
             <p>Scene 7을 건너뛰어도 같은 FAB와 요청 조건으로 실제 엔진을 끝까지 진행해 결과를 보여줍니다.</p>
-          </>}
+          </div>}
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}
         {scene.id === 9 && <div className="w6-inner-controls">
