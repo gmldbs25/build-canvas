@@ -531,7 +531,7 @@ export default function Work6() {
             <p className="w6-context-line">같은 공장과 OHT 48대로 10분씩 운영하고, 요청 간격만 바꿔봤어요.</p>
             <div className="w6-capacity-grid" aria-label="평상시와 요청 폭증 시 실제 처리량 비교">
               {([
-                { name: '평상시', rate: '3초에 1건', value: outcome.baseline, kind: 'base' },
+                { name: '기본 요청', rate: '3초에 1건', value: outcome.baseline, kind: 'base' },
                 { name: '요청 폭증', rate: '초당 2건', value: outcome.surge, kind: 'surge' },
               ] as const).map(part => <div className={'w6-capacity-card '+part.kind} key={part.name}>
                 <div className="w6-capacity-card-heading"><strong>{part.name}</strong><span>{part.rate}</span></div>
@@ -542,9 +542,12 @@ export default function Work6() {
                 <div className="w6-capacity-pending">배차 대기 변화 <strong>{part.value.pendingEnd - part.value.pendingStart >= 0 ? '+' : ''}{part.value.pendingEnd - part.value.pendingStart}건</strong></div>
               </div>)}
             </div>
-            <p className="w6-result-takeaway">{outcome.surge.created > outcome.surge.completed
-              ? '요청이 들어오는 속도가 처리 속도를 넘어서면, 기다리는 운송이 쌓입니다.'
-              : '이 조건에서는 운송 요청을 따라 처리했어요. 수요에 따라 결과는 달라질 수 있어요.'}</p>
+            <p className="w6-result-takeaway">{outcome.baseline.pendingEnd > outcome.baseline.pendingStart &&
+              outcome.surge.pendingEnd - outcome.surge.pendingStart > outcome.baseline.pendingEnd - outcome.baseline.pendingStart
+                ? '기본 요청에서도 일이 쌓였지만, 요청이 폭증하자 대기가 훨씬 빠르게 늘었어요.'
+                : outcome.surge.pendingEnd > outcome.surge.pendingStart
+                  ? '요청이 늘어나자 차량 배정을 기다리는 운송도 늘었어요.'
+                  : '이 조건에서는 대기가 크게 늘지 않았어요. 실제 수요와 처리량을 비교해 보세요.'}</p>
             <div className="w6-action-row">
               <button type="button" className="w6-secondary" onClick={() => nextScene(-1)}>움직임 다시 보기</button>
               <button type="button" className="w6-primary" onClick={() => nextScene(1)}>그럼 어떻게 개선할까? <span aria-hidden="true">↗</span></button>

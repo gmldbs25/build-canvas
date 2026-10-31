@@ -382,6 +382,10 @@ try {
        overflow8.panelTop<overflow8.stageTop-1||overflow8.panelBottom>overflow8.stageBottom+1)
       throw new Error('Scene 08 must fit inside the stage without a nested scrollbar: '+JSON.stringify(overflow8));
     await expect(page.locator('.w6-capacity-grid .w6-capacity-card')).toHaveCount(2);
+    await expect(page.locator('.w6-capacity-card.base')).toContainText('기본 요청');
+    await expect(page.locator('.w6-capacity-card.surge')).toContainText('초당 2건');
+    if(capacity.baselinePendingChange>0)
+      await expect(page.locator('.w6-result-takeaway')).toContainText('기본 요청에서도 일이 쌓였지만');
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
     console.log('native-pressure-capacity',JSON.stringify({openingPressure,warmCompleted,tickSamples,capacity,overflow,overflow8}));
     await page.getByRole('button',{name:/Scene 09:/}).click();
