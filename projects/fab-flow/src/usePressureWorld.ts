@@ -42,8 +42,8 @@ function snapshot(engine: Engine): SimulationState {
 // instead of staging a fake fleet entrance. This exact native state is also the
 // shared initial condition for the two operational comparisons.
 export const PRESSURE_WARMUP_SECONDS = 3000;
-export const PRESSURE_BASE_INTERVAL = 60; // one normal request per simulated minute
-export const PRESSURE_SURGE_INTERVAL = 2; // same fleet, 30x demand
+export const PRESSURE_BASE_INTERVAL = 20; // three requests per simulated minute; busy without overload
+export const PRESSURE_SURGE_INTERVAL = 2; // same 48 OHTs, ten times the normal demand
 export const PRESSURE_MEASURE_SECONDS = 1800;
 export const PRESSURE_STORY = {
   surgeAt: PRESSURE_WARMUP_SECONDS + 20,

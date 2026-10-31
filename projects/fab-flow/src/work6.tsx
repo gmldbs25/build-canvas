@@ -125,9 +125,7 @@ export default function Work6() {
   // Scene 08 branches two equal-length experiments from that same snapshot.
   const pressure = usePressureWorld(scene.id === 7, scene.id === 8, scene.id >= 6 && scene.id <= 8);
   const waitingForDispatch = pressure.state.requests.filter(item => item.phase === 'pending').length;
-  const waitingAtStart = Math.max(0, pressure.metrics.created - pressure.metrics.completed - pressure.state.requests.filter(r => r.phase !== 'completed').length); // invariant: zero
   const outcome = pressure.capacity;
-  const perMinute = (count: number) => outcome ? (count / (outcome.observationSeconds / 60)).toFixed(1) : '0.0';
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -505,7 +503,7 @@ export default function Work6() {
               : pressure.beat === 'normal'
                 ? '여러 OHT가 이미 FOUP를 옮기고 있어요. 지금은 평소처럼 운송 요청을 처리하고 있습니다.'
                 : pressure.beat === 'surge'
-                  ? '같은 48대의 OHT에게 운송 요청이 갑자기 30배로 들어옵니다.'
+                  ? '같은 48대의 OHT에게 운송 요청이 갑자기 10배로 들어옵니다.'
                   : 'OHT들은 여전히 움직이고 있어요. 그런데 배차를 기다리는 요청은 얼마나 늘었을까요?'}</p>
             <div className="w6-story-steps" aria-label="운송 요청 증가 순서">
               <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 정상 운영</span>
@@ -519,10 +517,10 @@ export default function Work6() {
               </div>
               <div className="w6-pressure-frequency">
                 <span>요청 발생 간격</span>
-                <strong>{pressure.beat === 'normal' ? '60초 → 2초' : '2초마다 1건'}</strong>
+                <strong>{pressure.beat === 'normal' ? '20초 → 2초' : '2초마다 1건'}</strong>
               </div>
             </div>
-            <p className="w6-pressure-subline">운송 차량은 그대로 48대 · 새 요청만 <strong>{pressure.beat === 'normal' ? '곧 30배 증가' : '30배 증가'}</strong></p>
+            <p className="w6-pressure-subline">운송 차량은 그대로 48대 · 새 요청만 <strong>{pressure.beat === 'normal' ? '곧 10배 증가' : '10배 증가'}</strong></p>
             <div className="w6-action-row">
               <button type="button" className="w6-secondary" disabled={!pressure.prepared} onClick={pressure.reset}>다시 보기</button>
               <button type="button" className="w6-primary" onClick={() => nextScene(1)}>왜 일이 밀릴까? <span aria-hidden="true">↗</span></button>
@@ -531,7 +529,7 @@ export default function Work6() {
             <p className="w6-context-line">같은 OHT 48대가 움직이는 공장에서, 요청량만 바꾸고 30분씩 비교했어요.</p>
             <div className="w6-capacity-grid" aria-label="평상시와 요청 폭증 시 실제 처리량 비교">
               {([
-                { name: '평상시', rate: '60초마다 1건', value: outcome.baseline, kind: 'base' },
+                { name: '평상시', rate: '20초마다 1건', value: outcome.baseline, kind: 'base' },
                 { name: '요청 폭증', rate: '2초마다 1건', value: outcome.surge, kind: 'surge' },
               ] as const).map(part => <div className={'w6-capacity-card '+part.kind} key={part.name}>
                 <div className="w6-capacity-card-heading"><strong>{part.name}</strong><span>{part.rate}</span></div>
