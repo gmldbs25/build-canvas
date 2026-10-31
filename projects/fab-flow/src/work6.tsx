@@ -121,11 +121,13 @@ export default function Work6() {
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
   const isPressure = scene.id >= 7 && scene.id <= 9;
-  // Scene 07 moves live; Scene 08 awaits the same native 85-second result.
-  const pressure = usePressureWorld(scene.id === 7, scene.id === 8);
-  // Native request phases, not guessed congestion: pending has no assigned OHT.
+  // The operating FAB is warmed from real Native ticks before the reveal.
+  // Scene 08 branches two equal-length experiments from that same snapshot.
+  const pressure = usePressureWorld(scene.id === 7, scene.id === 8, scene.id >= 6 && scene.id <= 8);
   const waitingForDispatch = pressure.state.requests.filter(item => item.phase === 'pending').length;
-  const transportInProgress = pressure.state.requests.filter(item => item.phase !== 'pending' && item.phase !== 'completed').length;
+  const waitingAtStart = Math.max(0, pressure.metrics.created - pressure.metrics.completed - pressure.state.requests.filter(r => r.phase !== 'completed').length); // invariant: zero
+  const outcome = pressure.capacity;
+  const perMinute = (count: number) => outcome ? (count / (outcome.observationSeconds / 60)).toFixed(1) : '0.0';
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -285,7 +287,7 @@ export default function Work6() {
   const shownRoute = routeStudy ? routeChoice === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
-  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 결과 관찰';
+  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 대기 확인';
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
@@ -359,12 +361,15 @@ export default function Work6() {
     data-pressure-beat={scene.id === 7 || scene.id === 8 ? pressure.beat : ''}
     data-pressure-layout={isPressure ? pressure.engine.layout.id : ''}
     data-pressure-demand-changes={isPressure ? pressure.engine.scenario.demandChanges?.length ?? 0 : ''}
-    data-pressure-ready={scene.id === 8 ? String(pressure.ready) : ''}
-    data-pressure-created={scene.id === 8 && pressure.ready ? pressure.metrics.created : ''}
-    data-pressure-completed={scene.id === 8 && pressure.ready ? pressure.metrics.completed : ''}
-    data-pressure-unfinished={scene.id === 8 && pressure.ready ? pressure.metrics.unfinished : ''}
-    data-pressure-dispatch-waiting={scene.id === 8 && pressure.ready ? waitingForDispatch : ''}
-    data-pressure-in-progress={scene.id === 8 && pressure.ready ? transportInProgress : ''}>
+    data-pressure-ready={scene.id === 8 ? String(!!outcome) : ''}
+    data-pressure-prepared={isPressure ? String(pressure.prepared) : ''}
+    data-pressure-warm-completed={isPressure ? pressure.warmCompleted : ''}
+    data-pressure-created={scene.id === 8 && outcome ? outcome.surge.created : ''}
+    data-pressure-completed={scene.id === 8 && outcome ? outcome.surge.completed : ''}
+    data-pressure-normal-created={scene.id === 8 && outcome ? outcome.baseline.created : ''}
+    data-pressure-normal-completed={scene.id === 8 && outcome ? outcome.baseline.completed : ''}
+    data-pressure-normal-pending-delta={scene.id === 8 && outcome ? outcome.baseline.pendingEnd - outcome.baseline.pendingStart : ''}
+    data-pressure-surge-pending-delta={scene.id === 8 && outcome ? outcome.surge.pendingEnd - outcome.surge.pendingStart : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -378,7 +383,7 @@ export default function Work6() {
           floor={0}
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? scene.id === 7 && !pressure.paused : isOpening ? true : busy}
+          running={isPressure ? scene.id === 7 && pressure.prepared : isOpening ? true : busy}
           tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
           selected={isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
             : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
@@ -399,12 +404,16 @@ export default function Work6() {
         {focusMode && <div className="w6-focus-note" role="note">{isOpening ? '고정된 시야에서 여러 OHT의 실제 움직임을 관찰해요' : '지금은 한 대의 운송에 집중해요 · 전체 공장은 Scene 04에서'}</div>}
         {(scene.id === 3 || isNetwork || isDecision) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
-        {scene.id === 7 && <div className="w6-pressure-caption" aria-live="off">
+        {scene.id === 7 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
+          <strong>운영 중인 FAB를 준비하고 있어요.</strong>
+          <span>실제 엔진으로 운송이 진행된 상태를 계산하고 있습니다.</span>
+        </div>}
+        {scene.id === 7 && pressure.prepared && <div className="w6-pressure-caption" aria-live="off">
           <span className={pressure.beat === 'normal' ? 'is-calm' : 'is-busy'} aria-hidden="true"/>
           {pressureBeatLabel}
         </div>}
       </div>
-      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 7 && scene.id <= 10 ? ' w6-narrative-data' : '')} aria-label="장면 설명">
+      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 7 && scene.id <= 8 ? ' w6-narrative-pressure' : '') + (scene.id >= 9 && scene.id <= 10 ? ' w6-narrative-data' : '')} aria-label="장면 설명">
         <p className="w6-chapter">{scene.chapter}</p>
         <h1>{scene.title}</h1>
         <p className="w6-description">{scene.body}</p>
@@ -489,55 +498,62 @@ export default function Work6() {
           </div>}
         </div>}
         {(scene.id === 7 || scene.id === 8) && <div className="w6-inner-controls">
-          <p className="w6-overline">NATIVE FAB FLOW · LARGE 9-BAY</p>
+          <p className="w6-overline">FAB FLOW · LARGE FAB / OHT 48대</p>
           {scene.id === 7 ? <>
-            <p className="w6-context-line">{pressure.beat === 'normal'
-              ? '공장이 평소처럼 움직이고 있어요. 잠시 뒤 들어오는 운송 요청이 훨씬 많아집니다.'
-              : pressure.beat === 'surge'
-                ? '운송 요청 간격이 10초에서 1초로 줄었어요. 실제 OHT들이 움직이는 동안 새로운 요청이 얼마나 늘어나는지 보세요.'
-                : '이제 관찰 결과를 볼 차례예요. 쌓인 요청이 모두 레일 정체를 뜻하는 건 아니에요.'}</p>
-            <div className="w6-story-steps" aria-label="운송 요청 증가 관찰 순서">
-              <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 평상시</span>
-              <span className={pressure.beat === 'surge' ? 'current' : pressure.beat === 'normal' ? '' : 'past'}>02 요청 증가</span>
-              <span className={pressure.beat === 'observe' || pressure.beat === 'complete' ? 'current' : ''}>03 결과 확인</span>
+            <p className="w6-context-line">{!pressure.prepared
+              ? '먼저 실제 운송이 이뤄지고 있는 공장 상태를 준비합니다.'
+              : pressure.beat === 'normal'
+                ? '여러 OHT가 이미 FOUP를 옮기고 있어요. 지금은 평소처럼 운송 요청을 처리하고 있습니다.'
+                : pressure.beat === 'surge'
+                  ? '같은 48대의 OHT에게 운송 요청이 갑자기 30배로 들어옵니다.'
+                  : 'OHT들은 여전히 움직이고 있어요. 그런데 배차를 기다리는 요청은 얼마나 늘었을까요?'}</p>
+            <div className="w6-story-steps" aria-label="운송 요청 증가 순서">
+              <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 정상 운영</span>
+              <span className={pressure.beat === 'surge' ? 'current' : pressure.beat === 'normal' ? '' : 'past'}>02 요청 폭증</span>
+              <span className={pressure.beat === 'observe' ? 'current' : ''}>03 대기 확인</span>
             </div>
-            <div className="w6-pressure-total" aria-label="지금까지 들어온 전체 운송 요청">
-              <div><span>지금까지 들어온 운송 요청</span><strong>{pressure.metrics.created}<small>건</small></strong></div>
-              <div className="w6-pressure-frequency"><span>새 요청 간격</span><strong>{pressure.beat === 'normal' ? '10초에 1건' : '1초에 1건'}</strong></div>
+            <div className="w6-pressure-total">
+              <div>
+                <span>차량 배정을 기다리는 운송</span>
+                <strong>{pressure.prepared ? waitingForDispatch : '—'}<small>건</small></strong>
+              </div>
+              <div className="w6-pressure-frequency">
+                <span>요청 발생 간격</span>
+                <strong>{pressure.beat === 'normal' ? '60초 → 2초' : '2초마다 1건'}</strong>
+              </div>
             </div>
-            <p className="w6-pressure-subline">아직 완료되지 않은 요청 <strong>{pressure.metrics.unfinished}건</strong> · 실제 엔진 집계</p>
+            <p className="w6-pressure-subline">운송 차량은 그대로 48대 · 새 요청만 <strong>{pressure.beat === 'normal' ? '곧 30배 증가' : '30배 증가'}</strong></p>
             <div className="w6-action-row">
-              <button type="button" className="w6-secondary" onClick={pressure.reset}>다시 보기</button>
-              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운송 결과 확인하기 <span aria-hidden="true">↗</span></button>
+              <button type="button" className="w6-secondary" disabled={!pressure.prepared} onClick={pressure.reset}>다시 보기</button>
+              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>왜 일이 밀릴까? <span aria-hidden="true">↗</span></button>
             </div>
-            <p className="w6-microcopy">{pressure.beat === 'complete' ? '관찰 완료' : '자동 관찰 진행 중'} · 실제 엔진 0.5초 Tick · {Math.round(pressure.state.time)} 시뮬레이션 초</p>
-          </> : pressure.ready ? <>
-            <p className="w6-context-line">한꺼번에 몰린 운송 요청 중, 실제로 끝난 운송은 얼마나 될까요?</p>
-            <div className="w6-result-heading">
-              <span>관찰 구간에 들어온 운송 요청</span>
-              <strong>{pressure.metrics.created}<small>건</small></strong>
+          </> : outcome ? <>
+            <p className="w6-context-line">같은 OHT 48대가 움직이는 공장에서, 요청량만 바꾸고 30분씩 비교했어요.</p>
+            <div className="w6-capacity-grid" aria-label="평상시와 요청 폭증 시 실제 처리량 비교">
+              {([
+                { name: '평상시', rate: '60초마다 1건', value: outcome.baseline, kind: 'base' },
+                { name: '요청 폭증', rate: '2초마다 1건', value: outcome.surge, kind: 'surge' },
+              ] as const).map(part => <div className={'w6-capacity-card '+part.kind} key={part.name}>
+                <div className="w6-capacity-card-heading"><strong>{part.name}</strong><span>{part.rate}</span></div>
+                <div className="w6-capacity-metric"><span>새로 들어온 요청</span><strong>{part.value.created}건</strong></div>
+                <div className="w6-capacity-bar"><span style={{width: (outcome.surge.created ? part.value.created / outcome.surge.created * 100 : 0)+'%'}}/></div>
+                <div className="w6-capacity-metric"><span>완료한 운송</span><strong>{part.value.completed}건</strong></div>
+                <div className="w6-capacity-bar complete"><span style={{width: (outcome.surge.created ? part.value.completed / outcome.surge.created * 100 : 0)+'%'}}/></div>
+                <div className="w6-capacity-pending">배차 대기 변화 <strong>{part.value.pendingEnd - part.value.pendingStart >= 0 ? '+' : ''}{part.value.pendingEnd - part.value.pendingStart}건</strong></div>
+              </div>)}
             </div>
-            <div className="w6-result-bar" role="img" aria-label={`완료 ${pressure.metrics.completed}건, 차량 배정·운송 중 ${transportInProgress}건, 배차 대기 ${waitingForDispatch}건`}>
-              <div className="w6-result-finished" style={{width:(pressure.metrics.created ? pressure.metrics.completed / pressure.metrics.created * 100 : 0)+'%'}}/>
-              <div className="w6-result-inflight" style={{width:(pressure.metrics.created ? transportInProgress / pressure.metrics.created * 100 : 0)+'%'}}/>
-              <div className="w6-result-pending" style={{width:(pressure.metrics.created ? waitingForDispatch / pressure.metrics.created * 100 : 0)+'%'}}/>
-            </div>
-            <div className="w6-result-legend">
-              <div><span className="w6-result-dot finished"/>완료 <strong>{pressure.metrics.completed}건</strong></div>
-              <div><span className="w6-result-dot inflight"/>차량 배정·운송 중 <strong>{transportInProgress}건</strong></div>
-              <div><span className="w6-result-dot pending"/>배차 대기 <strong>{waitingForDispatch}건</strong></div>
-            </div>
-            <p className="w6-result-takeaway">{waitingForDispatch > 0
-              ? '운송 요청이 한꺼번에 들어오자, 차량 배정을 기다리는 요청도 생겼어요.'
-              : '차량들이 운송하고 있지만, 아직 끝나지 않은 요청이 남아 있어요.'}</p>
-            <p className="w6-microcopy">완료되지 않은 요청 {pressure.metrics.unfinished}건 = 차량 배정·운송 중 {transportInProgress}건 + 배차 대기 {waitingForDispatch}건. 짧은 관찰에서 운송이 미완료라고 레일 정체를 단정할 수는 없어요. · 실제 엔진 {Math.round(pressure.state.time)} 시뮬레이션 초 관찰</p>
+            <p className="w6-result-takeaway">{outcome.surge.created > outcome.surge.completed
+              ? '요청이 들어오는 속도가 처리 속도를 넘어서면, 기다리는 운송이 쌓입니다.'
+              : '이 조건에서는 운송 요청을 따라 처리했어요. 수요에 따라 결과는 달라질 수 있어요.'}</p>
             <div className="w6-action-row">
-              <button type="button" className="w6-secondary" onClick={() => { pressure.reset(); nextScene(-1); }}>운송 증가 다시 보기</button>
-              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운영 조건 바꿔보기 <span aria-hidden="true">↗</span></button>
+              <button type="button" className="w6-secondary" onClick={() => nextScene(-1)}>움직임 다시 보기</button>
+              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>그럼 어떻게 개선할까? <span aria-hidden="true">↗</span></button>
             </div>
+            <p className="w6-capacity-foot">실제 FAB FLOW 엔진 · 동일한 시작 상태, 차량 수·경로 정책 · 요청량만 변경</p>
           </> : <div className="w6-observed" role="status" aria-live="polite">
-            <strong>같은 운송 결과를 계산하고 있어요.</strong>
-            <p>Scene 7을 건너뛰어도 같은 FAB와 요청 조건으로 실제 엔진을 끝까지 진행해 결과를 보여줍니다.</p>
+            <strong>{pressure.prepared ? '실제 처리량을 비교하는 중이에요.' : '운영 중인 공장을 준비하는 중이에요.'}</strong>
+            <p>{pressure.prepared ? '동일한 공장 상태에서 요청량만 바꾼 두 운영 결과를 계산합니다.' : '운송이 진행된 상태부터 정확히 재현하고 있어요.'}</p>
+            {pressure.capacityBusy && <p>분석 진행 {Math.round(pressure.capacityProgress * 100)}%</p>}
           </div>}
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}

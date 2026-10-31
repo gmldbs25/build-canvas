@@ -304,49 +304,62 @@ try {
     await page.getByRole('button',{name:/Scene 05:/}).click();
     await expect(page.getByRole('heading',{name:'차량은 아무 길로나 갈 수 없다.'})).toBeVisible();
     await expect(page.getByText('OHT가 이동하는 정해진 선로')).toBeVisible();
+
     await page.getByRole('button',{name:/Scene 07:/}).click();
-    await expect(page.getByRole('heading',{name:'운송이 많아지면 무슨 일이 생길까?'})).toBeVisible();
-    await expect(page.getByText('지금까지 들어온 운송 요청',{exact:true})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'잘 돌아가던 공장에 갑자기 일이 몰린다면?'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-layout','large');
-    await expect(page.getByText('01 평상시')).toBeVisible();
-    const congestionBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    const pressureSamples=[congestionBefore];
-    for(let k=0;k<6;k++){
-      await page.waitForTimeout(140);
-      pressureSamples.push(Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick')));
-    }
-    const congestionAfter=pressureSamples.at(-1);
-    if(congestionAfter<=congestionBefore || pressureSamples.some((tick,i)=>i>0 && (tick<pressureSamples[i-1] || tick-pressureSamples[i-1]>2))){
-      throw new Error('Native congestion should publish successive single ticks without 3-tick jumps: '+JSON.stringify(pressureSamples));
-    }
-    console.log('native-pressure-smooth',JSON.stringify({samples:pressureSamples}));
-    // The prescribed story switches the *same* Native Engine to FAB FLOW's
-    // live 1-request/second demand setting without resetting its history.
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-beat','surge',{timeout:12000});
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
-    await page.getByRole('button',{name:'다시 보기'}).click();
-    await page.waitForTimeout(320);
-    const afterReset=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    if(afterReset<0 || afterReset>7) throw new Error('Congestion reset must restart a fresh native Engine: '+afterReset);
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','0');
-    await page.getByRole('button',{name:/Scene 08:/}).click();
-    await expect(page.getByRole('heading',{name:'바쁘게 움직였지만, 운송은 끝났을까?'})).toBeVisible();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-ready','true',{timeout:30000});
-    const resultCounts = await page.locator('.w6-root').evaluate(el => ({
-      created:Number(el.getAttribute('data-pressure-created')),
-      completed:Number(el.getAttribute('data-pressure-completed')),
-      unfinished:Number(el.getAttribute('data-pressure-unfinished')),
-      assigned:Number(el.getAttribute('data-pressure-in-progress')),
-      dispatchWaiting:Number(el.getAttribute('data-pressure-dispatch-waiting')),
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true',{timeout:120000});
+    const warmCompleted=Number(await page.locator('.w6-root').getAttribute('data-pressure-warm-completed'));
+    const openingPressure=await page.evaluate(()=>({
+      active:Object.values(window.__FAB_3D__?.vehicles ?? {}).filter(x=>['empty','loaded','pickup','dropoff'].includes(x.phase)).length,
+      tick:window.__FAB_3D__?.tick ?? 0,
     }));
-    if(resultCounts.created < 30 || resultCounts.completed + resultCounts.unfinished !== resultCounts.created ||
-       resultCounts.assigned + resultCounts.dispatchWaiting !== resultCounts.unfinished)
-      throw new Error('Scene 08 must show authentic complete native results even after Scene 07 reset: '+JSON.stringify(resultCounts));
-    await expect(page.locator('.w6-result-bar')).toBeVisible();
-    await expect(page.locator('.w6-result-legend')).toContainText('차량 배정·운송 중');
-    await expect(page.locator('.w6-result-legend')).toContainText('배차 대기');
+    if(openingPressure.active<12||openingPressure.tick<4000){
+      throw new Error('Scene 07 must open with many native OHTs already busy, not a newly empty factory: '+JSON.stringify({openingPressure,warmCompleted}));
+    }
+    const scene7=page.locator('.w6-narrative-pressure');
+    const overflow=await scene7.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,innerScroll:el.querySelector('.w6-inner-controls').scrollHeight,innerClient:el.querySelector('.w6-inner-controls').clientHeight}));
+    if(overflow.scroll>overflow.client+3||overflow.innerScroll>overflow.innerClient+3)
+      throw new Error('Scene 07 must not have a narrative scrollbar: '+JSON.stringify(overflow));
+    const tickBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    const tickSamples=[tickBefore];
+    for(let k=0;k<6;k++){
+      await page.waitForTimeout(145);
+      tickSamples.push(Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick')));
+    }
+    if(tickSamples.at(-1)<=tickBefore||tickSamples.some((t,i)=>i>0&&(t<tickSamples[i-1]||t-tickSamples[i-1]>2)))
+      throw new Error('Native pressure playback must publish contiguous ticks: '+JSON.stringify(tickSamples));
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1',{timeout:15000});
+    await page.waitForTimeout(600);
+    const tickAfterSurge=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
+    if(tickAfterSurge<=tickSamples.at(-1))
+      throw new Error('Scene 07 must keep moving after the request surge');
+    await page.getByRole('button',{name:'다시 보기'}).click();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','0');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true');
+    await page.getByRole('button',{name:/Scene 08:/}).click();
+    await expect(page.getByRole('heading',{name:'왜 운송을 기다리는 일이 늘어날까?'})).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-ready','true',{timeout:120000});
+    const capacity=await page.locator('.w6-root').evaluate(el=>({
+      baselineCreated:Number(el.dataset.pressureNormalCreated),
+      baselineCompleted:Number(el.dataset.pressureNormalCompleted),
+      surgeCreated:Number(el.dataset.pressureCreated),
+      surgeCompleted:Number(el.dataset.pressureCompleted),
+      baselinePendingChange:Number(el.dataset.pressureNormalPendingDelta),
+      surgePendingChange:Number(el.dataset.pressureSurgePendingDelta),
+    }));
+    if(capacity.baselineCreated<5||capacity.baselineCompleted<1||
+       capacity.surgeCreated<=capacity.baselineCreated*5||
+       capacity.surgePendingChange<=capacity.baselinePendingChange){
+      throw new Error('Scene 08 should compare a meaningful warmed native baseline against actual overload: '+JSON.stringify(capacity));
+    }
+    const scene8=page.locator('.w6-narrative-pressure');
+    const overflow8=await scene8.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,innerScroll:el.querySelector('.w6-inner-controls').scrollHeight,innerClient:el.querySelector('.w6-inner-controls').clientHeight}));
+    if(overflow8.scroll>overflow8.client+3||overflow8.innerScroll>overflow8.innerClient+3)
+      throw new Error('Scene 08 must not have a narrative scrollbar: '+JSON.stringify(overflow8));
+    await expect(page.locator('.w6-capacity-grid .w6-capacity-card')).toHaveCount(2);
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
-    console.log('native-pressure-result',JSON.stringify(resultCounts));
+    console.log('native-pressure-capacity',JSON.stringify({openingPressure,warmCompleted,tickSamples,capacity,overflow,overflow8}));
     await page.getByRole('button',{name:/Scene 09:/}).click();
     await expect(page.getByRole('heading',{name:'차량을 더 넣으면 빨라질까?'})).toBeVisible();
     if(width===1440){

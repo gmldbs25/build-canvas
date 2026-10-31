@@ -3,7 +3,7 @@ import { Engine, getKpis } from './sim/engine';
 import { operationalScenario } from './sim/experiments';
 import { presetScenario } from './sim/demand-presets';
 import { publicationCopy } from './sim/publication';
-import type { Policy, Scenario, SimulationState } from './sim/types';
+import type { Policy, Scenario, SimulationState, Snapshot } from './sim/types';
 
 export type NativeMetrics = ReturnType<typeof getKpis>;
 export type ComparisonMode = 'fleet' | 'policy';
@@ -18,50 +18,72 @@ export type ComparisonResult = {
   baselinePolicy: Policy;
   changedPolicy: Policy;
 };
+export type PressureWindow = {
+  created: number;
+  completed: number;
+  pendingStart: number;
+  pendingEnd: number;
+};
+export type PressureCapacityResult = {
+  baseline: PressureWindow;
+  surge: PressureWindow;
+  observationSeconds: number;
+  baselineInterval: number;
+  surgeInterval: number;
+  fleet: number;
+  warmupSeconds: number;
+};
 
 function snapshot(engine: Engine): SimulationState {
   return publicationCopy({ version: 1, scenario: engine.scenario, state: engine.state }).state;
 }
 
-// Short, deterministic guided observation using the same Large V6 native
-// facility and live interval-demand API as the standalone FAB FLOW application.
-// All vehicle movement, request history and counts still come from Engine.step.
+// Warm the *genuine* Large V6 engine long enough to start in an active factory,
+// instead of staging a fake fleet entrance. This exact native state is also the
+// shared initial condition for the two operational comparisons.
+export const PRESSURE_WARMUP_SECONDS = 3000;
+export const PRESSURE_BASE_INTERVAL = 60; // one normal request per simulated minute
+export const PRESSURE_SURGE_INTERVAL = 2; // same fleet, 30x demand
+export const PRESSURE_MEASURE_SECONDS = 1800;
+export const PRESSURE_STORY = {
+  surgeAt: PRESSURE_WARMUP_SECONDS + 20,
+  observeAt: PRESSURE_WARMUP_SECONDS + 130,
+} as const;
+export const PRESSURE_PLAYBACK_MS = 115;
+export type PressureBeat = 'normal' | 'surge' | 'observe';
+export function pressureBeat(time: number): PressureBeat {
+  return time < PRESSURE_STORY.surgeAt ? 'normal'
+    : time < PRESSURE_STORY.observeAt ? 'surge' : 'observe';
+}
 function pressureScenario(): Scenario {
   return {
-    ...presetScenario('large', 'active', 31, 'DBR', 48),
-    duration: 360, demandWindow: 300,
+    ...presetScenario('large', 'relaxed', 31, 'DBR', 48),
+    demandIntervalSeconds: PRESSURE_BASE_INTERVAL,
+    duration: 7200, demandWindow: 6300,
+  };
+}
+function counts(engine: Engine) {
+  const metrics = getKpis(engine);
+  return { created: metrics.created, completed: metrics.completed, pending: metrics.pending };
+}
+function windowResult(before: ReturnType<typeof counts>, after: ReturnType<typeof counts>): PressureWindow {
+  return {
+    created: after.created - before.created,
+    completed: after.completed - before.completed,
+    pendingStart: before.pending,
+    pendingEnd: after.pending,
   };
 }
 
-// The cinema has only three editorial beats. These are simulated timestamps,
-// not a claim of a real factory's response times. At the original one-tick
-// playback cadence the entire story takes ~20 wall-clock seconds.
-export const PRESSURE_STORY = { surgeAt: 10, observeAt: 70, endAt: 85 } as const;
-export type PressureBeat = 'normal' | 'surge' | 'observe' | 'complete';
-export function pressureBeat(time: number): PressureBeat {
-  return time < PRESSURE_STORY.surgeAt ? 'normal'
-    : time < PRESSURE_STORY.observeAt ? 'surge'
-      : time < PRESSURE_STORY.endAt ? 'observe' : 'complete';
-}
-
-// Keep the renderer's transition duration equal to the Native Engine
-// publication cadence. Previously each React update skipped three 0.5s
-// native ticks, which made OHTs jump before the next interpolation began.
-export const PRESSURE_PLAYBACK_MS = 115;
-
-/** Run one authentic tick in both live playback and result preparation. */
-function advancePressureTick(engine: Engine): void {
-  if (engine.state.time >= PRESSURE_STORY.surgeAt && !(engine.scenario.demandChanges?.length)) {
-    engine.setDemandInterval(1, 'congested');
-  }
-  engine.step(1);
-}
-
-export function usePressureWorld(active: boolean, showResults: boolean) {
-  const [engine, setEngine] = useState(() => new Engine(pressureScenario()));
+export function usePressureWorld(active: boolean, showResults: boolean, prewarm: boolean) {
+  const [engine, setEngine] = useState(() => new Engine(pressureScenario(), { analysis: false }));
   const [state, setState] = useState<SimulationState>(() => snapshot(engine));
   const [metrics, setMetrics] = useState<NativeMetrics>(() => getKpis(engine));
-  const [paused, setPaused] = useState(false);
+  const [prepared, setPrepared] = useState(false);
+  const warmSnapshotRef = useRef<Snapshot | null>(null);
+  const [capacity, setCapacity] = useState<PressureCapacityResult | null>(null);
+  const [capacityBusy, setCapacityBusy] = useState(false);
+  const [capacityProgress, setCapacityProgress] = useState(0);
   const [compareMode, setCompareMode] = useState<ComparisonMode>('fleet');
   const [compareDemand, setCompareDemand] = useState<8 | 14>(14);
   const [result, setResult] = useState<ComparisonResult | null>(null);
@@ -70,65 +92,120 @@ export function usePressureWorld(active: boolean, showResults: boolean) {
   const [error, setError] = useState('');
   const epoch = useRef(0);
 
+  // Yield every small native batch. Never publish the empty warm-up world as
+  // Scene 07; it would look like vehicles magically entering an empty factory.
   useEffect(() => {
-    if (!active || paused || engine.state.time >= PRESSURE_STORY.endAt) return;
-    const interval = window.setInterval(() => {
-      try {
-        // 1 native 0.5s tick = 1 publication = 1 3D interpolation.
-        // The authentic demand, dispatch, congestion and route logic remains.
-        // One deliberate intervention, made through FAB FLOW's actual native
-        // demand control. Never replace OHT positions with scripted poses.
-        advancePressureTick(engine);
-        setState(snapshot(engine));
-        setMetrics(getKpis(engine));
-        if (engine.state.time >= PRESSURE_STORY.endAt) {
-          window.clearInterval(interval);
-          setPaused(true);
-        }
-      } catch (e) {
-        window.clearInterval(interval);
-        setError(e instanceof Error ? e.message : '실제 엔진 관찰 중 오류');
-      }
-    }, PRESSURE_PLAYBACK_MS);
-    return () => window.clearInterval(interval);
-  }, [active, engine, paused]);
-
-  // Navigating straight to Scene 08 must never display the initial zeroes
-  // as an experiment result. Finish the identical native observation in
-  // browser-yielding batches before exposing the true 85-second KPIs.
-  useEffect(() => {
-    if (!showResults || engine.state.time >= PRESSURE_STORY.endAt) return;
-    let cancelled = false;
-    let timer: number;
-    const finish = () => {
+    if (!prewarm || prepared || error) return;
+    let cancelled = false, timer: number;
+    const prime = () => {
       if (cancelled) return;
       try {
-        for (let i = 0; i < 12 && engine.state.time < PRESSURE_STORY.endAt; i++) {
-          advancePressureTick(engine);
-        }
-        if (engine.state.time < PRESSURE_STORY.endAt) timer = window.setTimeout(finish, 0);
+        for (let i = 0; i < 24 && engine.state.time < PRESSURE_WARMUP_SECONDS; i++) engine.step(1);
+        if (engine.state.time < PRESSURE_WARMUP_SECONDS) timer = window.setTimeout(prime, 0);
         else {
+          warmSnapshotRef.current = engine.snapshot();
           setState(snapshot(engine));
           setMetrics(getKpis(engine));
-          setPaused(true);
+          setPrepared(true);
         }
       } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : '실제 엔진의 관찰 결과를 계산할 수 없어요.');
+        if (!cancelled) setError(cause instanceof Error ? cause.message : '실제 공장 운영 상태를 준비할 수 없어요.');
       }
     };
-    timer = window.setTimeout(finish, 0);
+    timer = window.setTimeout(prime, 0);
     return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [showResults, engine]);
+  }, [prewarm, prepared, engine, error]);
+
+  // Playback always publishes one genuine 0.5s Engine tick per renderer
+  // interpolation. The editorial sequence ends, but the factory keeps moving.
+  useEffect(() => {
+    if (!active || !prepared || engine.state.time >= engine.scenario.duration) return;
+    const timer = window.setInterval(() => {
+      try {
+        if (engine.state.time >= PRESSURE_STORY.surgeAt && !(engine.scenario.demandChanges?.length))
+          engine.setDemandInterval(PRESSURE_SURGE_INTERVAL, 'congested');
+        engine.step(1);
+        setState(snapshot(engine));
+        setMetrics(getKpis(engine));
+      } catch (cause) {
+        window.clearInterval(timer);
+        setError(cause instanceof Error ? cause.message : 'FAB FLOW 운송 중 오류가 발생했어요.');
+      }
+    }, PRESSURE_PLAYBACK_MS);
+    return () => window.clearInterval(timer);
+  }, [active, prepared, engine]);
+
+  // Both 30-minute experiments branch from exactly the same warmed Native
+  // snapshot, not from the truncated Scene 07 playback. They run with identical
+  // layout, fleet, policy and initial state; only interval-demand changes.
+  useEffect(() => {
+    if (!showResults || !prepared || capacity || error || !warmSnapshotRef.current) return;
+    let cancelled = false, timer: number;
+    let base: Engine, stressed: Engine;
+    try {
+      base = Engine.restore(warmSnapshotRef.current);
+      stressed = Engine.restore(warmSnapshotRef.current);
+      // Identical first 20s on both branches. Demand changes at the same
+      // native tick as in the on-screen Scene 07 story.
+      base.step(40);
+      stressed.step(40);
+      const anchor = counts(base);
+      stressed.setDemandInterval(PRESSURE_SURGE_INTERVAL, 'congested');
+      const totalTicks = PRESSURE_MEASURE_SECONDS * 2;
+      let done = 0;
+      setCapacityBusy(true);
+      const measure = () => {
+        if (cancelled) return;
+        try {
+          const batch = Math.min(18, totalTicks - done);
+          base.step(batch);
+          stressed.step(batch);
+          done += batch;
+          if (done < totalTicks) {
+            if (done % 180 === 0) setCapacityProgress(done / totalTicks);
+            timer = window.setTimeout(measure, 0);
+          } else {
+            setCapacity({
+              baseline: windowResult(anchor, counts(base)),
+              surge: windowResult(anchor, counts(stressed)),
+              observationSeconds: PRESSURE_MEASURE_SECONDS,
+              baselineInterval: PRESSURE_BASE_INTERVAL,
+              surgeInterval: PRESSURE_SURGE_INTERVAL,
+              fleet: base.scenario.fleet,
+              warmupSeconds: PRESSURE_WARMUP_SECONDS,
+            });
+            setCapacityProgress(1);
+            setCapacityBusy(false);
+          }
+        } catch (cause) {
+          if (!cancelled) {
+            setCapacityBusy(false);
+            setError(cause instanceof Error ? cause.message : '실제 처리량을 비교하지 못했어요.');
+          }
+        }
+      };
+      timer = window.setTimeout(measure, 0);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '동일한 공장 상태를 복원하지 못했어요.');
+    }
+    return () => { cancelled = true; window.clearTimeout(timer); setCapacityBusy(false); };
+  }, [showResults, prepared, capacity, error]);
 
   useEffect(() => () => { epoch.current += 1; }, []);
 
   const reset = useCallback(() => {
-    const next = new Engine(pressureScenario());
-    setEngine(next);
-    setState(snapshot(next));
-    setMetrics(getKpis(next));
-    setPaused(false);
-    setError('');
+    try {
+      const fresh = warmSnapshotRef.current
+        ? Engine.restore(warmSnapshotRef.current)
+        : new Engine(pressureScenario(), { analysis: false });
+      setEngine(fresh);
+      setState(snapshot(fresh));
+      setMetrics(getKpis(fresh));
+      setPrepared(!!warmSnapshotRef.current);
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '동일한 운영 상태를 복원할 수 없어요.');
+    }
   }, []);
 
   const compare = useCallback(async () => {
@@ -184,6 +261,13 @@ export function usePressureWorld(active: boolean, showResults: boolean) {
     epoch.current++; setComparing(false); setResult(null); setProgress(0); setCompareDemand(next);
   }, []);
 
-  return { engine, state, metrics, ready: state.time >= PRESSURE_STORY.endAt, beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
-    compareMode, changeMode, compareDemand, changeDemand, compare, comparing, progress, result };
+
+  return {
+    engine, state, metrics, prepared, warmupSeconds: PRESSURE_WARMUP_SECONDS,
+    warmCompleted: warmSnapshotRef.current?.state.requests.filter(request => request.phase === 'completed').length ?? 0,
+    beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS,
+    capacity, capacityBusy, capacityProgress,
+    reset, error, compareMode, changeMode, compareDemand, changeDemand,
+    compare, comparing, progress, result,
+  };
 }

@@ -155,3 +155,50 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 /* Completed / assigned-and-moving / unassigned is more meaningful at short native horizons. */
 .w6-result-inflight{height:100%;background:#779d9a;min-width:0}
 .w6-result-dot.inflight{background:#779d9a}
+
+/* Scene 07–08 exhibition: no nested scroll. The 3D world remains the hero
+   of 07; 08 uses a single compact side-by-side capacity comparison. */
+.w6-narrative-pressure{max-width:min(440px,calc(100vw - 42px));max-height:none;overflow:visible;padding:15px 16px 10px 0;bottom:clamp(18px,3vh,42px);pointer-events:auto}
+.w6-narrative-pressure::before{inset:-20px -55px -20px -42px;background:linear-gradient(90deg,rgba(244,241,234,.97) 8%,rgba(244,241,234,.89) 76%,transparent)}
+.w6-narrative-pressure h1{font-size:clamp(26px,2.7vw,39px);line-height:1.18;margin-bottom:11px}
+.w6-narrative-pressure .w6-description{font-size:14px;line-height:1.55;max-width:380px}
+.w6-narrative-pressure .w6-chapter{margin-bottom:9px}
+.w6-narrative-pressure .w6-inner-controls{max-height:none;overflow:visible;margin-top:17px;padding-top:13px;gap:10px;padding-right:0}
+.w6-narrative-pressure .w6-overline{margin-bottom:2px;font-size:10px}
+.w6-narrative-pressure .w6-action-row{gap:7px}
+.w6-narrative-pressure .w6-primary,.w6-narrative-pressure .w6-secondary{font-size:12px;min-height:36px;padding:8px 11px}
+.w6-pressure-loading{position:absolute;inset:0;z-index:7;background:rgba(233,236,228,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:#36574a;font-size:14px;pointer-events:none}
+.w6-pressure-loading strong{font-weight:650}.w6-pressure-loading span{font-size:12px;color:#66786c}
+.w6-capacity-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.w6-capacity-card{border:1px solid #c5cec2;background:rgba(249,248,241,.88);padding:12px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.w6-capacity-card.surge{border-color:#cca784}
+.w6-capacity-card-heading{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:baseline;justify-content:space-between;border-bottom:1px solid #d6ded4;padding-bottom:8px}
+.w6-capacity-card-heading strong{font-size:13px;color:#315348}.w6-capacity-card-heading span{font-size:10px;color:#7a8a7d}
+.w6-capacity-metric{display:flex;justify-content:space-between;align-items:baseline;gap:5px}
+.w6-capacity-metric span{font-size:10px;color:#627469;word-break:keep-all}
+.w6-capacity-metric strong{font:650 13px ui-monospace,Menlo,Consolas,monospace;color:#2f594b;white-space:nowrap}
+.w6-capacity-bar{height:6px;background:#e2e5dc;overflow:hidden;border-radius:1px}
+.w6-capacity-bar span{display:block;height:100%;background:#c18d5a}
+.w6-capacity-bar.complete span{background:#558f7a}
+.w6-capacity-pending{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px;font-size:10px;color:#68786d;margin-top:4px}
+.w6-capacity-pending strong{font:650 13px ui-monospace,Menlo,Consolas,monospace;color:#366451}
+.w6-narrative-pressure .w6-result-takeaway{font-size:13px;margin:0;line-height:1.5}
+.w6-capacity-foot{font-size:10px;line-height:1.4;color:#687b6e;margin:0}
+@media(max-width:650px){
+  .w6-narrative-pressure{left:18px;right:18px;bottom:15px;max-width:none;padding:12px 0 10px}
+  .w6-narrative-pressure::before{inset:-10px -16px -15px;background:linear-gradient(0deg,rgba(244,241,234,.98) 10%,rgba(244,241,234,.90) 82%,rgba(244,241,234,.54))}
+  .w6-narrative-pressure h1{font-size:27px;margin-bottom:8px}
+  .w6-narrative-pressure .w6-description{font-size:12px;line-height:1.45}
+  .w6-narrative-pressure .w6-inner-controls{margin-top:10px;padding-top:9px;gap:7px;max-height:none;overflow:visible}
+  .w6-capacity-card{padding:9px;gap:6px}
+  .w6-capacity-grid{gap:7px}
+  .w6-capacity-metric strong{font-size:12px}
+  .w6-narrative-pressure .w6-result-takeaway{font-size:12px}
+  .w6-narrative-pressure .w6-action-row{gap:6px}
+  .w6-narrative-pressure .w6-primary,.w6-narrative-pressure .w6-secondary{font-size:11px}
+}
+@media(max-height:730px) and (min-width:651px){
+  .w6-narrative-pressure h1{font-size:29px}
+  .w6-narrative-pressure .w6-inner-controls{margin-top:9px;gap:7px}
+  .w6-narrative-pressure .w6-description{font-size:12px}
+}
