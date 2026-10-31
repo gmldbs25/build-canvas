@@ -121,8 +121,8 @@ export default function Work6() {
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
   const isPressure = scene.id >= 7 && scene.id <= 9;
-  // Scene 07 runs the timed native story; Scenes 08–09 keep its final frame.
-  const pressure = usePressureWorld(scene.id === 7);
+  // Scene 07 moves live; Scene 08 awaits the same native 85-second result.
+  const pressure = usePressureWorld(scene.id === 7, scene.id === 8);
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -282,7 +282,7 @@ export default function Work6() {
   const shownRoute = routeStudy ? routeChoice === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
-  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 밀리는 운송';
+  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 결과 관찰';
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
@@ -355,7 +355,11 @@ export default function Work6() {
     data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}
     data-pressure-beat={scene.id === 7 || scene.id === 8 ? pressure.beat : ''}
     data-pressure-layout={isPressure ? pressure.engine.layout.id : ''}
-    data-pressure-demand-changes={isPressure ? pressure.engine.scenario.demandChanges?.length ?? 0 : ''}>
+    data-pressure-demand-changes={isPressure ? pressure.engine.scenario.demandChanges?.length ?? 0 : ''}
+    data-pressure-ready={scene.id === 8 ? String(pressure.ready) : ''}
+    data-pressure-created={scene.id === 8 && pressure.ready ? pressure.metrics.created : ''}
+    data-pressure-completed={scene.id === 8 && pressure.ready ? pressure.metrics.completed : ''}
+    data-pressure-unfinished={scene.id === 8 && pressure.ready ? pressure.metrics.unfinished : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -380,8 +384,8 @@ export default function Work6() {
           softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
           cameraLocked={focusMode}
-          heatmap={scene.id === 8}
-          view={scene.id === 8 ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
+          heatmap={false}
+          view={isDecision || isNetwork ? 'network' : 'overview'}
           routeCandidates={candidates}
           onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
           onFloorChange={() => {}}
@@ -483,37 +487,48 @@ export default function Work6() {
           <p className="w6-overline">NATIVE FAB FLOW · LARGE 9-BAY</p>
           {scene.id === 7 ? <>
             <p className="w6-context-line">{pressure.beat === 'normal'
-              ? '평소에는 운송 요청이 천천히 발생해요. 잠시 뒤, 같은 FAB에 요청이 한꺼번에 몰립니다.'
+              ? '공장이 평소처럼 움직이고 있어요. 잠시 뒤 들어오는 운송 요청이 훨씬 많아집니다.'
               : pressure.beat === 'surge'
-                ? '실제 엔진의 요청 발생 간격을 10초에서 1초로 높였어요. 차량이 움직여도 미완료 운송이 어떻게 쌓이는지 보세요.'
-                : '요청이 빠르게 들어온 뒤의 결과예요. 진행 중인 운송과 아직 처리하지 못한 요청을 함께 살펴보세요.'}</p>
+                ? '운송 요청 간격이 10초에서 1초로 줄었어요. 실제 OHT들이 움직이는 동안 새로운 요청이 얼마나 늘어나는지 보세요.'
+                : '이제 관찰 결과를 볼 차례예요. 쌓인 요청이 모두 레일 정체를 뜻하는 건 아니에요.'}</p>
             <div className="w6-story-steps" aria-label="운송 요청 증가 관찰 순서">
               <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 평상시</span>
               <span className={pressure.beat === 'surge' ? 'current' : pressure.beat === 'normal' ? '' : 'past'}>02 요청 증가</span>
-              <span className={pressure.beat === 'observe' || pressure.beat === 'complete' ? 'current' : ''}>03 결과 관찰</span>
+              <span className={pressure.beat === 'observe' || pressure.beat === 'complete' ? 'current' : ''}>03 결과 확인</span>
             </div>
-            <div className="w6-stat-pair">
-              <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
-              <div><span>현재 대기 중인 OHT</span><strong>{pressure.state.vehicles.filter(vehicle => vehicle.waiting > 0 && !vehicle.parked).length}</strong><small>대</small></div>
+            <div className="w6-pressure-total" aria-label="지금까지 들어온 전체 운송 요청">
+              <div><span>지금까지 들어온 운송 요청</span><strong>{pressure.metrics.created}<small>건</small></strong></div>
+              <div className="w6-pressure-frequency"><span>새 요청 간격</span><strong>{pressure.beat === 'normal' ? '10초에 1건' : '1초에 1건'}</strong></div>
             </div>
+            <p className="w6-pressure-subline">아직 완료되지 않은 요청 <strong>{pressure.metrics.unfinished}건</strong> · 실제 엔진 집계</p>
             <div className="w6-action-row">
-              <button type="button" className="w6-secondary" onClick={pressure.reset}>처음부터 다시 보기</button>
-              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>이 결과를 어떻게 볼까? <span aria-hidden="true">↗</span></button>
+              <button type="button" className="w6-secondary" onClick={pressure.reset}>다시 보기</button>
+              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운송 결과 확인하기 <span aria-hidden="true">↗</span></button>
             </div>
             <p className="w6-microcopy">{pressure.beat === 'complete' ? '관찰 완료' : '자동 관찰 진행 중'} · 실제 엔진 0.5초 Tick · {Math.round(pressure.state.time)} 시뮬레이션 초</p>
-          </> : <>
-            <p className="w6-context-line">앞 장면에서 같은 Large FAB에 운송 요청을 빠르게 보냈어요. 차량이 바쁘게 움직인다고 운송이 모두 끝나는 건 아니에요.</p>
-            <div className="w6-stat-pair">
-              <div><span>실제로 완료된 운송</span><strong>{pressure.metrics.completed}</strong><small>건</small></div>
-              <div><span>아직 완료되지 않은 요청</span><strong>{pressure.metrics.unfinished}</strong><small>건</small></div>
+          </> : pressure.ready ? <>
+            <p className="w6-context-line">한꺼번에 몰린 운송 요청 중, 실제로 끝난 운송은 얼마나 될까요?</p>
+            <div className="w6-result-heading">
+              <span>관찰 구간에 들어온 운송 요청</span>
+              <strong>{pressure.metrics.created}<small>건</small></strong>
             </div>
-            <div className="w6-meter" aria-label="실제 완료와 미완료 요청 비율">
-              <div style={{width:(pressure.metrics.created ? (pressure.metrics.completed / pressure.metrics.created)*100 : 0)+'%'}}/>
+            <div className="w6-result-bar" role="img" aria-label={`완료된 운송 ${pressure.metrics.completed}건, 아직 완료되지 않은 운송 ${pressure.metrics.unfinished}건`}>
+              <div className="w6-result-finished" style={{width:(pressure.metrics.created ? pressure.metrics.completed / pressure.metrics.created * 100 : 0)+'%'}}/>
+              <div className="w6-result-pending" style={{width:(pressure.metrics.created ? pressure.metrics.unfinished / pressure.metrics.created * 100 : 0)+'%'}}/>
             </div>
-            <p className="w6-microcopy">평균 운송 소요 {pressure.metrics.completed ? pressure.metrics.averageTransport.toFixed(1) + '초' : '완료 사례 없음'} · 경과 {Math.round(pressure.state.time)} 시뮬레이션 초 · Scene 07의 실제 운영 상태</p>
+            <div className="w6-result-legend">
+              <div><span className="w6-result-dot finished"/>완료된 운송 <strong>{pressure.metrics.completed}건</strong></div>
+              <div><span className="w6-result-dot pending"/>아직 끝나지 않은 운송 <strong>{pressure.metrics.unfinished}건</strong></div>
+            </div>
+            <p className="w6-result-takeaway">OHT가 계속 움직여도 모든 운송이 끝난 건 아니에요.</p>
+            <p className="w6-microcopy">아직 끝나지 않은 운송에는 이동 중인 요청도 포함돼요. 이 숫자만으로 레일 정체를 단정할 수는 없어요. · 실제 엔진 {Math.round(pressure.state.time)} 시뮬레이션 초 관찰</p>
             <div className="w6-action-row">
               <button type="button" className="w6-secondary" onClick={() => { pressure.reset(); nextScene(-1); }}>운송 증가 다시 보기</button>
+              <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운영 조건 바꿔보기 <span aria-hidden="true">↗</span></button>
             </div>
+          </> : <div className="w6-observed" role="status" aria-live="polite">
+            <strong>같은 운송 결과를 계산하고 있어요.</strong>
+            <p>Scene 7을 건너뛰어도 같은 FAB와 요청 조건으로 실제 엔진을 끝까지 진행해 결과를 보여줍니다.</p>
           </>}
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}

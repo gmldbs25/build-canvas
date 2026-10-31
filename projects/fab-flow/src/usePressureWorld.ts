@@ -49,7 +49,15 @@ export function pressureBeat(time: number): PressureBeat {
 // native ticks, which made OHTs jump before the next interpolation began.
 export const PRESSURE_PLAYBACK_MS = 115;
 
-export function usePressureWorld(active: boolean) {
+/** Run one authentic tick in both live playback and result preparation. */
+function advancePressureTick(engine: Engine): void {
+  if (engine.state.time >= PRESSURE_STORY.surgeAt && !(engine.scenario.demandChanges?.length)) {
+    engine.setDemandInterval(1, 'congested');
+  }
+  engine.step(1);
+}
+
+export function usePressureWorld(active: boolean, showResults: boolean) {
   const [engine, setEngine] = useState(() => new Engine(pressureScenario()));
   const [state, setState] = useState<SimulationState>(() => snapshot(engine));
   const [metrics, setMetrics] = useState<NativeMetrics>(() => getKpis(engine));
@@ -70,11 +78,7 @@ export function usePressureWorld(active: boolean) {
         // The authentic demand, dispatch, congestion and route logic remains.
         // One deliberate intervention, made through FAB FLOW's actual native
         // demand control. Never replace OHT positions with scripted poses.
-        if (engine.state.time >= PRESSURE_STORY.surgeAt &&
-            !(engine.scenario.demandChanges?.length)) {
-          engine.setDemandInterval(1, 'congested');
-        }
-        engine.step(1);
+        advancePressureTick(engine);
         setState(snapshot(engine));
         setMetrics(getKpis(engine));
         if (engine.state.time >= PRESSURE_STORY.endAt) {
@@ -88,6 +92,33 @@ export function usePressureWorld(active: boolean) {
     }, PRESSURE_PLAYBACK_MS);
     return () => window.clearInterval(interval);
   }, [active, engine, paused]);
+
+  // Navigating straight to Scene 08 must never display the initial zeroes
+  // as an experiment result. Finish the identical native observation in
+  // browser-yielding batches before exposing the true 85-second KPIs.
+  useEffect(() => {
+    if (!showResults || engine.state.time >= PRESSURE_STORY.endAt) return;
+    let cancelled = false;
+    let timer: number;
+    const finish = () => {
+      if (cancelled) return;
+      try {
+        for (let i = 0; i < 12 && engine.state.time < PRESSURE_STORY.endAt; i++) {
+          advancePressureTick(engine);
+        }
+        if (engine.state.time < PRESSURE_STORY.endAt) timer = window.setTimeout(finish, 0);
+        else {
+          setState(snapshot(engine));
+          setMetrics(getKpis(engine));
+          setPaused(true);
+        }
+      } catch (cause) {
+        if (!cancelled) setError(cause instanceof Error ? cause.message : '실제 엔진의 관찰 결과를 계산할 수 없어요.');
+      }
+    };
+    timer = window.setTimeout(finish, 0);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [showResults, engine]);
 
   useEffect(() => () => { epoch.current += 1; }, []);
 
@@ -153,6 +184,6 @@ export function usePressureWorld(active: boolean) {
     epoch.current++; setComparing(false); setResult(null); setProgress(0); setCompareDemand(next);
   }, []);
 
-  return { engine, state, metrics, beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
+  return { engine, state, metrics, ready: state.time >= PRESSURE_STORY.endAt, beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS, paused, setPaused, reset, error,
     compareMode, changeMode, compareDemand, changeDemand, compare, comparing, progress, result };
 }

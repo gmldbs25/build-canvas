@@ -306,7 +306,7 @@ try {
     await expect(page.getByText('OHT가 이동하는 정해진 선로')).toBeVisible();
     await page.getByRole('button',{name:/Scene 07:/}).click();
     await expect(page.getByRole('heading',{name:'운송이 많아지면 무슨 일이 생길까?'})).toBeVisible();
-    await expect(page.getByText('아직 완료되지 않은 요청',{exact:true})).toBeVisible();
+    await expect(page.getByText('지금까지 들어온 운송 요청',{exact:true})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-layout','large');
     await expect(page.getByText('01 평상시')).toBeVisible();
     const congestionBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
@@ -324,14 +324,25 @@ try {
     // live 1-request/second demand setting without resetting its history.
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-beat','surge',{timeout:12000});
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
-    await page.getByRole('button',{name:'처음부터 다시 보기'}).click();
+    await page.getByRole('button',{name:'다시 보기'}).click();
     await page.waitForTimeout(320);
     const afterReset=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     if(afterReset<0 || afterReset>7) throw new Error('Congestion reset must restart a fresh native Engine: '+afterReset);
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','0');
     await page.getByRole('button',{name:/Scene 08:/}).click();
-    await expect(page.getByRole('heading',{name:'잘 움직인다는 건 무슨 뜻일까?'})).toBeVisible();
-    await expect(page.getByText('실제로 완료된 운송')).toBeVisible();
+    await expect(page.getByRole('heading',{name:'바쁘게 움직였지만, 운송은 끝났을까?'})).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-ready','true',{timeout:30000});
+    const resultCounts = await page.locator('.w6-root').evaluate(el => ({
+      created:Number(el.getAttribute('data-pressure-created')),
+      completed:Number(el.getAttribute('data-pressure-completed')),
+      unfinished:Number(el.getAttribute('data-pressure-unfinished')),
+    }));
+    if(resultCounts.created < 30 || resultCounts.completed + resultCounts.unfinished !== resultCounts.created)
+      throw new Error('Scene 08 must show authentic complete native results even after Scene 07 reset: '+JSON.stringify(resultCounts));
+    await expect(page.locator('.w6-result-bar')).toBeVisible();
+    await expect(page.locator('.w6-result-legend')).toContainText('아직 끝나지 않은 운송');
+    await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
+    console.log('native-pressure-result',JSON.stringify(resultCounts));
     await page.getByRole('button',{name:/Scene 09:/}).click();
     await expect(page.getByRole('heading',{name:'차량을 더 넣으면 빨라질까?'})).toBeVisible();
     if(width===1440){
