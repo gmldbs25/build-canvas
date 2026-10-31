@@ -359,6 +359,8 @@ export default function Work6() {
     data-pressure-beat={scene.id === 7 || scene.id === 8 ? pressure.beat : ''}
     data-pressure-layout={isPressure ? pressure.engine.layout.id : ''}
     data-pressure-demand-changes={isPressure ? pressure.engine.scenario.demandChanges?.length ?? 0 : ''}
+    data-pressure-baseline-interval={isPressure ? 3 : ''}
+    data-pressure-surge-interval={isPressure ? 0.5 : ''}
     data-pressure-ready={scene.id === 8 ? String(!!outcome) : ''}
     data-pressure-prepared={isPressure ? String(pressure.prepared) : ''}
     data-pressure-warm-completed={isPressure ? pressure.warmCompleted : ''}
@@ -501,9 +503,9 @@ export default function Work6() {
             <p className="w6-context-line">{!pressure.prepared
               ? '먼저 실제 운송이 이뤄지고 있는 공장 상태를 준비합니다.'
               : pressure.beat === 'normal'
-                ? '여러 OHT가 이미 FOUP를 옮기고 있어요. 지금은 평소처럼 운송 요청을 처리하고 있습니다.'
+                ? 'OHT들이 이미 FOUP를 옮기고 있어요. 운송 요청은 3초마다 1건씩 들어옵니다.'
                 : pressure.beat === 'surge'
-                  ? '같은 48대의 OHT에게 운송 요청이 갑자기 10배로 들어옵니다.'
+                  ? '같은 OHT 48대에 운송 요청이 초당 2건씩, 평소의 6배로 몰려옵니다.'
                   : 'OHT들은 여전히 움직이고 있어요. 그런데 배차를 기다리는 요청은 얼마나 늘었을까요?'}</p>
             <div className="w6-story-steps" aria-label="운송 요청 증가 순서">
               <span className={pressure.beat === 'normal' ? 'current' : 'past'}>01 정상 운영</span>
@@ -517,20 +519,20 @@ export default function Work6() {
               </div>
               <div className="w6-pressure-frequency">
                 <span>요청 발생 간격</span>
-                <strong>{pressure.beat === 'normal' ? '20초 → 2초' : '2초마다 1건'}</strong>
+                <strong>{pressure.beat === 'normal' ? '3초에 1건' : '1초에 2건'}</strong>
               </div>
             </div>
-            <p className="w6-pressure-subline">운송 차량은 그대로 48대 · 새 요청만 <strong>{pressure.beat === 'normal' ? '곧 10배 증가' : '10배 증가'}</strong></p>
+            <p className="w6-pressure-subline">OHT는 그대로 48대 · <strong>{pressure.beat === 'normal' ? '곧 운송 요청 6배 증가' : '운송 요청 6배 증가'}</strong></p>
             <div className="w6-action-row">
               <button type="button" className="w6-secondary" disabled={!pressure.prepared} onClick={pressure.reset}>다시 보기</button>
               <button type="button" className="w6-primary" onClick={() => nextScene(1)}>왜 일이 밀릴까? <span aria-hidden="true">↗</span></button>
             </div>
           </> : outcome ? <>
-            <p className="w6-context-line">같은 OHT 48대가 움직이는 공장에서, 요청량만 바꾸고 30분씩 비교했어요.</p>
+            <p className="w6-context-line">같은 공장과 OHT 48대로 10분씩 운영하고, 요청 간격만 바꿔봤어요.</p>
             <div className="w6-capacity-grid" aria-label="평상시와 요청 폭증 시 실제 처리량 비교">
               {([
-                { name: '평상시', rate: '20초마다 1건', value: outcome.baseline, kind: 'base' },
-                { name: '요청 폭증', rate: '2초마다 1건', value: outcome.surge, kind: 'surge' },
+                { name: '평상시', rate: '3초에 1건', value: outcome.baseline, kind: 'base' },
+                { name: '요청 폭증', rate: '초당 2건', value: outcome.surge, kind: 'surge' },
               ] as const).map(part => <div className={'w6-capacity-card '+part.kind} key={part.name}>
                 <div className="w6-capacity-card-heading"><strong>{part.name}</strong><span>{part.rate}</span></div>
                 <div className="w6-capacity-metric"><span>새로 들어온 요청</span><strong>{part.value.created}건</strong></div>
@@ -594,8 +596,11 @@ export default function Work6() {
         {scene.id === 11 && <div className="w6-inner-controls">
           <p className="w6-context-line">Work6에서 본 물류는 정적인 그림이 아니라 실제로 작동하는 시뮬레이터에서 왔습니다. 이제 직접 공장 크기와 OHT 대수, 운송 요청량을 바꿀 수 있어요.</p>
           <span className="w6-overline">FAB FLOW · 반도체 물류 세상</span>
-          <p className="w6-microcopy">원본 FAB FLOW 앱의 공개 접속 주소는 현재 확인되지 않아 잘못된 링크 대신 연결을 보류했습니다.</p>
-          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>처음부터 다시 보기 ↗</button>
+          <a className="w6-primary w6-explore-fabflow" href="https://fabflow-yoon.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="FAB FLOW 시뮬레이터 직접 체험하기, 새 탭으로 열기">
+            <span>FAB FLOW 직접 체험하기</span><span aria-hidden="true">↗</span>
+          </a>
+          <p className="w6-microcopy w6-explore-url">fabflow-yoon.vercel.app · 새 탭에서 열립니다.</p>
+          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>Work6 처음부터 다시 보기 ↗</button>
         </div>}
         {scene.id === 4 && <div className="w6-inner-controls">
           <p className="w6-microcopy">실제 FAB FLOW Large V6 모델 · 삼성 평택 내부 배치를 재현한 것은 아닙니다.</p>

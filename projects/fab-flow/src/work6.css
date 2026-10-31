@@ -202,3 +202,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
   .w6-narrative-pressure .w6-inner-controls{margin-top:9px;gap:7px}
   .w6-narrative-pressure .w6-description{font-size:12px}
 }
+
+/* The final scene is a handoff to the actual playable Vercel simulator. */
+.w6-explore-fabflow{align-self:flex-start;text-decoration:none;min-width:min(320px,100%);display:inline-flex;font-weight:650}
+.w6-explore-fabflow:focus-visible{outline:2px solid #ad714c;outline-offset:4px}
+.w6-explore-url{overflow-wrap:anywhere;margin:0}

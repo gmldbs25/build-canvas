@@ -42,9 +42,13 @@ function snapshot(engine: Engine): SimulationState {
 // instead of staging a fake fleet entrance. This exact native state is also the
 // shared initial condition for the two operational comparisons.
 export const PRESSURE_WARMUP_SECONDS = 3000;
-export const PRESSURE_BASE_INTERVAL = 20; // three requests per simulated minute; busy without overload
-export const PRESSURE_SURGE_INTERVAL = 2; // same 48 OHTs, ten times the normal demand
-export const PRESSURE_MEASURE_SECONDS = 1800;
+// The off-screen warm-up is deliberately gentler than the public normal
+// operation: prefill realistic active transports without arriving already
+// backlogged. The visitor-facing normal stage itself is exactly 1/3s.
+export const PRESSURE_WARMUP_INTERVAL = 20;
+export const PRESSURE_BASE_INTERVAL = 3; // 1 request / 3 simulated seconds
+export const PRESSURE_SURGE_INTERVAL = 0.5; // 2 requests / simulated second (6x)
+export const PRESSURE_MEASURE_SECONDS = 600; // compare identical 10-minute windows
 export const PRESSURE_STORY = {
   surgeAt: PRESSURE_WARMUP_SECONDS + 20,
   observeAt: PRESSURE_WARMUP_SECONDS + 130,
@@ -58,7 +62,7 @@ export function pressureBeat(time: number): PressureBeat {
 function pressureScenario(): Scenario {
   return {
     ...presetScenario('large', 'relaxed', 31, 'DBR', 48),
-    demandIntervalSeconds: PRESSURE_BASE_INTERVAL,
+    demandIntervalSeconds: PRESSURE_WARMUP_INTERVAL,
     duration: 7200, demandWindow: 6300,
   };
 }
@@ -103,6 +107,9 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
         for (let i = 0; i < 24 && engine.state.time < PRESSURE_WARMUP_SECONDS; i++) engine.step(1);
         if (engine.state.time < PRESSURE_WARMUP_SECONDS) timer = window.setTimeout(prime, 0);
         else {
+          // Switch to the requested normal rate *before* exposing the scene.
+          // This is a real Engine demand change, not a visual-only counter.
+          engine.setDemandInterval(PRESSURE_BASE_INTERVAL, 'active');
           warmSnapshotRef.current = engine.snapshot();
           setState(snapshot(engine));
           setMetrics(getKpis(engine));
@@ -122,7 +129,8 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
     if (!active || !prepared || engine.state.time >= engine.scenario.duration) return;
     const timer = window.setInterval(() => {
       try {
-        if (engine.state.time >= PRESSURE_STORY.surgeAt && !(engine.scenario.demandChanges?.length))
+        if (engine.state.time >= PRESSURE_STORY.surgeAt &&
+            !(engine.scenario.demandChanges ?? []).some(change => change.intervalSeconds === PRESSURE_SURGE_INTERVAL))
           engine.setDemandInterval(PRESSURE_SURGE_INTERVAL, 'congested');
         engine.step(1);
         setState(snapshot(engine));
@@ -135,7 +143,7 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
     return () => window.clearInterval(timer);
   }, [active, prepared, engine]);
 
-  // Both 30-minute experiments branch from exactly the same warmed Native
+  // Both 10-minute experiments branch from exactly the same warmed Native
   // snapshot, not from the truncated Scene 07 playback. They run with identical
   // layout, fleet, policy and initial state; only interval-demand changes.
   useEffect(() => {

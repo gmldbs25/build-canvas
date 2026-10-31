@@ -309,6 +309,10 @@ try {
     await expect(page.getByRole('heading',{name:'잘 돌아가던 공장에 갑자기 일이 몰린다면?'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-layout','large');
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true',{timeout:120000});
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-baseline-interval','3');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-surge-interval','0.5');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
+    await expect(page.getByText('3초에 1건',{exact:true})).toBeVisible();
     const warmCompleted=Number(await page.locator('.w6-root').getAttribute('data-pressure-warm-completed'));
     const openingPressure=await page.evaluate(()=>({
       active:Object.values(window.__FAB_3D__?.vehicles ?? {}).filter(x=>['empty','loaded','pickup','dropoff'].includes(x.phase)).length,
@@ -339,13 +343,14 @@ try {
     }
     if(tickSamples.at(-1)<=tickBefore||tickSamples.some((t,i)=>i>0&&(t<tickSamples[i-1]||t-tickSamples[i-1]>2)))
       throw new Error('Native pressure playback must publish contiguous ticks: '+JSON.stringify(tickSamples));
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1',{timeout:15000});
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','2',{timeout:15000});
+    await expect(page.getByText('1초에 2건',{exact:true})).toBeVisible();
     await page.waitForTimeout(600);
     const tickAfterSurge=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     if(tickAfterSurge<=tickSamples.at(-1))
       throw new Error('Scene 07 must keep moving after the request surge');
     await page.getByRole('button',{name:'다시 보기'}).click();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','0');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true');
     await page.getByRole('button',{name:/Scene 08:/}).click();
     await expect(page.getByRole('heading',{name:'왜 운송을 기다리는 일이 늘어날까?'})).toBeVisible();
@@ -358,8 +363,9 @@ try {
       baselinePendingChange:Number(el.dataset.pressureNormalPendingDelta),
       surgePendingChange:Number(el.dataset.pressureSurgePendingDelta),
     }));
-    if(capacity.baselineCreated<5||capacity.baselineCompleted<1||
-       capacity.surgeCreated<=capacity.baselineCreated*5||
+    if(capacity.baselineCreated<50||capacity.baselineCompleted<1||
+       capacity.surgeCreated<capacity.baselineCreated*5.5||
+       capacity.surgeCreated>capacity.baselineCreated*6.5||
        capacity.surgePendingChange<=capacity.baselinePendingChange){
       throw new Error('Scene 08 should compare a meaningful warmed native baseline against actual overload: '+JSON.stringify(capacity));
     }
@@ -391,6 +397,11 @@ try {
     await expect(page.getByText('0.5초마다 상태 계산')).toBeVisible();
     await page.getByRole('button',{name:/Scene 11:/}).click();
     await expect(page.getByRole('heading',{name:'이제 직접 운영해 볼 차례.'})).toBeVisible();
+    const explore=page.getByRole('link',{name:/FAB FLOW 시뮬레이터 직접 체험하기/});
+    await expect(explore).toBeVisible();
+    await expect(explore).toHaveAttribute('href','https://fabflow-yoon.vercel.app/');
+    await expect(explore).toHaveAttribute('target','_blank');
+    await expect(explore).toHaveAttribute('rel',/noopener noreferrer/);
     await page.screenshot({path:path.join(evidence, 'scene11-'+width+'.png')});
     const renderer=await page.locator('[data-renderer="three-webgl"]').count();
     if(renderer!==1) throw new Error('Native 3D renderer unexpectedly unmounted');
