@@ -151,3 +151,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-result-dot{display:inline-block;width:9px;height:9px;border-radius:2px;flex:none}.w6-result-dot.finished{background:#3f8470}.w6-result-dot.pending{background:#d4aa77}
 .w6-result-takeaway{font-size:15px;line-height:1.5;letter-spacing:-.03em;font-weight:600;color:#285b4b;margin:3px 0 0;word-break:keep-all}
 @media(max-width:650px){.w6-pressure-total{padding:11px 0}.w6-pressure-total>div:first-child>strong{font-size:34px}.w6-result-legend{gap:8px}}
+
+/* Completed / assigned-and-moving / unassigned is more meaningful at short native horizons. */
+.w6-result-inflight{height:100%;background:#779d9a;min-width:0}
+.w6-result-dot.inflight{background:#779d9a}

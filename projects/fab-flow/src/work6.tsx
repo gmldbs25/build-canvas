@@ -123,6 +123,9 @@ export default function Work6() {
   const isPressure = scene.id >= 7 && scene.id <= 9;
   // Scene 07 moves live; Scene 08 awaits the same native 85-second result.
   const pressure = usePressureWorld(scene.id === 7, scene.id === 8);
+  // Native request phases, not guessed congestion: pending has no assigned OHT.
+  const waitingForDispatch = pressure.state.requests.filter(item => item.phase === 'pending').length;
+  const transportInProgress = pressure.state.requests.filter(item => item.phase !== 'pending' && item.phase !== 'completed').length;
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -359,7 +362,9 @@ export default function Work6() {
     data-pressure-ready={scene.id === 8 ? String(pressure.ready) : ''}
     data-pressure-created={scene.id === 8 && pressure.ready ? pressure.metrics.created : ''}
     data-pressure-completed={scene.id === 8 && pressure.ready ? pressure.metrics.completed : ''}
-    data-pressure-unfinished={scene.id === 8 && pressure.ready ? pressure.metrics.unfinished : ''}>
+    data-pressure-unfinished={scene.id === 8 && pressure.ready ? pressure.metrics.unfinished : ''}
+    data-pressure-dispatch-waiting={scene.id === 8 && pressure.ready ? waitingForDispatch : ''}
+    data-pressure-in-progress={scene.id === 8 && pressure.ready ? transportInProgress : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -512,16 +517,20 @@ export default function Work6() {
               <span>관찰 구간에 들어온 운송 요청</span>
               <strong>{pressure.metrics.created}<small>건</small></strong>
             </div>
-            <div className="w6-result-bar" role="img" aria-label={`완료된 운송 ${pressure.metrics.completed}건, 아직 완료되지 않은 운송 ${pressure.metrics.unfinished}건`}>
+            <div className="w6-result-bar" role="img" aria-label={`완료 ${pressure.metrics.completed}건, 차량 배정·운송 중 ${transportInProgress}건, 배차 대기 ${waitingForDispatch}건`}>
               <div className="w6-result-finished" style={{width:(pressure.metrics.created ? pressure.metrics.completed / pressure.metrics.created * 100 : 0)+'%'}}/>
-              <div className="w6-result-pending" style={{width:(pressure.metrics.created ? pressure.metrics.unfinished / pressure.metrics.created * 100 : 0)+'%'}}/>
+              <div className="w6-result-inflight" style={{width:(pressure.metrics.created ? transportInProgress / pressure.metrics.created * 100 : 0)+'%'}}/>
+              <div className="w6-result-pending" style={{width:(pressure.metrics.created ? waitingForDispatch / pressure.metrics.created * 100 : 0)+'%'}}/>
             </div>
             <div className="w6-result-legend">
-              <div><span className="w6-result-dot finished"/>완료된 운송 <strong>{pressure.metrics.completed}건</strong></div>
-              <div><span className="w6-result-dot pending"/>아직 끝나지 않은 운송 <strong>{pressure.metrics.unfinished}건</strong></div>
+              <div><span className="w6-result-dot finished"/>완료 <strong>{pressure.metrics.completed}건</strong></div>
+              <div><span className="w6-result-dot inflight"/>차량 배정·운송 중 <strong>{transportInProgress}건</strong></div>
+              <div><span className="w6-result-dot pending"/>배차 대기 <strong>{waitingForDispatch}건</strong></div>
             </div>
-            <p className="w6-result-takeaway">OHT가 계속 움직여도 모든 운송이 끝난 건 아니에요.</p>
-            <p className="w6-microcopy">아직 끝나지 않은 운송에는 이동 중인 요청도 포함돼요. 이 숫자만으로 레일 정체를 단정할 수는 없어요. · 실제 엔진 {Math.round(pressure.state.time)} 시뮬레이션 초 관찰</p>
+            <p className="w6-result-takeaway">{waitingForDispatch > 0
+              ? '운송 요청이 한꺼번에 들어오자, 차량 배정을 기다리는 요청도 생겼어요.'
+              : '차량들이 운송하고 있지만, 아직 끝나지 않은 요청이 남아 있어요.'}</p>
+            <p className="w6-microcopy">완료되지 않은 요청 {pressure.metrics.unfinished}건 = 차량 배정·운송 중 {transportInProgress}건 + 배차 대기 {waitingForDispatch}건. 짧은 관찰에서 운송이 미완료라고 레일 정체를 단정할 수는 없어요. · 실제 엔진 {Math.round(pressure.state.time)} 시뮬레이션 초 관찰</p>
             <div className="w6-action-row">
               <button type="button" className="w6-secondary" onClick={() => { pressure.reset(); nextScene(-1); }}>운송 증가 다시 보기</button>
               <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운영 조건 바꿔보기 <span aria-hidden="true">↗</span></button>

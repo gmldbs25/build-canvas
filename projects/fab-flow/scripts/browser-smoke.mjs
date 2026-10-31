@@ -336,11 +336,15 @@ try {
       created:Number(el.getAttribute('data-pressure-created')),
       completed:Number(el.getAttribute('data-pressure-completed')),
       unfinished:Number(el.getAttribute('data-pressure-unfinished')),
+      assigned:Number(el.getAttribute('data-pressure-in-progress')),
+      dispatchWaiting:Number(el.getAttribute('data-pressure-dispatch-waiting')),
     }));
-    if(resultCounts.created < 30 || resultCounts.completed + resultCounts.unfinished !== resultCounts.created)
+    if(resultCounts.created < 30 || resultCounts.completed + resultCounts.unfinished !== resultCounts.created ||
+       resultCounts.assigned + resultCounts.dispatchWaiting !== resultCounts.unfinished)
       throw new Error('Scene 08 must show authentic complete native results even after Scene 07 reset: '+JSON.stringify(resultCounts));
     await expect(page.locator('.w6-result-bar')).toBeVisible();
-    await expect(page.locator('.w6-result-legend')).toContainText('아직 끝나지 않은 운송');
+    await expect(page.locator('.w6-result-legend')).toContainText('차량 배정·운송 중');
+    await expect(page.locator('.w6-result-legend')).toContainText('배차 대기');
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
     console.log('native-pressure-result',JSON.stringify(resultCounts));
     await page.getByRole('button',{name:/Scene 09:/}).click();
