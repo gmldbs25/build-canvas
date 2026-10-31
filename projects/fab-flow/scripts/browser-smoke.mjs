@@ -318,9 +318,19 @@ try {
       throw new Error('Scene 07 must open with many native OHTs already busy, not a newly empty factory: '+JSON.stringify({openingPressure,warmCompleted}));
     }
     const scene7=page.locator('.w6-narrative-pressure');
-    const overflow=await scene7.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,innerScroll:el.querySelector('.w6-inner-controls').scrollHeight,innerClient:el.querySelector('.w6-inner-controls').clientHeight}));
-    if(overflow.scroll>overflow.client+3||overflow.innerScroll>overflow.innerClient+3)
-      throw new Error('Scene 07 must not have a narrative scrollbar: '+JSON.stringify(overflow));
+    const overflow=await scene7.evaluate(el=>({
+      panelOverflow:getComputedStyle(el).overflowY,
+      innerOverflow:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
+      panelTop:el.getBoundingClientRect().top,
+      stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top,
+      panelBottom:el.getBoundingClientRect().bottom,
+      stageBottom:document.querySelector('.w6-stage').getBoundingClientRect().bottom,
+    }));
+    // The extended ::before gradient adds scrollHeight beyond clientHeight, but
+    // unlike overflow:auto this does not create an actual nested scrollbar.
+    if(overflow.panelOverflow!=='visible'||overflow.innerOverflow!=='visible'||
+       overflow.panelTop<overflow.stageTop-1||overflow.panelBottom>overflow.stageBottom+1)
+      throw new Error('Scene 07 must fit inside the stage without a nested scrollbar: '+JSON.stringify(overflow));
     const tickBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
     const tickSamples=[tickBefore];
     for(let k=0;k<6;k++){
@@ -354,9 +364,17 @@ try {
       throw new Error('Scene 08 should compare a meaningful warmed native baseline against actual overload: '+JSON.stringify(capacity));
     }
     const scene8=page.locator('.w6-narrative-pressure');
-    const overflow8=await scene8.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,innerScroll:el.querySelector('.w6-inner-controls').scrollHeight,innerClient:el.querySelector('.w6-inner-controls').clientHeight}));
-    if(overflow8.scroll>overflow8.client+3||overflow8.innerScroll>overflow8.innerClient+3)
-      throw new Error('Scene 08 must not have a narrative scrollbar: '+JSON.stringify(overflow8));
+    const overflow8=await scene8.evaluate(el=>({
+      panelOverflow:getComputedStyle(el).overflowY,
+      innerOverflow:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
+      panelTop:el.getBoundingClientRect().top,
+      stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top,
+      panelBottom:el.getBoundingClientRect().bottom,
+      stageBottom:document.querySelector('.w6-stage').getBoundingClientRect().bottom,
+    }));
+    if(overflow8.panelOverflow!=='visible'||overflow8.innerOverflow!=='visible'||
+       overflow8.panelTop<overflow8.stageTop-1||overflow8.panelBottom>overflow8.stageBottom+1)
+      throw new Error('Scene 08 must fit inside the stage without a nested scrollbar: '+JSON.stringify(overflow8));
     await expect(page.locator('.w6-capacity-grid .w6-capacity-card')).toHaveCount(2);
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
     console.log('native-pressure-capacity',JSON.stringify({openingPressure,warmCompleted,tickSamples,capacity,overflow,overflow8}));
