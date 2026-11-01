@@ -13,6 +13,7 @@ import type { DecorativeEquipment, Failure, Layout, SimulationState, Vehicle } f
 import { pathForLink, pointAlongPath, vehiclePosition } from '@/sim/geometry';
 import { buildRouteHighlightPaths, createRouteHighlightMaterial, routeHighlightRenderOrders } from '@/components/routeHighlights';
 import { confirmedMotion } from '@/sim/motion';
+import { continuousVehicleHeading } from '@/sim/vehicleHeading';
 import { fitProjectedFacility, overviewSafeRect, type CameraCommand, type ProjectedBounds, type ScreenRect } from '@/components/fabCamera';
 import { releaseFocusedProjection } from '@/components/focusCameraHandoff';
 import FacilitySceneFallback from '@/components/FacilityScene';
@@ -2001,13 +2002,19 @@ export default function ThreeFacilityScene(props: Props) {
       camera?.updateMatrixWorld();
       for (const item of animations) {
         const pose = item.motion(fraction); item.root.position.set(pose.x, 72, pose.y);
-        item.physical.rotation.y = -pose.angle * Math.PI / 180;
+        // A path change (including the outer U-turn rail) can express the
+        // same tangent as +270° on one link and -90° on the next. Preserve the
+        // previously *displayed* heading branch rather than rotating through
+        // a spurious full circle on every link boundary.
+        const displayedHeading = -item.physical.rotation.y * 180 / Math.PI;
+        const heading = continuousVehicleHeading(displayedHeading, pose.angle);
+        item.physical.rotation.y = -heading * Math.PI / 180;
         // Interpolate the existing FAB FLOW hoist pose between genuine Engine
         // service ticks. No simulated FOUP ownership/phase is modified.
         item.foup.position.y = THREE.MathUtils.lerp(item.previousFoupY, item.currentFoupY, fraction);
         // A completed pickup is reflected at the confirmed tick boundary; during pickup service, the hoist carries its token.
         item.foup.visible = item.vehicle.loaded || item.vehicle.phase === 'pickup';
-        if (camera && projected) { const point = new THREE.Vector3(pose.x, 72, pose.y).project(camera), { width, height } = viewportSizeRef.current; projected[item.vehicle.id] = { x: (point.x + 1) / 2 * width, y: (1 - point.y) / 2 * height, worldX: pose.x, worldZ: pose.y, height: 72, heading: pose.angle, floor: pose.floor, loaded: item.vehicle.loaded, foupAttached: item.vehicle.loaded || item.vehicle.phase === 'pickup', phase: item.vehicle.phase, requestId: item.vehicle.request }; }
+        if (camera && projected) { const point = new THREE.Vector3(pose.x, 72, pose.y).project(camera), { width, height } = viewportSizeRef.current; projected[item.vehicle.id] = { x: (point.x + 1) / 2 * width, y: (1 - point.y) / 2 * height, worldX: pose.x, worldZ: pose.y, height: 72, heading, floor: pose.floor, loaded: item.vehicle.loaded, foupAttached: item.vehicle.loaded || item.vehicle.phase === 'pickup', phase: item.vehicle.phase, requestId: item.vehicle.request }; }
       }
       updateStagingLabels();
       updateEssentialLabels(camera);

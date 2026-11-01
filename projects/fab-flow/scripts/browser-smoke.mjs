@@ -3,11 +3,41 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import ts from 'typescript';
 import os from 'node:os';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const evidence = path.resolve(project, 'evidence');
 await fs.mkdir(evidence, { recursive: true });
+
+
+// Test the exact pure heading helper used by the Three.js OHT actor.
+// Transpiling this no-import module allows the production static Pages smoke
+// to check 360° seam handling without changing app globals or Native state.
+const headingSource = await fs.readFile(path.join(project, 'src/sim/vehicleHeading.ts'), 'utf8');
+const headingModule = ts.transpileModule(headingSource, {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
+const { shortestHeadingDelta, continuousVehicleHeading } = await import(
+  'data:text/javascript;base64,' + Buffer.from(headingModule).toString('base64')
+);
+const transitions = [
+  [359,1,2], [1,359,-2], [170,-170,20], [-170,170,-20],
+  [270,-90,0], [-90,270,0], [630,-90,0], [-630,90,0],
+];
+for(const [start,end,expected] of transitions){
+  const actual=shortestHeadingDelta(start,end);
+  if(Math.abs(actual-expected)>1e-8 ||
+     Math.abs(continuousVehicleHeading(start,end)-start-expected)>1e-8)
+    throw new Error('OHT heading seam introduced a full rotation: '+JSON.stringify({start,end,expected,actual}));
+}
+const railUturn=[175,179,-179,-175,-150,-120,-90,-60,-30,0,30,60,90,120,150,179,-179];
+let followed=railUturn[0],maxStep=0;
+for(const angle of railUturn.slice(1)){
+  const next=continuousVehicleHeading(followed,angle);
+  maxStep=Math.max(maxStep,Math.abs(next-followed));
+  if(Math.abs(next-followed)>90)throw new Error('U-turn link boundary caused an extra spin: '+JSON.stringify({followed,angle,next}));
+  followed=next;
+}
+console.log('oht-heading-seam-regression',JSON.stringify({cases:transitions.length,maxStep,final:followed}));
 
 const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-static-'));
 const deploymentDir = path.join(sandbox, 'build-canvas', 'fab-flow-preview');

@@ -1,4 +1,5 @@
 import type { Layout, Link, Point, Vehicle } from './types';
+import { shortestHeadingDelta } from './vehicleHeading';
 
 export function pathLength(points: readonly Point[]): number {
   let length = 0;
@@ -9,8 +10,7 @@ export function pathLength(points: readonly Point[]): number {
 export function pathHeading(a: Point, b: Point, t: number): number {
   const fallback = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
   if (a.tangent === undefined || b.tangent === undefined) return fallback;
-  const delta = ((b.tangent - a.tangent + 540) % 360) - 180;
-  return a.tangent + delta * t;
+  return a.tangent + shortestHeadingDelta(a.tangent, b.tangent) * t;
 }
 
 /** Lift wrapped tangent angles onto one continuous branch along a rail path. */
@@ -43,7 +43,7 @@ export function pointAlongPath(points: readonly Point[], progress: number): Poin
     if (remaining <= segment || i === points.length - 1) {
       const t = Math.min(1, remaining / segment);
       const angle = tangentA !== undefined && tangentB !== undefined
-        ? tangentA + (((tangentB - tangentA + 540) % 360) - 180) * t
+        ? tangentA + shortestHeadingDelta(tangentA, tangentB) * t
         : pathHeading(sourceA, sourceB, t);
       return { x: sourceA.x + (sourceB.x - sourceA.x) * t, y: sourceA.y + (sourceB.y - sourceA.y) * t, angle, ...(tangentA !== undefined && tangentB !== undefined ? { tangent: angle } : {}) };
     }

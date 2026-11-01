@@ -1,5 +1,6 @@
 import type { Layout, Point, Vehicle } from './types';
 import { continuousPath, pathForLink, pathHeading, pathLength, pointAlongPath, vehiclePosition } from './geometry';
+import { continuousVehicleHeading } from './vehicleHeading';
 
 function slicePath(points: Point[], start: number, end: number): Point[] {
   const length = pathLength(points), lower = start * length, upper = end * length;
@@ -38,6 +39,9 @@ export function confirmedMotion(layout: Layout, previous: Vehicle | undefined, c
     const target = Math.max(0, Math.min(1, fraction)) * total;
     let i = 1; while (i < lengths.length - 1 && lengths[i] < target) i++;
     const a = vertices[i - 1], b = vertices[i], segment = lengths[i] - lengths[i - 1], t = segment ? (target - lengths[i - 1]) / segment : 1;
-    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, angle: pathHeading(a, b, t), floor: end.floor };
+    // Keep each short (0.5s) confirmed movement connected to the previous
+    // Native heading; the same tangent can be stored on different 360° branches.
+    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t,
+      angle: continuousVehicleHeading(old.angle, pathHeading(a, b, t)), floor: end.floor };
   };
 }
