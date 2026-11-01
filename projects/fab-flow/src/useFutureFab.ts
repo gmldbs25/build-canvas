@@ -22,7 +22,7 @@ export function useFutureFab(active: boolean, playing: boolean) {
   const [prepared, setPrepared] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    if (!active || engineRef.current || error) return;
+    if (!active || prepared || engineRef.current || error) return;
     let cancelled = false, timer: number;
     const begin = () => {
       if (cancelled) return;

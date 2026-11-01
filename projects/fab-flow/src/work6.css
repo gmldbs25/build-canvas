@@ -207,3 +207,46 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-explore-fabflow{align-self:flex-start;text-decoration:none;min-width:min(320px,100%);display:inline-flex;font-weight:650}
 .w6-explore-fabflow:focus-visible{outline:2px solid #ad714c;outline-offset:4px}
 .w6-explore-url{overflow-wrap:anywhere;margin:0}
+
+/* Work6 v2 — Native two-floor facility and future concept cards. */
+.w6-multi-stage{position:absolute;inset:0;background:#e8eee9;overflow:hidden}
+.w6-multi-stage .ml-native-scene{width:100%;height:100%;min-height:0;max-width:none;margin:0;display:flex;flex-direction:column;gap:0}
+.w6-multi-stage .ml-native-toolbar{position:absolute;z-index:6;top:18px;right:20px;max-width:56vw;display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap}
+.w6-multi-stage .ml-native-toolbar button{font-size:10px;min-height:32px;padding:4px 8px;background:rgba(249,248,242,.94);color:#30584a;border-color:#a6beaf}
+.w6-multi-stage .ml-native-canvas{flex:1;min-height:0;max-height:none;border:0;border-radius:0}
+.w6-multi-stage .ml-native-status{position:absolute;bottom:10px;right:14px;z-index:5;width:min(270px,34vw);grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.w6-multi-stage .ml-native-status span{font-size:9px;padding:6px;background:#20382ddf;color:#e0f0df}
+.w6-future-loading{position:absolute;inset:0;background:#e8eee9;display:grid;place-content:center;padding:15px;color:#34574b;font-size:13px;text-align:center}
+.w6-narrative-v2{max-width:min(415px,calc(100vw - 44px));bottom:clamp(22px,4vh,56px);padding:14px 15px 12px 0;max-height:none;overflow:visible;pointer-events:auto}
+.w6-narrative-v2::before{background:linear-gradient(90deg,rgba(244,241,234,.97) 8%,rgba(244,241,234,.90) 74%,transparent)}
+.w6-narrative-v2 h1{font-size:clamp(27px,2.7vw,39px);line-height:1.18;margin-bottom:10px}
+.w6-narrative-v2 .w6-description{font-size:13px;line-height:1.55}
+.w6-narrative-v2 .w6-chapter{margin-bottom:10px}
+.w6-narrative-v2 .w6-inner-controls{margin-top:14px;padding-top:12px;max-height:none;overflow:visible;gap:10px}
+.w6-narrative-v2 .w6-overline{font-size:10px;margin:0}
+.w6-narrative-v2 .w6-microcopy{font-size:10px;margin:0}
+.w6-narrative-v2 .w6-result-takeaway{font-size:13px;line-height:1.55;margin:0}
+.w6-narrative-v2 .w6-action-row{gap:7px}
+.w6-narrative-v2 .w6-action-row button{font-size:11px;min-height:35px;padding:7px 10px}
+.w6-focus-status{padding:10px 12px;border-left:3px solid #6aa28b;background:rgba(250,248,241,.9);display:grid;gap:4px}
+.w6-focus-status>span{color:#718476;font-size:10px}
+.w6-focus-status strong{color:#315c4c;font-size:18px;line-height:1.2}
+.w6-focus-status small{color:#536d5f;font-size:11px}
+.w6-concept-tag{display:inline-flex;align-self:flex-start;border:1px solid #c19b72;color:#896443;padding:6px 9px;font:650 10px/1.3 ui-monospace,Menlo,Consolas,monospace}
+.w6-future-explainer{background:rgba(249,247,240,.94);border:1px solid #c7d3c8;display:grid;gap:8px;padding:13px}
+.w6-future-explainer strong{font-size:15px;color:#275344;line-height:1.4;word-break:keep-all}
+.w6-future-explainer p{font-size:12px;line-height:1.6;color:#506356;margin:0;word-break:keep-all}
+.w6-future-explainer small{font-size:10px;line-height:1.45;color:#806d53;word-break:keep-all}
+@media(max-width:650px){
+.w6-narrative-v2{left:16px;right:16px;bottom:12px;max-width:none;padding:10px 0}
+.w6-narrative-v2 h1{font-size:27px;margin-bottom:7px}
+.w6-narrative-v2 .w6-description{font-size:12px;line-height:1.4}
+.w6-narrative-v2 .w6-inner-controls{margin-top:10px;padding-top:9px;gap:7px;max-height:none;overflow:visible}
+.w6-narrative-v2 .w6-action-row button{font-size:10px;min-height:33px;padding:6px 8px}
+.w6-narrative-v2 .w6-future-explainer{padding:9px;gap:5px}
+.w6-narrative-v2 .w6-future-explainer strong{font-size:13px}
+.w6-narrative-v2 .w6-future-explainer p{font-size:11px}
+.w6-multi-stage .ml-native-toolbar{top:8px;right:8px;max-width:62vw}
+.w6-multi-stage .ml-native-toolbar button{font-size:9px;min-height:30px;padding:3px 5px}
+.w6-multi-stage .ml-native-status{right:8px;bottom:8px;width:min(220px,48vw)}
+}
