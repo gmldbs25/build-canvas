@@ -1,6 +1,6 @@
 # Work 6 — FAB FLOW / 콘텐츠·디자인 마스터 플랜
 
-> Status: 11-SCENE FIRST-PASS IMPLEMENTATION · v0.4 · 2026-10-30
+> Status: v2.0 MCS TODAY & TOMORROW · 2026-11-01 (v0.4 sections below retained as historical design; v2.0 addendum supersedes Scenes 07–11)
 >
 > 이 문서는 Build Canvas Work6의 현재 합의 사항을 누적 관리한다. 구현·배포 승인 문서는 아니다. 내용/디자인/기술 결정의 **확정/제안/미결정** 상태를 혼동하지 않는다.
 

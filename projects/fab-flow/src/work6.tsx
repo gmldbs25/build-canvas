@@ -399,12 +399,13 @@ export default function Work6() {
     data-future-prepared={isFuture ? String(future.prepared) : ''}
     data-future-tick={isFuture ? future.state?.tick ?? '' : ''}
     data-future-lift={isFuture ? String(future.transfer) : ''}
+    data-future-transferred={isFuture ? String(future.transferred) : ''}
     data-future-view={isFuture ? futureView : ''}
     data-future-mode={scene.id === 9 ? futureDiagnostic : scene.id === 10 ? futureOption : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
-      <span className="w6-prototype">INTERACTIVE ENGINE DOCUMENTARY</span>
+      <span className="w6-prototype">MCS · TODAY & TOMORROW</span>
     </header>
     <main className="w6-stage">
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">

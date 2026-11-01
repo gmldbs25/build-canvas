@@ -250,3 +250,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-multi-stage .ml-native-toolbar button{font-size:9px;min-height:30px;padding:3px 5px}
 .w6-multi-stage .ml-native-status{right:8px;bottom:8px;width:min(220px,48vw)}
 }
+
+/* Keep conceptual diagnostic pages quiet: the lifter controls belong to the actual 08 demo. */
+.w6-root[data-current-scene="9"] .w6-multi-stage .ml-native-status,
+.w6-root[data-current-scene="10"] .w6-multi-stage .ml-native-status{display:none}
+.w6-root[data-current-scene="9"] .w6-multi-stage .ml-native-toolbar,
+.w6-root[data-current-scene="10"] .w6-multi-stage .ml-native-toolbar{display:none}

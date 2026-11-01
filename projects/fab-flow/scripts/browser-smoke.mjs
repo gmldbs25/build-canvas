@@ -309,6 +309,7 @@ try {
     await expect(page.getByRole('heading',{name:'길을 찾았는데, 왜 기다려야 할까?'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true',{timeout:120000});
     await expect(page.getByText('MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.')).toBeVisible();
+    await expect.poll(async() => page.locator('.w6-root').getAttribute('data-pressure-vehicle'),{timeout:25000}).not.toBe('');
     await page.screenshot({path:path.join(evidence,'scene07-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 08:/}).click();
     await expect(page.getByRole('heading',{name:'공장이 더 복잡해진다면?'})).toBeVisible();
@@ -316,6 +317,10 @@ try {
     await expect(page.locator('[data-testid="multi-large-native-scene"]')).toBeVisible({timeout:20000});
     await expect(page.locator('[data-testid="multi-large-native-lifters"] span')).toHaveCount(4);
     await expect(page.locator('.w6-root')).toHaveAttribute('data-future-view','stacked',{timeout:12000});
+    // The selected OHT must actually traverse a Native lifter link, not just
+    // be positioned between two illustrated floors.
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-lift','true',{timeout:22000});
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-transferred','true',{timeout:22000});
     const futureTickBefore=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
     await page.waitForTimeout(950);
     const futureTickAfter=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
