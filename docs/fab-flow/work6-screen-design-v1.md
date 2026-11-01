@@ -186,3 +186,11 @@
 - S11 CTA remains `https://fabflow-yoon.vercel.app/` in a new tab; future features are distinct.
 - Keep all 11 scenes, desktop/mobile layout, keyboard h/arrow navigation, without nested vertical scroll on 07–10.
 - Technical boundary: future concepts draw the actual Multi Large visual background but do **not** alter Native Engine or purport to have deployed FLOW INTELLIGENCE. Actual Multi Large support is still in an isolated preview stage in `gmldbs25/fab_flow`.
+
+
+## v2.1 — 물류의 시선 / 여러 미래 / FOUP-only Lifter (2026-11-02)
+- Scene 8의 기존 Native OHT 승강 재생은 **물리적 모델이 사용자 의도와 다르므로 제거**. 실제 Native Multi Large 엔진은 현재도 차량이 FOUP와 함께 승강하는 구조다. 실제 배포용 3D Layout을 tick 0에서 정지시킨 배경 위에 **명시적으로 CONCEPT MODEL**로 구분한 FOUP-only 물류 인계 전시를 추가한다.
+- FOUP-only 아키텍처: 1F OHT가 FOUP를 IN Port에 내려놓음 → Lifter는 **FOUP만** 수송 → 2F OUT Port에서 FOUP를 대기시킴 → 2F의 **다른 OHT**가 인수. OHT가 Lifter에 진입하거나 층을 이동하지 않는다. 각 층에는 독립 운송 차량이 존재한다.
+- Scene 9: 실제 Multi Large Layout에서 1F/2F 레일망과 Lifter 위치를 읽어 SVG 연결망을 생성. 각 연결 지점에 관측 '시선'을 투영하되, 실제 AI 진단이나 발견된 혼잡으로 주장하지 않는다. 무거운 별도 WebGL 인스턴스를 사용하지 않는다.
+- Scene 10: 동일 원본 Layout의 **방향성 링크 그래프**를 이용해 다른 Lifter 자원을 경유하는 두 유효 경로를 탐색하고 분할 슬라이더로 비교한다. 실제 운송 정책 변경이나 어느 쪽이 빠르다는 결과를 만들지 않는다.
+- 진짜 FOUP-only Native Engine은 FAB FLOW의 구조 변경 (운송 2개 구간, FOUP 인계, 승강기 독립 자원, 저장·Replay·분석·검증)이 요구되며 이번 Work6 콘셉트 개발과는 구분한다. 기존 Native Engine을 화면만 속여 FOUP-only로 보이게 하지 않는다.

@@ -342,37 +342,35 @@ try {
     await expect.poll(async() => page.locator('.w6-root').getAttribute('data-pressure-vehicle'),{timeout:25000}).not.toBe('');
     await page.screenshot({path:path.join(evidence,'scene07-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 08:/}).click();
-    await expect(page.getByRole('heading',{name:'공장이 더 복잡해진다면?'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'층을 옮기는 건 OHT가 아니라 FOUP.'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-future-prepared','true',{timeout:120000});
     await expect(page.locator('[data-testid="multi-large-native-scene"]')).toBeVisible({timeout:20000});
     await expect(page.locator('[data-testid="multi-large-native-lifters"] span')).toHaveCount(4);
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-view','stacked',{timeout:12000});
-    // The selected OHT must actually traverse a Native lifter link, not just
-    // be positioned between two illustrated floors.
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-lift','true',{timeout:22000});
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-transferred','true',{timeout:22000});
-    const futureTickBefore=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
-    await page.waitForTimeout(950);
-    const futureTickAfter=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
-    if(futureTickAfter<=futureTickBefore)throw new Error('Native Multi Large engine failed to move: '+futureTickBefore+' → '+futureTickAfter);
-    const noNested=await page.locator('.w6-narrative-v2').evaluate(el=>({
-      panel:getComputedStyle(el).overflowY,inner:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
-      top:el.getBoundingClientRect().top,stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top
-    }));
-    if(noNested.panel!=='visible'||noNested.inner!=='visible'||noNested.top<noNested.stageTop-1)
-      throw new Error('Scene08 must not create nested scroll: '+JSON.stringify(noNested));
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-kind','concept-layout-only');
+    const stoppedTick = await page.locator('.w6-root').getAttribute('data-future-tick');
+    await page.waitForTimeout(750);
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-tick',stoppedTick);
+    const cargo=page.locator('[data-testid="fo-only-concept"]');
+    await expect(cargo).toBeVisible();
+    await expect(cargo).toContainText('OHT는 각자의 층에 남습니다');
+    await expect(cargo).toContainText('FOUP-ONLY LIFTER');
+    await expect.poll(async()=>Number(await cargo.locator('[data-cargo-phase]').getAttribute('data-cargo-phase')),{timeout:10000}).toBeGreaterThan(0);
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 09:/}).click();
-    await expect(page.getByRole('heading',{name:'문제가 생기기 전에 알아챌 수 있다면?'})).toBeVisible();
-    await expect(page.getByText('FLOW INTELLIGENCE · 미래 기능 콘셉트')).toBeVisible();
-    await page.getByRole('button',{name:'02 원인 진단'}).click();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-mode','explain');
+    await expect(page.getByRole('heading',{name:'미래의 MCS는 무엇을 볼까?'})).toBeVisible();
+    await expect(page.locator('[data-testid="future-vision"]')).toBeVisible();
+    await expect(page.locator('[data-testid="future-vision"] .w6-intel-flow path')).toHaveCount(4);
     await page.screenshot({path:path.join(evidence,'scene09-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 10:/}).click();
-    await expect(page.getByRole('heading',{name:'바꾸기 전에 먼저 시험해 볼 수 있다면?'})).toBeVisible();
-    await page.getByRole('button',{name:'B · 경로 분산 검토'}).click();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-mode','alternative');
-    await expect(page.getByText(/실제 운영 정책을 변경하거나 검증되지 않은 개선 수치를 제시하지 않아요/)).toBeVisible();
+    await expect(page.getByRole('heading',{name:'하나의 공장, 여러 가지 미래.'})).toBeVisible();
+    const comparison=page.locator('[data-testid="future-alternatives"]');
+    await expect(comparison).toBeVisible();
+    await expect(comparison).toHaveAttribute('data-real-route-count','2');
+    const comparisonSlider=page.getByRole('slider',{name:'두 대안 경로 비교 슬라이더'});
+    await expect(comparisonSlider).toHaveValue('50');
+    await comparisonSlider.fill('80');
+    await expect(comparisonSlider).toHaveValue('80');
+    await expect(comparison.locator('svg clipPath')).toHaveCount(2);
     await page.screenshot({path:path.join(evidence,'scene10-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 11:/}).click();
     await expect(page.getByRole('heading',{name:'이제 직접 운영해 볼 차례.'})).toBeVisible();

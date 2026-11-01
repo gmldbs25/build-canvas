@@ -11,11 +11,12 @@ function makeMulti() {
   return new Engine(scenario, { analysis: false });
 }
 
-/** True Native two-floor transfer: real FOUP/OHT pose, four lift resources.
- * Seed 17 is a documented, tested 1F→2F trace (TR-0003 / OHT-003).
- * Warm-up is computed off-screen in short batches, never faked as a keyframe.
+/** The current Native 2F engine moves the *OHT* with FOUP in the lift.
+ * Work6 must NOT present that as FOUP-only transport. When conceptOnly=true
+ * it uses only the genuine 2F layout at time 0, without running the old
+ * vertical vehicle transfer. The independent exhibit is explicitly conceptual.
  */
-export function useFutureFab(active: boolean, playing: boolean) {
+export function useFutureFab(active: boolean, playing: boolean, conceptOnly = false) {
   const engineRef = useRef<Engine | null>(null);
   const [engine, setEngine] = useState<Engine | null>(null);
   const [state, setState] = useState<SimulationState | null>(null);
@@ -29,6 +30,12 @@ export function useFutureFab(active: boolean, playing: boolean) {
       try {
         const instance = makeMulti();
         engineRef.current = instance;
+        if (conceptOnly) {
+          setEngine(instance);
+          setState(instance.snapshot().state);
+          setPrepared(true);
+          return;
+        }
         const advance = () => {
           if (cancelled) return;
           try {
@@ -52,17 +59,17 @@ export function useFutureFab(active: boolean, playing: boolean) {
     };
     timer = window.setTimeout(begin, 0);
     return () => { cancelled = true; window.clearTimeout(timer); if (!prepared) engineRef.current = null; };
-  }, [active, prepared, error]);
+  }, [active, prepared, error, conceptOnly]);
 
   useEffect(() => {
-    if (!playing || !prepared || !engine || engine.state.tick >= END_AT_TICK) return;
+    if (conceptOnly || !playing || !prepared || !engine || engine.state.tick >= END_AT_TICK) return;
     const timer = window.setInterval(() => {
       if (engine.state.tick >= END_AT_TICK) { window.clearInterval(timer); return; }
       try { engine.step(1); setState(engine.snapshot().state); }
       catch (cause) { window.clearInterval(timer); setError(cause instanceof Error ? cause.message : '다층 운송 중 문제가 발생했어요.'); }
     }, PLAYBACK_MS);
     return () => window.clearInterval(timer);
-  }, [playing, prepared, engine]);
+  }, [playing, prepared, engine, conceptOnly]);
   const selected = state?.vehicles.find(v => v.id === 'OHT-003');
   const lift = selected?.link ? engine?.layout.links.find(l => l.id === selected.link && l.kind === 'lifter') : undefined;
   const completed = state?.requests.filter(v => v.phase === 'completed').length ?? 0;

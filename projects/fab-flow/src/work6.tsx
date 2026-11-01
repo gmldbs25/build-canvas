@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ThreeFacilityScene from './components/ThreeFacilityScene';
 import MultiLargeFacilityScene, { type MultiLargeView } from './components/MultiLargeFacilityScene';
+import FutureExhibit from './components/FutureExhibit';
 import { useFutureFab } from './useFutureFab';
 import { Engine } from './sim/engine';
 import { SCENES } from './work6-scenes';
@@ -125,10 +126,7 @@ export default function Work6() {
   const isPressure = scene.id === 7;
   const isFuture = scene.id >= 8 && scene.id <= 10;
   const [futureView, setFutureView] = useState<MultiLargeView>('stacked');
-  const [futureFollowing, setFutureFollowing] = useState(false);
-  const [futureDiagnostic, setFutureDiagnostic] = useState<'observe' | 'explain'>('observe');
-  const [futureOption, setFutureOption] = useState<'current' | 'alternative'>('current');
-  const future = useFutureFab(isFuture, scene.id === 8);
+  const future = useFutureFab(isFuture, false, true);
   // The operating FAB is warmed from real Native ticks before the reveal.
   // Scene 08 branches two equal-length experiments from that same snapshot.
   const pressure = usePressureWorld(scene.id === 7, false, scene.id === 6 || scene.id === 7);
@@ -365,16 +363,10 @@ export default function Work6() {
     issueCamera('follow', congestionVehicleId);
   }, [scene.id, congestionVehicleId, pressure.engine, issueCamera]);
   useEffect(() => {
-    if (scene.id !== 8 || !future.prepared) return;
-    setFutureView('1f'); setFutureFollowing(false);
-    const reveal = window.setTimeout(() => setFutureView('stacked'), 1500);
-    const follow = window.setTimeout(() => setFutureFollowing(true), 2700);
-    return () => { window.clearTimeout(reveal); window.clearTimeout(follow); };
-  }, [scene.id, future.prepared]);
-  useEffect(() => {
-    if (scene.id === 9 || scene.id === 10) { setFutureView('stacked'); setFutureFollowing(false); }
-  }, [scene.id]);
-  // Keep the original port annotations stable through request/dispatch.
+    if (!isFuture || !future.prepared) return;
+    setFutureView('stacked');
+  }, [isFuture, future.prepared]);
+  // Keep the original port annotations stable through request/dispatch.  // Keep the original port annotations stable through request/dispatch.
   // Creating the FOUP should change only that model, never reframe the FAB.
   const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
 
@@ -401,7 +393,8 @@ export default function Work6() {
     data-future-lift={isFuture ? String(future.transfer) : ''}
     data-future-transferred={isFuture ? String(future.transferred) : ''}
     data-future-view={isFuture ? futureView : ''}
-    data-future-mode={scene.id === 9 ? futureDiagnostic : scene.id === 10 ? futureOption : ''}>
+    data-future-mode={scene.id === 8 ? 'fo-only-concept' : scene.id === 9 ? 'vision' : scene.id === 10 ? 'alternatives' : ''}
+    data-future-kind={isFuture ? 'concept-layout-only' : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -411,10 +404,10 @@ export default function Work6() {
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
         {isFuture ? (future.engine && future.state ? <div className="w6-multi-stage" aria-label="실제 FAB FLOW 2층 Native 3D">
           <MultiLargeFacilityScene layout={future.engine.layout} scenario={future.engine.scenario} state={future.state}
-            running={scene.id === 8 && !future.ended} tickMs={future.tickMs}
-            selectedVehicleId="OHT-003" followVehicleId={scene.id === 8 && futureFollowing ? 'OHT-003' : undefined}
+            running={false} tickMs={future.tickMs}
             view={futureView} introEnabled={false} onViewChange={view => setFutureView(view)}
             onSelectVehicle={() => {}} />
+          <FutureExhibit layout={future.engine.layout} mode={scene.id === 8 ? 'transfer' : scene.id === 9 ? 'vision' : 'alternatives'}/>
         </div> : <div className="w6-future-loading" role="status">{future.error || '실제 두 층의 운송을 준비하고 있어요.'}</div>) : <ThreeFacilityScene
           layout={activeEngine.layout}
           state={activeState}
@@ -547,39 +540,22 @@ export default function Work6() {
             <button type="button" className="w6-primary" onClick={() => nextScene(1)}>더 복잡한 FAB 보기 ↗</button></div>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}
-        {scene.id === 8 && <div className="w6-inner-controls">
-          <span className="w6-overline">MULTI LARGE · REAL NATIVE 3D PREVIEW</span>
-          <p className="w6-context-line">두 층과 네 개의 Lifter가 연결된 레일망이에요. 실제 FOUP를 실은 OHT가 층을 이동하는 과정을 살펴보세요.</p>
-          <div className="w6-focus-status"><span>층간 운송</span><strong>1F → Lifter → 2F</strong><small>{future.transfer ? '지금 Lifter에서 이동 중' : future.transferred ? '2층으로 이동한 상태' : '실제 경로를 따라 이동 중'}</small></div>
-          <div className="w6-action-row"><button type="button" className="w6-secondary" disabled={!future.prepared} onClick={() => { setFutureView('stacked'); setFutureFollowing(false); }}>전체 보기</button>
-            <button type="button" className="w6-primary" onClick={() => nextScene(1)}>지능형 운영 살펴보기 ↗</button></div>
-          <p className="w6-microcopy">FAB FLOW 개발 중인 실제 Multi Large Preview · 정식 운영 기능과 구분</p>
+        {scene.id === 8 && <div className="w6-inner-controls w6-intel-narrative">
+          <span className="w6-concept-tag">FOUP-ONLY LIFTER · 미래 물류 모델</span>
+          <p className="w6-context-line">1층 OHT는 입구에 FOUP만 내려놓습니다. Lifter가 FOUP를 2층 출구로 올리면, 2층의 다른 OHT가 인수해요.</p>
+          <p className="w6-microcopy">기존 FAB FLOW Native 엔진은 OHT와 FOUP가 함께 이동하는 구조입니다. 이 장면은 변경할 물류 구조를 보여주는 개념 시각화예요.</p>
+          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>미래 MCS의 시선으로 보기 ↗</button>
         </div>}
-        {scene.id === 9 && <div className="w6-inner-controls">
+        {scene.id === 9 && <div className="w6-inner-controls w6-intel-narrative">
           <span className="w6-concept-tag">FLOW INTELLIGENCE · 미래 기능 콘셉트</span>
-          <div className="w6-action-row" role="group" aria-label="진단 단계">
-            <button type="button" className={futureDiagnostic === 'observe' ? 'w6-primary' : 'w6-secondary'} onClick={() => setFutureDiagnostic('observe')}>01 상태 관찰</button>
-            <button type="button" className={futureDiagnostic === 'explain' ? 'w6-primary' : 'w6-secondary'} onClick={() => setFutureDiagnostic('explain')}>02 원인 진단</button></div>
-          <div className="w6-future-explainer">{futureDiagnostic === 'observe' ? <>
-            <strong>어느 연결 구간에 차량이 몰릴까?</strong>
-            <p>미래의 시스템은 레일과 Lifter의 대기 기록을 살펴 변화가 큰 구간을 찾아낼 수 있어요.</p>
-            <small>아래 FAB는 실제 시뮬레이션이고, 진단은 미래 기능의 개념 예시예요.</small>
-          </> : <><strong>여러 경로가 한 Lifter에 집중된다면?</strong>
-            <p>차량 흐름과 점유 기록을 종합해 가능한 원인을 설명하는 것이 목표예요.</p>
-            <small>관측된 사실과 원인에 대한 추정은 구분해야 해요.</small></>}</div>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>다른 방법도 시험해 볼까? ↗</button>
+          <p className="w6-context-line">차량 하나가 아닌 전체 운송망을 바라봅니다. 실제 레일과 네 개의 Lifter를 통해 연결 관계가 어떻게 이루어지는지 살펴보세요.</p>
+          <p className="w6-result-takeaway">미래 시스템의 역할은 움직임을 보는 데서 나아가, 서로 연결된 운송들을 함께 이해하는 것입니다.</p>
+          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>여러 가지 미래 비교하기 ↗</button>
         </div>}
-        {scene.id === 10 && <div className="w6-inner-controls">
-          <span className="w6-concept-tag">FLOW INTELLIGENCE · 미래 의사결정 콘셉트</span>
-          <p className="w6-context-line">동일한 물류 상황에서 다른 운영 방안을 검토하는 미래의 의사결정 지원을 살펴봅니다.</p>
-          <div className="w6-action-row" role="group" aria-label="운영 대안 검토">
-            <button type="button" className={futureOption === 'current' ? 'w6-primary' : 'w6-secondary'} onClick={() => setFutureOption('current')}>A · 현재 운영 유지</button>
-            <button type="button" className={futureOption === 'alternative' ? 'w6-primary' : 'w6-secondary'} onClick={() => setFutureOption('alternative')}>B · 경로 분산 검토</button></div>
-          <div className="w6-future-explainer">{futureOption === 'current' ? <>
-            <strong>지금의 운송 방식 유지</strong><p>현재 레일과 Lifter 선택 방식을 그대로 유지했을 때를 생각해 봅니다.</p>
-          </> : <><strong>다른 연결 경로를 사용할 수 있을까?</strong><p>다른 Lifter의 경로를 검토하고 동일 조건의 시뮬레이션으로 영향을 비교하는 방안을 생각해 봅니다.</p></>}
-            <small>미래 기능 콘셉트이며 실제 운영 정책을 변경하거나 검증되지 않은 개선 수치를 제시하지 않아요.</small></div>
-          <p className="w6-result-takeaway">시스템이 대안을 설명하고, 최종 결정은 운영자가 내립니다.</p>
+        {scene.id === 10 && <div className="w6-inner-controls w6-intel-narrative">
+          <span className="w6-concept-tag">WHAT-IF · 미래 의사결정 콘셉트</span>
+          <p className="w6-context-line">같은 FAB, 같은 출발지와 목적지. 서로 다른 Lifter를 통과하는 합법적인 두 경로를 슬라이더로 비교합니다.</p>
+          <p className="w6-result-takeaway">어떤 경로가 실제로 더 좋은지는 측정이 필요합니다. 미래 MCS는 이를 시험하고 운영자의 선택을 도울 수 있어요.</p>
           <button type="button" className="w6-primary" onClick={() => nextScene(1)}>FAB FLOW 직접 체험하기 ↗</button>
         </div>}
         {scene.id === 11 && <div className="w6-inner-controls">

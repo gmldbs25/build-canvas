@@ -164,8 +164,10 @@ function CargoTransfer() {
       <g fill="#174b40"><rect x="135" y="218" width="52" height="7" rx="2"/><rect x="510" y="84" width="52" height="7" rx="2"/></g>
       <text x="162" y="278" fontSize="13" textAnchor="middle" fill="#d3edda">OHT · 1F</text>
       <text x="536" y="146" fontSize="13" textAnchor="middle" fill="#d3edda">OHT · 2F</text>
-      <rect x={x-20} y={y-19} width="40" height="30" rx="5" fill="#f4cc86" stroke="#fff1ca" strokeWidth="2" className="w6-intel-cargo"/>
-      <rect x={x-10} y={y-25} width="20" height="7" rx="2" fill="#f4cc86" className="w6-intel-cargo"/>
+      <g className="w6-intel-cargo" style={{ transform:'translate('+(x-20)+'px,'+(y-19)+'px)' }}>
+        <rect x="0" y="0" width="40" height="30" rx="5" fill="#f4cc86" stroke="#fff1ca" strokeWidth="2"/>
+        <rect x="10" y="-6" width="20" height="7" rx="2" fill="#f4cc86"/>
+      </g>
       <text x="352" y="299" textAnchor="middle" fontSize="13" fill="#cee0d7">① 인계 → ② FOUP 승강 → ③ 반출 → ④ 인수</text>
     </svg>
     <div className="w6-intel-transfer-status" aria-live="polite"><span>{String(phase+1).padStart(2,'0')} / 05</span><strong>{labels[phase]}</strong></div>
@@ -190,7 +192,7 @@ export default function FutureExhibit({layout,mode}:{layout:Layout;mode:Mode}) {
       <strong>{revealed?'네 개의 Lifter를 중심으로 서로 다른 층이 연결됩니다':'운송 경로와 층간 연결을 살펴보는 중…'}</strong>
       <small>실제 레일·Lifter 위치 기반 시각화 · 혼잡 진단 결과가 아닙니다</small>
     </div> : <div className="w6-intel-comparison">
-      <div className="w6-intel-comparison-labels"><span>A · {graph.routes[0] ? 'Lifter '+graph.lifters.findIndex(l=>l.id===layout.lifters?.find(x=>x.resource===graph.routes[0].resource)?.id) : '현재 후보'}</span><span>B · 다른 Lifter 경로</span></div>
+      <div className="w6-intel-comparison-labels"><span>A · {graph.routes[0] ? layout.lifters?.find(x=>x.resource===graph.routes[0].resource)?.id : '기존 경로 후보'}</span><span>B · {graph.routes[1] ? layout.lifters?.find(x=>x.resource===graph.routes[1].resource)?.id : '다른 경로 후보'}</span></div>
       <label htmlFor="w6-future-split">두 경로를 비교할 위치</label>
       <input id="w6-future-split" aria-label="두 대안 경로 비교 슬라이더" type="range" min="0" max="100" value={split} onChange={event=>setSplit(Number(event.target.value))}/>
       <small>{graph.routes.length===2?'실제 방향성 레일망에서 계산한 서로 다른 Lifter 경유 가능 경로 · 소요시간과 성능은 비교하지 않았습니다':'두 개의 합법적 층간 경로를 구성하지 못해 경로를 표시하지 않았습니다.'}</small>
