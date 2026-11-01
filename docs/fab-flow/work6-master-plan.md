@@ -167,3 +167,15 @@
 - 제안은 시안 검토로 확정하며, 미결정 항목을 완성된 결정으로 취급하지 않는다.
 - Work6 이외 기존 Work와 원본 `fab_flow`는 사용자가 별도로 요청하지 않는 한 수정하지 않는다.
 - 실제 개발 시작 시 `README.md`, `AGENTS.md`, 그리고 이 문서를 기준으로 한다.
+
+
+## v2.0 — CURRENT MCS → FLOW INTELLIGENCE (2026-11-01)
+
+- Work6 is a beginner-facing narrative about the role of current MCS and future FAB logistics, **not** a transport throughput dashboard. Scenes 01–06 preserve the actual original Native tutorial, reveal, directional rail and MCS path comparison.
+- S07 CHALLENGE: use original Native Large engine to show an actual waiting OHT and its last genuine MCS selected route. Queue and vehicle waiting are read from Native state; there is no synthetic congestion or reroute.
+- S08 MULTI LARGE: port the original FAB FLOW `MultiLargeFacilityScene.tsx` renderer to Work6 and play documented multi-floor seed 17 TR-0003/OHT-003 lift trace from actual `Engine.step()`. Start 1F, reveal stacked floors and four lifters, then follow the actual vehicle during the lift. Clearly mark as **development Native Preview** rather than released Multi Large.
+- S09 FLOW INTELLIGENCE: show two selectable concept stages: observe actual engine data in principle, then offer possible cause analysis. Do not present speculative lifter congestion as a measured detection or working AI.
+- S10 FUTURE DECISION: compare qualitative current-operation versus alternative-route investigation (concept only), and explain same-condition simulation plus operator approval. No unimplemented actual rerouting, fake AI recommendations, or invented outcomes.
+- S11 CTA remains `https://fabflow-yoon.vercel.app/` in a new tab; future features are distinct.
+- Keep all 11 scenes, desktop/mobile layout, keyboard h/arrow navigation, without nested vertical scroll on 07–10.
+- Technical boundary: future concepts draw the actual Multi Large visual background but do **not** alter Native Engine or purport to have deployed FLOW INTELLIGENCE. Actual Multi Large support is still in an isolated preview stage in `gmldbs25/fab_flow`.

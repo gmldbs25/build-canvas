@@ -174,3 +174,15 @@
 - 관람자가 소개를 끝낸 다음 실제 FAB FLOW를 바로 체험할 수 있도록 `https://fabflow-yoon.vercel.app/`을 명시적인 CTA로 연결한다(새 탭, `noopener noreferrer`). 더 이상 링크 미확인 문구를 노출하지 않는다.
 
 - **측정 후 카피 보정:** 원본 V6 엔진으로 검증한 기본 요청(3초/건)도 10분 동안 완료보다 요청이 많아 대기가 증가한다. 따라서 Scene 08에서는 이를 무조건 '원활한 평상시'라고 주장하지 않고 '기본 요청'이라고 부르며, 폭증 후 대기 누적 속도의 차이를 그대로 설명한다.
+
+
+## v2.0 — CURRENT MCS → FLOW INTELLIGENCE (2026-11-01)
+
+- Work6 is a beginner-facing narrative about the role of current MCS and future FAB logistics, **not** a transport throughput dashboard. Scenes 01–06 preserve the actual original Native tutorial, reveal, directional rail and MCS path comparison.
+- S07 CHALLENGE: use original Native Large engine to show an actual waiting OHT and its last genuine MCS selected route. Queue and vehicle waiting are read from Native state; there is no synthetic congestion or reroute.
+- S08 MULTI LARGE: port the original FAB FLOW `MultiLargeFacilityScene.tsx` renderer to Work6 and play documented multi-floor seed 17 TR-0003/OHT-003 lift trace from actual `Engine.step()`. Start 1F, reveal stacked floors and four lifters, then follow the actual vehicle during the lift. Clearly mark as **development Native Preview** rather than released Multi Large.
+- S09 FLOW INTELLIGENCE: show two selectable concept stages: observe actual engine data in principle, then offer possible cause analysis. Do not present speculative lifter congestion as a measured detection or working AI.
+- S10 FUTURE DECISION: compare qualitative current-operation versus alternative-route investigation (concept only), and explain same-condition simulation plus operator approval. No unimplemented actual rerouting, fake AI recommendations, or invented outcomes.
+- S11 CTA remains `https://fabflow-yoon.vercel.app/` in a new tab; future features are distinct.
+- Keep all 11 scenes, desktop/mobile layout, keyboard h/arrow navigation, without nested vertical scroll on 07–10.
+- Technical boundary: future concepts draw the actual Multi Large visual background but do **not** alter Native Engine or purport to have deployed FLOW INTELLIGENCE. Actual Multi Large support is still in an isolated preview stage in `gmldbs25/fab_flow`.

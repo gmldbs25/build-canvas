@@ -306,99 +306,39 @@ try {
     await expect(page.getByText('OHT가 이동하는 정해진 선로')).toBeVisible();
 
     await page.getByRole('button',{name:/Scene 07:/}).click();
-    await expect(page.getByRole('heading',{name:'잘 돌아가던 공장에 갑자기 일이 몰린다면?'})).toBeVisible();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-layout','large');
+    await expect(page.getByRole('heading',{name:'길을 찾았는데, 왜 기다려야 할까?'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true',{timeout:120000});
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-baseline-interval','3');
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-surge-interval','0.5');
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
-    await expect(page.getByText('3초에 1건',{exact:true})).toBeVisible();
-    const warmCompleted=Number(await page.locator('.w6-root').getAttribute('data-pressure-warm-completed'));
-    const openingPressure=await page.evaluate(()=>({
-      active:Object.values(window.__FAB_3D__?.vehicles ?? {}).filter(x=>['empty','loaded','pickup','dropoff'].includes(x.phase)).length,
-      tick:window.__FAB_3D__?.tick ?? 0,
-    }));
-    if(openingPressure.active<12||openingPressure.tick<4000){
-      throw new Error('Scene 07 must open with many native OHTs already busy, not a newly empty factory: '+JSON.stringify({openingPressure,warmCompleted}));
-    }
-    const scene7=page.locator('.w6-narrative-pressure');
-    const overflow=await scene7.evaluate(el=>({
-      panelOverflow:getComputedStyle(el).overflowY,
-      innerOverflow:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
-      panelTop:el.getBoundingClientRect().top,
-      stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top,
-      panelBottom:el.getBoundingClientRect().bottom,
-      stageBottom:document.querySelector('.w6-stage').getBoundingClientRect().bottom,
-    }));
-    // The extended ::before gradient adds scrollHeight beyond clientHeight, but
-    // unlike overflow:auto this does not create an actual nested scrollbar.
-    if(overflow.panelOverflow!=='visible'||overflow.innerOverflow!=='visible'||
-       overflow.panelTop<overflow.stageTop-1||overflow.panelBottom>overflow.stageBottom+1)
-      throw new Error('Scene 07 must fit inside the stage without a nested scrollbar: '+JSON.stringify(overflow));
-    const tickBefore=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    const tickSamples=[tickBefore];
-    for(let k=0;k<6;k++){
-      await page.waitForTimeout(145);
-      tickSamples.push(Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick')));
-    }
-    if(tickSamples.at(-1)<=tickBefore||tickSamples.some((t,i)=>i>0&&(t<tickSamples[i-1]||t-tickSamples[i-1]>2)))
-      throw new Error('Native pressure playback must publish contiguous ticks: '+JSON.stringify(tickSamples));
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','2',{timeout:15000});
-    await expect(page.getByText('1초에 2건',{exact:true})).toBeVisible();
-    await page.waitForTimeout(600);
-    const tickAfterSurge=Number(await page.locator('[data-simulation-tick]').getAttribute('data-simulation-tick'));
-    if(tickAfterSurge<=tickSamples.at(-1))
-      throw new Error('Scene 07 must keep moving after the request surge');
-    await page.getByRole('button',{name:'다시 보기'}).click();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-demand-changes','1');
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true');
+    await expect(page.getByText('MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.')).toBeVisible();
+    await page.screenshot({path:path.join(evidence,'scene07-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 08:/}).click();
-    await expect(page.getByRole('heading',{name:'왜 운송을 기다리는 일이 늘어날까?'})).toBeVisible();
-    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-ready','true',{timeout:120000});
-    const capacity=await page.locator('.w6-root').evaluate(el=>({
-      baselineCreated:Number(el.dataset.pressureNormalCreated),
-      baselineCompleted:Number(el.dataset.pressureNormalCompleted),
-      surgeCreated:Number(el.dataset.pressureCreated),
-      surgeCompleted:Number(el.dataset.pressureCompleted),
-      baselinePendingChange:Number(el.dataset.pressureNormalPendingDelta),
-      surgePendingChange:Number(el.dataset.pressureSurgePendingDelta),
+    await expect(page.getByRole('heading',{name:'공장이 더 복잡해진다면?'})).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-prepared','true',{timeout:120000});
+    await expect(page.locator('[data-testid="multi-large-native-scene"]')).toBeVisible({timeout:20000});
+    await expect(page.locator('[data-testid="multi-large-native-lifters"] span')).toHaveCount(4);
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-view','stacked',{timeout:12000});
+    const futureTickBefore=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
+    await page.waitForTimeout(950);
+    const futureTickAfter=Number(await page.locator('.w6-root').getAttribute('data-future-tick'));
+    if(futureTickAfter<=futureTickBefore)throw new Error('Native Multi Large engine failed to move: '+futureTickBefore+' → '+futureTickAfter);
+    const noNested=await page.locator('.w6-narrative-v2').evaluate(el=>({
+      panel:getComputedStyle(el).overflowY,inner:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
+      top:el.getBoundingClientRect().top,stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top
     }));
-    if(capacity.baselineCreated<50||capacity.baselineCompleted<1||
-       capacity.surgeCreated<capacity.baselineCreated*5.5||
-       capacity.surgeCreated>capacity.baselineCreated*6.5||
-       capacity.surgePendingChange<=capacity.baselinePendingChange){
-      throw new Error('Scene 08 should compare a meaningful warmed native baseline against actual overload: '+JSON.stringify(capacity));
-    }
-    const scene8=page.locator('.w6-narrative-pressure');
-    const overflow8=await scene8.evaluate(el=>({
-      panelOverflow:getComputedStyle(el).overflowY,
-      innerOverflow:getComputedStyle(el.querySelector('.w6-inner-controls')).overflowY,
-      panelTop:el.getBoundingClientRect().top,
-      stageTop:document.querySelector('.w6-stage').getBoundingClientRect().top,
-      panelBottom:el.getBoundingClientRect().bottom,
-      stageBottom:document.querySelector('.w6-stage').getBoundingClientRect().bottom,
-    }));
-    if(overflow8.panelOverflow!=='visible'||overflow8.innerOverflow!=='visible'||
-       overflow8.panelTop<overflow8.stageTop-1||overflow8.panelBottom>overflow8.stageBottom+1)
-      throw new Error('Scene 08 must fit inside the stage without a nested scrollbar: '+JSON.stringify(overflow8));
-    await expect(page.locator('.w6-capacity-grid .w6-capacity-card')).toHaveCount(2);
-    await expect(page.locator('.w6-capacity-card.base')).toContainText('기본 요청');
-    await expect(page.locator('.w6-capacity-card.surge')).toContainText('초당 2건');
-    if(capacity.baselinePendingChange>0)
-      await expect(page.locator('.w6-result-takeaway')).toContainText('기본 요청에서도 일이 쌓였지만');
+    if(noNested.panel!=='visible'||noNested.inner!=='visible'||noNested.top<noNested.stageTop-1)
+      throw new Error('Scene08 must not create nested scroll: '+JSON.stringify(noNested));
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
-    console.log('native-pressure-capacity',JSON.stringify({openingPressure,warmCompleted,tickSamples,capacity,overflow,overflow8}));
     await page.getByRole('button',{name:/Scene 09:/}).click();
-    await expect(page.getByRole('heading',{name:'차량을 더 넣으면 빨라질까?'})).toBeVisible();
-    if(width===1440){
-      await page.getByRole('button',{name:/같은 조건으로 두 번 실행하기/}).click();
-      await expect(page.getByText(/실제 실험 결과/)).toBeVisible({timeout:120000});
-      await expect(page.getByRole('table')).toBeVisible();
-      await page.screenshot({path:path.join(evidence, 'scene09-compare-'+width+'.png')});
-    }
+    await expect(page.getByRole('heading',{name:'문제가 생기기 전에 알아챌 수 있다면?'})).toBeVisible();
+    await expect(page.getByText('FLOW INTELLIGENCE · 미래 기능 콘셉트')).toBeVisible();
+    await page.getByRole('button',{name:'02 원인 진단'}).click();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-mode','explain');
+    await page.screenshot({path:path.join(evidence,'scene09-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 10:/}).click();
-    await expect(page.getByRole('heading',{name:'화면 뒤에서는 무슨 일이 일어날까?'})).toBeVisible();
-    await expect(page.getByText('0.5초마다 상태 계산')).toBeVisible();
+    await expect(page.getByRole('heading',{name:'바꾸기 전에 먼저 시험해 볼 수 있다면?'})).toBeVisible();
+    await page.getByRole('button',{name:'B · 경로 분산 검토'}).click();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-future-mode','alternative');
+    await expect(page.getByText(/실제 운영 정책을 변경하거나 검증되지 않은 개선 수치를 제시하지 않아요/)).toBeVisible();
+    await page.screenshot({path:path.join(evidence,'scene10-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 11:/}).click();
     await expect(page.getByRole('heading',{name:'이제 직접 운영해 볼 차례.'})).toBeVisible();
     const explore=page.getByRole('link',{name:/FAB FLOW 시뮬레이터 직접 체험하기/});
