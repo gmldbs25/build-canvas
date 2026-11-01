@@ -137,13 +137,16 @@ function NetworkMap({ graph, view, split }: { graph:DisplayGraph; view:'vision'|
 
 function CargoTransfer() {
   const [phase,setPhase] = useState(0);
+  const [replay,setReplay] = useState(0);
   useEffect(() => {
-    const timer = window.setInterval(()=>setPhase(value=>(value+1)%5),1700);
+    const timer = window.setInterval(()=>setPhase(value=>(value+1)%6),1550);
     return ()=>window.clearInterval(timer);
-  },[]);
-  const positions = [[166,225],[282,225],[353,91],[435,91],[535,91]];
+  },[replay]);
+  // Physical route: 1F OHT -> IN -> lift bottom -> VERTICAL rise -> OUT -> 2F OHT.
+  // Only the FOUP icon changes floors, and it travels vertically inside shaft.
+  const positions = [[166,225],[282,225],[353,225],[353,91],[435,91],[535,91]];
   const [x,y] = positions[phase];
-  const labels = ['1F OHT가 FOUP를 가져옵니다','1F 전용 입구에서 FOUP 인계','OHT 없이 FOUP만 층간 이동','2F 전용 출구로 FOUP 반출','2F OHT가 FOUP를 인수합니다'];
+  const labels = ['1F OHT가 FOUP를 가져옵니다','1F 전용 입구에서 FOUP 인계','FOUP만 승강기에 진입합니다','OHT 없이 FOUP가 수직 상승합니다','2F 전용 출구로 FOUP 반출','2F OHT가 FOUP를 인수합니다'];
   return <div className="w6-intel-transfer" data-cargo-phase={phase}>
     <div className="w6-intel-transfer-head"><strong>OHT는 각자의 층에 남습니다</strong><span>FOUP-ONLY LIFTER · CONCEPT MODEL</span></div>
     <svg viewBox="0 0 700 315" role="img" aria-label="1층 OHT가 FOUP를 내려놓고 Lifter가 FOUP만 2층으로 이동한 뒤 2층 OHT가 인수하는 개념 애니메이션">
@@ -170,8 +173,8 @@ function CargoTransfer() {
       </g>
       <text x="352" y="299" textAnchor="middle" fontSize="13" fill="#cee0d7">① 인계 → ② FOUP 승강 → ③ 반출 → ④ 인수</text>
     </svg>
-    <div className="w6-intel-transfer-status" aria-live="polite"><span>{String(phase+1).padStart(2,'0')} / 05</span><strong>{labels[phase]}</strong></div>
-    <button type="button" className="w6-intel-replay" onClick={()=>setPhase(0)}>처음부터 보기 ↺</button>
+    <div className="w6-intel-transfer-status" aria-live="polite"><span>{String(phase+1).padStart(2,'0')} / 06</span><strong>{labels[phase]}</strong></div>
+    <button type="button" className="w6-intel-replay" onClick={()=>{setPhase(0);setReplay(value=>value+1);}}>처음부터 보기 ↺</button>
   </div>;
 }
 

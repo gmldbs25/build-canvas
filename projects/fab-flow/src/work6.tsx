@@ -584,6 +584,6 @@ export default function Work6() {
         <button type="button" onClick={() => nextScene(1)} disabled={sceneIndex === SCENES.length-1} aria-label="다음 장면">→</button>
       </div>
     </footer>
-    <div className="w6-prototype-disclaimer">WORK 06 · 11 SCENES · ORIGINAL FAB FLOW NATIVE ENGINE & THREE.JS · EDUCATIONAL MODEL, NOT A REAL FAB DIGITAL TWIN</div>
+    <div className="w6-prototype-disclaimer">WORK 06 · 11 SCENES · CURRENT MCS: NATIVE MODEL / FUTURE INTELLIGENCE & FOUP TRANSFER: CONCEPT · NOT A REAL FAB DIGITAL TWIN</div>
   </div>;
 }

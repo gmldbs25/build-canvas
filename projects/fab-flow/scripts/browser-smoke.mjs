@@ -355,6 +355,9 @@ try {
     await expect(cargo).toContainText('OHT는 각자의 층에 남습니다');
     await expect(cargo).toContainText('FOUP-ONLY LIFTER');
     await expect.poll(async()=>Number(await cargo.locator('[data-cargo-phase]').getAttribute('data-cargo-phase')),{timeout:10000}).toBeGreaterThan(0);
+    await expect(cargo).toContainText('06');
+    const transferSteps=await cargo.locator('svg .w6-intel-cargo').count();
+    if(transferSteps!==1) throw new Error('FOUP-only transfer must animate a single cargo, never a second OHT.');
     await page.screenshot({path:path.join(evidence,'scene08-'+width+'.png')});
     await page.getByRole('button',{name:/Scene 09:/}).click();
     await expect(page.getByRole('heading',{name:'미래의 MCS는 무엇을 볼까?'})).toBeVisible();
