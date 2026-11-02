@@ -401,3 +401,30 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
   .w6-graph-legend strong{font-size:12px}
   .w6-graph-legend small{font-size:12px}
 }
+
+
+/* In portrait graph mode the physical Node/Link/Port example must remain
+   visible ABOVE the explanation. Keep essential controls and legend reachable. */
+@media (max-width:650px) and (orientation:portrait) {
+  .w6-root[data-scene2-network="network"] .w6-narrative {
+    max-height: min(38svh, 305px);
+    overflow-y: auto;
+    bottom: 8px;
+    padding-top: 9px;
+    padding-bottom: 8px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-chapter,
+  .w6-root[data-scene2-network="network"] .w6-description { display:none; }
+  .w6-root[data-scene2-network="network"] .w6-narrative h1 {
+    font-size: 21px;
+    line-height: 1.24;
+    margin-bottom: 5px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-inner-controls {
+    margin-top: 8px;
+    padding-top: 8px;
+    gap: 7px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-graph-legend { gap: 2px; padding: 7px 10px; }
+  .w6-root[data-scene2-network="network"] .w6-microcopy { font-size:12px;line-height:1.44; }
+}
