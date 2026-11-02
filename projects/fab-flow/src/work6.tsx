@@ -102,7 +102,11 @@ function createClockEngine(): Engine {
   // Separate genuine native experiment; the tutorial remains command-owned.
   const scenario: Scenario = { ...operationalScenario('large'), fleet: 12, demand: 2,
     duration: 1800, seed: 17, pattern: 'steady' };
-  return new Engine(scenario, { analysis: false });
+  const engine = new Engine(scenario, { analysis: false });
+  // Genuine 0.5-second steps: start at an observable active point, not t=0 parking.
+  // Both fresh runs replay the exact same 300 native ticks.
+  engine.step(300);
+  return engine;
 }
 
 function freezeState(engine: Engine): SimulationState {
@@ -411,6 +415,8 @@ export default function Work6() {
     data-opening-moving={ambient.openingMovingVehicles}
     data-opening-local-moving={ambient.openingLocalVehicles}
     data-scene-count={SCENES.length} data-current-scene={scene.id}
+    data-clock-time={scene.id === 4 ? clockState.time : ''}
+    data-clock-tick={scene.id === 4 ? clockState.tick : ''}
     data-route-study-seed={routeStudy?.seed ?? ''}
     data-route-study-source={routeStudy?.sourceBay ?? ''}
     data-route-study-destination={routeStudy?.destinationBay ?? ''}
