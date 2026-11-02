@@ -26,6 +26,8 @@ type Props = {
   tickMs: number; running: boolean; selected?: string; trackedVehicle?: string; trackedRequest?: string;
   analysis?: AnalysisReport; analysisMode?: 'current' | 'recent';
   heatmap: boolean; view?: 'overview' | 'network' | 'traffic'; cameraCommand?: CameraCommand;
+  /** Work6 Scene 02 only: expose the ORIGINAL real directional rails without factory shells. */
+  networkFocus?: boolean;
   /** Work6 narrative gate: preserve the close-up until its intentional reveal. */
   cameraLocked?: boolean;
   /** Work6-only visual easing for a newly registered real FOUP token. */
@@ -1094,11 +1096,15 @@ export function disposeFacilityPreviewScene(world: ReturnType<typeof buildScene>
   disposeWorld(world);
 }
 
-function updateStaticLod(world: ReturnType<typeof buildScene>, cameraSpan: number, zoom: number, viewportHeight: number) {
+function updateStaticLod(world: ReturnType<typeof buildScene>, cameraSpan: number, zoom: number, viewportHeight: number, networkFocus = false) {
   const detailed = rendererKeepsStaticDetail(cameraSpan, zoom, viewportHeight, world.staticLodDetailed, world.denseOverview);
   world.staticLodDetailed = detailed;
-  world.rails.visible = detailed; world.lowRails.visible = !detailed;
-  world.tools.visible = detailed; world.lowEquipment.visible = !detailed;
+  world.rails.visible = detailed || networkFocus; world.lowRails.visible = !detailed && !networkFocus;
+  // The network lens is presentation-only. Preserve original rail geometry,
+  // native OHT poses and FOUP ownership, but remove the equipment silhouettes
+  // so the underlying directed graph is unambiguously visible.
+  world.tools.visible = !networkFocus && detailed;
+  world.lowEquipment.visible = !networkFocus && !detailed;
   for (const label of world.root.children.filter(child => child.userData.role === 'bridge-label')) label.visible = detailed;
 }
 
@@ -1220,7 +1226,7 @@ export function pickSceneTarget(world: { vehicleGroups: Map<string, { root: THRE
 }
 
 export default function ThreeFacilityScene(props: Props) {
-  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes, cameraLocked = false, softTokenEntrance = false } = props;
+  const { layout, state, floor, failures, storageCapacity, tickMs, running, selected, trackedVehicle, trackedRequest, analysis, analysisMode, heatmap, view = 'overview', networkFocus = false, cameraCommand, onFollowChange, onSelect, onFloorChange, routeCandidates, focusNodes, cameraLocked = false, softTokenEntrance = false } = props;
   const hostRef = useRef<HTMLDivElement>(null), rendererRef = useRef<THREE.WebGLRenderer | null>(null), sceneRef = useRef<THREE.Scene | null>(null), cameraRef = useRef<THREE.OrthographicCamera | null>(null), worldRef = useRef<ReturnType<typeof buildScene> | null>(null);
   const diagnosticRef = useRef<unknown>(null);
   const [rendererReady, setRendererReady] = useState(false), [worldRevision, setWorldRevision] = useState(0), [lodRevision, setLodRevision] = useState(0), [error, setError] = useState(''), [quality, setQuality] = useState<'high' | 'balanced' | 'low'>('high'), [graphicsInfo, setGraphicsInfo] = useState({ software: false, renderer: '' });
@@ -1802,6 +1808,7 @@ export default function ThreeFacilityScene(props: Props) {
     const queueCounts = new Map((state.linkQueues ?? []).map(queue => [queue.linkId, queue.vehicleIds.length]));
     const analysisRails = new Map(analysis?.rails.map(rail => [rail.linkId, rail]) ?? []);
     let hasActiveOverlay = false;
+    const networkRailColor = new THREE.Color(0x159989); // Same Native rails, editorial emphasis.
     let selectedOverlayId: string | undefined;
     const closedRails: Array<{ points: Array<{ x: number; y: number }>; closed: boolean }> = [];
     for (const [linkId, related] of world.statusLinks) {
@@ -1832,9 +1839,13 @@ export default function ThreeFacilityScene(props: Props) {
         material.opacity = selectedRail ? .98 : blocked ? .88 : analysis ? .78 : Math.min(.94, .38 + Math.log2(traffic + queued + 1) * .2);
         const cue = mesh.getObjectByName('closure-cross'); if (cue) cue.visible = blocked;
         const opacity = selectedRail ? .98 : blocked ? .88 : analysis ? .78 : Math.min(.94, .38 + Math.log2(traffic + queued + 1) * .2);
-        world.overlayBatch.setStyle(linkId, material.color, active && !selectedRail ? opacity : 0);
+        world.overlayBatch.setStyle(linkId, networkFocus ? networkRailColor : material.color,
+          networkFocus ? .94 : active && !selectedRail ? opacity : 0);
+      } else {
+        // Also clear the prior presentation when switching back to factory view.
+        world.overlayBatch.setStyle(linkId, networkRailColor, networkFocus ? .94 : 0);
       }
-      hasActiveOverlay ||= active && !selectedRail;
+      hasActiveOverlay ||= networkFocus || (active && !selectedRail);
       if (active && selectedRail) selectedOverlayId = linkId;
       if (blocked) closedRails.push({ points: world.statusPoints.get(linkId) ?? [], closed: true });
     }
@@ -1911,7 +1922,7 @@ export default function ThreeFacilityScene(props: Props) {
     if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
     const refreshInstances = () => {
       const camera = cameraRef.current; camera?.updateMatrixWorld();
-      updateStaticLod(world, cameraSpanRef.current, zoom, viewportSizeRef.current.height);
+      updateStaticLod(world, cameraSpanRef.current, zoom, viewportSizeRef.current.height, networkFocus);
 
       if (world.vehicleBodyInstances && world.lowVehicleBodyInstances && world.foupInstances && world.lowFoupInstances && world.stateInstances && world.farStateInstances && world.waitingInstances && world.failureInstances) {
         const currentVehicles = vehicleById;
@@ -1976,7 +1987,10 @@ export default function ThreeFacilityScene(props: Props) {
             if (renderable.material) for (const material of Array.isArray(renderable.material) ? renderable.material : [renderable.material]) materials.add(material);
           });
           return { objects, materials: materials.size, geometries: geometries.size };
-        }, renderer: 'three-webgl', worldId: world.root.uuid, analysis: { enabled: !!analysis, mode: analysisMode ?? 'recent', windowSeconds: analysis?.windowSeconds ?? null, rails: [...world.statusMeshes].filter(([,mesh])=>mesh.visible).map(([id,mesh])=>({id,color: (mesh.material as THREE.MeshBasicMaterial).color.getHexString(),geometry:mesh.geometry.uuid,closed:mesh.getObjectByName('closure-cross')?.visible??false})) }, equipment: { ports: layout.ports.length, functional: layout.facility?.equipment.length ?? 0, context: layout.facility?.decorativeEquipment?.length ?? 0 }, staging: { representation: 'off-rail-pool-counts', parked: state.vehicles.filter(v => v.parked).length, pools: Object.fromEntries([...world.stagingLabels].map(([id, sign]) => [id, sign.userData.count])) }, graphics: { ...graphicsInfo, fleetSize: state.vehicles.length, pixelRatio: renderer.getPixelRatio(), adaptiveReason: softwareLargeFleet ? 'software-renderer-large-fleet' : null }, inventoryDisplayLimit, inventorySampled, omittedSource: sampledInventory.omittedSource, omittedStored: sampledInventory.omittedStored, inventory: { sourceActual: sampledInventory.sourceTotal, sourceDrawn: sampledInventory.source.length, storedActual: sampledInventory.storedTotal, storedDrawn: sampledInventory.stored.length }, time: state.time, tick: state.tick, overviewFit: overviewRef.current ? overviewFitRef.current : null, camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z, target: { ...cameraTargetRef.current }, span: cameraSpanRef.current / zoom, near: camera.near, far: camera.far }, vehicles: projected, foupOwners, physicalFoups,
+        }, renderer: 'three-webgl', worldId: world.root.uuid,
+        networkPresentation: { active: networkFocus, equipmentVisible: world.tools.visible || world.lowEquipment.visible,
+          originalRailsVisible: world.rails.visible, highlightedNativeLinks: networkFocus ? world.statusLinks.size : 0 },
+        analysis: { enabled: !!analysis, mode: analysisMode ?? 'recent', windowSeconds: analysis?.windowSeconds ?? null, rails: [...world.statusMeshes].filter(([,mesh])=>mesh.visible).map(([id,mesh])=>({id,color: (mesh.material as THREE.MeshBasicMaterial).color.getHexString(),geometry:mesh.geometry.uuid,closed:mesh.getObjectByName('closure-cross')?.visible??false})) }, equipment: { ports: layout.ports.length, functional: layout.facility?.equipment.length ?? 0, context: layout.facility?.decorativeEquipment?.length ?? 0 }, staging: { representation: 'off-rail-pool-counts', parked: state.vehicles.filter(v => v.parked).length, pools: Object.fromEntries([...world.stagingLabels].map(([id, sign]) => [id, sign.userData.count])) }, graphics: { ...graphicsInfo, fleetSize: state.vehicles.length, pixelRatio: renderer.getPixelRatio(), adaptiveReason: softwareLargeFleet ? 'software-renderer-large-fleet' : null }, inventoryDisplayLimit, inventorySampled, omittedSource: sampledInventory.omittedSource, omittedStored: sampledInventory.omittedStored, inventory: { sourceActual: sampledInventory.sourceTotal, sourceDrawn: sampledInventory.source.length, storedActual: sampledInventory.storedTotal, storedDrawn: sampledInventory.stored.length }, time: state.time, tick: state.tick, overviewFit: overviewRef.current ? overviewFitRef.current : null, camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z, target: { ...cameraTargetRef.current }, span: cameraSpanRef.current / zoom, near: camera.near, far: camera.far }, vehicles: projected, foupOwners, physicalFoups,
           // Native renderer diagnostics, not a second FOUP representation.
           carrierHandoff: (() => {
             const item = animations.find(animation => animation.vehicle.id === ownerId);
@@ -2046,7 +2060,7 @@ export default function ThreeFacilityScene(props: Props) {
       animationRef.current = null;
       cameraPresentationRef.current = () => undefined;
     };
-  }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, floor, worldRevision, cameraCommand?.sequence, routeCandidates, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
+  }, [layout, state, running, reducedMotion, tickMs, ownerId, follow, zoom, selected, failures, analysis, analysisMode, heatmap, view, networkFocus, floor, worldRevision, cameraCommand?.sequence, routeCandidates, lodRevision, graphicsInfo, softwareLargeFleet, essentialOwnerText, essentialEndpoints, essentialSelectedPort, inventoryDisplayLimit, sampledInventory, error]);
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => { if (cameraLocked) return; cancelCameraTransition(); const camera = cameraRef.current; if (!camera) return; (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); pointerPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointerPoints.current.size === 2) { pinchGestureRef.current = true; const [a, b] = Array.from(pointerPoints.current.values()); pinchRef.current = { distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom, moved: false }; dragRef.current = null; }
     else if (pointerPoints.current.size === 1) dragRef.current = { x: event.clientX, y: event.clientY, center: camera.position.clone(), target: { ...cameraTargetRef.current } };
