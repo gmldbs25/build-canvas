@@ -35,13 +35,25 @@ export function confirmedMotion(layout: Layout, previous: Vehicle | undefined, c
   const lengths: number[] = [0];
   for (let i = 1; i < points.length; i++) lengths.push(lengths[i - 1] + Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y));
   const vertices = points, total = lengths[lengths.length - 1];
+  // Unwrap heading ONCE along the whole confirmed polyline, not independently
+  // against the heading at the start of the tick. A U-turn can sweep past
+  // 180° inside a single native step: repeatedly applying the shortest
+  // delta from old.angle flips +181° to -179° and visually spins the OHT.
+  const segmentHeadings: Array<{ start: number; end: number }> = [];
+  let previousHeading = old.angle;
+  for (let i = 1; i < vertices.length; i++) {
+    const a = vertices[i - 1], b = vertices[i];
+    const start = continuousVehicleHeading(previousHeading, pathHeading(a, b, 0));
+    const finish = continuousVehicleHeading(start, pathHeading(a, b, 1));
+    segmentHeadings.push({ start, end: finish });
+    previousHeading = finish;
+  }
   return fraction => {
     const target = Math.max(0, Math.min(1, fraction)) * total;
     let i = 1; while (i < lengths.length - 1 && lengths[i] < target) i++;
     const a = vertices[i - 1], b = vertices[i], segment = lengths[i] - lengths[i - 1], t = segment ? (target - lengths[i - 1]) / segment : 1;
-    // Keep each short (0.5s) confirmed movement connected to the previous
-    // Native heading; the same tangent can be stored on different 360° branches.
+    const heading = segmentHeadings[i - 1];
     return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t,
-      angle: continuousVehicleHeading(old.angle, pathHeading(a, b, t)), floor: end.floor };
+      angle: heading.start + (heading.end - heading.start) * t, floor: end.floor };
   };
 }

@@ -39,6 +39,60 @@ for(const angle of railUturn.slice(1)){
 }
 console.log('oht-heading-seam-regression',JSON.stringify({cases:transitions.length,maxStep,final:followed}));
 
+// Exercise the real confirmed-motion interpolation across TWO connected native
+// links in ONE 0.5s tick. The old implementation compared every sample against
+// the first heading, so a swept turn >180° jumped backward by a full 360°.
+const moduleUrl = source => 'data:text/javascript;base64,' + Buffer.from(
+  ts.transpileModule(source, {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText
+).toString('base64');
+const headingUrl = moduleUrl(headingSource);
+const geometrySource = await fs.readFile(path.join(project, 'src/sim/geometry.ts'), 'utf8');
+const geometryUrl = moduleUrl(geometrySource.replaceAll("'./vehicleHeading'", "'" + headingUrl + "'"));
+const motionSource = await fs.readFile(path.join(project, 'src/sim/motion.ts'), 'utf8');
+const motionUrl = moduleUrl(motionSource.replaceAll("'./geometry'", "'" + geometryUrl + "'")
+  .replaceAll("'./vehicleHeading'", "'" + headingUrl + "'"));
+const { confirmedMotion } = await import(motionUrl);
+function assertNativeTurn(sign) {
+  const coords = [[0,0],[10,0],[20,10],[20,20],[10,30],[0,30],[-10,20],[-10,10]];
+  const tangent = [0,45,90,135,179,-179,-135,-90].map(value => value * sign);
+  const points = coords.map(([x,y],i) => ({x,y: y*sign,tangent:tangent[i]}));
+  const layout = {
+    nodes:[{id:'A',x:points[0].x,y:points[0].y,floor:0},{id:'B',x:points[4].x,y:points[4].y,floor:0},
+      {id:'C',x:points[7].x,y:points[7].y,floor:0}],
+    links:[{id:'curve-a',from:'A',to:'B',kind:'rail',path:points.slice(0,5)},
+      {id:'curve-b',from:'B',to:'C',kind:'rail',path:points.slice(4)}],
+  };
+  const before = {node:'A',link:'curve-a',progress:0};
+  const after = {node:'B',link:'curve-b',progress:1};
+  const at = confirmedMotion(layout,before,after);
+  let last = at(0).angle, maxStep = 0;
+  for(let i=1;i<=120;i++) {
+    const next = at(i/120).angle;
+    const delta = next-last;
+    maxStep = Math.max(maxStep,Math.abs(delta));
+    if(!Number.isFinite(next) || delta*sign < -1e-7 || Math.abs(delta) > 22)
+      throw Error('Native U-turn heading spun/reversed at frame '+i+': '+JSON.stringify({sign,last,next,delta}));
+    last = next;
+  }
+  if (Math.abs(last-sign*270) > 1e-6)
+    throw Error('Native 270-degree confirmed turn failed: '+JSON.stringify({sign,last,maxStep}));
+  // A renderer heading can be on another 360° branch. It must use a stable
+  // offset for the whole tick, instead of rewrapping each frame.
+  for(const displayed of [-720,0,720]) {
+    const offset = continuousVehicleHeading(displayed,at(0).angle)-at(0).angle;
+    let prev = at(0).angle + offset;
+    for(let i=1;i<=120;i++) {
+      const heading=at(i/120).angle+offset;
+      if((heading-prev)*sign < -1e-7 || Math.abs(heading-prev)>22)
+        throw Error('Renderer branch reversed during confirmed turn '+JSON.stringify({sign,displayed,prev,heading}));
+      prev=heading;
+    }
+  }
+  return maxStep;
+}
+const uturnMax = [1,-1].map(assertNativeTurn);
+console.log('oht-native-multilink-uturn',JSON.stringify({cases:2,maxStep:uturnMax}));
+
 const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-static-'));
 const deploymentDir = path.join(sandbox, 'build-canvas', 'fab-flow-preview');
 await fs.mkdir(deploymentDir, { recursive: true });
