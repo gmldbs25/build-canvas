@@ -527,7 +527,7 @@ export default function Work6() {
             <small>{realQueue ? '레일 대기열 확인됨' : congestionVehicle?.waiting ? '실제 진행 대기 확인됨' : '선택 경로와 교통 상황 관찰'}</small></div>
           <p className="w6-result-takeaway">MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.</p>
           <div className="w6-action-row"><button type="button" className="w6-secondary" onClick={() => { pressure.reset(); setCongestionVehicleId(undefined); setCongestionDecision(undefined); issueCamera('overview'); }}>다시 관찰</button>
-            <button type="button" className="w6-primary" onClick={() => nextScene(1)}>더 복잡한 FAB 보기 ↗</button></div>
+            <button type="button" className="w6-primary" onClick={() => nextScene(1)}>전체 FAB의 운송 살펴보기 ↗</button></div>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}
         {scene.id === 8 && <div className="w6-inner-controls w6-singlefab-controls">
