@@ -377,3 +377,27 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
   .w6-root .w6-narrative h1 { font-size: 25px; }
   .w6-root .w6-narrative .w6-description { font-size: 13px; }
 }
+
+/* Scene 02 — same native FAB world, now with a graph-reading key. */
+.w6-graph-legend{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+  padding:11px 12px;
+  border:1px solid rgba(46,102,89,.22);
+  border-radius:7px;
+  background:rgba(255,253,246,.94);
+}
+.w6-graph-legend > div{display:flex;align-items:center;gap:11px;min-width:0}
+.w6-graph-legend p{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:10px;row-gap:1px;margin:0;min-width:0}
+.w6-graph-legend strong{font:700 13px/1.4 ui-monospace,Menlo,monospace;color:#2d574e}
+.w6-graph-legend small{font-size:12px;line-height:1.4;color:#536a60;word-break:keep-all}
+.w6-graph-symbol{flex:none;display:inline-flex;align-items:center;justify-content:center}
+.w6-graph-symbol.is-node{width:12px;height:12px;border-radius:50%;background:#0b9c98;box-shadow:0 0 0 3px rgba(11,156,152,.12)}
+.w6-graph-symbol.is-link{width:23px;height:20px;color:#196977;font:800 25px/1 ui-monospace,Menlo,monospace}
+.w6-graph-symbol.is-port{width:12px;height:12px;background:#d58936;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 0 0 1px #bd8134}
+@media(max-width:650px){
+  .w6-graph-legend{gap:5px;padding:8px 10px}
+  .w6-graph-legend strong{font-size:12px}
+  .w6-graph-legend small{font-size:12px}
+}
