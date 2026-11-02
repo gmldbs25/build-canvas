@@ -138,8 +138,27 @@ try {
 
     await page.getByRole('button',{name:/Scene 02:/}).click();
     await expect(page.getByRole('heading',{name:'공장 안의 길은 어떻게 코드가 될까?'})).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','factory');
+    await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation?.equipmentVisible),{timeout:30000}).toBe(true);
+    const factoryWorld = await page.evaluate(() => window.__FAB_3D__?.worldId);
+    await page.screenshot({path:path.join(evidence,'scene2-factory-'+width+'.png')});
     await page.getByRole('button',{name:'길찾기 구조 보기'}).click();
-    await expect(page.getByText(/원본 Large FAB의 실제 방향성 레일망/)).toBeVisible();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','network');
+    await expect(page.getByText(/장비 외형을 숨기고 실제 이동 가능한 레일/)).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation),{timeout:30000})
+      .toMatchObject({active:true,equipmentVisible:false,originalRailsVisible:true});
+    const actualGraph = await page.evaluate(() => window.__FAB_3D__?.networkPresentation);
+    if(!actualGraph || actualGraph.highlightedNativeLinks < 1)
+      throw Error('Scene 02 highlights no real native rail links: '+JSON.stringify(actualGraph));
+    await page.screenshot({path:path.join(evidence,'scene2-graph-'+width+'.png')});
+    await page.getByRole('button',{name:'공장 보기'}).click();
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','factory');
+    await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation?.equipmentVisible)).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation?.highlightedNativeLinks)).toBe(0);
+    const restoredWorld = await page.evaluate(() => window.__FAB_3D__?.worldId);
+    if (factoryWorld !== restoredWorld)
+      throw Error('Scene 02 toggle unexpectedly rebuilt original native 3D world');
+    console.log('scene2-native-network-toggle',JSON.stringify({viewport:[width,height],highlighted:actualGraph.highlightedNativeLinks,worldPreserved:true}));
 
     await page.getByRole('button',{name:/Scene 03:/}).click();
     await expect(page.getByRole('heading',{name:/상자 하나를 옮기는 데도 여러 단계/})).toBeVisible();
