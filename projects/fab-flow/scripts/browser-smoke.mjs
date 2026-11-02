@@ -144,7 +144,7 @@ try {
     await page.screenshot({path:path.join(evidence,'scene2-factory-'+width+'.png')});
     await page.getByRole('button',{name:'길찾기 구조 보기'}).click();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','network');
-    await expect(page.getByText(/장비 외형을 숨기고 실제 이동 가능한 레일/)).toBeVisible();
+    await expect(page.getByText(/공장 속 실제 한 구간을 확대했어요/)).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation),{timeout:30000})
       .toMatchObject({active:true,equipmentVisible:false,originalRailsVisible:true});
     const actualGraph = await page.evaluate(() => window.__FAB_3D__?.networkPresentation);
