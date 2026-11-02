@@ -79,6 +79,7 @@ try {
     await expect(page.getByRole('heading',{name:'이 작은 공장은 어떻게 움직일까?'})).toBeVisible();
     const opening = await page.locator('.w6-root').evaluate(node=>({moving:Number(node.dataset.openingMoving),local:Number(node.dataset.openingLocalMoving)}));
     if(opening.moving < 2 || opening.local < 2) throw Error('Native opening lost real OHT activity: '+JSON.stringify(opening));
+    const openingSpan = await page.evaluate(() => window.__FAB_3D__?.camera?.span);
     await page.screenshot({path:path.join(evidence,'engineering-opening-'+width+'.png')});
 
     await page.getByRole('button',{name:/Scene 02:/}).click();
@@ -142,6 +143,10 @@ try {
     await expect(page.getByRole('heading',{name:/움직이는 화면 뒤에는/})).toBeVisible();
     await expect(page.getByRole('link',{name:/FAB FLOW 직접 체험하기/}))
       .toHaveAttribute('href','https://fabflow-yoon.vercel.app/');
+    await page.waitForTimeout(1500);
+    const endingSpan = await page.evaluate(() => window.__FAB_3D__?.camera?.span);
+    if(!Number.isFinite(openingSpan) || !Number.isFinite(endingSpan) || endingSpan > openingSpan * 1.25)
+      throw Error('Final native OHT camera lost readable scale: '+JSON.stringify({openingSpan,endingSpan}));
     await page.screenshot({path:path.join(evidence,'engineering-ending-'+width+'.png')});
     if(faults.length) throw Error('Browser faults: '+JSON.stringify(faults.slice(0,15)));
     console.log('engineering-smoke-pass',JSON.stringify({viewport:[width,height],opening,clockBefore:before,clockAfter:after}));
