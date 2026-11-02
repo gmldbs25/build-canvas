@@ -137,7 +137,6 @@ export default function Work6() {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>(undefined);
   const [decision, setDecision] = useState<ReturnType<Engine['inspectDecision']>>(undefined);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ sequence: 1, kind: 'opening' });
-  const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
   // Shared original Large 3D renderer; independent scenarios are labelled.
   const isPressure = scene.id === 6 || scene.id === 7;
@@ -387,11 +386,8 @@ export default function Work6() {
       return;
     }
     if (scene.id === 2) {
-      setCameraMoment(0);
-      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 2700 }));
-      const a = window.setTimeout(() => setCameraMoment(1), 850);
-      const b = window.setTimeout(() => setCameraMoment(2), 2000);
-      return () => { window.clearTimeout(a); window.clearTimeout(b); };
+      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 1500 }));
+      return;
     }
     if (scene.id === 3) {
       issueCamera(tracked ? 'follow' : 'opening', tracked, reqId); return;
@@ -498,7 +494,7 @@ export default function Work6() {
           <span aria-hidden="true" className={trafficLens ? 'is-scanning' : ''}/>
           {trafficLens ? '실제 레일 점유·대기 신호' : '기본 FAB 화면'}
         </div>}
-        {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
+        {isReveal && <div className="w6-reveal-note" aria-live="polite">{networkLens ? '실제 Port · Link · Node 구조 확대' : '원본 3D FAB · 공장의 모습'}</div>}
         {scene.id === 6 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
           <strong>운영 중인 FAB를 준비하고 있어요.</strong>
           <span>실제 엔진으로 운송이 진행된 상태를 계산하고 있습니다.</span>
