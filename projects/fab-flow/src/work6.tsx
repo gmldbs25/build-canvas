@@ -387,7 +387,7 @@ export default function Work6() {
     data-pressure-rail-blocked={scene.id === 7 ? String(!!railIsBlocked) : ''}
     data-pressure-active={scene.id === 7 ? activeTransports : ''}
     data-pressure-fleet={scene.id === 7 ? pressure.engine.scenario.fleet : ''}
-    data-pressure-demand-interval={scene.id === 7 ? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
+    data-pressure-demand-interval={scene.id === 7 ? pressure.engine.scenario.demandChanges?.at(-1)?.intervalSeconds ?? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
     data-fab-layout={(scene.id >= 7 && scene.id <= 10) ? activeEngine.layout.id : ''}
     data-mcs-lens={scene.id === 9 ? (intelligenceLens ? 'traffic' : 'normal') : ''}
     data-future-route={scene.id === 10 ? futureRoute : ''}>
