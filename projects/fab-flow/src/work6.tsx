@@ -417,26 +417,26 @@ export default function Work6() {
     data-route-study-distinct-fraction={routeStudy?.contrast.distinctFraction ?? ''}
     data-route-study-separation={routeStudy?.contrast.maxSeparation ?? ''}
     data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}
-    data-pressure-prepared={scene.id === 7 ? String(pressure.prepared) : ''}
-    data-pressure-waiting={scene.id === 7 ? waitingVehicles : ''}
-    data-pressure-vehicle={scene.id === 7 ? congestionVehicleId ?? '' : ''}
-    data-pressure-queue={scene.id === 7 ? realQueue?.linkId ?? pressure.railFocus?.linkId ?? '' : ''}
-    data-pressure-start-wait={scene.id === 7 ? pressure.railFocus?.waitSeconds ?? 0 : ''}
-    data-pressure-verified={scene.id === 7 ? String(!!pressure.railFocus && pressure.railFocus.waitSeconds >= 3) : ''}
-    data-pressure-staging-clearance={scene.id === 7 ? pressure.railFocus?.stagingClearance ?? '' : ''}
-    data-pressure-fleet-changes={scene.id === 7 ? pressure.engine.scenario.fleetChanges?.length ?? 0 : ''}
-    data-pressure-vehicle-count={scene.id === 7 ? pressure.state.vehicles.length : ''}
-    data-pressure-rail-blocked={scene.id === 7 ? String(!!railIsBlocked) : ''}
-    data-pressure-active={scene.id === 7 ? activeTransports : ''}
-    data-pressure-fleet={scene.id === 7 ? pressure.engine.scenario.fleet : ''}
-    data-pressure-demand-interval={scene.id === 7 ? pressure.engine.scenario.demandChanges?.at(-1)?.intervalSeconds ?? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
-    data-fab-layout={(scene.id >= 7 && scene.id <= 10) ? activeEngine.layout.id : ''}
-    data-mcs-lens={scene.id === 9 ? (intelligenceLens ? 'traffic' : 'normal') : ''}
-    data-future-route={scene.id === 10 ? futureRoute : ''}>
+    data-pressure-prepared={scene.id === 6 ? String(pressure.prepared) : ''}
+    data-pressure-waiting={scene.id === 6 ? waitingVehicles : ''}
+    data-pressure-vehicle={scene.id === 6 ? congestionVehicleId ?? '' : ''}
+    data-pressure-queue={scene.id === 6 ? realQueue?.linkId ?? pressure.railFocus?.linkId ?? '' : ''}
+    data-pressure-start-wait={scene.id === 6 ? pressure.railFocus?.waitSeconds ?? 0 : ''}
+    data-pressure-verified={scene.id === 6 ? String(!!pressure.railFocus && pressure.railFocus.waitSeconds >= 3) : ''}
+    data-pressure-staging-clearance={scene.id === 6 ? pressure.railFocus?.stagingClearance ?? '' : ''}
+    data-pressure-fleet-changes={scene.id === 6 ? pressure.engine.scenario.fleetChanges?.length ?? 0 : ''}
+    data-pressure-vehicle-count={scene.id === 6 ? pressure.state.vehicles.length : ''}
+    data-pressure-rail-blocked={scene.id === 6 ? String(!!railIsBlocked) : ''}
+    data-pressure-active={scene.id === 6 ? activeTransports : ''}
+    data-pressure-fleet={scene.id === 6 ? pressure.engine.scenario.fleet : ''}
+    data-pressure-demand-interval={scene.id === 6 ? pressure.engine.scenario.demandChanges?.at(-1)?.intervalSeconds ?? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
+    data-fab-layout={(scene.id >= 4 && scene.id <= 8) ? activeEngine.layout.id : ''}
+    data-mcs-lens={scene.id === 6 ? (trafficLens ? 'traffic' : 'normal') : ''}
+    data-story-version="behind-the-simulation-v3">
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
-      <span className="w6-prototype">MCS · TODAY & TOMORROW</span>
+      <span className="w6-prototype">BEHIND THE SIMULATION</span>
     </header>
     <main className="w6-stage">
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
@@ -446,12 +446,12 @@ export default function Work6() {
           floor={0}
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? pressure.prepared : isOpening ? true : busy}
-          tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={scene.id === 7 && congestionVehicleId ? 'vehicle:' + congestionVehicleId : isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
+          running={isPressure ? pressure.prepared : isOpening ? true : scene.id === 4 ? clockPlaying : busy}
+          tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : scene.id === 4 ? 520 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
+          selected={scene.id === 6 && congestionVehicleId ? 'vehicle:' + congestionVehicleId : isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
             : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={isPressure ? (scene.id === 7 ? congestionVehicleId : undefined) : isDecision && routeStudy ? routeStudy.vehicleId : isOpening ? undefined : selectedVehicleId}
-          trackedRequest={isOpening || isPressure || isDecision || request?.phase === 'completed' ? undefined : request?.id}
+          trackedVehicle={isPressure ? (scene.id === 6 ? congestionVehicleId : undefined) : isDecision && routeStudy ? routeStudy.vehicleId : isOpening ? undefined : selectedVehicleId}
+          trackedRequest={isOpening || isPressure || isDecision || scene.id === 4 || request?.phase === 'completed' ? undefined : request?.id}
           plannedTutorialIngress={scene.id === 3 ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
@@ -464,23 +464,23 @@ export default function Work6() {
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
-        {focusMode && <div className="w6-focus-note" role="note">{isOpening ? '고정된 시야에서 여러 OHT의 실제 움직임을 관찰해요' : '지금은 한 대의 운송에 집중해요 · 전체 공장은 Scene 04에서'}</div>}
-        {(scene.id === 3 || isNetwork || isDecision || scene.id === 7) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 10 ? '유효 경로 사례 · 운송은 변경하지 않음' : '실제 OHT 이동 경로'}</div> : null}
-        {scene.id === 9 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
-          <span aria-hidden="true" className={intelligenceLens ? 'is-scanning' : ''}/>
-          {intelligenceLens ? '실제 레일 점유·대기 신호' : '기본 FAB 화면'}
+        {focusMode && <div className="w6-focus-note" role="note">{isOpening ? 'FAB FLOW 엔진에서 계산한 운송을 관찰해요' : '실제 한 건의 운송 상태를 따라가요'}</div>}
+        {(scene.id === 3 || isDecision || scene.id === 6) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 5 ? '실제 선택 경로 · 다른 경로는 비교용' : '실제 OHT 이동 경로'}</div> : null}
+        {scene.id === 6 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
+          <span aria-hidden="true" className={trafficLens ? 'is-scanning' : ''}/>
+          {trafficLens ? '실제 레일 점유·대기 신호' : '기본 FAB 화면'}
         </div>}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
-        {scene.id === 7 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
+        {scene.id === 6 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
           <strong>운영 중인 FAB를 준비하고 있어요.</strong>
           <span>실제 엔진으로 운송이 진행된 상태를 계산하고 있습니다.</span>
         </div>}
-        {scene.id === 7 && pressure.prepared && <div className="w6-pressure-caption" aria-live="off">
+        {scene.id === 6 && pressure.prepared && <div className="w6-pressure-caption" aria-live="off">
           <span className="is-busy" aria-hidden="true"/>
           {pressureBeatLabel}
         </div>}
       </div>
-      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 7 && scene.id <= 10 ? ' w6-narrative-v2' : '')} aria-label="장면 설명">
+      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 4 && scene.id <= 8 ? ' w6-narrative-v2' : '')} aria-label="장면 설명">
         <p className="w6-chapter">{scene.chapter}</p>
         <h1>{scene.title}</h1>
         <p className="w6-description">{scene.body}</p>
@@ -643,6 +643,6 @@ export default function Work6() {
         <button type="button" onClick={() => nextScene(1)} disabled={sceneIndex === SCENES.length-1} aria-label="다음 장면">→</button>
       </div>
     </footer>
-    <div className="w6-prototype-disclaimer">WORK 06 · LARGE V6 SINGLE-FLOOR NATIVE MODEL · FUTURE INTELLIGENCE: CONCEPT · NOT A REAL FAB DIGITAL TWIN</div>
+    <div className="w6-prototype-disclaimer">WORK 06 · ORIGINAL FAB FLOW NATIVE 3D · EDUCATIONAL MODEL · NOT AN INDUSTRIAL DIGITAL TWIN</div>
   </div>;
 }
