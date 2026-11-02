@@ -485,150 +485,118 @@ export default function Work6() {
         <h1>{scene.title}</h1>
         <p className="w6-description">{scene.body}</p>
 
-        {scene.id === 1 && <div className="w6-inner-controls">
-          <p className="w6-context-line">하나의 장비에서 다음 장비로. 필요한 것은 운송의 연결이에요.</p>
-          <button type="button" className="w6-primary" onClick={() => setSceneIndex(1)}>무엇을 옮기는지 살펴보기 <span aria-hidden="true">↗</span></button>
-        </div>}
-        {scene.id === 2 && <div className="w6-inner-controls">
-          <div className="w6-terms">
-            <p><strong>웨이퍼</strong><span>반도체 회로가 만들어지는 얇은 원판</span></p>
-            <p><strong>FOUP</strong><span>웨이퍼를 보호하며 이동하는 전용 용기</span></p>
-            <p><strong>OHT</strong><span>FOUP를 옮기는 천장 운반 차량</span></p>
-            <p><strong>Port</strong><span>장비와 차량이 FOUP를 주고받는 자리</span></p>
-          </div>
-          <button type="button" className="w6-primary" onClick={() => setSceneIndex(2)}>직접 한 건을 옮겨보기 <span aria-hidden="true">↗</span></button>
-          <p className="w6-microcopy">이 화면은 실제 FAB FLOW의 3D 장비·레일 모델입니다. 공정 가공 자체를 시뮬레이션하지는 않습니다.</p>
-        </div>}
-        {scene.id === 5 && <div className="w6-inner-controls">
-          <p className="w6-context-line">출발지와 목적지의 거리가 가까워도, 일방통행 레일을 거슬러 갈 수는 없어요. 레일이 만나는 곳에서 다른 길로 갈아타야 할 수도 있죠.</p>
-          <div className="w6-terms">
-            <p><strong>Bay</strong><span>공정 장비가 모여 있는 작업 구역</span></p>
-            <p><strong>Rail</strong><span>OHT가 이동하는 정해진 선로</span></p>
-            <p><strong>Port</strong><span>FOUP를 건네는 장비 앞 자리</span></p>
-          </div>
-          {currentDecision?.candidates.some(candidate => candidate.selected)
-            ? <p className="w6-microcopy">현재 운송에서 실제로 선택한 레일 경로를 함께 표시했어요.</p>
-            : <p className="w6-microcopy">실제 V6 레일망의 방향·교차로를 보여줘요. 경로 강조는 앞 장면에서 운송을 진행한 뒤에 나타납니다.</p>}
-        </div>}
 
-        {scene.id === 3 && <div className="w6-inner-controls">
-          {lastCompleted && <div className="w6-observed" role="status" aria-live="polite">
-            <strong>방금 무슨 일이 일어났나요?</strong>
-            <p>{OBSERVED_RESULTS[lastCompleted]}</p>
-          </div>}
-          {beginner ? <>
-            <div className="w6-step">
-              <span>운송 과정 {STEP_ORDER.indexOf(stage as TutorialCommand) + 1} / 7</span>
-              <b>{beginner.question}</b>
-            </div>
-            <p className="w6-step-explanation">{beginner.explanation}</p>
-          </> : <div className="w6-observed">
-            <strong>한 건의 운송이 끝났어요.</strong>
-            <p>운송 요청부터 하역까지 끝났어요. 이제 이 작은 이동이 전체 FAB 안에서 얼마나 작은 부분인지 살펴볼까요?</p>
-          </div>}
-          <div className="w6-action-row">
-            <button type="button" className="w6-primary" disabled={busy || (!beginner && !transportFinished)} onClick={() => transportFinished ? nextScene(1) : runNext()}>
-              {busy ? '실제 차량 움직임을 계산하고 있어요…' : transportFinished ? '전체 FAB 살펴보기' : beginner?.button ?? '운송 진행 중'} <span aria-hidden="true">↗</span>
-            </button>
-            <button type="button" className="w6-secondary" onClick={reset}>처음부터 보기</button>
+        {scene.id === 1 && <div className="w6-inner-controls w6-story-controls">
+          <p className="w6-context-line">화면 속 움직임은 실제 FAB FLOW 엔진에서 계산됩니다. 작은 차량들이 어떤 규칙을 따라가는지 살펴보세요.</p>
+          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>레일의 규칙 살펴보기 ↗</button>
+        </div>}
+        {scene.id === 2 && <div className="w6-inner-controls w6-story-controls">
+          <div className="w6-action-row" role="group" aria-label="공장과 네트워크 보기">
+            <button type="button" className={!networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!networkLens} onClick={() => setNetworkLens(false)}>공장 보기</button>
+            <button type="button" className={networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={networkLens} onClick={() => setNetworkLens(true)}>길찾기 구조 보기</button>
           </div>
-          <details className="w6-native-details">
-            <summary>실제 시뮬레이션 정보 보기</summary>
-            <p>{nativeState.time.toFixed(1)}초 · {nativeState.tick}번의 엔진 계산 · 요청 상태: {request?.phase ?? '아직 없음'}</p>
+          <p className="w6-microcopy">원본 Large FAB의 실제 방향성 레일망입니다. 화면의 선로와 경로 계산에 쓰이는 연결망은 같은 모델이에요.</p>
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 그래프 모델링</summary>
+            <p>엔진은 Node(연결점), Link(방향이 있는 레일), Port(FOUP를 주고받는 장소)를 구별합니다. 가까운 장비라도 선로 방향이 맞지 않으면 돌아가야 합니다. 실제 산업 현장의 전체 배치를 복제한 것은 아닙니다.</p>
           </details>
         </div>}
-        {scene.id === 6 && <div className="w6-inner-controls">
-          <p className="w6-context-line">앞에서는 옆 Bay로 짧게 옮겼어요. 이번에는 FAB의 대각선 반대편 장비까지 이동합니다. 같은 출발지와 도착지라도 레일을 달리 지나갈 수 있을까요?</p>
-          {routeStudy && shownRoute ? <>
-            <span className="w6-overline">MCS ROUTE · LARGE FAB / 9 BAY</span>
-            <div className="w6-action-row" role="group" aria-label="MCS 경로 비교">
-              <button className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('selected')}>MCS가 선택한 길</button>
-              <button className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('alternative')}>다른 가능한 길</button>
-              <button className={routeChoice === 'both' ? 'w6-primary' : 'w6-secondary'} type="button" onClick={() => setRouteChoice('both')}>두 경로 함께 보기</button>
-            </div>
-            <div className="w6-decision-row">
-              <span>{routeChoice === 'selected' ? 'MCS가 실제 선택한 경로' : routeChoice === 'alternative' ? '같은 목적지로 가는 우회 경로' : '하나의 목적지, 두 가지 경로'}</span>
-              <strong>{routeStudy.sourceBay} <em aria-hidden="true">→</em> {routeStudy.destinationBay}</strong>
-              <small>출발 Bay → 도착 Bay</small>
-            </div>
-            <p className="w6-decision-copy">{routeChoice === 'selected'
-              ? 'MCS가 선택한 길이에요. 청록색 레일을 따라 FAB 반대편의 목적지까지 어떻게 이어지는지 살펴보세요.'
-              : routeChoice === 'alternative'
-                ? '같은 출발지와 목적지를 잇는 다른 길이에요. 실제 선택된 경로와 어디에서 갈라지는지 비교해 보세요.'
-                : '청록색 실선은 MCS가 선택한 길, 보라색 점선은 우회 가능한 길이에요. 두 경로가 어디서 갈라지고 만나는지 살펴보세요.'}</p>
-            <p className="w6-microcopy">실제 FAB FLOW의 방향성 레일망을 이용했어요. {routeStudy.alternativeKind === 'detour'
-              ? '우회 경로는 일부 레일을 제외하고 다시 계산한 가정으로, 실제 MCS가 선택한 경로는 아니에요.'
-              : '우회 경로도 원본 MCS가 계산한 후보 중 하나예요.'} 경로 비교는 실제 운송을 변경하지 않아요.</p>
-          </> : <div className="w6-observed" role="status">
-            <strong>{routeError ? '실제 경로 사례를 준비하지 못했어요.' : '여러 Bay를 지나는 경로를 계산하고 있어요.'}</strong>
-            <p>{routeError || '실제 엔진에서 운송 요청과 배차를 진행한 뒤 MCS가 선택한 경로를 확인합니다.'}</p>
-          </div>}
+        {scene.id === 3 && <div className="w6-inner-controls w6-story-controls">
+          <div className="w6-story-steps" aria-label="운송의 네 단계">
+            {['요청·배차','빈 차 이동','픽업·적재 운송','하역 완료'].map((label, index) =>
+              <span key={label} className={beat === index + 1 ? 'current' : beat > index + 1 ? 'past' : ''}>{index + 1}. {label}</span>)}
+          </div>
+          {lastCompleted && <div className="w6-observed" role="status"><strong>방금 일어난 변화</strong><p>{OBSERVED_RESULTS[lastCompleted]}</p></div>}
+          {beginner ? <p className="w6-step-explanation">{beginner.question} {beginner.explanation}</p>
+            : <p className="w6-result-takeaway">요청부터 하역까지, 네이티브 엔진에서 한 건의 운송이 완료됐습니다.</p>}
+          <div className="w6-action-row">
+            <button type="button" className="w6-primary" disabled={busy || !beginner} onClick={() => { autoTransportRef.current = true; runNext(); }}>
+              {busy ? '실제 운송을 관찰하는 중…' : '끝까지 자동 관찰하기'}
+            </button>
+            <button type="button" className="w6-secondary" disabled={busy || !beginner} onClick={() => { autoTransportRef.current = false; runNext(); }}>한 단계씩</button>
+            <button type="button" className="w6-secondary" onClick={reset}>다시 보기</button>
+          </div>
+          {transportFinished && <button type="button" className="w6-primary" onClick={() => nextScene(1)}>움직임을 만든 시간의 규칙 ↗</button>}
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 운송 상태</summary>
+            <p>물류 요청은 담당 차량이 정해지기 전부터 존재합니다. OHT가 빈 상태로 출발 Port를 찾아가 FOUP를 싣고, 목적지 Port에 내려놓습니다. 엔진이 이 실제 소유권과 상태를 관리합니다.</p>
+            <p>{nativeState.time.toFixed(1)} 시뮬레이션 초 · {nativeState.tick} Tick · 요청: {request?.phase ?? '아직 없음'}</p>
+          </details>
         </div>}
-        {scene.id === 7 && <div className="w6-inner-controls">
-          <span className="w6-overline">CURRENT MCS · LIVE NATIVE ENGINE</span>
-          <p className="w6-context-line">{!pressure.prepared
-            ? '이미 운행 중인 OHT들이 실제로 기다리는 레일 구간을 찾고 있어요.'
-            : '차량 수를 늘리지 않고, 바쁜 공장의 정체 구간만 가까이 보여줍니다. 앞쪽 레일이 비워질 때까지 기다리는 모습을 살펴보세요.'}</p>
-          <div className="w6-traffic-metrics" aria-label="실제 FAB 혼잡 현황">
-            <span><strong>{pressure.engine.scenario.fleet}</strong>대 OHT</span>
+        {scene.id === 4 && <div className="w6-inner-controls w6-story-controls">
+          <div className="w6-clock-readout" aria-live="off">
+            <div><span>SIMULATION TIME</span><strong>{clockState.time.toFixed(1)} <small>sec</small></strong></div>
+            <div><span>ENGINE TICK</span><strong>{clockState.tick}</strong></div>
+          </div>
+          <p className="w6-microcopy">별도로 시작한 동일 Large FAB의 실제 네이티브 실험입니다. 앞 장면의 운송 상태를 임의로 건너뛰지 않습니다.</p>
+          <div className="w6-action-row">
+            <button type="button" className="w6-primary" onClick={() => setClockPlaying(current => !current)}>{clockPlaying ? '일시정지' : '재생'}</button>
+            <button type="button" className="w6-secondary" disabled={clockPlaying} onClick={stepClock}>0.5초 한 Tick</button>
+            <button type="button" className="w6-secondary" onClick={resetClock}>같은 조건으로 다시</button>
+          </div>
+          <p className="w6-context-line">한 Tick 동안 차량은 조금 움직이거나 그대로일 수도 있어요. 그러나 엔진의 시뮬레이션 시간은 정확히 0.5초 진행합니다.</p>
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 결정적 실행</summary>
+            <p>FAB FLOW는 고정된 Tick과 Seed로 실험 입력을 재현합니다. 브라우저 재생 속도와 시뮬레이션 시간은 다르며, 3D 화면 보간은 운송 결과를 새로 결정하지 않습니다.</p>
+          </details>
+        </div>}
+        {scene.id === 5 && <div className="w6-inner-controls w6-story-controls">
+          {routeStudy ? <>
+            <span className="w6-overline">NATIVE MCS · LARGE 9 BAY</span>
+            <div className="w6-action-row" role="group" aria-label="실제 레일 경로 비교">
+              <button type="button" className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'selected'} onClick={() => setRouteChoice('selected')}>선택 경로</button>
+              <button type="button" className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'alternative'} onClick={() => setRouteChoice('alternative')}>다른 길</button>
+              <button type="button" className={routeChoice === 'both' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'both'} onClick={() => setRouteChoice('both')}>함께 보기</button>
+            </div>
+            <p className="w6-route-difference">{routeStudy.sourceBay} → {routeStudy.destinationBay} · 실제 방향성 레일망</p>
+            <p className="w6-microcopy">{routeStudy.alternativeKind === 'detour'
+              ? '다른 길은 일부 링크를 제외하고 다시 계산한 비교용 가정입니다. 실제 MCS가 선택한 길은 아닙니다.'
+              : '다른 길도 실제 MCS가 계산한 후보입니다. 실제로 선택된 경로와 구분해 표시합니다.'} 버튼은 실제 운송 상태를 바꾸지 않습니다.</p>
+          </> : <p className="w6-context-line" role="status">{routeError || '네이티브 MCS의 실제 경로를 계산하고 있어요.'}</p>}
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · Weighted Dijkstra</summary>
+            <p>DBR은 이동 거리를 중심으로 경로를 고릅니다. CBR은 거리와 현재 레일 점유·대기 비용을 함께 평가합니다. 예상 비용은 실제 도착 시간을 보장하지 않습니다.</p>
+          </details>
+        </div>}
+        {scene.id === 6 && <div className="w6-inner-controls w6-story-controls">
+          <span className="w6-overline">REAL NATIVE RAIL WAIT · LARGE V6</span>
+          <div className="w6-action-row" role="group" aria-label="혼잡 관찰">
+            <button type="button" className={!trafficLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!trafficLens} onClick={() => setTrafficLens(false)}>전체 흐름</button>
+            <button type="button" className={trafficLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={trafficLens} onClick={() => setTrafficLens(true)}>대기 구간</button>
+          </div>
+          <div className="w6-traffic-metrics"><span><strong>{pressure.engine.scenario.fleet}</strong>대 OHT</span>
             <span><strong>{activeTransports}</strong>대 운송 중</span>
-            <span><strong>{waitingVehicles}</strong>대 레일 대기</span>
-          </div>
-          <div className="w6-focus-status"><span>실제 대기 사례 · {congestionVehicleId ?? '탐색 중'}</span>
-            <strong>{!pressure.prepared ? '혼잡 구간 준비 중'
-              : railIsBlocked ? '앞쪽 레일 점유로 대기 중' : '대기 해제 · 다음 구간 이동'}</strong>
-            <small>{railIsBlocked
-              ? '현재 대기 ' + congestionVehicle!.waiting.toFixed(1) + '초 · 다음 레일 진입 대기열'
-              : '이 OHT는 진입 직전 실제 레일에서 ' + (pressure.railFocus?.waitSeconds ?? 0).toFixed(1) + '초 이상 기다렸어요.'}</small>
-          </div>
-          <p className="w6-result-takeaway">MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.</p>
-          <div className="w6-action-row"><button type="button" className="w6-secondary" onClick={() => { pressure.reset(); if (pressure.railFocus) setCameraCommand(previous => ({sequence:previous.sequence+1,kind:'tableau',frame:pressure.railFocus!.frame})); }}>대기 장면 다시 보기</button>
-            <button type="button" className="w6-primary" onClick={() => nextScene(1)}>전체 FAB의 운송 살펴보기 ↗</button></div>
+            <span><strong>{waitingVehicles}</strong>대 레일 대기</span></div>
+          <p className="w6-context-line">{!pressure.prepared
+            ? '실제 엔진에서 점유 중인 레일 앞에 대기하는 OHT를 찾고 있어요.'
+            : railIsBlocked ? (congestionVehicleId ?? '선택 차량') + ' · 현재 앞쪽 레일 점유로 대기 중'
+              : '확인된 대기 차량이 이후 어떻게 움직이는지 관찰하고 있어요.'}</p>
+          <p className="w6-microcopy">여기서 보여주는 것은 실제 레일 대기입니다. 대기 상태를 곧바로 Deadlock이라고 부르지는 않습니다.</p>
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 안전한 이동</summary>
+            <p>OHT는 레일 구간과 교차로 진입을 독점 예약합니다. 서로 기다리는 순환 의존이 지속되는 Deadlock은 별도로 진단하고 복구를 시도합니다. 개별 차량의 정지와 확인된 교착은 구분해야 합니다.</p>
+          </details>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}
-        {scene.id === 8 && <div className="w6-inner-controls w6-singlefab-controls">
-          <span className="w6-overline">LARGE FAB · NATIVE OHT TRANSPORT</span>
-          <p className="w6-context-line">앞에서 따라온 한 대의 OHT와 같은 공장입니다. 지금은 전체 Large FAB에서 여러 운송이 동시에 움직이는 모습을 보세요.</p>
-          <p className="w6-result-takeaway">MCS는 수많은 차량과 운송 요청을 하나의 레일망에서 함께 관리해야 합니다.</p>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운송 흐름의 신호 보기 ↗</button>
-        </div>}
-        {scene.id === 9 && <div className="w6-inner-controls w6-singlefab-controls">
-          <span className="w6-concept-tag">FLOW INTELLIGENCE · 미래 운영 시선</span>
-          <p className="w6-context-line">같은 공장에 운행 정보를 겹쳐 봅니다. 현재 차량의 레일 점유와 대기 신호는 실제 엔진 상태에서 가져옵니다.</p>
-          <div className="w6-action-row" role="group" aria-label="운행 신호 표시 선택">
-            <button type="button" className={intelligenceLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={intelligenceLens} onClick={() => setIntelligenceLens(true)}>운행 신호 보기</button>
-            <button type="button" className={!intelligenceLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!intelligenceLens} onClick={() => setIntelligenceLens(false)}>기본 FAB 보기</button>
+        {scene.id === 7 && <div className="w6-inner-controls w6-story-controls">
+          <span className="w6-overline">MATCHED BENCHMARK · OPERATIONAL 2.1 · SEED 17</span>
+          <div className="w6-benchmark" aria-label="검증된 이전 모델 정책 실험">
+            <div><span>DBR · 거리 중심</span><strong>131 <small>/ 240 완료</small></strong><p>미완료 109건</p></div>
+            <div><span>CBR · 혼잡 고려</span><strong>130 <small>/ 240 완료</small></strong><p>미완료 110건</p></div>
           </div>
-          <p className="w6-microcopy">이것은 실제 점유·대기 데이터의 시각화이며 AI 진단 결과는 아닙니다. 미래에는 이런 기록을 분석해 위험 구간을 미리 발견하도록 발전할 수 있어요.</p>
-          <button type="button" className="w6-secondary" onClick={() => nextScene(1)}>다른 선택을 비교해 보기 ↗</button>
+          <p className="w6-context-line">OHT 48대, 요청 8건/분, 같은 Seed와 1,800 시뮬레이션 초. 같은 조건에서도 더 복잡한 정책이 항상 유리한 것은 아니었어요. 1건 차이로 일반적인 우열을 판단할 수는 없습니다.</p>
+          <p className="w6-microcopy">수치는 FAB FLOW의 검증된 이전 operational 2.1 실험에서 가져왔습니다. 배경의 현재 Large V6 3D는 이 결과의 실시간 Replay가 아닙니다.</p>
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 실험의 조건</summary>
+            <p>모델, Seed, 요청 일정, 차량 수, 실패 조건과 관찰 종료 시점을 고정하고 완료 및 미완료를 함께 기록했습니다. 알고리즘 계산 속도와 실제 운송 처리량은 서로 다른 측정 대상입니다.</p>
+          </details>
         </div>}
-        {scene.id === 10 && <div className="w6-inner-controls w6-singlefab-controls">
-          <span className="w6-concept-tag">WHAT-IF · 미래 운영 판단</span>
-          <p className="w6-context-line">Scene 6의 실제 MCS 운송 사례를 같은 Large FAB에서 다시 살펴봅니다. 선택된 길 외에 다른 합법적인 경로도 가능할까요?</p>
-          {routeStudy ? <>
-            <div className="w6-action-row" role="group" aria-label="미래 경로 비교">
-              <button type="button" className={futureRoute === 'selected' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'selected'} onClick={() => setFutureRoute('selected')}>MCS 경로</button>
-              <button type="button" className={futureRoute === 'alternative' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'alternative'} onClick={() => setFutureRoute('alternative')}>대안 경로</button>
-              <button type="button" className={futureRoute === 'both' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'both'} onClick={() => setFutureRoute('both')}>함께 보기</button>
-            </div>
-            <p className="w6-route-difference">{routeStudy.sourceBay} → {routeStudy.destinationBay} · 두 경로는 실제 방향성 레일망을 따릅니다.</p>
-            <p className="w6-microcopy">{routeStudy.alternativeKind === 'detour' ? '대안은 일부 레일을 제외하고 계산한 가정입니다. ' : '대안은 MCS가 계산한 경로 후보입니다. '}실제 운송 변경이나 처리시간 개선을 입증한 것은 아닙니다.</p>
-          </> : <p className="w6-context-line" role="status">{routeError || '실제 경로 사례를 준비하고 있습니다.'}</p>}
-          <p className="w6-result-takeaway">미래의 지능형 MCS는 이런 선택지를 사전에 시험하고 운영자가 판단하도록 도울 수 있습니다.</p>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>FAB FLOW 직접 체험하기 ↗</button>
-        </div>}
-        {scene.id === 11 && <div className="w6-inner-controls">
-          <p className="w6-context-line">현재의 MCS가 물류를 움직이는 방식과 미래의 지능형 의사결정 지원을 살펴봤어요. 이제 직접 FAB FLOW에서 공장을 운영해 보세요.</p>
-          <span className="w6-overline">FAB FLOW · 반도체 물류 세상</span>
-          <a className="w6-primary w6-explore-fabflow" href="https://fabflow-yoon.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="FAB FLOW 시뮬레이터 직접 체험하기, 새 탭으로 열기">
-            <span>FAB FLOW 직접 체험하기</span><span aria-hidden="true">↗</span>
-          </a>
-          <p className="w6-microcopy w6-explore-url">fabflow-yoon.vercel.app · 현재 시뮬레이터 체험 · FLOW INTELLIGENCE는 미래 기획</p>
-          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>Work6 처음부터 다시 보기 ↗</button>
-        </div>}
-        {scene.id === 4 && <div className="w6-inner-controls">
-          <p className="w6-microcopy">실제 FAB FLOW Large V6 모델 · 삼성 평택 내부 배치를 재현한 것은 아닙니다.</p>
-          <button type="button" className="w6-primary" disabled aria-label="전체 FAB 살펴보기, 완료">전체 FAB 살펴보기 <span aria-hidden="true">↗</span></button>
+        {scene.id === 8 && <div className="w6-inner-controls w6-story-controls">
+          <div className="w6-architecture" aria-label="엔진과 화면의 역할">
+            <div><small>01 · ENGINE</small><strong>운송 규칙을 계산한다</strong></div>
+            <div><small>02 · STATE</small><strong>현재의 결과를 기록한다</strong></div>
+            <div><small>03 · THREE.JS</small><strong>그 결과를 3D로 보여준다</strong></div>
+          </div>
+          <p className="w6-context-line">실제 공장 전체를 똑같이 구현한 디지털 트윈은 아닙니다. 하지만 복잡한 물류를 관찰하고 질문할 수 있는 모델입니다.</p>
+          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 엔진과 렌더러</summary>
+            <p>엔진은 Request, OHT 위치, 레일 점유, FOUP 소유권을 계산합니다. Three.js는 확인된 Geometry와 상태로 이를 보여주며, LOD·Instancing으로 렌더링 비용을 조절합니다. 화면이 물류 결과를 결정하지는 않습니다.</p>
+          </details>
+          <a className="w6-primary w6-explore-fabflow" href="https://fabflow-yoon.vercel.app/" target="_blank" rel="noopener noreferrer">FAB FLOW 직접 체험하기 ↗</a>
+          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>처음부터 다시 보기</button>
         </div>}
         {error && <p className="w6-error" role="alert">{error}</p>}
       </section>
