@@ -364,7 +364,7 @@ export default function Work6() {
   // Its color is not a computed AI diagnosis or prediction.
   const observedRailView = scene.id === 7 || (scene.id === 9 && intelligenceLens);
   // Keep the original port annotations stable through request/dispatch.
-  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
+  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
 
   return <div className="w6-root" data-prototype="true"
     data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
@@ -395,12 +395,12 @@ export default function Work6() {
     <main className="w6-stage">
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
         <ThreeFacilityScene
-          layout={activeEngine.layout}          layout={activeEngine.layout}
+          layout={activeEngine.layout}
           state={activeState}
           floor={0}
           failures={activeEngine.scenario.failures}
           storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? scene.id === 7 && pressure.prepared : isOpening ? true : busy}
+          running={isPressure ? pressure.prepared : isOpening ? true : busy}
           tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
           selected={scene.id === 7 && congestionVehicleId ? 'vehicle:' + congestionVehicleId : isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
             : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
