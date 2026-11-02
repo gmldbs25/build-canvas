@@ -389,6 +389,12 @@ export default function Work6() {
       return;
     }
     if (scene.id === 4) { issueCamera('opening'); return; }
+    if (scene.id === 8) {
+      // On narrow screens a whole-FAB overview shrinks OHTs to invisible dots.
+      // The original FAB FLOW native introductory tableau keeps real vehicles legible.
+      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame }));
+      return;
+    }
     issueCamera('overview');
   }, [scene.id, issueCamera, routeStudy?.seed]);
 
