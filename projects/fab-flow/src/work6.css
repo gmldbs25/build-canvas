@@ -249,3 +249,131 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-traffic-metrics span{display:flex;flex-direction:column;gap:4px;border-top:2px solid #99b6a6;padding-top:7px;font-size:10px;line-height:1.4;color:#627568}
 .w6-traffic-metrics strong{font:700 23px/1.15 ui-monospace,Menlo,Consolas,monospace;color:#306c59;font-variant-numeric:tabular-nums}
 @media(max-width:650px){.w6-traffic-metrics span{font-size:9px;padding-top:5px}.w6-traffic-metrics strong{font-size:20px}}
+
+
+/* Behind the Simulation — editorial layer over the unmodified FAB FLOW world.
+   The native ThreeFacilityScene CSS/geometry stays authoritative. */
+.w6-root .w6-narrative {
+  max-width: min(475px, calc(100vw - 64px));
+  pointer-events: auto;
+}
+.w6-root .w6-narrative h1 {
+  font-size: clamp(28px, 2.75vw, 41px);
+  line-height: 1.16;
+  letter-spacing: -.036em;
+  word-break: keep-all;
+}
+.w6-root .w6-narrative .w6-description {
+  font-size: clamp(15px, 1.14vw, 17px);
+  line-height: 1.58;
+  word-break: keep-all;
+  color: #3e6152;
+}
+.w6-story-controls { gap: 12px; }
+.w6-story-controls .w6-context-line { font-size: 14px; line-height: 1.58; }
+.w6-story-controls .w6-microcopy { font-size: 12px; line-height: 1.52; }
+.w6-story-controls .w6-action-row { display: flex; gap: 7px; flex-wrap: wrap; }
+.w6-story-controls .w6-action-row button {
+  min-height: 38px;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+.w6-story-controls .w6-step-explanation {
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: keep-all;
+  max-height: min(26svh, 174px);
+  overflow-y: auto;
+}
+.w6-story-controls .w6-observed {
+  max-height: min(17svh, 114px);
+  overflow-y: auto;
+}
+.w6-story-controls .w6-story-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 13px;
+}
+.w6-story-controls .w6-story-steps span { font-size: 11px; line-height: 1.45; white-space: normal; }
+.w6-deep {
+  margin-top: 3px;
+  border-top: 1px solid #c3d3c6;
+  padding-top: 10px;
+  color: #476454;
+}
+.w6-deep summary {
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  padding: 5px 0;
+  min-height: 27px;
+}
+.w6-deep p {
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 9px 0 0;
+  word-break: keep-all;
+}
+.w6-clock-readout { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.w6-clock-readout > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid #b9cfc0;
+  background: rgba(252,250,243,.94);
+}
+.w6-clock-readout span { font: 650 10px/1.35 ui-monospace,Menlo,monospace; color: #687f70; letter-spacing: .03em; }
+.w6-clock-readout strong { font: 700 29px/1.1 ui-monospace,Menlo,monospace; color: #2d6150; font-variant-numeric: tabular-nums; }
+.w6-clock-readout small { font-size: 12px; font-weight: 500; }
+.w6-benchmark { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.w6-benchmark > div { padding: 14px; border: 1px solid #bdcebf; background: rgba(252,250,243,.94); display: grid; gap: 8px; }
+.w6-benchmark > div > span { font-size: 12px; font-weight: 650; color: #557360; }
+.w6-benchmark > div > strong { font: 700 36px/1 ui-monospace,Menlo,monospace; color: #28604b; font-variant-numeric: tabular-nums; }
+.w6-benchmark > div > strong small { font-size: 11px; font-weight: 500; }
+.w6-benchmark p { margin: 0; font-size: 12px; color: #6b7d70; }
+.w6-root .w6-architecture { margin-bottom: 6px; }
+.w6-root .w6-architecture > div { padding-bottom: 11px; }
+.w6-root .w6-architecture > div:last-child { padding-bottom: 0; }
+.w6-root .w6-architecture strong { font-size: 14px; }
+.w6-root .w6-architecture small { font-size: 11px; }
+.w6-story-controls .w6-explore-fabflow { text-align: center; min-height: 40px; justify-content: center; align-items: center; }
+.w6-story-controls > .w6-secondary { width: fit-content; }
+@media (max-width: 900px) {
+  .w6-root .w6-narrative h1 { font-size: 29px; }
+  .w6-root .w6-narrative .w6-description { font-size: 14px; }
+}
+@media (max-width: 650px) {
+  .w6-root .w6-narrative {
+    left: 16px; right: 16px; bottom: 13px;
+    max-width: none;
+    max-height: min(71svh, 545px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 1px 14px;
+  }
+  .w6-root .w6-narrative::before {
+    inset: -8px -15px -12px;
+    background: linear-gradient(0deg, rgba(244,241,234,.98) 14%, rgba(244,241,234,.91) 76%, rgba(244,241,234,.58));
+  }
+  .w6-root .w6-narrative h1 { font-size: 26px; line-height: 1.22; margin-bottom: 9px; }
+  .w6-root .w6-narrative .w6-description { font-size: 14px; line-height: 1.5; }
+  .w6-story-controls .w6-context-line { font-size: 13px; line-height: 1.52; }
+  .w6-story-controls .w6-microcopy { font-size: 12px; }
+  .w6-story-controls .w6-action-row button { font-size: 12px; min-height: 36px; }
+  .w6-story-controls .w6-story-steps span { font-size: 11px; }
+  .w6-clock-readout strong { font-size: 25px; }
+  .w6-benchmark > div { padding: 11px; }
+  .w6-benchmark > div > strong { font-size: 30px; }
+  .w6-deep summary { font-size: 12px; }
+  .w6-deep p { font-size: 12px; }
+}
+@media (max-height: 650px) and (orientation: landscape) {
+  .w6-root .w6-narrative {
+    max-height: calc(100svh - 165px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .w6-root .w6-narrative h1 { font-size: 25px; }
+  .w6-root .w6-narrative .w6-description { font-size: 13px; }
+}
