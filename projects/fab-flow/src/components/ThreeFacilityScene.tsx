@@ -1789,7 +1789,13 @@ export default function ThreeFacilityScene(props: Props) {
       mark.foup.position.y = currentFoupY;
       if (!mark.root.visible) return [];
       const motion = confirmedRendererMotion(layout, from, vehicle);
-      return [{ vehicle, ...mark, motion, previousFoupY, currentFoupY }];
+      // Preserve one rotation branch for the ENTIRE confirmed tick. Re-choosing
+      // the shortest angular distance every animation frame would flip a
+      // legitimate U-turn as it passes 180 degrees, creating a full spin.
+      const displayedHeading = -mark.physical.rotation.y * 180 / Math.PI;
+      const firstHeading = motion(0).angle;
+      const headingOffset = continuousVehicleHeading(displayedHeading, firstHeading) - firstHeading;
+      return [{ vehicle, ...mark, motion, headingOffset, previousFoupY, currentFoupY }];
     });
     const linkCounts = new Map<string, number>(), vehicleById = new Map(state.vehicles.map(vehicle => [vehicle.id, vehicle]));
     for (const vehicle of state.vehicles) if (vehicle.link) linkCounts.set(vehicle.link, (linkCounts.get(vehicle.link) ?? 0) + 1);
@@ -2002,12 +2008,10 @@ export default function ThreeFacilityScene(props: Props) {
       camera?.updateMatrixWorld();
       for (const item of animations) {
         const pose = item.motion(fraction); item.root.position.set(pose.x, 72, pose.y);
-        // A path change (including the outer U-turn rail) can express the
-        // same tangent as +270° on one link and -90° on the next. Preserve the
-        // previously *displayed* heading branch rather than rotating through
-        // a spurious full circle on every link boundary.
-        const displayedHeading = -item.physical.rotation.y * 180 / Math.PI;
-        const heading = continuousVehicleHeading(displayedHeading, pose.angle);
+        // The native confirmed path has an unwrapped heading, and its branch
+        // offset stays fixed for this entire tick. Following frame-to-frame
+        // shortest arcs could reverse direction halfway through a U-turn.
+        const heading = pose.angle + item.headingOffset;
         item.physical.rotation.y = -heading * Math.PI / 180;
         // Interpolate the existing FAB FLOW hoist pose between genuine Engine
         // service ticks. No simulated FOUP ownership/phase is modified.
