@@ -98,6 +98,13 @@ function createWork6Tutorial() {
   return { engine, plannedIngress, selection };
 }
 
+function createClockEngine(): Engine {
+  // Separate genuine native experiment; the tutorial remains command-owned.
+  const scenario: Scenario = { ...operationalScenario('large'), fleet: 12, demand: 2,
+    duration: 1800, seed: 17, pattern: 'steady' };
+  return new Engine(scenario, { analysis: false });
+}
+
 function freezeState(engine: Engine): SimulationState {
   return publicationCopy({ version: 1, scenario: engine.scenario, state: engine.state }).state;
 }
@@ -113,6 +120,13 @@ export default function Work6() {
   const [stage, setStage] = useState<TutorialStage>('request');
   const [lastCompleted, setLastCompleted] = useState<TutorialCommand | null>(null);
   const [sceneIndex, setSceneIndex] = useState(0);
+  const autoTransportRef = useRef(false);
+  const clockInitial = useMemo(() => createClockEngine(), []);
+  const clockRef = useRef(clockInitial);
+  const [clockState, setClockState] = useState<SimulationState>(() => freezeState(clockInitial));
+  const [clockPlaying, setClockPlaying] = useState(false);
+  const [networkLens, setNetworkLens] = useState(false);
+  const [trafficLens, setTrafficLens] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>(undefined);
@@ -120,13 +134,9 @@ export default function Work6() {
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ sequence: 1, kind: 'opening' });
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
-  // Keep one Native single-floor Large world and its canvas throughout the
-  // contemporary traffic / prospective intelligence story (Scenes 07–09).
-  const isPressure = scene.id >= 7 && scene.id <= 9;
-  const [intelligenceLens, setIntelligenceLens] = useState(true);
-  const [futureRoute, setFutureRoute] = useState<'selected' | 'alternative' | 'both'>('both');
-  // One real Large V6 scenario continues between Scenes 07, 08 and 09.
-  const pressure = usePressureWorld(isPressure, false, scene.id >= 6 && scene.id <= 9);
+  // Shared original Large 3D renderer; independent scenarios are labelled.
+  const isPressure = scene.id === 6 || scene.id === 7;
+  const pressure = usePressureWorld(isPressure, false, isPressure);
   const congestionVehicleId = pressure.railFocus?.vehicleId;
   const congestionVehicle = pressure.state.vehicles.find(vehicle => vehicle.id === congestionVehicleId);
   const realQueue = pressure.state.linkQueues?.find(queue => queue.vehicleIds.includes(congestionVehicleId ?? ''));
@@ -134,17 +144,19 @@ export default function Work6() {
   const activeTransports = pressure.state.vehicles.filter(vehicle => !vehicle.parked && !!vehicle.request).length;
   const railIsBlocked = congestionVehicle?.waitReason === 'rail' && (congestionVehicle.waiting ?? 0) > 0;
   const congestionDecision = congestionVehicleId ? pressure.engine.inspectDecision(congestionVehicleId) : undefined;
-  const isOpening = scene.id <= 2;
+  const isOpening = scene.id === 1 || scene.id === 2 || scene.id === 8;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
   const [routeError, setRouteError] = useState('');
   const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative' | 'both'>('both');
   const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
-    (scene.id === 6 || scene.id === 10) && routeStudy ? routeStudy.engine : engineRef.current;
+    scene.id === 4 ? clockRef.current :
+    scene.id === 5 && routeStudy ? routeStudy.engine : engineRef.current;
   const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
-    (scene.id === 6 || scene.id === 10) && routeStudy ? routeStudy.state : nativeState;
+    scene.id === 4 ? clockState :
+    scene.id === 5 && routeStudy ? routeStudy.state : nativeState;
   useEffect(() => {
-    if ((scene.id !== 6 && scene.id !== 10) || routeStudy || routeError) return;
+    if (scene.id !== 5 || routeStudy || routeError) return;
     // Compute a real, separate long-range native case once on entry. Scene03
     // keeps its short route and completed FOUP intact.
     let cancelled = false;
@@ -158,6 +170,35 @@ export default function Work6() {
     }, 30);
     return () => { cancelled = true; window.clearTimeout(timer); };
   }, [scene.id, routeStudy, routeError]);
+
+  useEffect(() => {
+    if (scene.id !== 4 || !clockPlaying) return;
+    const timer = window.setInterval(() => {
+      try {
+        clockRef.current.step(1);
+        setClockState(freezeState(clockRef.current));
+      } catch (cause) {
+        setClockPlaying(false);
+        setError(cause instanceof Error ? cause.message : '네이티브 Tick 계산 오류');
+      }
+    }, 520);
+    return () => window.clearInterval(timer);
+  }, [scene.id, clockPlaying]);
+  const stepClock = () => {
+    if (clockPlaying) return;
+    try {
+      clockRef.current.step(1);
+      setClockState(freezeState(clockRef.current));
+      setError('');
+    } catch (cause) { setError(cause instanceof Error ? cause.message : '네이티브 Tick 계산 오류'); }
+  };
+  const resetClock = () => {
+    setClockPlaying(false);
+    const engine = createClockEngine();
+    clockRef.current = engine;
+    setClockState(freezeState(engine));
+    setError('');
+  };
 
   const publish = useCallback(() => {
     const engine = engineRef.current;
@@ -184,6 +225,7 @@ export default function Work6() {
   }, []);
 
   const reset = () => {
+    autoTransportRef.current = false;
     cancelRunning();
     const next = createWork6Tutorial();
     engineRef.current = next.engine;
@@ -220,7 +262,11 @@ export default function Work6() {
       timerRef.current = null;
       const req = tutorialRequest(engine), vehicle = tutorialVehicle(engine);
       if (next === 'empty-travel' && vehicle) issueCamera('follow', vehicle.id, req?.id);
-      // Keep the same close camera after dropoff; only Scene 04 may reveal the whole Bay.
+      if (autoTransportRef.current && next !== 'bay') {
+        timerRef.current = window.setTimeout(() => {
+          if (runId === runIdRef.current && autoTransportRef.current) runNext();
+        }, 700);
+      } else autoTransportRef.current = false;
     };
     try {
       if (command === 'route') {
@@ -266,6 +312,13 @@ export default function Work6() {
   const nextScene = useCallback((delta: number) => {
     setSceneIndex(current => Math.max(0, Math.min(SCENES.length - 1, current + delta)));
   }, []);
+  useEffect(() => {
+    if (scene.id !== 3) {
+      autoTransportRef.current = false;
+      cancelRunning();
+    }
+    if (scene.id !== 4) setClockPlaying(false);
+  }, [scene.id, cancelRunning]);
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -288,65 +341,51 @@ export default function Work6() {
   const currentDecision = decision ?? (vehicle && request?.phase !== 'completed' ? engineRef.current.inspectDecision(vehicle.id) : undefined);
   const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
   const transportFinished = stage === 'bay' && request?.phase === 'completed';
-  const isReveal = scene.id === 4;
-  const isDecision = scene.id === 6 || scene.id === 10;
-  const presentationRoute = scene.id === 10 ? futureRoute : routeChoice;
+  const isReveal = scene.id === 2;
+  const isDecision = scene.id === 5;
+  const presentationRoute = routeChoice;
   const shownRoute = routeStudy ? presentationRoute === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
-  const isNetwork = scene.id === 5;
-  const focusMode = scene.id <= 3;
+  const isNetwork = scene.id === 2 && networkLens;
+  const focusMode = scene.id === 1 || scene.id === 3;
   const pressureBeatLabel = '혼잡한 Large FAB · 실제 엔진';
-  // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
-  // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
     (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
-  const candidates = scene.id === 7 && congestionDecision
+  const candidates = scene.id === 6 && congestionDecision
     ? congestionDecision.candidates.filter(candidate => candidate.selected)
     : isDecision && routeStudy && shownRoute
-    ? presentationRoute === 'both'
-      ? [{ ...routeStudy.alternative, selected: false }, { ...routeStudy.selected, selected: true }]
-      : [{ ...shownRoute, selected: true }]
-    : (isNetwork || isTransportRouteVisible) && currentDecision
-      ? currentDecision.candidates.filter(candidate => candidate.selected)
-      : undefined;
-
+      ? presentationRoute === 'both'
+        ? [{ ...routeStudy.alternative, selected: false }, { ...routeStudy.selected, selected: true }]
+        : [{ ...shownRoute, selected: true }]
+      : isTransportRouteVisible && currentDecision
+        ? currentDecision.candidates.filter(candidate => candidate.selected)
+        : undefined;
+  const beat = transportFinished ? 4 : stage === 'request' || stage === 'dispatch' ? 1
+    : stage === 'empty-travel' ? 2 : stage === 'dropoff' ? 4 : 3;
   useEffect(() => {
     const req = tutorialRequest(engineRef.current);
     const owner = tutorialVehicle(engineRef.current);
     const tracked = owner?.id, reqId = req?.id;
-    if (scene.id <= 2) {
-      // One stable camera view for the entire opening. Native OHTs keep
-      // moving underneath it; no new camera commands on request/vehicle changes.
-      setCameraCommand(previous => ({
-        sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame,
-      }));
+    if (scene.id === 1) {
+      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame }));
       return;
+    }
+    if (scene.id === 2) {
+      setCameraMoment(0);
+      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 2700 }));
+      const a = window.setTimeout(() => setCameraMoment(1), 850);
+      const b = window.setTimeout(() => setCameraMoment(2), 2000);
+      return () => { window.clearTimeout(a); window.clearTimeout(b); };
     }
     if (scene.id === 3) {
-      issueCamera(tracked ? 'follow' : 'opening', tracked, reqId);
-      return;
+      issueCamera(tracked ? 'follow' : 'opening', tracked, reqId); return;
     }
-    if (scene.id === 6 || scene.id === 10) {
-      if (routeStudy) setCameraCommand(previous => ({
-        sequence: previous.sequence + 1, kind: 'tableau', frame: routeStudy.frame,
-      }));
+    if (scene.id === 5) {
+      if (routeStudy) setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: routeStudy.frame }));
       else issueCamera('overview');
       return;
     }
-    if (scene.id !== 4) {
-      setCameraMoment(0);
-      issueCamera(scene.id <= 3 ? 'opening' : 'overview', undefined, undefined);
-      return;
-    }
-    // Scene 03's final close-up is the *first frame* of the reveal.
-    // One continuous editorial camera move, not three discontinuous jumps.
-    setCameraMoment(0);
-    setCameraCommand(previous => ({
-      sequence: previous.sequence + 1, kind: 'overview', vehicleId: tracked,
-      requestId: reqId, transitionMs: 2700,
-    }));
-    const a = window.setTimeout(() => setCameraMoment(1), 850);
-    const b = window.setTimeout(() => setCameraMoment(2), 2000);
-    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+    if (scene.id === 4) { issueCamera('opening'); return; }
+    issueCamera('overview');
   }, [scene.id, issueCamera, routeStudy?.seed]);
 
 
@@ -354,13 +393,13 @@ export default function Work6() {
   // warm-up. A wider fixed tableau keeps the occupied link and surrounding
   // OHTs visible instead of following a single free-moving vehicle too close.
   useEffect(() => {
-    if (scene.id !== 7 || !pressure.prepared || !pressure.railFocus) return;
+    if (scene.id !== 6 || !pressure.prepared || !pressure.railFocus) return;
     setCameraCommand(previous => ({ sequence:previous.sequence + 1,
       kind:'tableau',frame:pressure.railFocus!.frame }));
   }, [scene.id, pressure.prepared, pressure.railFocus?.vehicleId]);
   // The scanner is purely a way to visualize native rail occupancy / queues.
   // Its color is not a computed AI diagnosis or prediction.
-  const observedRailView = scene.id === 7 || (scene.id === 9 && intelligenceLens);
+  const observedRailView = scene.id === 6 && trafficLens;
   // Keep the original port annotations stable through request/dispatch.
   const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
 
