@@ -3,6 +3,7 @@ import { Engine, getKpis } from './sim/engine';
 import { operationalScenario } from './sim/experiments';
 import { presetScenario } from './sim/demand-presets';
 import { publicationCopy } from './sim/publication';
+import { findRealRailWait, type RailTrafficFocus } from './scene7Traffic';
 import type { Policy, Scenario, SimulationState, Snapshot } from './sim/types';
 
 export type NativeMetrics = ReturnType<typeof getKpis>;
@@ -42,6 +43,10 @@ function snapshot(engine: Engine): SimulationState {
 // instead of staging a fake fleet entrance. This exact native state is also the
 // shared initial condition for the two operational comparisons.
 export const PRESSURE_WARMUP_SECONDS = 3000;
+export const PRESSURE_TRAFFIC_START_SECONDS = 2740;
+export const PRESSURE_TRAFFIC_SEARCH_LIMIT = 3470;
+export const PRESSURE_TRAFFIC_FLEET = 64;
+export const PRESSURE_TRAFFIC_INTERVAL = 1; // native request every simulated second
 // The off-screen warm-up is deliberately gentler than the public normal
 // operation: prefill realistic active transports without arriving already
 // backlogged. The visitor-facing normal stage itself is exactly 1/3s.
@@ -53,7 +58,7 @@ export const PRESSURE_STORY = {
   surgeAt: PRESSURE_WARMUP_SECONDS + 20,
   observeAt: PRESSURE_WARMUP_SECONDS + 130,
 } as const;
-export const PRESSURE_PLAYBACK_MS = 115;
+export const PRESSURE_PLAYBACK_MS = 175;
 export type PressureBeat = 'normal' | 'surge' | 'observe';
 export function pressureBeat(time: number): PressureBeat {
   return time < PRESSURE_STORY.surgeAt ? 'normal'
@@ -61,7 +66,7 @@ export function pressureBeat(time: number): PressureBeat {
 }
 function pressureScenario(): Scenario {
   return {
-    ...presetScenario('large', 'relaxed', 31, 'DBR', 48),
+    ...presetScenario('large', 'relaxed', 31, 'DBR', PRESSURE_TRAFFIC_FLEET),
     demandIntervalSeconds: PRESSURE_WARMUP_INTERVAL,
     duration: 7200, demandWindow: 6300,
   };
@@ -84,6 +89,7 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
   const [state, setState] = useState<SimulationState>(() => snapshot(engine));
   const [metrics, setMetrics] = useState<NativeMetrics>(() => getKpis(engine));
   const [prepared, setPrepared] = useState(false);
+  const [railFocus, setRailFocus] = useState<RailTrafficFocus>();
   const warmSnapshotRef = useRef<Snapshot | null>(null);
   const [capacity, setCapacity] = useState<PressureCapacityResult | null>(null);
   const [capacityBusy, setCapacityBusy] = useState(false);
@@ -104,17 +110,30 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
     const prime = () => {
       if (cancelled) return;
       try {
-        for (let i = 0; i < 24 && engine.state.time < PRESSURE_WARMUP_SECONDS; i++) engine.step(1);
-        if (engine.state.time < PRESSURE_WARMUP_SECONDS) timer = window.setTimeout(prime, 0);
-        else {
-          // Switch to the requested normal rate *before* exposing the scene.
-          // This is a real Engine demand change, not a visual-only counter.
-          engine.setDemandInterval(PRESSURE_BASE_INTERVAL, 'active');
+        let focus: RailTrafficFocus | undefined;
+        for (let i = 0; i < 24 && engine.state.time < PRESSURE_TRAFFIC_SEARCH_LIMIT; i++) {
+          if (engine.state.time >= PRESSURE_TRAFFIC_START_SECONDS &&
+              !(engine.scenario.demandChanges ?? []).some(change => change.intervalSeconds === PRESSURE_TRAFFIC_INTERVAL)) {
+            engine.setDemandInterval(PRESSURE_TRAFFIC_INTERVAL, 'congested');
+          }
+          engine.step(1);
+          if (engine.state.time >= PRESSURE_WARMUP_SECONDS) {
+            focus = findRealRailWait(engine.layout, engine.state);
+            // The opening of Scene 07 must capture a genuine blocked rail,
+            // not the first OHT that happened to wait during pickup or service.
+            if (focus && focus.nearbyActive >= 3 && focus.waitSeconds >= 3) break;
+            focus = undefined;
+          }
+        }
+        if (focus) {
           warmSnapshotRef.current = engine.snapshot();
+          setRailFocus(focus);
           setState(snapshot(engine));
           setMetrics(getKpis(engine));
           setPrepared(true);
-        }
+        } else if (engine.state.time >= PRESSURE_TRAFFIC_SEARCH_LIMIT) {
+          throw new Error('실제 레일에서 대기하는 OHT가 확인되지 않아 혼잡 장면을 시작하지 않았어요.');
+        } else timer = window.setTimeout(prime, 0);
       } catch (cause) {
         if (!cancelled) setError(cause instanceof Error ? cause.message : '실제 공장 운영 상태를 준비할 수 없어요.');
       }
@@ -129,9 +148,6 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
     if (!active || !prepared || engine.state.time >= engine.scenario.duration) return;
     const timer = window.setInterval(() => {
       try {
-        if (engine.state.time >= PRESSURE_STORY.surgeAt &&
-            !(engine.scenario.demandChanges ?? []).some(change => change.intervalSeconds === PRESSURE_SURGE_INTERVAL))
-          engine.setDemandInterval(PRESSURE_SURGE_INTERVAL, 'congested');
         engine.step(1);
         setState(snapshot(engine));
         setMetrics(getKpis(engine));
@@ -271,9 +287,9 @@ export function usePressureWorld(active: boolean, showResults: boolean, prewarm:
 
 
   return {
-    engine, state, metrics, prepared, warmupSeconds: PRESSURE_WARMUP_SECONDS,
+    engine, state, metrics, prepared, railFocus, warmupSeconds: PRESSURE_WARMUP_SECONDS,
     warmCompleted: warmSnapshotRef.current?.state.requests.filter(request => request.phase === 'completed').length ?? 0,
-    beat: pressureBeat(state.time), tickMs: PRESSURE_PLAYBACK_MS,
+    beat: state.time < PRESSURE_TRAFFIC_START_SECONDS ? 'normal' as const : 'surge' as const, tickMs: PRESSURE_PLAYBACK_MS,
     capacity, capacityBusy, capacityProgress,
     reset, error, compareMode, changeMode, compareDemand, changeDemand,
     compare, comparing, progress, result,

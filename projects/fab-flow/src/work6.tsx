@@ -127,12 +127,13 @@ export default function Work6() {
   const [futureRoute, setFutureRoute] = useState<'selected' | 'alternative' | 'both'>('both');
   // One real Large V6 scenario continues between Scenes 07, 08 and 09.
   const pressure = usePressureWorld(isPressure, false, scene.id >= 6 && scene.id <= 9);
-  const [congestionVehicleId, setCongestionVehicleId] = useState<string>();
-  const [congestionDecision, setCongestionDecision] = useState<ReturnType<Engine['inspectDecision']>>();
-  const queueVehicleIds = pressure.state.linkQueues?.flatMap(queue => queue.vehicleIds) ?? [];
+  const congestionVehicleId = pressure.railFocus?.vehicleId;
   const congestionVehicle = pressure.state.vehicles.find(vehicle => vehicle.id === congestionVehicleId);
   const realQueue = pressure.state.linkQueues?.find(queue => queue.vehicleIds.includes(congestionVehicleId ?? ''));
-  const waitingVehicles = pressure.state.vehicles.filter(vehicle => !vehicle.parked && vehicle.waiting > 0).length;
+  const waitingVehicles = pressure.state.vehicles.filter(vehicle => !vehicle.parked && vehicle.waitReason === 'rail' && vehicle.waiting > 0).length;
+  const activeTransports = pressure.state.vehicles.filter(vehicle => !vehicle.parked && !!vehicle.request).length;
+  const railIsBlocked = congestionVehicle?.waitReason === 'rail' && (congestionVehicle.waiting ?? 0) > 0;
+  const congestionDecision = congestionVehicleId ? pressure.engine.inspectDecision(congestionVehicleId) : undefined;
   const isOpening = scene.id <= 2;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
@@ -293,7 +294,7 @@ export default function Work6() {
   const shownRoute = routeStudy ? presentationRoute === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
-  const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 대기 확인';
+  const pressureBeatLabel = '혼잡한 Large FAB · 실제 엔진';
   // Reuse actual MCS decisions for both empty-vehicle travel and the loaded
   // leg. Do not draw a speculative route before the Engine has selected it.
   const isTransportRouteVisible = scene.id === 3 &&
@@ -349,17 +350,14 @@ export default function Work6() {
   }, [scene.id, issueCamera, routeStudy?.seed]);
 
 
+  // The blocked vehicle and approach link were verified by the real Native
+  // warm-up. A wider fixed tableau keeps the occupied link and surrounding
+  // OHTs visible instead of following a single free-moving vehicle too close.
   useEffect(() => {
-    if (scene.id !== 7 || !pressure.prepared || congestionVehicleId) return;
-    const id = queueVehicleIds.find(id => pressure.state.vehicles.some(v => v.id === id && !!v.request))
-      ?? pressure.state.vehicles.find(v => !v.parked && !!v.request && v.waiting > 0)?.id;
-    if (id) setCongestionVehicleId(id);
-  }, [scene.id, pressure.prepared, pressure.state.tick, congestionVehicleId]);
-  useEffect(() => {
-    if (scene.id !== 7 || !congestionVehicleId) return;
-    setCongestionDecision(pressure.engine.inspectDecision(congestionVehicleId));
-    issueCamera('follow', congestionVehicleId);
-  }, [scene.id, congestionVehicleId, pressure.engine, issueCamera]);
+    if (scene.id !== 7 || !pressure.prepared || !pressure.railFocus) return;
+    setCameraCommand(previous => ({ sequence:previous.sequence + 1,
+      kind:'tableau',frame:pressure.railFocus!.frame }));
+  }, [scene.id, pressure.prepared, pressure.railFocus?.vehicleId]);
   // The scanner is purely a way to visualize native rail occupancy / queues.
   // Its color is not a computed AI diagnosis or prediction.
   const observedRailView = scene.id === 7 || (scene.id === 9 && intelligenceLens);
@@ -383,7 +381,13 @@ export default function Work6() {
     data-pressure-prepared={scene.id === 7 ? String(pressure.prepared) : ''}
     data-pressure-waiting={scene.id === 7 ? waitingVehicles : ''}
     data-pressure-vehicle={scene.id === 7 ? congestionVehicleId ?? '' : ''}
-    data-pressure-queue={scene.id === 7 ? realQueue?.linkId ?? '' : ''}
+    data-pressure-queue={scene.id === 7 ? realQueue?.linkId ?? pressure.railFocus?.linkId ?? '' : ''}
+    data-pressure-start-wait={scene.id === 7 ? pressure.railFocus?.waitSeconds ?? 0 : ''}
+    data-pressure-verified={scene.id === 7 ? String(!!pressure.railFocus && pressure.railFocus.waitSeconds >= 3) : ''}
+    data-pressure-rail-blocked={scene.id === 7 ? String(!!railIsBlocked) : ''}
+    data-pressure-active={scene.id === 7 ? activeTransports : ''}
+    data-pressure-fleet={scene.id === 7 ? pressure.engine.scenario.fleet : ''}
+    data-pressure-demand-interval={scene.id === 7 ? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
     data-fab-layout={(scene.id >= 7 && scene.id <= 10) ? activeEngine.layout.id : ''}
     data-mcs-lens={scene.id === 9 ? (intelligenceLens ? 'traffic' : 'normal') : ''}
     data-future-route={scene.id === 10 ? futureRoute : ''}>
@@ -430,7 +434,7 @@ export default function Work6() {
           <span>실제 엔진으로 운송이 진행된 상태를 계산하고 있습니다.</span>
         </div>}
         {scene.id === 7 && pressure.prepared && <div className="w6-pressure-caption" aria-live="off">
-          <span className={pressure.beat === 'normal' ? 'is-calm' : 'is-busy'} aria-hidden="true"/>
+          <span className="is-busy" aria-hidden="true"/>
           {pressureBeatLabel}
         </div>}
       </div>
@@ -520,13 +524,23 @@ export default function Work6() {
         </div>}
         {scene.id === 7 && <div className="w6-inner-controls">
           <span className="w6-overline">CURRENT MCS · LIVE NATIVE ENGINE</span>
-          <p className="w6-context-line">{!pressure.prepared ? '실제로 운행 중인 FAB를 준비하고 있어요.'
-            : congestionVehicleId ? '실제 레일에서 대기한 OHT를 따라갑니다. 경로를 찾아도 앞선 차량이나 레일 점유 때문에 기다려야 할 수 있어요.'
-            : '현재 운행 중인 OHT 가운데 실제 대기하는 차량을 찾고 있어요.'}</p>
-          <div className="w6-focus-status"><span>관찰 중인 운반 차량</span><strong>{congestionVehicleId ?? '대기 차량 탐색 중'}</strong>
-            <small>{realQueue ? '레일 대기열 확인됨' : congestionVehicle?.waiting ? '실제 진행 대기 확인됨' : '선택 경로와 교통 상황 관찰'}</small></div>
+          <p className="w6-context-line">{!pressure.prepared
+            ? '여러 OHT와 운송 요청이 몰린 실제 Large FAB의 레일 대기 장면을 찾고 있어요.'
+            : '운송 요청이 몰리면 여러 OHT가 같은 레일 구간을 이용하려고 합니다. 앞쪽 구간을 비워줄 때까지 기다리는 모습을 살펴보세요.'}</p>
+          <div className="w6-traffic-metrics" aria-label="실제 FAB 혼잡 현황">
+            <span><strong>{pressure.engine.scenario.fleet}</strong>대 OHT</span>
+            <span><strong>{activeTransports}</strong>대 운송 중</span>
+            <span><strong>{waitingVehicles}</strong>대 레일 대기</span>
+          </div>
+          <div className="w6-focus-status"><span>실제 대기 사례 · {congestionVehicleId ?? '탐색 중'}</span>
+            <strong>{!pressure.prepared ? '혼잡 구간 준비 중'
+              : railIsBlocked ? '앞쪽 레일 점유로 대기 중' : '대기 해제 · 다음 구간 이동'}</strong>
+            <small>{railIsBlocked
+              ? '현재 대기 ' + congestionVehicle!.waiting.toFixed(1) + '초 · 다음 레일 진입 대기열'
+              : '이 OHT는 진입 직전 실제 레일에서 ' + (pressure.railFocus?.waitSeconds ?? 0).toFixed(1) + '초 이상 기다렸어요.'}</small>
+          </div>
           <p className="w6-result-takeaway">MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.</p>
-          <div className="w6-action-row"><button type="button" className="w6-secondary" onClick={() => { pressure.reset(); setCongestionVehicleId(undefined); setCongestionDecision(undefined); issueCamera('overview'); }}>다시 관찰</button>
+          <div className="w6-action-row"><button type="button" className="w6-secondary" onClick={() => { pressure.reset(); if (pressure.railFocus) setCameraCommand(previous => ({sequence:previous.sequence+1,kind:'tableau',frame:pressure.railFocus!.frame})); }}>대기 장면 다시 보기</button>
             <button type="button" className="w6-primary" onClick={() => nextScene(1)}>전체 FAB의 운송 살펴보기 ↗</button></div>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}

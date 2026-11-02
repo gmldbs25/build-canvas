@@ -243,3 +243,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
  .w6-singlefab-controls .w6-microcopy{font-size:9px;line-height:1.4}
  .w6-mcs-lens-note{top:118px;right:12px;max-width:155px;font-size:9px;padding:5px 8px}
 }
+
+/* Scene 07 — proof of a real, busy native rail bottleneck (no invented queue). */
+.w6-traffic-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.w6-traffic-metrics span{display:flex;flex-direction:column;gap:4px;border-top:2px solid #99b6a6;padding-top:7px;font-size:10px;line-height:1.4;color:#627568}
+.w6-traffic-metrics strong{font:700 23px/1.15 ui-monospace,Menlo,Consolas,monospace;color:#306c59;font-variant-numeric:tabular-nums}
+@media(max-width:650px){.w6-traffic-metrics span{font-size:9px;padding-top:5px}.w6-traffic-metrics strong{font-size:20px}}

@@ -339,7 +339,18 @@ try {
     await expect(page.getByRole('heading',{name:'길을 찾았는데, 왜 기다려야 할까?'})).toBeVisible();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-prepared','true',{timeout:120000});
     await expect(page.getByText('MCS는 경로를 결정한 뒤에도 변하는 교통 상황에 대응해야 합니다.')).toBeVisible();
-    await expect.poll(async() => page.locator('.w6-root').getAttribute('data-pressure-vehicle'),{timeout:25000}).not.toBe('');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-verified','true');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-fleet','64');
+    const railEvidence = await page.locator('.w6-root').evaluate(node => ({
+      vehicle: node.dataset.pressureVehicle, link: node.dataset.pressureQueue,
+      wait: Number(node.dataset.pressureStartWait), fleet: Number(node.dataset.pressureFleet),
+      active: Number(node.dataset.pressureActive), demand: Number(node.dataset.pressureDemandInterval)
+    }));
+    if (!railEvidence.vehicle || !railEvidence.link || railEvidence.wait < 3 ||
+        railEvidence.active < 10 || railEvidence.demand !== 1)
+      throw new Error('Scene 07 is not a verified busy Native rail bottleneck: '+JSON.stringify(railEvidence));
+    await expect(page.getByText('앞쪽 레일 점유로 대기 중')).toBeVisible({timeout:12000});
+    console.log('scene07-verified-native-bottleneck',JSON.stringify(railEvidence));
     await page.screenshot({path:path.join(evidence,'scene07-'+width+'.png')});
     // Same WebGL world persists through the entire future-facing narrative.
     await page.locator('.three-scene-host canvas').evaluate(el=>el.dataset.storyCanvas='kept');
