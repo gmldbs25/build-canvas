@@ -208,16 +208,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-explore-fabflow:focus-visible{outline:2px solid #ad714c;outline-offset:4px}
 .w6-explore-url{overflow-wrap:anywhere;margin:0}
 
-/* Work6 v2 — Native two-floor facility and future concept cards. */
-.w6-multi-stage{position:absolute;inset:0;background:#e8eee9;overflow:hidden}
-.w6-multi-stage .ml-native-scene{width:100%;height:100%;min-height:0;max-width:none;margin:0;display:flex;flex-direction:column;gap:0}
-.w6-multi-stage .ml-native-toolbar{position:absolute;z-index:6;top:18px;right:20px;max-width:56vw;display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap}
-.w6-multi-stage .ml-native-toolbar button{font-size:10px;min-height:32px;padding:4px 8px;background:rgba(249,248,242,.94);color:#30584a;border-color:#a6beaf}
-.w6-multi-stage .ml-native-canvas{flex:1;min-height:0;max-height:none;border:0;border-radius:0}
-.w6-multi-stage .ml-native-status{position:absolute;bottom:10px;right:14px;z-index:5;width:min(270px,34vw);grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
-.w6-multi-stage .ml-native-status span{font-size:9px;padding:6px;background:#20382ddf;color:#e0f0df}
-.w6-future-loading{position:absolute;inset:0;background:#e8eee9;display:grid;place-content:center;padding:15px;color:#34574b;font-size:13px;text-align:center}
-.w6-narrative-v2{max-width:min(415px,calc(100vw - 44px));bottom:clamp(22px,4vh,56px);padding:14px 15px 12px 0;max-height:none;overflow:visible;pointer-events:auto}
+
+/* Work6 v2.2 — one native Large 9-Bay canvas across every scene.
+   No Multi Large interstitial, dark cover, synthetic AI visual or stacked floor. */
+.w6-narrative-v2{max-width:min(418px,calc(100vw - 44px));bottom:clamp(22px,4vh,56px);padding:14px 15px 12px 0;max-height:none;overflow:visible;pointer-events:auto}
 .w6-narrative-v2::before{background:linear-gradient(90deg,rgba(244,241,234,.97) 8%,rgba(244,241,234,.90) 74%,transparent)}
 .w6-narrative-v2 h1{font-size:clamp(27px,2.7vw,39px);line-height:1.18;margin-bottom:10px}
 .w6-narrative-v2 .w6-description{font-size:13px;line-height:1.55}
@@ -225,7 +219,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-narrative-v2 .w6-inner-controls{margin-top:14px;padding-top:12px;max-height:none;overflow:visible;gap:10px}
 .w6-narrative-v2 .w6-overline{font-size:10px;margin:0}
 .w6-narrative-v2 .w6-microcopy{font-size:10px;margin:0}
-.w6-narrative-v2 .w6-result-takeaway{font-size:13px;line-height:1.55;margin:0}
+.w6-narrative-v2 .w6-result-takeaway{font-size:12px;line-height:1.5;margin:0}
 .w6-narrative-v2 .w6-action-row{gap:7px}
 .w6-narrative-v2 .w6-action-row button{font-size:11px;min-height:35px;padding:7px 10px}
 .w6-focus-status{padding:10px 12px;border-left:3px solid #6aa28b;background:rgba(250,248,241,.9);display:grid;gap:4px}
@@ -233,91 +227,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
 .w6-focus-status strong{color:#315c4c;font-size:18px;line-height:1.2}
 .w6-focus-status small{color:#536d5f;font-size:11px}
 .w6-concept-tag{display:inline-flex;align-self:flex-start;border:1px solid #c19b72;color:#896443;padding:6px 9px;font:650 10px/1.3 ui-monospace,Menlo,Consolas,monospace}
-.w6-future-explainer{background:rgba(249,247,240,.94);border:1px solid #c7d3c8;display:grid;gap:8px;padding:13px}
-.w6-future-explainer strong{font-size:15px;color:#275344;line-height:1.4;word-break:keep-all}
-.w6-future-explainer p{font-size:12px;line-height:1.6;color:#506356;margin:0;word-break:keep-all}
-.w6-future-explainer small{font-size:10px;line-height:1.45;color:#806d53;word-break:keep-all}
+.w6-singlefab-controls{gap:9px}
+.w6-route-difference{margin:0;font:600 11px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#32685c}
+.w6-mcs-lens-note{position:absolute;z-index:6;top:80px;right:clamp(16px,3.6vw,66px);padding:8px 11px;display:flex;gap:8px;align-items:center;pointer-events:none;color:#335b4a;border:1px solid rgba(99,153,129,.33);background:rgba(250,249,243,.9);font:650 11px/1.4 ui-monospace,Menlo,Consolas,monospace}
+.w6-mcs-lens-note span{width:8px;height:8px;border-radius:50%;background:#9da79c}
+.w6-mcs-lens-note span.is-scanning{background:#66a78c;box-shadow:0 0 0 4px rgba(112,173,135,.17)}
 @media(max-width:650px){
-.w6-narrative-v2{left:16px;right:16px;bottom:12px;max-width:none;padding:10px 0}
-.w6-narrative-v2 h1{font-size:27px;margin-bottom:7px}
-.w6-narrative-v2 .w6-description{font-size:12px;line-height:1.4}
-.w6-narrative-v2 .w6-inner-controls{margin-top:10px;padding-top:9px;gap:7px;max-height:none;overflow:visible}
-.w6-narrative-v2 .w6-action-row button{font-size:10px;min-height:33px;padding:6px 8px}
-.w6-narrative-v2 .w6-future-explainer{padding:9px;gap:5px}
-.w6-narrative-v2 .w6-future-explainer strong{font-size:13px}
-.w6-narrative-v2 .w6-future-explainer p{font-size:11px}
-.w6-multi-stage .ml-native-toolbar{top:8px;right:8px;max-width:62vw}
-.w6-multi-stage .ml-native-toolbar button{font-size:9px;min-height:30px;padding:3px 5px}
-.w6-multi-stage .ml-native-status{right:8px;bottom:8px;width:min(220px,48vw)}
+ .w6-narrative-v2{left:16px;right:16px;bottom:12px;max-width:none;padding:10px 0}
+ .w6-narrative-v2 h1{font-size:25px;margin-bottom:7px}
+ .w6-narrative-v2 .w6-description{font-size:11px;line-height:1.4}
+ .w6-narrative-v2 .w6-inner-controls{margin-top:8px;padding-top:8px;gap:7px;max-height:none;overflow:visible}
+ .w6-narrative-v2 .w6-action-row button{font-size:10px;min-height:33px;padding:6px 8px}
+ .w6-narrative-v2 .w6-context-line{font-size:11px;line-height:1.5}
+ .w6-narrative-v2 .w6-result-takeaway{font-size:11px}
+ .w6-singlefab-controls .w6-microcopy{font-size:9px;line-height:1.4}
+ .w6-mcs-lens-note{top:118px;right:12px;max-width:155px;font-size:9px;padding:5px 8px}
 }
-
-/* Keep conceptual diagnostic pages quiet: the lifter controls belong to the actual 08 demo. */
-.w6-root[data-current-scene="9"] .w6-multi-stage .ml-native-status,
-.w6-root[data-current-scene="10"] .w6-multi-stage .ml-native-status{display:none}
-.w6-root[data-current-scene="9"] .w6-multi-stage .ml-native-toolbar,
-.w6-root[data-current-scene="10"] .w6-multi-stage .ml-native-toolbar{display:none}
-
-/* Work6 v2.1 — cinematic intelligence exhibits; one paused native 3D renderer.
-   FOUP-only vertical transport is explicitly a concept, never old Native replay. */
-.w6-root[data-current-scene="8"] .w6-multi-stage .ml-native-toolbar,
-.w6-root[data-current-scene="8"] .w6-multi-stage .ml-native-status{display:none}
-.w6-root[data-current-scene="8"] .w6-multi-stage .ml-native-floor-label,
-.w6-root[data-current-scene="9"] .w6-multi-stage .ml-native-floor-label,
-.w6-root[data-current-scene="10"] .w6-multi-stage .ml-native-floor-label{opacity:.22}
-.w6-intel-exhibit{position:absolute;z-index:5;top:9%;right:4%;width:min(60%,860px);max-height:77%;padding:18px;background:linear-gradient(135deg,rgba(12,36,34,.96),rgba(18,53,51,.91));border:1px solid rgba(159,225,194,.48);box-shadow:0 28px 95px rgba(13,28,22,.28);border-radius:16px;display:flex;flex-direction:column;gap:12px;pointer-events:auto;overflow:hidden;color:#e0f6e9;isolation:isolate}
-.w6-intel-map{width:100%;height:auto;min-height:0;display:block;filter:drop-shadow(0 0 12px rgba(79,207,164,.10))}
-.w6-intel-map-head{display:flex;gap:6px;justify-content:space-between;align-items:baseline;flex-wrap:wrap;font-size:13px}
-.w6-intel-map-head span{font:650 10px ui-monospace,monospace;letter-spacing:.12em;color:#95baac}
-.w6-intel-map-head strong{font-size:18px;font-weight:700}
-.w6-intel-status{border-top:1px solid rgba(174,212,197,.20);padding-top:12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.w6-intel-status strong{font-size:12px}.w6-intel-status small{color:#abc9bb;font-size:10px;line-height:1.4}
-.w6-intel-pulse{width:9px;height:9px;border-radius:50%;background:#65d7b5;box-shadow:0 0 14px #6cdabb}
-.w6-intel-beacon{transform-box:fill-box;transform-origin:center;animation:w6-intel-glow 2.6s infinite alternate}
-.w6-intel-flow path{animation:w6-intel-route 5s linear infinite}
-.w6-intel-scan{animation:w6-intel-sweep 4.2s ease-in-out infinite}
-@keyframes w6-intel-glow{0%{opacity:.2;transform:scale(.75)}100%{opacity:1;transform:scale(1.17)}}
-@keyframes w6-intel-route{to{stroke-dashoffset:-72}}
-@keyframes w6-intel-sweep{0%,100%{transform:translateY(0);opacity:.05}45%{transform:translateY(205px);opacity:.7}}
-.w6-intel-transfer{display:flex;flex-direction:column;gap:8px}
-.w6-intel-transfer-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
-.w6-intel-transfer-head strong{font-size:18px}.w6-intel-transfer-head span{font:600 10px ui-monospace,monospace;letter-spacing:.09em;color:#bdc9a8}
-.w6-intel-transfer svg{width:100%;height:auto;max-height:340px}
-.w6-intel-cargo{transition:transform 1.15s cubic-bezier(.23,.68,.28,1);will-change:transform;filter:drop-shadow(0 0 7px rgba(249,212,148,.45))}
-.w6-intel-transfer-status{border-top:1px solid rgba(182,229,201,.2);display:flex;gap:14px;align-items:center;padding-top:10px}
-.w6-intel-transfer-status span{color:#f2cc84;font:650 12px ui-monospace,monospace;white-space:nowrap}
-.w6-intel-transfer-status strong{font-size:13px;line-height:1.5}
-.w6-intel-replay{align-self:flex-start;border:1px solid #7daa92;border-radius:6px;color:#dbefe3;background:#21483f;padding:7px 12px;font-size:11px;cursor:pointer}
-.w6-intel-comparison{display:flex;flex-direction:column;gap:8px;padding:0 8px 2px}
-.w6-intel-comparison-labels{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:700}
-.w6-intel-comparison-labels span:first-child{color:#79e1c7}
-.w6-intel-comparison-labels span:last-child{color:#e2b4f5}
-.w6-intel-comparison label{font-size:10px;color:#c6dacf}
-.w6-intel-comparison input{width:100%;accent-color:#75d5b7;cursor:ew-resize;touch-action:pan-x}
-.w6-intel-comparison small{font-size:10px;line-height:1.4;color:#b0cbbf}
-.w6-intel-narrative{gap:9px!important}
-.w6-intel-narrative .w6-context-line{font-size:13px;line-height:1.52}
-.w6-intel-narrative .w6-result-takeaway{font-size:12px!important}
-.w6-intel-narrative .w6-primary{align-self:flex-start}
-@media(max-width:900px){
-  .w6-intel-exhibit{top:6%;right:2.5%;width:58%;padding:12px;gap:7px}
-  .w6-intel-transfer-head strong,.w6-intel-map-head strong{font-size:14px}
-}
-@media(max-width:650px){
-  .w6-intel-exhibit{top:42px;left:10px;right:10px;width:auto;max-height:310px;padding:10px;border-radius:12px;gap:5px}
-  .w6-intel-transfer svg{max-height:185px}
-  .w6-intel-map{max-height:180px}
-  .w6-intel-transfer-head strong,.w6-intel-map-head strong{font-size:13px}
-  .w6-intel-transfer-head span,.w6-intel-map-head span{font-size:8px}
-  .w6-intel-transfer-status{padding-top:5px;gap:5px}
-  .w6-intel-transfer-status strong{font-size:10px}
-  .w6-intel-replay{font-size:9px;padding:5px 8px}
-  .w6-intel-status{gap:5px;padding-top:5px}
-  .w6-intel-status strong{font-size:10px}.w6-intel-status small{font-size:9px}
-  .w6-intel-comparison{gap:4px}
-  .w6-intel-comparison-labels{font-size:10px}
-  .w6-narrative-v2:has(.w6-intel-narrative) h1{font-size:23px}
-  .w6-narrative-v2:has(.w6-intel-narrative) .w6-description{font-size:11px}
-  .w6-narrative-v2:has(.w6-intel-narrative) .w6-intel-narrative{margin-top:7px;padding-top:8px}
-  .w6-intel-narrative .w6-context-line{font-size:11px}
-}
-@media(prefers-reduced-motion:reduce){.w6-intel-beacon,.w6-intel-flow path,.w6-intel-scan{animation:none}.w6-intel-cargo{transition:none}}

@@ -194,3 +194,10 @@
 - Scene 9: 실제 Multi Large Layout에서 1F/2F 레일망과 Lifter 위치를 읽어 SVG 연결망을 생성. 각 연결 지점에 관측 '시선'을 투영하되, 실제 AI 진단이나 발견된 혼잡으로 주장하지 않는다. 무거운 별도 WebGL 인스턴스를 사용하지 않는다.
 - Scene 10: 동일 원본 Layout의 **방향성 링크 그래프**를 이용해 다른 Lifter 자원을 경유하는 두 유효 경로를 탐색하고 분할 슬라이더로 비교한다. 실제 운송 정책 변경이나 어느 쪽이 빠르다는 결과를 만들지 않는다.
 - 진짜 FOUP-only Native Engine은 FAB FLOW의 구조 변경 (운송 2개 구간, FOUP 인계, 승강기 독립 자원, 저장·Replay·분석·검증)이 요구되며 이번 Work6 콘셉트 개발과는 구분한다. 기존 Native Engine을 화면만 속여 FOUP-only로 보이게 하지 않는다.
+
+## v2.2 — WORK6 단층 Large 일원화 / 3D 연속성 (2026-11-02)
+- 사용자 피드백: Scene 8/9에서 앞에 튀어나온 별도의 암색 SVG Exhibit는 FAB FLOW 3D의 몰입감을 깨므로 제거. Work6 전체는 동일한 FAB FLOW **단층 Large V6** 3D 화면을 유지한다.
+- Scenes 07→08→09에서는 동일한 실제 Large 시뮬레이션 상태와 같은 WebGL canvas를 유지하고, 프레임만 전체→교통 신호로 바꾼다. Scene 08은 실제 다수 OHT가 움직이는 전체 FAB, Scene 09는 **실제 현재 점유·대기 신호**를 원래 렌더러의 교통 레일 강조로 보여주며 토글 가능. 실제 AI 분석 결과/예측으로 표현하지 않는다.
+- Scene 10은 Scene 06에서 사용한 검증된 Large Native 실제 운송 및 합법적인 대안 경로 사례를 동일 ThreeFacilityScene 3D 위에 다시 보여주며 A/B/함께 보기. 실제 운송 변경이나 개선 수치를 만들지 않는다. 목적은 미래 AI 의사결정 지원의 가능성 소개.
+- 이번 Work6에서는 다층 운송 및 FOUP-only Lifter 장면을 전부 제외. 미래 FAB FLOW 본편의 FOUP-only 물류 구조 변경 요구사항은 `gmldbs25/fab_flow` 별도 설계 문서에 유지한다.
+- 11번 실제 FAB FLOW CTA 유지, Scenes 1–6 기존 기능·H/화살표 단축키 유지, 모바일 내장 스크롤 없음.

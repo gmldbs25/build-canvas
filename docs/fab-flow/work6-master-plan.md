@@ -179,3 +179,10 @@
 - S11 CTA remains `https://fabflow-yoon.vercel.app/` in a new tab; future features are distinct.
 - Keep all 11 scenes, desktop/mobile layout, keyboard h/arrow navigation, without nested vertical scroll on 07–10.
 - Technical boundary: future concepts draw the actual Multi Large visual background but do **not** alter Native Engine or purport to have deployed FLOW INTELLIGENCE. Actual Multi Large support is still in an isolated preview stage in `gmldbs25/fab_flow`.
+
+## v2.2 — WORK6 단층 Large 일원화 / 3D 연속성 (2026-11-02)
+- 사용자 피드백: Scene 8/9에서 앞에 튀어나온 별도의 암색 SVG Exhibit는 FAB FLOW 3D의 몰입감을 깨므로 제거. Work6 전체는 동일한 FAB FLOW **단층 Large V6** 3D 화면을 유지한다.
+- Scenes 07→08→09에서는 동일한 실제 Large 시뮬레이션 상태와 같은 WebGL canvas를 유지하고, 프레임만 전체→교통 신호로 바꾼다. Scene 08은 실제 다수 OHT가 움직이는 전체 FAB, Scene 09는 **실제 현재 점유·대기 신호**를 원래 렌더러의 교통 레일 강조로 보여주며 토글 가능. 실제 AI 분석 결과/예측으로 표현하지 않는다.
+- Scene 10은 Scene 06에서 사용한 검증된 Large Native 실제 운송 및 합법적인 대안 경로 사례를 동일 ThreeFacilityScene 3D 위에 다시 보여주며 A/B/함께 보기. 실제 운송 변경이나 개선 수치를 만들지 않는다. 목적은 미래 AI 의사결정 지원의 가능성 소개.
+- 이번 Work6에서는 다층 운송 및 FOUP-only Lifter 장면을 전부 제외. 미래 FAB FLOW 본편의 FOUP-only 물류 구조 변경 요구사항은 `gmldbs25/fab_flow` 별도 설계 문서에 유지한다.
+- 11번 실제 FAB FLOW CTA 유지, Scenes 1–6 기존 기능·H/화살표 단축키 유지, 모바일 내장 스크롤 없음.

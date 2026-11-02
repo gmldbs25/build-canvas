@@ -7,9 +7,9 @@ export const SCENES = [
 { id:5, chapter:'02 / REVEAL', eyebrow:'SCENE 05 — THE RAIL', title:'차량은 아무 길로나 갈 수 없다.', body:'레일에는 진행 방향이 있고, 장비와 장비를 잇는 연결 지점이 있습니다. 가까워 보여도 돌아가야 하는 이유가 여기 있어요.', format:'editorial' },
 { id:6, chapter:'02 / REVEAL', eyebrow:'SCENE 06 — THE DECISION', title:'멀리 있는 장비까지, 어느 길로 갈까?', body:'짧은 운송을 넘어 여러 Bay를 지나는 길을 살펴봅니다. 물류 제어 시스템(MCS)은 방향이 정해진 레일과 여러 후보 경로를 계산해 이동할 길을 선택합니다.', format:'interactive' },
 { id:7, chapter:'03 / CHALLENGE', eyebrow:'SCENE 07 — THE TRAFFIC', title:'길을 찾았는데, 왜 기다려야 할까?', body:'목적지까지의 길이 있어도 다른 OHT가 이용 중인 레일 앞에서는 기다릴 수 있어요.', format:'cinematic' },
-{ id:8, chapter:'03 / CHALLENGE', eyebrow:'SCENE 08 — MULTI LARGE', title:'층을 옮기는 건 OHT가 아니라 FOUP.', body:'각 층의 OHT가 Lifter 입·출구에서 FOUP를 인계합니다. FOUP만 층 사이를 이동하는 미래 물류 모델을 만나보세요.', format:'cinematic' },
-{ id:9, chapter:'04 / INTELLIGENCE', eyebrow:'SCENE 09 — OBSERVE & DIAGNOSE', title:'미래의 MCS는 무엇을 볼까?', body:'한 대의 차량을 넘어, 수많은 운송과 레일·Lifter가 연결된 공장 전체를 바라봅니다.', format:'editorial' },
-{ id:10, chapter:'04 / INTELLIGENCE', eyebrow:'SCENE 10 — TEST BEFORE ACTING', title:'하나의 공장, 여러 가지 미래.', body:'같은 출발지와 목적지라도 지나갈 수 있는 길은 여럿입니다. 두 개의 가능한 경로를 직접 비교해 보세요.', format:'interactive' },
+{ id:8, chapter:'03 / CHALLENGE', eyebrow:'SCENE 08 — MULTI LARGE', title:'하나의 FAB에서 동시에 벌어지는 일들.', body:'한 대의 차량을 따라왔다면 이제 전체 공장을 보세요. 수많은 운송을 동시에 관리하는 것이 MCS의 일이에요.', format:'cinematic' },
+{ id:9, chapter:'04 / INTELLIGENCE', eyebrow:'SCENE 09 — OBSERVE & DIAGNOSE', title:'미래의 MCS는 무엇을 먼저 알아볼까?', body:'같은 공장, 다른 시선. 눈에 보이는 OHT 움직임 아래에도 레일 점유와 대기 신호가 있습니다.', format:'editorial' },
+{ id:10, chapter:'04 / INTELLIGENCE', eyebrow:'SCENE 10 — TEST BEFORE ACTING', title:'하나의 공장, 여러 가지 선택.', body:'하나의 목적지에도 길은 여럿입니다. 운영 방식을 결정하기 전에 가능한 경로들을 살펴볼까요?', format:'interactive' },
 { id:11, chapter:'04 / INTELLIGENCE', eyebrow:'SCENE 11 — YOUR FAB', title:'이제 직접 운영해 볼 차례.', body:'현재의 MCS에서 미래형 운영 지원까지. 실제 FAB FLOW에서 물류 시스템을 경험해 보세요.', format:'cinematic' },
 ] as const;
 export type Work6SceneId = typeof SCENES[number]['id'];

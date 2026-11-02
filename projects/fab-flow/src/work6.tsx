@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ThreeFacilityScene from './components/ThreeFacilityScene';
-import MultiLargeFacilityScene, { type MultiLargeView } from './components/MultiLargeFacilityScene';
-import FutureExhibit from './components/FutureExhibit';
-import { useFutureFab } from './useFutureFab';
 import { Engine } from './sim/engine';
 import { SCENES } from './work6-scenes';
 import { usePressureWorld } from './usePressureWorld';
@@ -123,13 +120,13 @@ export default function Work6() {
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ sequence: 1, kind: 'opening' });
   const [cameraMoment, setCameraMoment] = useState(0);
   const scene = SCENES[sceneIndex];
-  const isPressure = scene.id === 7;
-  const isFuture = scene.id >= 8 && scene.id <= 10;
-  const [futureView, setFutureView] = useState<MultiLargeView>('stacked');
-  const future = useFutureFab(isFuture, false, true);
-  // The operating FAB is warmed from real Native ticks before the reveal.
-  // Scene 08 branches two equal-length experiments from that same snapshot.
-  const pressure = usePressureWorld(scene.id === 7, false, scene.id === 6 || scene.id === 7);
+  // Keep one Native single-floor Large world and its canvas throughout the
+  // contemporary traffic / prospective intelligence story (Scenes 07–09).
+  const isPressure = scene.id >= 7 && scene.id <= 9;
+  const [intelligenceLens, setIntelligenceLens] = useState(true);
+  const [futureRoute, setFutureRoute] = useState<'selected' | 'alternative' | 'both'>('both');
+  // One real Large V6 scenario continues between Scenes 07, 08 and 09.
+  const pressure = usePressureWorld(isPressure, false, scene.id >= 6 && scene.id <= 9);
   const [congestionVehicleId, setCongestionVehicleId] = useState<string>();
   const [congestionDecision, setCongestionDecision] = useState<ReturnType<Engine['inspectDecision']>>();
   const queueVehicleIds = pressure.state.linkQueues?.flatMap(queue => queue.vehicleIds) ?? [];
@@ -142,11 +139,11 @@ export default function Work6() {
   const [routeError, setRouteError] = useState('');
   const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative' | 'both'>('both');
   const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
-    scene.id === 6 && routeStudy ? routeStudy.engine : engineRef.current;
+    (scene.id === 6 || scene.id === 10) && routeStudy ? routeStudy.engine : engineRef.current;
   const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
-    scene.id === 6 && routeStudy ? routeStudy.state : nativeState;
+    (scene.id === 6 || scene.id === 10) && routeStudy ? routeStudy.state : nativeState;
   useEffect(() => {
-    if (scene.id !== 6 || routeStudy || routeError) return;
+    if ((scene.id !== 6 && scene.id !== 10) || routeStudy || routeError) return;
     // Compute a real, separate long-range native case once on entry. Scene03
     // keeps its short route and completed FOUP intact.
     let cancelled = false;
@@ -291,8 +288,9 @@ export default function Work6() {
   const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
   const transportFinished = stage === 'bay' && request?.phase === 'completed';
   const isReveal = scene.id === 4;
-  const isDecision = scene.id === 6;
-  const shownRoute = routeStudy ? routeChoice === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
+  const isDecision = scene.id === 6 || scene.id === 10;
+  const presentationRoute = scene.id === 10 ? futureRoute : routeChoice;
+  const shownRoute = routeStudy ? presentationRoute === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
   const isNetwork = scene.id === 5;
   const focusMode = scene.id <= 3;
   const pressureBeatLabel = pressure.beat === 'normal' ? '01 · 평상시 운송' : pressure.beat === 'surge' ? '02 · 요청 급증' : '03 · 대기 확인';
@@ -303,7 +301,7 @@ export default function Work6() {
   const candidates = scene.id === 7 && congestionDecision
     ? congestionDecision.candidates.filter(candidate => candidate.selected)
     : isDecision && routeStudy && shownRoute
-    ? routeChoice === 'both'
+    ? presentationRoute === 'both'
       ? [{ ...routeStudy.alternative, selected: false }, { ...routeStudy.selected, selected: true }]
       : [{ ...shownRoute, selected: true }]
     : (isNetwork || isTransportRouteVisible) && currentDecision
@@ -326,7 +324,7 @@ export default function Work6() {
       issueCamera(tracked ? 'follow' : 'opening', tracked, reqId);
       return;
     }
-    if (scene.id === 6) {
+    if (scene.id === 6 || scene.id === 10) {
       if (routeStudy) setCameraCommand(previous => ({
         sequence: previous.sequence + 1, kind: 'tableau', frame: routeStudy.frame,
       }));
@@ -362,13 +360,11 @@ export default function Work6() {
     setCongestionDecision(pressure.engine.inspectDecision(congestionVehicleId));
     issueCamera('follow', congestionVehicleId);
   }, [scene.id, congestionVehicleId, pressure.engine, issueCamera]);
-  useEffect(() => {
-    if (!isFuture || !future.prepared) return;
-    setFutureView('stacked');
-  }, [isFuture, future.prepared]);
-  // Keep the original port annotations stable through request/dispatch.  // Keep the original port annotations stable through request/dispatch.
-  // Creating the FOUP should change only that model, never reframe the FAB.
-  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
+  // The scanner is purely a way to visualize native rail occupancy / queues.
+  // Its color is not a computed AI diagnosis or prediction.
+  const observedRailView = scene.id === 7 || (scene.id === 9 && intelligenceLens);
+  // Keep the original port annotations stable through request/dispatch.
+  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
 
   return <div className="w6-root" data-prototype="true"
     data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
@@ -388,13 +384,9 @@ export default function Work6() {
     data-pressure-waiting={scene.id === 7 ? waitingVehicles : ''}
     data-pressure-vehicle={scene.id === 7 ? congestionVehicleId ?? '' : ''}
     data-pressure-queue={scene.id === 7 ? realQueue?.linkId ?? '' : ''}
-    data-future-prepared={isFuture ? String(future.prepared) : ''}
-    data-future-tick={isFuture ? future.state?.tick ?? '' : ''}
-    data-future-lift={isFuture ? String(future.transfer) : ''}
-    data-future-transferred={isFuture ? String(future.transferred) : ''}
-    data-future-view={isFuture ? futureView : ''}
-    data-future-mode={scene.id === 8 ? 'fo-only-concept' : scene.id === 9 ? 'vision' : scene.id === 10 ? 'alternatives' : ''}
-    data-future-kind={isFuture ? 'concept-layout-only' : ''}>
+    data-fab-layout={(scene.id >= 7 && scene.id <= 10) ? activeEngine.layout.id : ''}
+    data-mcs-lens={scene.id === 9 ? (intelligenceLens ? 'traffic' : 'normal') : ''}
+    data-future-route={scene.id === 10 ? futureRoute : ''}>
     <header className="w6-header">
       <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
       <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
@@ -402,14 +394,8 @@ export default function Work6() {
     </header>
     <main className="w6-stage">
       <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
-        {isFuture ? (future.engine && future.state ? <div className="w6-multi-stage" aria-label="실제 FAB FLOW 2층 Native 3D">
-          <MultiLargeFacilityScene layout={future.engine.layout} scenario={future.engine.scenario} state={future.state}
-            running={false} tickMs={future.tickMs}
-            view={futureView} introEnabled={false} onViewChange={view => setFutureView(view)}
-            onSelectVehicle={() => {}} />
-          <FutureExhibit layout={future.engine.layout} mode={scene.id === 8 ? 'transfer' : scene.id === 9 ? 'vision' : 'alternatives'}/>
-        </div> : <div className="w6-future-loading" role="status">{future.error || '실제 두 층의 운송을 준비하고 있어요.'}</div>) : <ThreeFacilityScene
-          layout={activeEngine.layout}
+        <ThreeFacilityScene
+          layout={activeEngine.layout}          layout={activeEngine.layout}
           state={activeState}
           floor={0}
           failures={activeEngine.scenario.failures}
@@ -418,22 +404,26 @@ export default function Work6() {
           tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
           selected={scene.id === 7 && congestionVehicleId ? 'vehicle:' + congestionVehicleId : isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
             : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={scene.id === 7 ? congestionVehicleId : isDecision && routeStudy ? routeStudy.vehicleId : isOpening ? undefined : selectedVehicleId}
+          trackedVehicle={isPressure ? (scene.id === 7 ? congestionVehicleId : undefined) : isDecision && routeStudy ? routeStudy.vehicleId : isOpening ? undefined : selectedVehicleId}
           trackedRequest={isOpening || isPressure || isDecision || request?.phase === 'completed' ? undefined : request?.id}
           plannedTutorialIngress={scene.id === 3 ? planned : undefined}
           tutorialStage={scene.id === 3 ? stage : undefined}
           softTokenEntrance={scene.id === 3}
           cameraCommand={cameraCommand}
           cameraLocked={focusMode}
-          heatmap={scene.id === 7}
-          view={scene.id === 7 ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
+          heatmap={observedRailView}
+          view={observedRailView ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
           routeCandidates={candidates}
           onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
           onFloorChange={() => {}}
-        />}
+        />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
         {focusMode && <div className="w6-focus-note" role="note">{isOpening ? '고정된 시야에서 여러 OHT의 실제 움직임을 관찰해요' : '지금은 한 대의 운송에 집중해요 · 전체 공장은 Scene 04에서'}</div>}
-        {(scene.id === 3 || isNetwork || isDecision || scene.id === 7) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 OHT 이동 경로</div> : null}
+        {(scene.id === 3 || isNetwork || isDecision || scene.id === 7) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 10 ? '유효 경로 사례 · 운송은 변경하지 않음' : '실제 OHT 이동 경로'}</div> : null}
+        {scene.id === 9 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
+          <span aria-hidden="true" className={intelligenceLens ? 'is-scanning' : ''}/>
+          {intelligenceLens ? '실제 레일 점유·대기 신호' : '기본 FAB 화면'}
+        </div>}
         {isReveal && <div className="w6-reveal-note" aria-live="polite">{['01 / 한 대의 OHT','02 / 하나의 Bay','03 / 연결된 FAB 전체'][cameraMoment]}</div>}
         {scene.id === 7 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
           <strong>운영 중인 FAB를 준비하고 있어요.</strong>
@@ -540,22 +530,35 @@ export default function Work6() {
             <button type="button" className="w6-primary" onClick={() => nextScene(1)}>더 복잡한 FAB 보기 ↗</button></div>
           {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
         </div>}
-        {scene.id === 8 && <div className="w6-inner-controls w6-intel-narrative">
-          <span className="w6-concept-tag">FOUP-ONLY LIFTER · 미래 물류 모델</span>
-          <p className="w6-context-line">1층 OHT는 입구에 FOUP만 내려놓습니다. Lifter가 FOUP를 2층 출구로 올리면, 2층의 다른 OHT가 인수해요.</p>
-          <p className="w6-microcopy">기존 FAB FLOW Native 엔진은 OHT와 FOUP가 함께 이동하는 구조입니다. 이 장면은 변경할 물류 구조를 보여주는 개념 시각화예요.</p>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>미래 MCS의 시선으로 보기 ↗</button>
+        {scene.id === 8 && <div className="w6-inner-controls w6-singlefab-controls">
+          <span className="w6-overline">LARGE FAB · NATIVE OHT TRANSPORT</span>
+          <p className="w6-context-line">앞에서 따라온 한 대의 OHT와 같은 공장입니다. 지금은 전체 Large FAB에서 여러 운송이 동시에 움직이는 모습을 보세요.</p>
+          <p className="w6-result-takeaway">MCS는 수많은 차량과 운송 요청을 하나의 레일망에서 함께 관리해야 합니다.</p>
+          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>운송 흐름의 신호 보기 ↗</button>
         </div>}
-        {scene.id === 9 && <div className="w6-inner-controls w6-intel-narrative">
-          <span className="w6-concept-tag">FLOW INTELLIGENCE · 미래 기능 콘셉트</span>
-          <p className="w6-context-line">차량 하나가 아닌 전체 운송망을 바라봅니다. 실제 레일과 네 개의 Lifter를 통해 연결 관계가 어떻게 이루어지는지 살펴보세요.</p>
-          <p className="w6-result-takeaway">미래 시스템의 역할은 움직임을 보는 데서 나아가, 서로 연결된 운송들을 함께 이해하는 것입니다.</p>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>여러 가지 미래 비교하기 ↗</button>
+        {scene.id === 9 && <div className="w6-inner-controls w6-singlefab-controls">
+          <span className="w6-concept-tag">FLOW INTELLIGENCE · 미래 운영 시선</span>
+          <p className="w6-context-line">같은 공장에 운행 정보를 겹쳐 봅니다. 현재 차량의 레일 점유와 대기 신호는 실제 엔진 상태에서 가져옵니다.</p>
+          <div className="w6-action-row" role="group" aria-label="운행 신호 표시 선택">
+            <button type="button" className={intelligenceLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={intelligenceLens} onClick={() => setIntelligenceLens(true)}>운행 신호 보기</button>
+            <button type="button" className={!intelligenceLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!intelligenceLens} onClick={() => setIntelligenceLens(false)}>기본 FAB 보기</button>
+          </div>
+          <p className="w6-microcopy">이것은 실제 점유·대기 데이터의 시각화이며 AI 진단 결과는 아닙니다. 미래에는 이런 기록을 분석해 위험 구간을 미리 발견하도록 발전할 수 있어요.</p>
+          <button type="button" className="w6-secondary" onClick={() => nextScene(1)}>다른 선택을 비교해 보기 ↗</button>
         </div>}
-        {scene.id === 10 && <div className="w6-inner-controls w6-intel-narrative">
-          <span className="w6-concept-tag">WHAT-IF · 미래 의사결정 콘셉트</span>
-          <p className="w6-context-line">같은 FAB, 같은 출발지와 목적지. 서로 다른 Lifter를 통과하는 합법적인 두 경로를 슬라이더로 비교합니다.</p>
-          <p className="w6-result-takeaway">어떤 경로가 실제로 더 좋은지는 측정이 필요합니다. 미래 MCS는 이를 시험하고 운영자의 선택을 도울 수 있어요.</p>
+        {scene.id === 10 && <div className="w6-inner-controls w6-singlefab-controls">
+          <span className="w6-concept-tag">WHAT-IF · 미래 운영 판단</span>
+          <p className="w6-context-line">Scene 6의 실제 MCS 운송 사례를 같은 Large FAB에서 다시 살펴봅니다. 선택된 길 외에 다른 합법적인 경로도 가능할까요?</p>
+          {routeStudy ? <>
+            <div className="w6-action-row" role="group" aria-label="미래 경로 비교">
+              <button type="button" className={futureRoute === 'selected' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'selected'} onClick={() => setFutureRoute('selected')}>MCS 경로</button>
+              <button type="button" className={futureRoute === 'alternative' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'alternative'} onClick={() => setFutureRoute('alternative')}>대안 경로</button>
+              <button type="button" className={futureRoute === 'both' ? 'w6-primary' : 'w6-secondary'} aria-pressed={futureRoute === 'both'} onClick={() => setFutureRoute('both')}>함께 보기</button>
+            </div>
+            <p className="w6-route-difference">{routeStudy.sourceBay} → {routeStudy.destinationBay} · 두 경로는 실제 방향성 레일망을 따릅니다.</p>
+            <p className="w6-microcopy">{routeStudy.alternativeKind === 'detour' ? '대안은 일부 레일을 제외하고 계산한 가정입니다. ' : '대안은 MCS가 계산한 경로 후보입니다. '}실제 운송 변경이나 처리시간 개선을 입증한 것은 아닙니다.</p>
+          </> : <p className="w6-context-line" role="status">{routeError || '실제 경로 사례를 준비하고 있습니다.'}</p>}
+          <p className="w6-result-takeaway">미래의 지능형 MCS는 이런 선택지를 사전에 시험하고 운영자가 판단하도록 도울 수 있습니다.</p>
           <button type="button" className="w6-primary" onClick={() => nextScene(1)}>FAB FLOW 직접 체험하기 ↗</button>
         </div>}
         {scene.id === 11 && <div className="w6-inner-controls">
@@ -584,6 +587,6 @@ export default function Work6() {
         <button type="button" onClick={() => nextScene(1)} disabled={sceneIndex === SCENES.length-1} aria-label="다음 장면">→</button>
       </div>
     </footer>
-    <div className="w6-prototype-disclaimer">WORK 06 · 11 SCENES · CURRENT MCS: NATIVE MODEL / FUTURE INTELLIGENCE & FOUP TRANSFER: CONCEPT · NOT A REAL FAB DIGITAL TWIN</div>
+    <div className="w6-prototype-disclaimer">WORK 06 · LARGE V6 SINGLE-FLOOR NATIVE MODEL · FUTURE INTELLIGENCE: CONCEPT · NOT A REAL FAB DIGITAL TWIN</div>
   </div>;
 }
