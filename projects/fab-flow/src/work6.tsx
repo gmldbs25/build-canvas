@@ -7,6 +7,7 @@ import { SCENES } from './work6-scenes';
 import { usePressureWorld } from './usePressureWorld';
 import { useAmbientIntro } from './useAmbientIntro';
 import { buildNativeRouteStudy, type NativeRouteStudy } from './routeStudy';
+import { chooseNativeGraphExample } from './nativeGraphExample';
 import { operationalScenario } from './sim/experiments';
 import { chooseLocalIntroDemand } from './introScenario';
 import { publicationCopy } from './sim/publication';
@@ -150,6 +151,7 @@ export default function Work6() {
   const congestionDecision = congestionVehicleId ? pressure.engine.inspectDecision(congestionVehicleId) : undefined;
   const isOpening = scene.id === 1 || scene.id === 2 || scene.id === 8;
   const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
+  const nativeGraphExample = useMemo(() => chooseNativeGraphExample(ambient.engine.layout, 0), [ambient.engine.layout]);
   const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
   const [routeError, setRouteError] = useState('');
   const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative' | 'both'>('both');
@@ -313,10 +315,21 @@ export default function Work6() {
     }
   };
 
+  const showGraphLens = () => {
+    setNetworkLens(true);
+    if (nativeGraphExample) setCameraCommand(previous => ({ sequence: previous.sequence + 1,
+      kind: 'tableau', frame: nativeGraphExample.frame }));
+  };
+  const showFactoryLens = () => {
+    setNetworkLens(false);
+    setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 1100 }));
+  };
+
   const nextScene = useCallback((delta: number) => {
     setSceneIndex(current => Math.max(0, Math.min(SCENES.length - 1, current + delta)));
   }, []);
   useEffect(() => {
+    if (scene.id !== 2) setNetworkLens(false);
     if (scene.id !== 3) {
       autoTransportRef.current = false;
       cancelRunning();
@@ -478,7 +491,7 @@ export default function Work6() {
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
-        {isNetwork && <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 방향성 레일망 · 장비 외형 숨김</div>}
+        {isNetwork && <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 Node · 방향성 Link · Port를 표시 중</div>}
         {focusMode && <div className="w6-focus-note" role="note">{isOpening ? 'FAB FLOW 엔진에서 계산한 운송을 관찰해요' : '실제 한 건의 운송 상태를 따라가요'}</div>}
         {(scene.id === 3 || isDecision || scene.id === 6) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 5 ? '실제 선택 경로 · 다른 경로는 비교용' : '실제 OHT 이동 경로'}</div> : null}
         {scene.id === 6 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
@@ -507,14 +520,19 @@ export default function Work6() {
         </div>}
         {scene.id === 2 && <div className="w6-inner-controls w6-story-controls">
           <div className="w6-action-row" role="group" aria-label="공장과 네트워크 보기">
-            <button type="button" className={!networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!networkLens} onClick={() => setNetworkLens(false)}>공장 보기</button>
-            <button type="button" className={networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={networkLens} onClick={() => setNetworkLens(true)}>길찾기 구조 보기</button>
+            <button type="button" className={!networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!networkLens} onClick={showFactoryLens}>공장 보기</button>
+            <button type="button" className={networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={networkLens} onClick={showGraphLens}>길찾기 구조 보기</button>
           </div>
           <p className="w6-microcopy" aria-live="polite">{networkLens
-            ? '장비 외형을 숨기고 실제 이동 가능한 레일을 청록색으로 강조했어요. 움직이는 OHT와 레일망은 원본 FAB FLOW 그대로입니다.'
-            : '공장의 장비와 실제 레일, 움직이는 OHT를 함께 보여줍니다. 길찾기 구조 보기를 눌러 레일망만 살펴보세요.'}</p>
+            ? '공장 속 실제 한 구간을 확대했어요. 동그란 지점은 Node, 화살표는 이동 방향이 있는 Link, 호박색 표시는 FOUP를 주고받는 Port입니다.'
+            : '먼저 FAB FLOW가 보여주는 장비와 OHT를 살펴보세요. 그래프 보기를 누르면 같은 공장의 실제 Node·Link·Port 구조를 확대해 보여줘요.'}</p>
+          {networkLens && <div className="w6-graph-legend" aria-label="실제 FAB 그래프 데이터 설명">
+            <div><span className="w6-graph-symbol is-node" aria-hidden="true"/><p><strong>Node</strong><small>차량이 거치는 실제 연결 지점</small></p></div>
+            <div><span className="w6-graph-symbol is-link" aria-hidden="true">→</span><p><strong>Link</strong><small>이동 가능한 레일과 그 방향</small></p></div>
+            <div><span className="w6-graph-symbol is-port" aria-hidden="true"/><p><strong>Port</strong><small>장비와 FOUP를 주고받는 접점</small></p></div>
+          </div>}
           <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 그래프 모델링</summary>
-            <p>엔진은 Node(연결점), Link(방향이 있는 레일), Port(FOUP를 주고받는 장소)를 구별합니다. 가까운 장비라도 선로 방향이 맞지 않으면 돌아가야 합니다. 실제 산업 현장의 전체 배치를 복제한 것은 아닙니다.</p>
+            <p>장비의 3D 외형은 사람이 이해하기 위한 표현입니다. Native 엔진은 방향성 Node·Link로 경로를 탐색하고 Port를 운송의 시작·도착 접점으로 사용합니다. 가까운 지점이라도 링크가 연결되지 않았거나 방향이 맞지 않으면 직접 이동할 수 없습니다. 표시된 지점과 화살표는 실제 FAB FLOW 레이아웃 데이터에서 읽어왔습니다.</p>
           </details>
         </div>}
         {scene.id === 3 && <div className="w6-inner-controls w6-story-controls">
