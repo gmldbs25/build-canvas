@@ -156,6 +156,11 @@ try {
     await expect(page.getByText('Node',{exact:true})).toBeVisible();
     await expect(page.getByText('Link',{exact:true})).toBeVisible();
     await expect(page.getByText('Port',{exact:true})).toBeVisible();
+    if (width === 390) {
+      const panel = await page.locator('.w6-narrative').boundingBox();
+      if (!panel || panel.y < height * .50)
+        throw Error('Scene 02 graph is hidden beneath the portrait narrative: '+JSON.stringify({panel,viewport:[width,height]}));
+    }
     const sampleCamera = await page.evaluate(() => window.__FAB_3D__?.camera?.span);
     if(!Number.isFinite(sampleCamera) || sampleCamera > openingSpan*.9)
       throw Error('Scene 02 did not focus the real graph close-up: '+JSON.stringify({openingSpan,sampleCamera}));
