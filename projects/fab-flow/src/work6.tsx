@@ -421,6 +421,7 @@ export default function Work6() {
     data-opening-moving={ambient.openingMovingVehicles}
     data-opening-local-moving={ambient.openingLocalVehicles}
     data-scene-count={SCENES.length} data-current-scene={scene.id}
+    data-scene2-network={scene.id === 2 ? (networkLens ? 'network' : 'factory') : ''}
     data-clock-time={scene.id === 4 ? clockState.time : ''}
     data-clock-tick={scene.id === 4 ? clockState.tick : ''}
     data-route-study-seed={routeStudy?.seed ?? ''}
@@ -471,11 +472,13 @@ export default function Work6() {
           cameraLocked={focusMode}
           heatmap={observedRailView}
           view={observedRailView ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
+          networkFocus={isNetwork}
           routeCandidates={candidates}
           onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
           onFloorChange={() => {}}
         />
         <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
+        {isNetwork && <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 방향성 레일망 · 장비 외형 숨김</div>}
         {focusMode && <div className="w6-focus-note" role="note">{isOpening ? 'FAB FLOW 엔진에서 계산한 운송을 관찰해요' : '실제 한 건의 운송 상태를 따라가요'}</div>}
         {(scene.id === 3 || isDecision || scene.id === 6) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 5 ? '실제 선택 경로 · 다른 경로는 비교용' : '실제 OHT 이동 경로'}</div> : null}
         {scene.id === 6 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
@@ -507,7 +510,9 @@ export default function Work6() {
             <button type="button" className={!networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!networkLens} onClick={() => setNetworkLens(false)}>공장 보기</button>
             <button type="button" className={networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={networkLens} onClick={() => setNetworkLens(true)}>길찾기 구조 보기</button>
           </div>
-          <p className="w6-microcopy">원본 Large FAB의 실제 방향성 레일망입니다. 화면의 선로와 경로 계산에 쓰이는 연결망은 같은 모델이에요.</p>
+          <p className="w6-microcopy" aria-live="polite">{networkLens
+            ? '장비 외형을 숨기고 실제 이동 가능한 레일을 청록색으로 강조했어요. 움직이는 OHT와 레일망은 원본 FAB FLOW 그대로입니다.'
+            : '공장의 장비와 실제 레일, 움직이는 OHT를 함께 보여줍니다. 길찾기 구조 보기를 눌러 레일망만 살펴보세요.'}</p>
           <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 그래프 모델링</summary>
             <p>엔진은 Node(연결점), Link(방향이 있는 레일), Port(FOUP를 주고받는 장소)를 구별합니다. 가까운 장비라도 선로 방향이 맞지 않으면 돌아가야 합니다. 실제 산업 현장의 전체 배치를 복제한 것은 아닙니다.</p>
           </details>
