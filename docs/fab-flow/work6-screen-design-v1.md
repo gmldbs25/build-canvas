@@ -201,3 +201,9 @@
 - Scene 10은 Scene 06에서 사용한 검증된 Large Native 실제 운송 및 합법적인 대안 경로 사례를 동일 ThreeFacilityScene 3D 위에 다시 보여주며 A/B/함께 보기. 실제 운송 변경이나 개선 수치를 만들지 않는다. 목적은 미래 AI 의사결정 지원의 가능성 소개.
 - 이번 Work6에서는 다층 운송 및 FOUP-only Lifter 장면을 전부 제외. 미래 FAB FLOW 본편의 FOUP-only 물류 구조 변경 요구사항은 `gmldbs25/fab_flow` 별도 설계 문서에 유지한다.
 - 11번 실제 FAB FLOW CTA 유지, Scenes 1–6 기존 기능·H/화살표 단축키 유지, 모바일 내장 스크롤 없음.
+
+## v2.3 Scene 07 — 투입구가 보이지 않는 실제 정체 관찰 (2026-11-02)
+- 차량 총수는 최초부터 64대로 고정되어 있었으며 Native Scenario에 `fleetChanges` 없음. 사용자가 OHT 생성으로 본 것은 비노출 staging pool의 기존 parked OHT가 dispatch되며 중앙 통로로 진입하는 모습이다.
+- Scene 07은 단층 Large Native Engine, 1건/시뮬레이션 초, 실제 rail queue / waitReason 판정은 그대로 사용한다. 정체 구간 후보의 카메라 중심에서 가장 가까운 staging pool까지 680 Native 좌표 단위 이상 떨어진 실제 레일 대기만 선택한다. staging spur는 직접 배제한다.
+- 카메라는 해당 대기 링크를 좁은 tableau(560 span)로 비추고, OHT 차량 추가 없이 막히는 구간만 보여준다. Scene 8/9는 기존 Large 상태와 WebGL 렌더링을 계속 공유한다.
+- 브라우저 검증: 차량 수와 fleetChanges 0, 실제 blocking/queue, staging pool 거리, OHT identity 유지, 데스크톱·모바일 smoke.

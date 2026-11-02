@@ -384,6 +384,9 @@ export default function Work6() {
     data-pressure-queue={scene.id === 7 ? realQueue?.linkId ?? pressure.railFocus?.linkId ?? '' : ''}
     data-pressure-start-wait={scene.id === 7 ? pressure.railFocus?.waitSeconds ?? 0 : ''}
     data-pressure-verified={scene.id === 7 ? String(!!pressure.railFocus && pressure.railFocus.waitSeconds >= 3) : ''}
+    data-pressure-staging-clearance={scene.id === 7 ? pressure.railFocus?.stagingClearance ?? '' : ''}
+    data-pressure-fleet-changes={scene.id === 7 ? pressure.engine.scenario.fleetChanges?.length ?? 0 : ''}
+    data-pressure-vehicle-count={scene.id === 7 ? pressure.state.vehicles.length : ''}
     data-pressure-rail-blocked={scene.id === 7 ? String(!!railIsBlocked) : ''}
     data-pressure-active={scene.id === 7 ? activeTransports : ''}
     data-pressure-fleet={scene.id === 7 ? pressure.engine.scenario.fleet : ''}
@@ -525,8 +528,8 @@ export default function Work6() {
         {scene.id === 7 && <div className="w6-inner-controls">
           <span className="w6-overline">CURRENT MCS · LIVE NATIVE ENGINE</span>
           <p className="w6-context-line">{!pressure.prepared
-            ? '여러 OHT와 운송 요청이 몰린 실제 Large FAB의 레일 대기 장면을 찾고 있어요.'
-            : '운송 요청이 몰리면 여러 OHT가 같은 레일 구간을 이용하려고 합니다. 앞쪽 구간을 비워줄 때까지 기다리는 모습을 살펴보세요.'}</p>
+            ? '이미 운행 중인 OHT들이 실제로 기다리는 레일 구간을 찾고 있어요.'
+            : '차량 수를 늘리지 않고, 바쁜 공장의 정체 구간만 가까이 보여줍니다. 앞쪽 레일이 비워질 때까지 기다리는 모습을 살펴보세요.'}</p>
           <div className="w6-traffic-metrics" aria-label="실제 FAB 혼잡 현황">
             <span><strong>{pressure.engine.scenario.fleet}</strong>대 OHT</span>
             <span><strong>{activeTransports}</strong>대 운송 중</span>
