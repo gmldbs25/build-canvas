@@ -144,12 +144,27 @@ try {
     await page.screenshot({path:path.join(evidence,'scene2-factory-'+width+'.png')});
     await page.getByRole('button',{name:'길찾기 구조 보기'}).click();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','network');
-    await expect(page.getByText(/장비 외형을 숨기고 실제 이동 가능한 레일/)).toBeVisible();
+    await expect(page.getByText(/공장 속 실제 한 구간을 확대했어요/)).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.__FAB_3D__?.networkPresentation),{timeout:30000})
       .toMatchObject({active:true,equipmentVisible:false,originalRailsVisible:true});
     const actualGraph = await page.evaluate(() => window.__FAB_3D__?.networkPresentation);
-    if(!actualGraph || actualGraph.highlightedNativeLinks < 1)
-      throw Error('Scene 02 highlights no real native rail links: '+JSON.stringify(actualGraph));
+    if(!actualGraph || actualGraph.highlightedNativeLinks < 1 ||
+       actualGraph.nodes < 1 || actualGraph.directedLinks < 1 ||
+       actualGraph.directionArrows < 1 || actualGraph.ports < 1 ||
+       !actualGraph.example?.portId || !actualGraph.example?.linkId || !actualGraph.example?.nodeId)
+      throw Error('Scene 02 actual Native Node/Link/Port model missing: '+JSON.stringify(actualGraph));
+    await expect(page.getByText('Node',{exact:true})).toBeVisible();
+    await expect(page.getByText('Link',{exact:true})).toBeVisible();
+    await expect(page.getByText('Port',{exact:true})).toBeVisible();
+    if (width === 390) {
+      const panel = await page.locator('.w6-narrative').boundingBox();
+      if (!panel || panel.y < height * .50)
+        throw Error('Scene 02 graph is hidden beneath the portrait narrative: '+JSON.stringify({panel,viewport:[width,height]}));
+    }
+    const sampleCamera = await page.evaluate(() => window.__FAB_3D__?.camera?.span);
+    if(!Number.isFinite(sampleCamera) || sampleCamera > openingSpan*.9)
+      throw Error('Scene 02 did not focus the real graph close-up: '+JSON.stringify({openingSpan,sampleCamera}));
+    await page.waitForTimeout(250);
     await page.screenshot({path:path.join(evidence,'scene2-graph-'+width+'.png')});
     await page.getByRole('button',{name:'공장 보기'}).click();
     await expect(page.locator('.w6-root')).toHaveAttribute('data-scene2-network','factory');
@@ -158,7 +173,11 @@ try {
     const restoredWorld = await page.evaluate(() => window.__FAB_3D__?.worldId);
     if (factoryWorld !== restoredWorld)
       throw Error('Scene 02 toggle unexpectedly rebuilt original native 3D world');
-    console.log('scene2-native-network-toggle',JSON.stringify({viewport:[width,height],highlighted:actualGraph.highlightedNativeLinks,worldPreserved:true}));
+    console.log('scene2-native-network-toggle',JSON.stringify({
+      viewport:[width,height], nativeNodes:actualGraph.nodes, nativeLinks:actualGraph.directedLinks,
+      directedArrows:actualGraph.directionArrows, nativePorts:actualGraph.ports,
+      example:actualGraph.example, worldPreserved:true
+    }));
 
     await page.getByRole('button',{name:/Scene 03:/}).click();
     await expect(page.getByRole('heading',{name:/상자 하나를 옮기는 데도 여러 단계/})).toBeVisible();

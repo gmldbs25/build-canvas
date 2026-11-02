@@ -14,6 +14,7 @@ import { pathForLink, pointAlongPath, vehiclePosition } from '@/sim/geometry';
 import { buildRouteHighlightPaths, createRouteHighlightMaterial, routeHighlightRenderOrders } from '@/components/routeHighlights';
 import { confirmedMotion } from '@/sim/motion';
 import { continuousVehicleHeading } from '@/sim/vehicleHeading';
+import { chooseNativeGraphExample } from '@/nativeGraphExample';
 import { fitProjectedFacility, overviewSafeRect, type CameraCommand, type ProjectedBounds, type ScreenRect } from '@/components/fabCamera';
 import { releaseFocusedProjection } from '@/components/focusCameraHandoff';
 import FacilitySceneFallback from '@/components/FacilityScene';
@@ -846,6 +847,104 @@ export function setRouteLayer(layout: Layout, floor: number, layer: THREE.Group,
   }
 }
 
+/**
+ * Work6 graph lens: a presentation of the SAME directed Node/Link/Port model
+ * already used by the Native FAB FLOW engine and rail geometry.
+ * No independent map, fabricated edges, or replacement 3D factory.
+ */
+function buildNativeGraphPresentation(layout: Layout, floor: number) {
+  const layer = new THREE.Group();
+  layer.name = 'native-graph-lens';
+  layer.visible = false;
+  const nodes = layout.nodes.filter(node => node.floor === floor);
+  const nodeMap = new Map(nodes.map(node => [node.id, node]));
+  const links = layout.links.filter(link => link.kind !== 'lifter' && nodeMap.has(link.from) && nodeMap.has(link.to));
+  const ports = layout.ports.filter(port => port.floor === floor && nodeMap.has(port.node));
+  const example = chooseNativeGraphExample(layout, floor);
+
+  const transform = new THREE.Object3D();
+  const pointGeometry = new THREE.SphereGeometry(5.3, 8, 6);
+  const pointMaterial = new THREE.MeshBasicMaterial({ color: 0x0b9c98, depthWrite: false, toneMapped: false });
+  const pointInstances = new THREE.InstancedMesh(pointGeometry, pointMaterial, nodes.length);
+  pointInstances.name = 'native-graph-nodes'; pointInstances.frustumCulled = false;
+  nodes.forEach((node, index) => {
+    transform.position.set(node.x, 79, node.y);
+    transform.rotation.set(0, 0, 0);
+    transform.scale.setScalar(1);
+    transform.updateMatrix();
+    pointInstances.setMatrixAt(index, transform.matrix);
+  });
+  pointInstances.instanceMatrix.needsUpdate = true;
+  layer.add(pointInstances);
+
+  // Real Node positions, with Link tangent defining each arrow direction.
+  // Cap density in very large maps; the example Link is always included.
+  const stride = Math.max(1, Math.ceil(links.length / 850));
+  const shownLinks = links.filter((link, index) => index % stride === 0 || link.id === example?.linkId);
+  const arrowGeometry = new THREE.BufferGeometry();
+  arrowGeometry.setAttribute('position', new THREE.Float32BufferAttribute([
+    11,0,0, -6,0,-6.5, -6,0,6.5,
+  ], 3));
+  arrowGeometry.computeVertexNormals();
+  const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0x196977, side: THREE.DoubleSide, depthWrite: false, toneMapped: false });
+  const arrows = new THREE.InstancedMesh(arrowGeometry, arrowMaterial, shownLinks.length);
+  arrows.name = 'native-directed-link-arrows'; arrows.frustumCulled = false;
+  shownLinks.forEach((link,index) => {
+    const at = pointAlongPath(pathForLink(layout, link), .5);
+    transform.position.set(at.x, 82, at.y);
+    transform.rotation.set(0, -at.angle * Math.PI / 180, 0);
+    transform.scale.setScalar(1);
+    transform.updateMatrix();
+    arrows.setMatrixAt(index,transform.matrix);
+  });
+  arrows.instanceMatrix.needsUpdate = true;
+  layer.add(arrows);
+
+  const portGeometry = new THREE.OctahedronGeometry(8, 0);
+  const portMaterial = new THREE.MeshBasicMaterial({ color: 0xd58936, depthWrite: false, toneMapped: false });
+  const portInstances = new THREE.InstancedMesh(portGeometry,portMaterial,ports.length);
+  portInstances.name = 'native-graph-ports'; portInstances.frustumCulled = false;
+  ports.forEach((port,index) => {
+    const node = nodeMap.get(port.node)!;
+    transform.position.set(node.x, 92, node.y);
+    transform.rotation.set(0,0,0);
+    transform.scale.setScalar(1);
+    transform.updateMatrix();
+    portInstances.setMatrixAt(index,transform.matrix);
+  });
+  portInstances.instanceMatrix.needsUpdate = true;
+  layer.add(portInstances);
+
+  if (example) {
+    const sampleNode = nodeMap.get(example.nodeId);
+    const samplePortNode = nodeMap.get(example.portNodeId);
+    const sampleLink = links.find(link => link.id === example.linkId);
+    const samplePoint = sampleLink && pointAlongPath(pathForLink(layout,sampleLink), .5);
+    const highlights: Array<{name:string; x:number; z:number; color:number; radius:number; y:number}> = [];
+    if (sampleNode) highlights.push({name:'NODE',x:sampleNode.x,z:sampleNode.y,color:0x0b9c98,radius:16,y:83});
+    if (samplePoint) highlights.push({name:'LINK',x:samplePoint.x,z:samplePoint.y,color:0x196977,radius:15,y:86});
+    if (samplePortNode) highlights.push({name:'PORT',x:samplePortNode.x,z:samplePortNode.y,color:0xd58936,radius:18,y:97});
+    for (const marker of highlights) {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(marker.radius - 3, marker.radius, 36),
+        new THREE.MeshBasicMaterial({color:marker.color,side:THREE.DoubleSide,depthWrite:false,toneMapped:false}));
+      ring.rotation.x = -Math.PI/2; ring.position.set(marker.x, marker.y, marker.z);
+      ring.renderOrder = 14;
+      ring.userData.role = 'native-graph-example-' + marker.name.toLowerCase();
+      layer.add(ring);
+    }
+  }
+
+  return {
+    layer,
+    example,
+    nodeCount:nodes.length,
+    directedLinkCount:links.length,
+    arrowCount:shownLinks.length,
+    portCount:ports.length,
+  };
+}
+
 export function facilityFitPoints(root: THREE.Object3D, excluded: Set<THREE.Object3D>) {
   root.updateMatrixWorld(true);
   const points: THREE.Vector3[] = [];
@@ -1045,6 +1144,10 @@ function buildScene(layout: Layout, state: SimulationState, floor: number, selec
       object.matrixWorldAutoUpdate = false;
     });
   }
+  // Deliberately after static batching: the graph lens must not be merged
+  // into the permanent factory geometry or regenerate the Three.js world.
+  const graphPresentation = buildNativeGraphPresentation(layout, floor);
+  root.add(graphPresentation.layer);
   const ownedResources = ownSharedWorldResources(root);
   const ownGeometry = (source: THREE.BufferGeometry) => {
     let owned = ownedResources.geometries.get(source);
@@ -1061,7 +1164,7 @@ function buildScene(layout: Layout, state: SimulationState, floor: number, selec
     source: { geometry: ownGeometry(SOURCE_FOUP_TOKEN.geometry), material: ownMaterial(SOURCE_FOUP_TOKEN.material as THREE.Material) },
     stored: { geometry: ownGeometry(STORED_FOUP_TOKEN.geometry), material: ownMaterial(STORED_FOUP_TOKEN.material as THREE.Material) },
   };
-  return { root, bounds, staticGeometryStats, stagingLabels, vehicleGroups, vehicleInstanceIds, highVehicleInstanceIds: initialVisibleIds, lowVehicleInstanceIds: [] as string[], vehicleBodyInstances, lowVehicleBodyInstances, foupInstances, lowFoupInstances, stateInstances, farStateInstances, waitingInstances, failureInstances, rails, lowRails, railMeshes, statusLayer, statusMeshes, statusPoints, statusLinks, statusMetadata, overlayBatch, overlayMesh, selectedRailOverlay, selectedRailOverlayId, closureMesh, closedLinkIds, tools, lowEquipment, tokenLayer, tokenOwners: [] as Array<{ requestId: string; owner: 'source' | 'stocker' }>, tokenPrototypes, dfgLutUniforms: ownedResources.dfgLutUniforms, equipmentGroups, routeLayer, focusLayer, interactionTargets, staticLodDetailed: true, denseOverview: true };
+  return { root, bounds, staticGeometryStats, stagingLabels, vehicleGroups, vehicleInstanceIds, highVehicleInstanceIds: initialVisibleIds, lowVehicleInstanceIds: [] as string[], vehicleBodyInstances, lowVehicleBodyInstances, foupInstances, lowFoupInstances, stateInstances, farStateInstances, waitingInstances, failureInstances, rails, lowRails, railMeshes, statusLayer, statusMeshes, statusPoints, statusLinks, statusMetadata, overlayBatch, overlayMesh, selectedRailOverlay, selectedRailOverlayId, closureMesh, closedLinkIds, tools, lowEquipment, tokenLayer, tokenOwners: [] as Array<{ requestId: string; owner: 'source' | 'stocker' }>, tokenPrototypes, dfgLutUniforms: ownedResources.dfgLutUniforms, equipmentGroups, graphPresentation, routeLayer, focusLayer, interactionTargets, staticLodDetailed: true, denseOverview: true };
 }
 
 /** Build the same static Three.js floor used by the live scene for isolated visual previews. */
@@ -1105,6 +1208,7 @@ function updateStaticLod(world: ReturnType<typeof buildScene>, cameraSpan: numbe
   // so the underlying directed graph is unambiguously visible.
   world.tools.visible = !networkFocus && detailed;
   world.lowEquipment.visible = !networkFocus && !detailed;
+  world.graphPresentation.layer.visible = networkFocus;
   for (const label of world.root.children.filter(child => child.userData.role === 'bridge-label')) label.visible = detailed;
 }
 
@@ -1989,7 +2093,12 @@ export default function ThreeFacilityScene(props: Props) {
           return { objects, materials: materials.size, geometries: geometries.size };
         }, renderer: 'three-webgl', worldId: world.root.uuid,
         networkPresentation: { active: networkFocus, equipmentVisible: world.tools.visible || world.lowEquipment.visible,
-          originalRailsVisible: world.rails.visible, highlightedNativeLinks: networkFocus ? world.statusLinks.size : 0 },
+          originalRailsVisible: world.rails.visible, highlightedNativeLinks: networkFocus ? world.statusLinks.size : 0,
+          nodes: networkFocus ? world.graphPresentation.nodeCount : 0,
+          directedLinks: networkFocus ? world.graphPresentation.directedLinkCount : 0,
+          directionArrows: networkFocus ? world.graphPresentation.arrowCount : 0,
+          ports: networkFocus ? world.graphPresentation.portCount : 0,
+          example: networkFocus ? world.graphPresentation.example : null },
         analysis: { enabled: !!analysis, mode: analysisMode ?? 'recent', windowSeconds: analysis?.windowSeconds ?? null, rails: [...world.statusMeshes].filter(([,mesh])=>mesh.visible).map(([id,mesh])=>({id,color: (mesh.material as THREE.MeshBasicMaterial).color.getHexString(),geometry:mesh.geometry.uuid,closed:mesh.getObjectByName('closure-cross')?.visible??false})) }, equipment: { ports: layout.ports.length, functional: layout.facility?.equipment.length ?? 0, context: layout.facility?.decorativeEquipment?.length ?? 0 }, staging: { representation: 'off-rail-pool-counts', parked: state.vehicles.filter(v => v.parked).length, pools: Object.fromEntries([...world.stagingLabels].map(([id, sign]) => [id, sign.userData.count])) }, graphics: { ...graphicsInfo, fleetSize: state.vehicles.length, pixelRatio: renderer.getPixelRatio(), adaptiveReason: softwareLargeFleet ? 'software-renderer-large-fleet' : null }, inventoryDisplayLimit, inventorySampled, omittedSource: sampledInventory.omittedSource, omittedStored: sampledInventory.omittedStored, inventory: { sourceActual: sampledInventory.sourceTotal, sourceDrawn: sampledInventory.source.length, storedActual: sampledInventory.storedTotal, storedDrawn: sampledInventory.stored.length }, time: state.time, tick: state.tick, overviewFit: overviewRef.current ? overviewFitRef.current : null, camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z, target: { ...cameraTargetRef.current }, span: cameraSpanRef.current / zoom, near: camera.near, far: camera.far }, vehicles: projected, foupOwners, physicalFoups,
           // Native renderer diagnostics, not a second FOUP representation.
           carrierHandoff: (() => {

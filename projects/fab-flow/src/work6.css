@@ -377,3 +377,54 @@ button:focus-visible,a:focus-visible{outline:2px solid #ad714c;outline-offset:4p
   .w6-root .w6-narrative h1 { font-size: 25px; }
   .w6-root .w6-narrative .w6-description { font-size: 13px; }
 }
+
+/* Scene 02 — same native FAB world, now with a graph-reading key. */
+.w6-graph-legend{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+  padding:11px 12px;
+  border:1px solid rgba(46,102,89,.22);
+  border-radius:7px;
+  background:rgba(255,253,246,.94);
+}
+.w6-graph-legend > div{display:flex;align-items:center;gap:11px;min-width:0}
+.w6-graph-legend p{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:10px;row-gap:1px;margin:0;min-width:0}
+.w6-graph-legend strong{font:700 13px/1.4 ui-monospace,Menlo,monospace;color:#2d574e}
+.w6-graph-legend small{font-size:12px;line-height:1.4;color:#536a60;word-break:keep-all}
+.w6-graph-symbol{flex:none;display:inline-flex;align-items:center;justify-content:center}
+.w6-graph-symbol.is-node{width:12px;height:12px;border-radius:50%;background:#0b9c98;box-shadow:0 0 0 3px rgba(11,156,152,.12)}
+.w6-graph-symbol.is-link{width:23px;height:20px;color:#196977;font:800 25px/1 ui-monospace,Menlo,monospace}
+.w6-graph-symbol.is-port{width:12px;height:12px;background:#d58936;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 0 0 1px #bd8134}
+@media(max-width:650px){
+  .w6-graph-legend{gap:5px;padding:8px 10px}
+  .w6-graph-legend strong{font-size:12px}
+  .w6-graph-legend small{font-size:12px}
+}
+
+
+/* In portrait graph mode the physical Node/Link/Port example must remain
+   visible ABOVE the explanation. Keep essential controls and legend reachable. */
+@media (max-width:650px) and (orientation:portrait) {
+  .w6-root[data-scene2-network="network"] .w6-narrative {
+    max-height: min(38svh, 305px);
+    overflow-y: auto;
+    bottom: 8px;
+    padding-top: 9px;
+    padding-bottom: 8px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-chapter,
+  .w6-root[data-scene2-network="network"] .w6-description { display:none; }
+  .w6-root[data-scene2-network="network"] .w6-narrative h1 {
+    font-size: 21px;
+    line-height: 1.24;
+    margin-bottom: 5px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-inner-controls {
+    margin-top: 8px;
+    padding-top: 8px;
+    gap: 7px;
+  }
+  .w6-root[data-scene2-network="network"] .w6-graph-legend { gap: 2px; padding: 7px 10px; }
+  .w6-root[data-scene2-network="network"] .w6-microcopy { font-size:12px;line-height:1.44; }
+}
