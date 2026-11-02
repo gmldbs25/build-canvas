@@ -356,12 +356,12 @@ try {
       throw new Error('Scene 07 is not a verified busy Native rail bottleneck: '+JSON.stringify(railEvidence));
     await expect(page.getByText('앞쪽 레일 점유로 대기 중')).toBeVisible({timeout:12000});
     console.log('scene07-verified-native-bottleneck',JSON.stringify(railEvidence));
-    // Keep the same 64 physical OHT identities while replaying the traffic.
-    // Parked OHTs may be dispatched, but no Native vehicle is introduced.
-    const initialIdentity = await page.evaluate(() => (window.__FAB_3D__?.vehicles ?? []).map(v => v.id).sort().join('|'));
+    // Native state and scenario fleet remain fixed. Off-rail staging may
+    // dispatch an already-existing OHT, but no extra vehicle can be added.
+    const initialCount = await page.locator('.w6-root').getAttribute('data-pressure-vehicle-count');
     await page.waitForTimeout(1100);
-    const afterIdentity = await page.evaluate(() => (window.__FAB_3D__?.vehicles ?? []).map(v => v.id).sort().join('|'));
-    if (initialIdentity !== afterIdentity) throw new Error('Scene 07 vehicle identities changed during playback (unwanted additional OHT).');
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-vehicle-count',initialCount);
+    await expect(page.locator('.w6-root')).toHaveAttribute('data-pressure-fleet-changes','0');
     await page.screenshot({path:path.join(evidence,'scene07-'+width+'.png')});
     // Same WebGL world persists through the entire future-facing narrative.
     await page.locator('.three-scene-host canvas').evaluate(el=>el.dataset.storyCanvas='kept');
