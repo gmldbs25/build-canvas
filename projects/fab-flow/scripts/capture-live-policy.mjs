@@ -26,6 +26,11 @@ try {
   await page.getByRole('button',{name:'실험 패널 열기'}).click();
   const settings=page.locator('.sandbox-settings');
   await settings.locator(':scope > summary').click();
+  await settings.getByRole('button',{name:/고급 설정/}).click();
+  const demandWindow=page.getByRole('spinbutton',{name:'수요 발생 시간 (s)'});
+  await demandWindow.waitFor({state:'visible'});
+  await demandWindow.fill('120');
+  await demandWindow.press('Tab');
   const duration=page.getByRole('spinbutton',{name:'관찰 시간 (s)'});
   await duration.waitFor({state:'visible'});
   await duration.fill('120');
