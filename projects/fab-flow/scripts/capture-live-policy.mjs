@@ -25,7 +25,7 @@ try {
   await page.getByRole('spinbutton',{name:'준비 OHT 수'}).fill('8');
   await page.getByRole('button',{name:'실험 패널 열기'}).click();
   const settings=page.locator('.sandbox-settings');
-  await settings.locator('summary').click();
+  await settings.locator(':scope > summary').click();
   const duration=page.getByRole('spinbutton',{name:'관찰 시간 (s)'});
   await duration.waitFor({state:'visible'});
   await duration.fill('120');
