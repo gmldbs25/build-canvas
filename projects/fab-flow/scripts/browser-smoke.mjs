@@ -70,9 +70,18 @@ try {
   }
   const homePage=await browser.newPage();
   await homePage.route('**/build-canvas/',route=>route.fulfill({status:200,contentType:'text/html',body:'<html lang="ko"><body>home</body></html>'}));
-  await homePage.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/');
+  await homePage.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/', { waitUntil: 'networkidle' });
+  await expect(homePage.locator('.article-page')).toBeVisible();
+  // Give the document (rather than a currently focused link/control) keyboard focus.
+  // Work6 intentionally ignores the H shortcut when the focused target is interactive.
+  await homePage.evaluate(() => {
+    document.body.setAttribute('tabindex', '-1');
+    document.body.focus();
+  });
+  const focusTag = await homePage.evaluate(() => document.activeElement?.tagName);
+  if (focusTag !== 'BODY') throw Error('Home shortcut smoke could not focus document: ' + focusTag);
   await homePage.keyboard.press('h');
-  await homePage.waitForURL('**/build-canvas/');
+  await homePage.waitForURL('**/build-canvas/', { waitUntil: 'domcontentloaded', timeout: 10000 });
   console.log('home-shortcut','ok');
   await homePage.close();
 }finally{
