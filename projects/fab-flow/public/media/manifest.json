@@ -243,64 +243,13 @@
     ],
     "not_refreshed": []
   },
-  "hero_motion": {
-    "source_url": "https://fabflow-yoon.vercel.app/",
-    "capture_type": "real-time screen recording of public FAB FLOW native simulator (not a GIF or AI animation)",
-    "captured_at_utc": "2026-11-03T02:34:11.197Z",
-    "application_deployment_sha": "not independently verified",
-    "scenario": {
-      "mode": "Sandbox",
-      "layout": "Medium V6",
-      "fleet": 32,
-      "policy": "DBR",
-      "demand_preset": "congested",
-      "camera": "full FAB overview",
-      "simulation_time_begin": 12.5,
-      "simulation_time_end": 40
-    },
-    "viewport": {
-      "width": 2560,
-      "height": 1440,
-      "device_pixel_ratio": 1,
-      "source_canvas": {
-        "width": 1920,
-        "height": 1039
-      }
-    },
-    "clip": {
-      "seconds": 5,
-      "fps": 30,
-      "width": 1920,
-      "height": 1080,
-      "muted": true,
-      "loop": true,
-      "encoding": "high quality"
-    },
-    "videos": [
-      {
-        "file": "hero-overview.mp4",
-        "bytes": 810195,
-        "duration": 5,
-        "width": 1920,
-        "height": 1080,
-        "frames": 150,
-        "distinct_motion_samples": 10,
-        "sha256": "b6b53c6198a94e47f1d82604fefe1abbe1adee2f2180033c224007c9ef424f1c"
-      },
-      {
-        "file": "hero-overview.webm",
-        "bytes": 749538,
-        "duration": 5,
-        "width": 1920,
-        "height": 1080,
-        "frames": 0,
-        "distinct_motion_samples": 10,
-        "sha256": "e864539a0e1490d93f64eff9153b15daee8a3fa557a1e389ae9abd97f422cf8c"
-      }
-    ],
-    "poster": {
-      "file": "hero-motion-poster.jpg",
-      "bytes": 186655
-    }
+  "native_preview": {
+    "status": "live_native_core",
+    "source_repository": "gmldbs25/fab_flow",
+    "source_code": "src/sim",
+    "mirrored_code": "projects/fab-flow/src/native",
+    "renderer": "2D Canvas; actual core Engine.step(1), getLayout V6 and confirmedMotion interpolation",
+    "scenario": "Small V6 native engine; 12 OHT, hotspot demand; 0.5s simulation ticks",
+    "note": "Native engine and topology; only 3D rendering has been replaced with an economical 2D Canvas. This is not footage and does not reproduce the complete 3D UI."
   }
 }
