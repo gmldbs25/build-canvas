@@ -18,7 +18,7 @@ type World = {
 };
 
 const TICK_MS = 150; // native 0.5-second ticks, ~3.3x wall clock
-const FRAME_MS = 33;
+const FRAME_MS = 17; // smooth interpolation; static world geometry is cached
 
 function newWorld(): World {
   const engine = new Engine({
@@ -30,96 +30,127 @@ function newWorld(): World {
   return {engine, layout: engine.layout, motion: new Map(), lastTick: performance.now()};
 }
 
-function draw(canvas: HTMLCanvasElement, world: World, fraction: number) {
-  const rect = canvas.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width)), height = Math.max(1, Math.round(rect.height));
-  if (width < 20 || height < 20) return;
-  const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-  if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
-    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-  }
-  const ctx = canvas.getContext('2d', {alpha: false});
-  if (!ctx) return;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.fillStyle = '#e6eee7';
-  ctx.fillRect(0,0,width,height);
-  const {layout,engine} = world;
-  const compact = width < 600;
-  // On phone screens, center the real first bay rather than shrinking both bays to tiny dots.
-  const visibleWidth = compact ? layout.width * .53 : layout.width;
-  const visibleHeight = layout.height;
-  const scale = Math.min((width-34)/visibleWidth, (height-70)/visibleHeight);
-  const px = (n: number) => n / scale;
-  ctx.translate((width-visibleWidth*scale)/2,(height-visibleHeight*scale)/2);
-  ctx.scale(scale,scale);
+type CachedMap = {layer: HTMLCanvasElement; width: number; height: number; dpr: number; layout: Layout};
+const mapCache = new WeakMap<HTMLCanvasElement, CachedMap>();
 
+/**
+ * Paint the V6 facility only when its dimensions change.
+ * The 30–60 FPS motion path must draw OHTs, not every bay, machine and rail again.
+ */
+function paintMap(ctx: CanvasRenderingContext2D, layout: Layout, width: number, height: number) {
+  const scale = Math.min((width - 34) / layout.width, (height - 70) / layout.height);
+  const px = (n: number) => n / scale;
+  ctx.fillStyle = '#e6eee7';
+  ctx.fillRect(0, 0, width, height);
+  ctx.save();
+  ctx.translate((width - layout.width * scale) / 2, (height - layout.height * scale) / 2);
+  ctx.scale(scale, scale);
   ctx.fillStyle = '#f9fbf6';
-  ctx.fillRect(0,0,layout.width,layout.height);
+  ctx.fillRect(0, 0, layout.width, layout.height);
   ctx.strokeStyle = '#b8ccc1';
   ctx.lineWidth = px(1);
-  ctx.strokeRect(0,0,layout.width,layout.height);
-  for(const area of layout.areas){
+  ctx.strokeRect(0, 0, layout.width, layout.height);
+  for (const area of layout.areas) {
     ctx.fillStyle = '#eaf0e7';
-    ctx.fillRect(area.x,area.y,area.width,area.height);
+    ctx.fillRect(area.x, area.y, area.width, area.height);
     ctx.strokeStyle = '#c8d9cd';
-    ctx.strokeRect(area.x,area.y,area.width,area.height);
+    ctx.strokeRect(area.x, area.y, area.width, area.height);
   }
-
   const equipment = [...(layout.facility?.decorativeEquipment ?? []), ...(layout.facility?.equipment ?? [])];
-  for(const eq of equipment){
+  for (const eq of equipment) {
     ctx.fillStyle = eq.variant === 'stocker' ? '#8db7a3' : eq.variant === 'wet' ? '#abcfc7' : '#b3cfc1';
-    ctx.fillRect(eq.x,eq.y,eq.width,eq.height);
+    ctx.fillRect(eq.x, eq.y, eq.width, eq.height);
     ctx.strokeStyle = '#8cae9e';
     ctx.lineWidth = px(.6);
-    ctx.strokeRect(eq.x,eq.y,eq.width,eq.height);
+    ctx.strokeRect(eq.x, eq.y, eq.width, eq.height);
   }
-
-  // Original V6 curved rail polylines, not decorative or inferred paths.
-  for(const link of layout.links) {
-    const points = pathForLink(layout,link);
-    if(points.length<2)continue;
-    ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);
-    for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);
-    ctx.strokeStyle = link.kind==='bridge' ? '#b79064' : '#397769';
-    ctx.lineWidth=px(link.kind==='bridge' ? 2.1 : 1.65);
-    ctx.lineJoin='round';ctx.stroke();
+  // The original engine's V6 curved rail paths, not guessed/animated routes.
+  for (const link of layout.links) {
+    const points = pathForLink(layout, link);
+    if (points.length < 2) continue;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+    ctx.strokeStyle = link.kind === 'bridge' ? '#b79064' : '#397769';
+    ctx.lineWidth = px(link.kind === 'bridge' ? 2.1 : 1.65);
+    ctx.lineJoin = 'round';
+    ctx.stroke();
   }
-  const nodes = new Map(layout.nodes.map(n=>[n.id,n]));
-  for(const port of layout.ports) {
-    const n=nodes.get(port.node);if(!n)continue;
-    ctx.beginPath();ctx.arc(n.x,n.y,px(2.6),0,Math.PI*2);
-    ctx.fillStyle='#d7a151';ctx.fill();
+  const nodes = new Map(layout.nodes.map(n => [n.id, n]));
+  for (const port of layout.ports) {
+    const n = nodes.get(port.node);
+    if (!n) continue;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, px(2.6), 0, Math.PI * 2);
+    ctx.fillStyle = '#d7a151';
+    ctx.fill();
   }
-
-  for(const vehicle of engine.state.vehicles) {
-    if(vehicle.parked || vehicle.failed)continue;
-    const position=world.motion.get(vehicle.id)?.(fraction) ?? vehiclePosition(layout,vehicle);
-    if(!position || position.floor!==0)continue;
-    ctx.save();
-    ctx.translate(position.x,position.y);
-    ctx.rotate((position.angle ?? 0)*Math.PI/180);
-    const w=px(15),h=px(9);
-    ctx.fillStyle='#fcfff4';ctx.fillRect(-w/2-px(1.2),-h/2-px(1.2),w+px(2.4),h+px(2.4));
-    ctx.fillStyle=vehicle.loaded?'#dc9336':'#1b9278';
-    ctx.fillRect(-w/2,-h/2,w,h);
-    ctx.fillStyle='#edf8ec';ctx.fillRect(w/4,-h/3,px(2),h*.66);
-    ctx.restore();
+  ctx.fillStyle = '#285a48';
+  ctx.font = '700 ' + px(width < 520 ? 10 : 12) + 'px ui-monospace,monospace';
+  for (let i = 0; i < layout.areas.length; i++) {
+    const a = layout.areas[i];
+    ctx.fillText('BAY ' + String(i + 1).padStart(2, '0'), a.x + px(12), a.y + px(24));
   }
-
-  ctx.fillStyle='#285a48';
-  ctx.font='700 '+px(width<520 ? 10:12)+'px ui-monospace,monospace';
-  for(let i=0;i<layout.areas.length;i++){
-    const a=layout.areas[i];
-    ctx.fillText('BAY '+String(i+1).padStart(2,'0'),a.x+px(12),a.y+px(24));
-  }
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.fillStyle='#d9e8db';ctx.fillRect(0,height-30,width,30);
-  ctx.font='700 10px ui-monospace,monospace';
-  ctx.fillStyle='#486957';
-  ctx.fillText(width<520 ? 'REAL V6 MAP  /  REAL OHT TICKS' :
-    'ACTUAL V6 TOPOLOGY  /  NATIVE ENGINE TICKS  /  LIGHTWEIGHT 2D VIEW',14,height-11);
+  ctx.restore();
+  ctx.fillStyle = '#d9e8db';
+  ctx.fillRect(0, height - 30, width, 30);
+  ctx.font = '700 10px ui-monospace,monospace';
+  ctx.fillStyle = '#486957';
+  ctx.fillText(width < 520 ? 'REAL V6 MAP  /  REAL OHT TICKS' :
+    'ACTUAL V6 TOPOLOGY  /  NATIVE ENGINE TICKS  /  LIGHTWEIGHT 2D VIEW', 14, height - 11);
 }
 
+function draw(canvas: HTMLCanvasElement, world: World, fraction: number) {
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  if (width < 20 || height < 20) return;
+  const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  const pixelWidth = Math.round(width * dpr), pixelHeight = Math.round(height * dpr);
+  let cached = mapCache.get(canvas);
+  if (!cached || cached.width !== width || cached.height !== height ||
+      cached.dpr !== dpr || cached.layout !== world.layout) {
+    const layer = document.createElement('canvas');
+    layer.width = pixelWidth;
+    layer.height = pixelHeight;
+    const bg = layer.getContext('2d', {alpha: false});
+    if (!bg) return;
+    bg.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paintMap(bg, world.layout, width, height);
+    cached = {layer, width, height, dpr, layout: world.layout};
+    mapCache.set(canvas, cached);
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+  }
+
+  const ctx = canvas.getContext('2d', {alpha: false});
+  if (!ctx) return;
+  // Reuse the stable rasterized facility. Only verified OHT motion changes per frame.
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(cached.layer, 0, 0);
+  const {layout, engine} = world;
+  const scale = Math.min((width - 34) / layout.width, (height - 70) / layout.height);
+  const px = (n: number) => n / scale;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.translate((width - layout.width * scale) / 2, (height - layout.height * scale) / 2);
+  ctx.scale(scale, scale);
+  for (const vehicle of engine.state.vehicles) {
+    if (vehicle.parked || vehicle.failed) continue;
+    const position = world.motion.get(vehicle.id)?.(fraction) ?? vehiclePosition(layout, vehicle);
+    if (!position || position.floor !== 0) continue;
+    ctx.save();
+    ctx.translate(position.x, position.y);
+    ctx.rotate((position.angle ?? 0) * Math.PI / 180);
+    const w = px(15), h = px(9);
+    ctx.fillStyle = '#fcfff4';
+    ctx.fillRect(-w / 2 - px(1.2), -h / 2 - px(1.2), w + px(2.4), h + px(2.4));
+    ctx.fillStyle = vehicle.loaded ? '#dc9336' : '#1b9278';
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.fillStyle = '#edf8ec';
+    ctx.fillRect(w / 4, -h / 3, px(2), h * .66);
+    ctx.restore();
+  }
+}
 export default function NativeFabPreview(){
   const canvasRef=useRef<HTMLCanvasElement>(null);
   const worldRef=useRef<World|null>(null);
