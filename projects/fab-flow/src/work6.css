@@ -40,11 +40,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e4
 .hero-visual-top>span:first-child{display:flex;align-items:center;gap:9px}
 .hero-visual-top i{width:7px;height:7px;border-radius:50%;background:#45ad8b;display:inline-block}
 .hero-visual img{display:block;width:100%;height:auto;aspect-ratio:16/8.7;object-fit:cover;object-position:center}
-.hero-motion-surface{position:relative;overflow:hidden;background:#e6ede5}
-.hero-motion-surface video{display:block;width:100%;height:auto;aspect-ratio:16/8.7;object-fit:cover;object-position:center;background:#e6ede5}
-.hero-motion-toggle{position:absolute;right:16px;bottom:16px;z-index:2;display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid rgba(244,250,245,.5);border-radius:3px;background:rgba(16,45,37,.84);color:#f5fff7;font:700 11px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer;transition:background .18s ease}
-.hero-motion-toggle:hover{background:rgba(16,45,37,.98)}
-.hero-motion-toggle span{font-size:15px;line-height:1}
 
 .hero-visual-bottom{color:#b0d0bf;background:#173b2f}
 .hero-footnote{font-size:11px;line-height:1.6;color:#aac2b4;margin:13px 0 0}
@@ -219,8 +214,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e4
  .hero-intro{align-items:flex-start;flex-direction:column;gap:30px;margin:26px 0 38px}
  .hero-intro p{font-size:18px}
  .hero-action{align-items:flex-start}
- .hero-visual img,.hero-motion-surface video{aspect-ratio:5/4;object-position:center}
- .hero-motion-toggle{right:10px;bottom:10px;padding:9px 11px;font-size:10px}
  .hero-visual-top,.hero-visual-bottom{font-size:8px;padding:10px}
  .hero-footnote{font-size:10px}
  .part-marker{grid-template-columns:1fr;gap:9px;text-align:left;padding:23px 22px}
@@ -279,4 +272,3 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e4
  .page-footer{flex-wrap:wrap;line-height:1.7}
 }
 @media(max-width:390px){.hero h1{font-size:17vw}.hero-scroll{font-size:9px}.chapter h2{font-size:33px}.transport-gallery{gap:10px}.article-figure figcaption{font-size:10px}.setting-list>div{grid-template-columns:28px 86px 1fr}.setting-list small{font-size:12px}.routing-flow b{font-size:18px}.bench-row span{font-size:11px}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.play-link,.site-nav a,.header-play,.detail-plus,.hero-motion-toggle{transition:none}}
