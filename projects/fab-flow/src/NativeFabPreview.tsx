@@ -32,18 +32,28 @@ function newWorld(): World {
 
 type CachedMap = {layer: HTMLCanvasElement; width: number; height: number; dpr: number; layout: Layout};
 const mapCache = new WeakMap<HTMLCanvasElement, CachedMap>();
+function sceneCamera(layout: Layout, width: number, height: number) {
+  // On phone screens show the real first bay at readable scale, not two tiny bays.
+  const visibleWidth = width < 600 ? layout.width * .53 : layout.width;
+  const scale = Math.min((width - 34) / visibleWidth, (height - 70) / layout.height);
+  return {
+    scale,
+    x: (width - visibleWidth * scale) / 2,
+    y: (height - layout.height * scale) / 2,
+  };
+}
 
 /**
  * Paint the V6 facility only when its dimensions change.
  * The 30–60 FPS motion path must draw OHTs, not every bay, machine and rail again.
  */
 function paintMap(ctx: CanvasRenderingContext2D, layout: Layout, width: number, height: number) {
-  const scale = Math.min((width - 34) / layout.width, (height - 70) / layout.height);
+  const {scale, x, y} = sceneCamera(layout, width, height);
   const px = (n: number) => n / scale;
   ctx.fillStyle = '#e6eee7';
   ctx.fillRect(0, 0, width, height);
   ctx.save();
-  ctx.translate((width - layout.width * scale) / 2, (height - layout.height * scale) / 2);
+  ctx.translate(x, y);
   ctx.scale(scale, scale);
   ctx.fillStyle = '#f9fbf6';
   ctx.fillRect(0, 0, layout.width, layout.height);
@@ -129,10 +139,10 @@ function draw(canvas: HTMLCanvasElement, world: World, fraction: number) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.drawImage(cached.layer, 0, 0);
   const {layout, engine} = world;
-  const scale = Math.min((width - 34) / layout.width, (height - 70) / layout.height);
+  const {scale, x, y} = sceneCamera(layout, width, height);
   const px = (n: number) => n / scale;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.translate((width - layout.width * scale) / 2, (height - layout.height * scale) / 2);
+  ctx.translate(x, y);
   ctx.scale(scale, scale);
   for (const vehicle of engine.state.vehicles) {
     if (vehicle.parked || vehicle.failed) continue;
