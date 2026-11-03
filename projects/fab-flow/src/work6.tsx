@@ -94,7 +94,7 @@ export default function Work6() {
           </div>
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> NATIVE ENGINE / LIVE</span><span>SMALL V6 / 2D PREVIEW</span></div>
             <Suspense fallback={<img src={IMAGE_ROOT + 'hero-overview.png?v=20261103-2x'} alt="FAB FLOW 실제 운영 화면. 실시간 미리보기를 준비하고 있습니다." fetchPriority="high" />}><NativeFabPreview /></Suspense>
-            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL FOOTAGE / 5S LOOP</span></div>
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL ENGINE / LIVE CANVAS</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
         </div>
