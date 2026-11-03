@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 const HOME_URL = '/build-canvas/';
 const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
 const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
-const evidenceNote = '실제 FAB FLOW Experience 도입부에서 움직이는 OHT를 녹화한 5초 반복 영상입니다. 소리는 없으며, 촬영 당시의 앱 화면입니다.';
+const evidenceNote = '실제 FAB FLOW Medium V6 시뮬레이션을 녹화한 5초 반복 영상입니다. 소리는 없으며, OHT 이동은 실제 엔진의 계산 결과입니다.';
 
 type FigureProps = {
   file: string;
@@ -50,13 +50,13 @@ function HeroMotion() {
   };
   return <div className="hero-motion-surface">
     <video ref={videoRef} autoPlay muted loop playsInline preload="metadata"
-      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-motion'}
-      aria-label="실제 FAB FLOW Experience 화면에서 OHT 차량들이 레일을 따라 움직이는 5초 반복 영상"
+      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
+      aria-label="실제 FAB FLOW Medium 시뮬레이션에서 OHT 차량들이 레일을 따라 움직이는 1080p 5초 반복 영상"
       onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
-      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-motion'} type="video/mp4" />
-      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-motion'} type="video/webm" />
-      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-motion'}
-        alt="FAB FLOW 실제 Experience 실행 화면. 레일 위에서 OHT 차량들이 움직이는 3D 공장" />
+      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-1080p'} type="video/mp4" />
+      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-1080p'} type="video/webm" />
+      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
+        alt="FAB FLOW 실제 Medium V6 시뮬레이션 전체 화면. 장비와 레일, 운행 중인 OHT가 보이는 3D 공장" />
     </video>
     <button type="button" className="hero-motion-toggle" onClick={togglePlayback}
       aria-label={playing ? '메인 영상 일시 정지' : '메인 영상 재생'}>
