@@ -19,7 +19,7 @@ const motionFiles = ['hero-overview.mp4', 'hero-overview.webm', 'hero-motion-pos
 for (const name of motionFiles) {
   const info = await fs.stat(path.join(project, 'dist-pages', 'media', name));
   const minimumBytes = name.endsWith('.jpg') ? 100000 : 500000;
-  if (info.size < minimumBytes) throw Error('Missing/undersized 1080p hero motion asset: ' + name + ', ' + info.size);
+  if (info.size < minimumBytes) throw Error('Missing/undersized QHD hero motion asset: ' + name + ', ' + info.size);
 }
 const screenshots = path.join(project, 'evidence');
 await fs.mkdir(screenshots, { recursive:true });
@@ -65,7 +65,7 @@ try {
       return video && video.readyState>=2 && video.videoWidth>0 && video.videoHeight>0;
     },null,{timeout:15000});
     const videoProps=await hero.evaluate(video=>({muted:video.muted,loop:video.loop,autoplay:video.autoplay,playsInline:video.playsInline,width:video.videoWidth,height:video.videoHeight}));
-    if(!videoProps.muted||!videoProps.loop||!videoProps.autoplay||!videoProps.playsInline||videoProps.width<1920||videoProps.height<1080)
+    if(!videoProps.muted||!videoProps.loop||!videoProps.autoplay||!videoProps.playsInline||videoProps.width<2560||videoProps.height<1440)
       throw Error('Hero playback setup invalid: '+JSON.stringify(videoProps));
     await hero.evaluate(video=>video.play());
     await expect(page.getByRole('button',{name:'메인 영상 일시 정지'})).toBeVisible();
