@@ -3,7 +3,7 @@
 > Status: **Phase 2 implementation plan / NOT an implementation authorization** · 2026-11-03  
 > Repository `gmldbs25/build-canvas` · starting main `457e9e895673b175ab7ed319b5fa27385f4c7751`  
 > Separate evidence-only source `gmldbs25/fab_flow` main `7a1ad9b36ccbf2c173a3676d85b7f790111378f7` (private; **must not edit**).  
-> Work branch `work6/editorial-showcase-plan-20261103`. Public app must remain untouched until user approves Phase 3 direction.  
+> **Main-first policy (updated 2026-11-03):** Commit each completed small unit directly to `main` (no routine feature branch). The user-facing Work6 route must continue serving the current version until the new article is approved and ready for final cutover.  
 > **Only current instructions:** [01_ARTICLE_DESIGN.md](01_ARTICLE_DESIGN.md), [02_CONTENT_STRUCTURE.md](02_CONTENT_STRUCTURE.md), this document. Six former 11/8-Scene plans are in [archive/](archive/) for history only.
 
 ## 0. Baseline & boundaries
@@ -47,7 +47,7 @@ Current root `scripts/build-pages.sh` runs primary portfolio build, packages ORC
 
 `projects/fab-flow/vite.config.ts` consumes `PAGES_BASE_PATH` with trailing slash. Ensure images are emitted via Vite public directory / imported assets and have correct basename; **no root-absolute `/media/foo`** URLs on Pages. Use `import.meta.env.BASE_URL` or equivalent for `public/media/*` references. Retain article URL exactly `https://gmldbs25.github.io/build-canvas/fab-flow-preview/`; do not rename it to `/fab-flow/` just because Vite's fallback base mentions it.
 
-Main Pages deployment occurs on pushes to `main` via `.github/workflows/deploy-pages.yml`. A topic branch **does not publish automatically** through that workflow. Never push a half-built article to main.
+Main Pages deployment occurs on **every push to `main`** via `.github/workflows/deploy-pages.yml`. Therefore **main-first does not mean publishing an unfinished article**. Keep new article code and media in an **unreferenced parallel working directory** (e.g. `projects/fab-flow/article-next/`), excluded from the production Work6 entrypoint/Pages copy until final approved cutover. The existing `src/main.tsx`, `scripts/build-pages.sh` Work6 target and `fab-flow-preview/` output stay unchanged while developing. Validate the article independently via a separate dev/preview entry or build config not copied to public Pages. Publish by switching the production entrypoint only once complete. Docs and other unreferenced files may be committed to `main` immediately.
 
 **Baseline acceptance before deletion:** capture current main SHA, full file inventory, current scripts, `npm run typecheck`/`build`/smoke baseline after local install if available. A source audit alone is not a claim of passing build. Review Git diff and asset sizes at each step.
 
@@ -124,7 +124,7 @@ FAB FLOW is **private**, so the public build must not link asset URLs hosted in 
 
 - Move the 6 legacy documents into `docs/fab-flow/archive/`, preserving Git objects/history; no archived Scene design is active.
 - Create three official documents with chapter copy, layout and verifiable facts.
-- Commit only docs to a new topic branch. **Do not modify `projects/fab-flow`, Build Canvas `main`, `fab_flow` or Actions in P1.**
+- Commit the archived docs and three new documents **directly to Build Canvas `main`**, as requested. Do not modify Work6 runtime, `fab_flow`, shared build integration or Actions in P1.
 - **Gate:** three docs cross-link correctly, target app/Pages routes accurate, source paths reviewed, open decisions enumerated; user receives review link. Phase 3+ require user approval.
 
 ### P2 — Content & media freeze (**after approval**)
@@ -135,9 +135,9 @@ FAB FLOW is **private**, so the public build must not link asset URLs hosted in 
 - Produce static design specimens for desktop Hero, mobile Hero, a feature spread, and a technical figure. Reject generic repeated cards.
 - **Gate:** source-backed copy + asset manifest + approved visual direction. No implementation before content is stable enough.
 
-### P3 — Article scaffold in branch
+### P3 — Article scaffold on main, not yet published
 
-- Implement semantic article sections, basic CSS tokens/type/grid, responsive typography and primary CTA at Hero/end.
+- Implement semantic article sections, basic CSS tokens/type/grid, responsive typography and primary CTA at Hero/end **in the unreferenced parallel `article-next/` source area**; commit validated pieces to `main` after each bounded change.
 - Preserve H shortcut and home link, current site base URL and portfolio integration.
 - Add minimal Figure/Disclosure components; **no Native Engine import**.
 - Use only approved media; if missing, mark development-only placeholder text and **do not deploy** placeholder.
@@ -152,23 +152,23 @@ FAB FLOW is **private**, so the public build must not link asset URLs hosted in 
 
 ### P5 — Legacy removal and CI migration
 
-- From successful lightweight article import graph, delete old Scene source, `sim/`, hooks, renderer helper modules, old CSS, and obsolete scene tests. Keep files only if justified by new article dependency.
+- While building on `main`, **keep old Scene runtime used by the public entrypoint**. Only after the approved article is fully working and verified independently, atomically switch production entry/build configuration and then delete the orphaned old Scene source, `sim/`, hooks, renderer helpers, CSS and obsolete scene tests in the same or subsequent verified main commits. Keep files only if justified by the new article dependency.
 - Remove Three.js dependency and types once build/typecheck confirm no imports; keep React if meaningful.
 - Replace `browser-smoke.mjs` with new article accessibility/link/responsive smoke. Consolidate duplicate CI after confirming parity; rename workflow according to new article purpose.
 - **Gate:** clear diff with deletion inventory; build and article smoke passing, old scene tests intentionally removed not silently skipped.
 
 ### P6 — Full integration + preview
 
-- Branch build: `npm run typecheck --prefix projects/fab-flow`, `GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build --prefix projects/fab-flow`; inspect `dist-pages` asset paths. Root `npm run build:pages` and `npm test`/`npm run lint` as supported by environment.
+- Run an **independent article-next build** during incremental work. Before the production cutover, run `npm run typecheck --prefix projects/fab-flow`, `GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build --prefix projects/fab-flow`; inspect `dist-pages` asset paths. Run root `npm run build:pages` and `npm test`/`npm run lint` as supported by environment.
 - Browser smoke against built static output, not only Vite dev server. Check real URLs.
 - Test modern Chromium/WebKit where available, 1920/1440/1366/1024/768/390/375/360 widths. Check keyboard, touch and reduced motion. Compare portfolio home + Works1–5 for any break.
-- Capture actual article screenshots for visual review; if preview cannot be provided without deployment, provide static artifact screenshots/temporary local preview without touching public main.
+- Capture actual article screenshots for visual review from the parallel unpublished build; share preview artifacts or local preview without changing the public `fab-flow-preview/` route.
 - **Gate:** user final approval, no critical regression, all media and hyperlinks verified.
 
 ### P7 — Controlled release (**only after explicit approval**)
 
-- Rebase/update branch against latest main; resolve conflicts without overwriting unrelated work.
-- Review diff and CI; merge/safe fast-forward to main (never force push). Ensure one main update triggers Pages and stable `/fab-flow-preview/` retains reachability.
+- Work directly from the latest `main`; check for concurrent commits before each write and avoid overwriting unrelated changes.
+- Review diff and CI, then **commit the final entrypoint cutover directly to `main`** (never force push). This main push intentionally activates the complete new article at the unchanged `/fab-flow-preview/` route.
 - Observe GitHub Actions build and deploy status; check exact output URL and media links on real desktop/mobile. Report final commit/SHA, checks, media versions and any limitations.
 - No claim of deployment completion without successful workflow and a verified page response.
 
@@ -193,10 +193,10 @@ FAB FLOW is **private**, so the public build must not link asset URLs hosted in 
 
 ## 6. Failure handling and revert
 
-- Branch work is isolated; current Work6 public page remains live throughout Phase 1–3.
+- Main-first commits trigger Pages. Until final approval, the new article stays **unreferenced by the published entrypoint**, so current Work6 remains live throughout Phase 1–3 and incremental development.
 - Keep archive blobs and original commit SHA; never rewrite Git history or delete history of old Scene approach.
 - If current Vercel media cannot be verified, explicitly mark CAPTURE REQUIRED and stop before fake assets or misleading claims are introduced.
-- If GitHub Pages build unexpectedly alters Work1–5, halt release and repair branch instead of pushing.
+- If GitHub Pages build unexpectedly alters Work1–5, do not make the affected production cutover; repair the unpublished article or fix the regression in the next bounded main commit only after verifying the change.
 - Recovery after release: revert **only the Work6 article commit(s)** after checking integrated changes; do not overwrite concurrent main commits. Historical snapshot available via Git SHA.
 - Do not modify `fab_flow`, even to create captures; use app UI or read-only scripts/access in separate ephemeral workspace.
 
