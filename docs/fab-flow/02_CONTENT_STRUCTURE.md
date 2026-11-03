@@ -1,9 +1,9 @@
 # FAB FLOW — Work6 Content Structure & Evidence Register
 
-> Status: **Phase 2 editorial draft / source-audited; media and final claims require Phase 3 verification** · 2026-11-03  
+> Status: **Published article copy v1 / historical screenshots remain version-labeled** · 2026-11-03  
 > Product: **FAB FLOW / 반도체 물류 세상** · Deep-dive theme: **Behind the Simulation**  
 > Build Canvas baseline `gmldbs25/build-canvas@457e9e895673b175ab7ed319b5fa27385f4c7751` · FAB FLOW source baseline `gmldbs25/fab_flow@7a1ad9b36ccbf2c173a3676d85b7f790111378f7`.  
-> The FAB FLOW repository is **private**. Paths below identify evidence for implementers; an eventual public-facing article must use exported/approved media and accessible public reference captions rather than expecting readers to open private GitHub links. The GitHub combined commit status for FAB FLOW source main **7a1ad9b** reports **Vercel: success** ([deployment receipt](https://vercel.com/hanauma-yoon/fab_flow/GRLk5fkfEEHtWzeYMdQctjbRxmK1)); this indicates an exact-SHA deployment success but **does not independently verify the live page appearance or user-visible controls**. Main source and internal release reports were inspected.
+> The public Work6 now uses locally exported historical images with a source manifest. These are real source captures, not verified exact-current live screenshots. The FAB FLOW repository is **private**. Paths below identify evidence for implementers; an eventual public-facing article must use exported/approved media and accessible public reference captions rather than expecting readers to open private GitHub links. The GitHub combined commit status for FAB FLOW source main **7a1ad9b** reports **Vercel: success** ([deployment receipt](https://vercel.com/hanauma-yoon/fab_flow/GRLk5fkfEEHtWzeYMdQctjbRxmK1)); this indicates an exact-SHA deployment success but **does not independently verify the live page appearance or user-visible controls**. Main source and internal release reports were inspected.
 
 ## 0. Editorial contract
 

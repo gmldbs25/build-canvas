@@ -1,10 +1,12 @@
 # FAB FLOW — Work6 Development Plan
 
-> Status: **Phase 2 implementation plan / NOT an implementation authorization** · 2026-11-03  
+> Status: **Implementation authorized / main cutover completed, live iteration underway** · 2026-11-03  
 > Repository `gmldbs25/build-canvas` · starting main `457e9e895673b175ab7ed319b5fa27385f4c7751`  
 > Separate evidence-only source `gmldbs25/fab_flow` main `7a1ad9b36ccbf2c173a3676d85b7f790111378f7` (private; **must not edit**).  
 > **Main-first policy (updated 2026-11-03):** Commit each completed small unit directly to `main` (no routine feature branch). The user-facing Work6 route must continue serving the current version until the new article is approved and ready for final cutover.  
 > **Only current instructions:** [01_ARTICLE_DESIGN.md](01_ARTICLE_DESIGN.md), [02_CONTENT_STRUCTURE.md](02_CONTENT_STRUCTURE.md), this document. Six former 11/8-Scene plans are in [archive/](archive/) for history only.
+
+**User override — 2026-11-03:** The user explicitly authorized direct `main` deployment and stated that preserving the previous Work6 is not required. The 11-chapter article was published in commit `2feaed6b8ac72579d3f30549316756fbb12a194c`; the earlier approval gate and `article-next/` isolation instructions no longer apply. The user will review the public page iteratively. Historical screenshots must remain labeled as reference captures; they are not current build-parity evidence.
 
 ## 0. Baseline & boundaries
 

@@ -1,6 +1,6 @@
 # FAB FLOW — Work6 Article Design
 
-> Status: **Phase 2 design proposal / awaiting user approval** · 2026-11-03  
+> Status: **Published 1st article implementation / live iteration authorized** · 2026-11-03  
 > Scope: `gmldbs25/build-canvas` · `projects/fab-flow/` · public URL `/build-canvas/fab-flow-preview/`  
 > Source of truth: this document + [02_CONTENT_STRUCTURE.md](02_CONTENT_STRUCTURE.md) + [03_DEVELOPMENT_PLAN.md](03_DEVELOPMENT_PLAN.md). Historical Scene plans in [archive/](archive/) are **not** implementation instructions.
 
@@ -13,7 +13,7 @@
 - Interaction: ordinary vertical document scrolling, optional lightweight native disclosure and image viewing. No scene locks, step gates, 3D runtime, or scroll hijacking.
 - Fidelity rule: only media captured from real FAB FLOW or diagrams constructed faithfully from verified source models. No AI/fake screenshots, recreated game HUD, decorative fake metrics, or stock 3D factories.
 - Content ownership: all factual assertions are governed by 02, including version/source labels. Art direction never overrides technical truth.
-- This is a **design proposal**, not permission to replace the live Work6. Confirm the Hero/media/copy direction before Phase 3–5.
+- This was the original design proposal. The user subsequently authorized direct main deployment and live feedback; see 03_DEVELOPMENT_PLAN.md for the 2026-11-03 implementation override.
 
 ## 1. Reading experience and page anatomy
 
