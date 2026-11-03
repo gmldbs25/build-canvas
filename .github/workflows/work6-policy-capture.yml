@@ -1,0 +1,56 @@
+name: Capture Work6 policy comparison (real app)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/work6-policy-capture.yml'
+      - 'projects/fab-flow/scripts/capture-live-policy.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: work6-live-policy-capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - name: Install Chromium
+        run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Capture actual DBR-CBR policy comparison
+        run: node projects/fab-flow/scripts/capture-live-policy.mjs
+      - name: Archive screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-policy-real-2x-png
+          path: |
+            projects/fab-flow/public/media/policy-comparison.png
+            projects/fab-flow/public/media/manifest.json
+          retention-days: 14
+      - name: Commit policy comparison media
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects/fab-flow/public/media/policy-comparison.png projects/fab-flow/public/media/manifest.json
+          git diff --cached --quiet && { echo "No new capture"; exit 1; }
+          git commit -m "fix(work6): capture actual DBR-CBR comparison at 2x density"
+          git push origin HEAD:main
+      - name: Trigger Pages deployment for Actions commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST repos/${{ github.repository }}/actions/workflows/deploy-pages.yml/dispatches -f ref=main
