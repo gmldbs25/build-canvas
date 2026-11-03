@@ -9,7 +9,7 @@ const SOURCE_URL = 'https://fabflow-yoon.vercel.app/';
 const OUTPUT = path.resolve('projects/fab-flow/public/media');
 const TMP = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-hero-qhd-'));
 const VIEWPORT = { width: 2560, height: 1440 };
-const VIDEO = { width: 2560, height: 1440, fps: 30, seconds: 5 };
+const VIDEO = { width: 2560, height: 1440, fps: 30, seconds: 8 };
 const MIN_SIM_ADVANCE = 8;
 // Record the real Three.js UI at QHD; never approximate it with a 2D renderer.
 
@@ -33,9 +33,9 @@ function mediaInfo(file) {
 async function verifyVideo(file) {
   const stat = await fs.stat(file), probe = mediaInfo(file);
   if (stat.size < 100_000 || stat.size > 25_000_000 ||
-      probe.duration < 4.65 || probe.duration > 5.30 ||
+      probe.duration < VIDEO.seconds - .35 || probe.duration > VIDEO.seconds + .35 ||
       probe.width !== VIDEO.width || probe.height !== VIDEO.height ||
-      (probe.frames && probe.frames < 110)) {
+      (probe.frames && probe.frames < VIDEO.fps * (VIDEO.seconds - .7))) {
     throw Error('Final encode quality gate failed: '+JSON.stringify({
       file,bytes:stat.size,...probe
     }));
@@ -83,9 +83,32 @@ try {
   await canvas.waitFor({state:'visible',timeout:30000});
   const live=page.locator('[data-testid="sandbox-demand-live"][data-simulation-time]');
   await live.waitFor({state:'attached'});
-  // Keep the original full-map perspective and avoid automatic camera-follow.
+  // Record the public app's ACTUAL Three.js/WebGL renderer, not a redrawn imitation.
+  // Fill the browser viewport using the app's own fullscreen control, then
+  // enlarge the real 3D camera so equipment and OHTs read at hero-video scale.
+  const stage=page.locator('.map-stage[data-renderer="three-webgl"].renderer-ready');
+  await stage.waitFor({state:'visible',timeout:60000});
   await page.locator('.view-switch').getByRole('button',{name:'전체',exact:true}).click();
-  await page.waitForTimeout(5500);
+  await page.locator('.focus-toggle').click();
+  await page.locator('.map-column.focus-mode').waitFor({state:'visible',timeout:15000});
+  await stage.locator('select[aria-label="3D 품질"]').selectOption('high');
+  const zoomIn=stage.getByRole('button',{name:'확대',exact:true});
+  for(let i=0;i<3;i++) await zoomIn.click();
+  await page.mouse.move(20,20);
+  await page.waitForTimeout(2200);
+  const frame=await stage.evaluate(element=>{
+    const rect=element.getBoundingClientRect();
+    const canvas=element.querySelector('canvas');
+    return {x:rect.x,y:rect.y,width:rect.width,height:rect.height,
+      canvasWidth:canvas?.width??0,canvasHeight:canvas?.height??0,
+      renderer:element.getAttribute('data-renderer'),
+      ready:element.classList.contains('renderer-ready')};
+  });
+  console.log('REAL_3D_HERO_FRAMING',JSON.stringify(frame));
+  if(!frame.ready||frame.renderer!=='three-webgl'||
+     frame.width<VIEWPORT.width*.82||frame.height<VIEWPORT.height*.72||
+     frame.canvasWidth<2000||frame.canvasHeight<950)
+    throw Error('True WebGL fullscreen video framing/quality gate failed: '+JSON.stringify(frame));
   const begin=Number(await live.getAttribute('data-simulation-time'));
   const firstCanvas=await canvas.screenshot({timeout:60000});
   const size=await canvas.evaluate(c=>({width:c.width,height:c.height}));
@@ -97,7 +120,7 @@ try {
   if (!Number.isFinite(begin)||size.width<1400||size.height<550)
     throw Error('Simulator not ready for high-resolution capture.');
 
-  await page.waitForTimeout(6200);
+  await page.waitForTimeout(9600);
   const end=Number(await live.getAttribute('data-simulation-time'));
   const lastCanvas=await canvas.screenshot({timeout:60000});
   const lastSHA=createHash('sha256').update(lastCanvas).digest('hex');
@@ -115,7 +138,7 @@ try {
   console.log('RAW_RECORDING',JSON.stringify({
     ...rawInfo,bytes:(await fs.stat(raw)).size
   }));
-  if(rawInfo.duration < 5.4 || rawInfo.width !== VIEWPORT.width ||
+  if(rawInfo.duration < VIDEO.seconds + .4 || rawInfo.width !== VIEWPORT.width ||
       rawInfo.height !== VIEWPORT.height)
     throw Error('Invalid source recording: '+JSON.stringify(rawInfo));
 
@@ -150,7 +173,7 @@ try {
     captured_at_utc:new Date().toISOString(),
     application_deployment_sha:'not independently verified',
     scenario:{mode:'Sandbox',layout:'Medium V6',fleet:32,
-      policy:'DBR',demand_preset:'congested',camera:'full FAB overview',
+      policy:'DBR',demand_preset:'congested',camera:'native fullscreen, overview with 3-step 3D camera zoom',
       simulation_time_begin:begin,simulation_time_end:end},
     viewport:{...VIEWPORT,device_pixel_ratio:1,source_canvas:size},
     clip:{seconds:VIDEO.seconds,fps:VIDEO.fps,width:VIDEO.width,
