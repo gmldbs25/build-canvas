@@ -11,7 +11,6 @@ const TMP = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-hero-motion-'));
 const VIEWPORT = { width: 1600, height: 900 };
 const FPS = 20;
 const TARGET_SECONDS = 5;
-const MIN_SIM_ADVANCE = 8;
 
 function command(exe, args) {
   const result = execFileSync(exe, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 150000 });
@@ -57,30 +56,25 @@ try {
 
   console.log('LIVE_RECORDING_SOURCE', URL);
   await page.goto(URL, {waitUntil:'domcontentloaded', timeout:60000});
-  await page.getByRole('button',{name:/새 물류 시뮬레이션 시작/}).first().click();
-  await page.getByTestId('sandbox-setup').waitFor();
-  await page.getByRole('group',{name:'운영 프리셋'})
-    .getByRole('button',{name:/활발한 운송/}).click();
-  await page.getByRole('combobox',{name:'FAB layout'}).selectOption('medium');
-  await page.getByRole('spinbutton',{name:'준비 OHT 수'}).fill('32');
-  await page.getByRole('combobox',{name:'MCS policy'}).selectOption('DBR');
-  await page.getByTestId('sandbox-setup').getByRole('button',{name:/시뮬레이션 시작하기/}).click();
-  await page.getByTestId('sandbox-setup').waitFor({state:'detached',timeout:30000});
-  await page.locator('canvas').first().waitFor({state:'visible',timeout:30000});
-  await page.locator('.view-switch').getByRole('button',{name:'전체',exact:true}).click();
-  await page.waitForTimeout(4300); // camera has completed its overview transition
-
-  const hud=page.getByTestId('sandbox-hud-kpis');
-  const begin=Number(await hud.getAttribute('data-simulation-time'));
-  const canvas=await page.locator('canvas').first().evaluate(c=>({width:c.width,height:c.height}));
-  if(!Number.isFinite(begin)||canvas.width < 700||canvas.height < 350)
-    throw Error('Live simulation not initialized: '+JSON.stringify({begin,canvas}));
-  console.log('LIVE_RECORDING_BEGIN',JSON.stringify({begin,canvas,layout:'medium',fleet:32,policy:'DBR',preset:'active'}));
-  await page.waitForTimeout(6700);
-  const end=Number(await hud.getAttribute('data-simulation-time'));
-  console.log('LIVE_RECORDING_END',JSON.stringify({end,simulationAdvance:end-begin}));
-  if (!Number.isFinite(end)||end-begin < MIN_SIM_ADVANCE)
-    throw Error('Real simulator did not advance enough while video was recorded.');
+  await page.getByRole('button',{name:/EXPERIENCE 시작/}).click({timeout:60000});
+  const intro=page.getByTestId('fab-experience-intro');
+  await intro.waitFor({state:'visible',timeout:60000});
+  await intro.locator('.w6-viewport canvas').first().waitFor({state:'visible',timeout:30000});
+  await page.waitForTimeout(2300); // allow the native experience camera to settle
+  const moving=Number(await intro.getAttribute('data-opening-moving'));
+  const nearby=Number(await intro.getAttribute('data-opening-local-moving'));
+  const canvas=await intro.locator('.w6-viewport canvas').first();
+  const size=await canvas.evaluate(c=>({width:c.width,height:c.height}));
+  if(!Number.isFinite(moving)||moving<1||size.width<700||size.height<350)
+    throw Error('Native Experience opening is not initialized: '+JSON.stringify({moving,nearby,size}));
+  console.log('LIVE_RECORDING_BEGIN',JSON.stringify({experience:'Scene 01 native ambient world',moving,nearby,canvas:size}));
+  const firstCanvasFrame=await canvas.screenshot({timeout:45000});
+  await page.waitForTimeout(6900);
+  const lastCanvasFrame=await canvas.screenshot({timeout:45000});
+  const firstSha=createHash('sha256').update(firstCanvasFrame).digest('hex');
+  const lastSha=createHash('sha256').update(lastCanvasFrame).digest('hex');
+  console.log('LIVE_RECORDING_MOTION',JSON.stringify({firstSha,lastSha,changed:firstSha!==lastSha}));
+  if(firstSha===lastSha)throw Error('3D canvas remained static: refusing to publish fake animation.');
   if (pageErrors.length) throw Error('Browser errors: '+pageErrors.slice(0,5).join(' | '));
 
   const raw=await page.video().path();
@@ -100,10 +94,15 @@ try {
     '-pix_fmt','yuv420p','-movflags','+faststart',mp4]);
   command('ffmpeg',[...common,'-c:v','libvpx-vp9','-b:v','0','-crf','34',
     '-deadline','good','-cpu-used','4','-pix_fmt','yuv420p',webm]);
+  const poster=path.join(TMP,'hero-motion-poster.jpg');
+  command('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',mp4,'-frames:v','1','-q:v','3',poster]);
+  const posterInfo=await fs.stat(poster);
+  if(posterInfo.size<35_000||posterInfo.size>1_500_000)throw Error('Motion poster invalid: '+posterInfo.size);
   const videos=[await verifyVideo(mp4),await verifyVideo(webm)];
   for(const item of videos){
     await fs.copyFile(path.join(TMP,item.file),path.join(OUTPUT,item.file));
   }
+  await fs.copyFile(poster,path.join(OUTPUT,'hero-motion-poster.jpg'));
   const manifestPath=path.join(OUTPUT,'manifest.json');
   const manifest=JSON.parse(await fs.readFile(manifestPath,'utf8'));
   manifest.hero_motion={
@@ -111,11 +110,13 @@ try {
     capture_type:'actual live FAB FLOW Chromium recording, not AI-generated animation',
     captured_at_utc:new Date().toISOString(),
     application_deployment_sha:'not independently verified',
-    scenario:{layout:'Medium V6',fleet:32,policy:'DBR',demand_preset:'active',
-      camera:'overview',simulation_time_start:begin,simulation_time_end:end},
+    scenario:{mode:'Experience Intro / Scene 01',layout:'Large V6 native simulation',
+      fleet:32,seed:47,distribution:'hotspot',camera:'native fixed tableau',
+      opening_moving_vehicles:moving,opening_local_vehicles:nearby},
     viewport:{width:VIEWPORT.width,height:VIEWPORT.height,device_pixel_ratio:1},
     clip:{seconds:TARGET_SECONDS,fps:FPS,width:1440,height:810,muted:true,loop:true},
-    videos
+    videos,
+    poster:{file:'hero-motion-poster.jpg',bytes:posterInfo.size}
   };
   await fs.writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\n');
   console.log('LIVE_HERO_VIDEO_SUCCESS',JSON.stringify(videos));
