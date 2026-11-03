@@ -35,7 +35,7 @@ try {
   }
   if(!await page.locator('.policy-details').isVisible()) await page.getByRole('button',{name:/실험 패널 열기/}).click();
   const policy=page.locator('.policy-details');
-  if(!await policy.getAttribute('open')) await policy.locator('summary').click();
+  if((await policy.getAttribute('open')) === null) await policy.locator('summary').click();
   console.log('POLICY_START',await page.locator('.sandbox-settings').innerText().then(x=>x.slice(0,500)).catch(()=>'unavailable'));
   await page.locator('.compare-button').click();
   await page.locator('.comparison-interpretation').waitFor({state:'visible',timeout:120000});
