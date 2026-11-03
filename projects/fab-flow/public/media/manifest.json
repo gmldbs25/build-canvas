@@ -5,127 +5,187 @@
   "source_repository_visibility": "private",
   "source_reference_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
   "deployment_sha": null,
-  "note": "Historical source captures approved as actual game imagery only. These images do not independently establish parity with the currently deployed application or equivalence of operating scenarios. Screenshot labels are historical. Never use these as measured same-condition A/B evidence.",
+  "note": "Work6 images are direct screenshots from the actual public FAB FLOW application. Scene metadata is noted per image; captures from different runs are NOT matched-condition performance comparisons. Deployment SHA is not independently attested.",
   "assets": [
     {
       "id": "hero-overview",
       "media_path": "media/hero-overview.png",
-      "source_path": "docs/operations-analysis/1.1/evidence/visual-release-fixed/1920x1080-off.png",
-      "source_reference": "Operations Analysis 1.1 visual verification",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Medium V6 actual live simulator full viewport",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 2000
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "operations-analysis",
       "media_path": "media/operations-analysis.png",
-      "source_path": "docs/operations-analysis/1.1/evidence/visual-release-fixed/1920x1080-on.png",
-      "source_reference": "Operations Analysis 1.1 visual verification",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Medium V6 live Operations Analysis panel",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 2000
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "fab-small",
       "media_path": "media/fab-small.png",
-      "source_path": "docs/operations-analysis/evidence/browser/webgl-small-off.png",
-      "source_reference": "Historical operational verification",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Small V6 / 8 OHT / active preset",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "fab-medium",
       "media_path": "media/fab-medium.png",
-      "source_path": "docs/operations-analysis/evidence/browser/webgl-medium-off.png",
-      "source_reference": "Historical operational verification",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Medium V6 / 32 OHT / congested preset",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "fab-large",
       "media_path": "media/fab-large.png",
-      "source_path": "docs/operations-analysis/evidence/browser/webgl-large-off.png",
-      "source_reference": "Historical operational verification",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Large V6 / 80 OHT / active preset",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "sandbox-setup",
       "media_path": "media/sandbox-setup.png",
-      "source_path": "docs/operations/default-fab/browser/small-setup.png",
-      "source_reference": "Historical layout/setup browser run",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Medium layout / setup before starting",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "transport-loaded",
       "media_path": "media/transport-loaded.png",
-      "source_path": "docs/screenshots/3d-tycoon/after/transport-loaded-29s.png",
-      "source_reference": "Historical native transport capture",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Native Experience Scene 03 / FOUP loaded",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1646
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "trip-request",
       "media_path": "media/trip-request.png",
-      "source_path": "docs/screenshots/3d-tycoon/after/trip-request.png",
-      "source_reference": "Historical native transport capture",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Native Experience Scene 03 / request registered",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1646
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "trip-dropoff",
       "media_path": "media/trip-dropoff.png",
-      "source_path": "docs/screenshots/3d-tycoon/after/trip-dropoff.png",
-      "source_reference": "Historical native transport capture",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Native Experience Scene 03 / transport completed",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1646
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "congestion-observation",
       "media_path": "media/congestion-observation.png",
-      "source_path": "docs/screenshots/3d-tycoon/after/performance-stress-t1800-1440-low-overview.png",
-      "source_reference": "Historical stress observation, not a matched A/B",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Large V6 / 120 OHT / 1 request per second congestion observation",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     },
     {
       "id": "policy-comparison",
@@ -142,14 +202,40 @@
     {
       "id": "fleet-high-load",
       "media_path": "media/fleet-high-load.png",
-      "source_path": "docs/operations/default-fab/browser/large-300.png",
-      "source_reference": "Historical high-fleet test image",
-      "source_sha": "7a1ad9b36ccbf2c173a3676d85b7f790111378f7",
-      "captured_at_utc": null,
-      "scenario": null,
-      "viewport": null,
-      "privacy_review": "visual sample review; source is the author's own FAB FLOW repository",
-      "status": "historical_capture"
+      "source_path": "https://fabflow-yoon.vercel.app/",
+      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_sha": null,
+      "captured_at_utc": "2026-11-03T01:43:28.152Z",
+      "scenario": "Large V6 / 300 OHT high-fleet demonstration",
+      "viewport": {
+        "css_width": 1800,
+        "css_height": 1000,
+        "device_pixel_ratio": 2,
+        "png_width": 3600,
+        "png_height": 1892
+      },
+      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "status": "live_capture"
     }
-  ]
+  ],
+  "capture_summary": {
+    "source_url": "https://fabflow-yoon.vercel.app/",
+    "captured_at_utc": "2026-11-03T01:43:28.152Z",
+    "updated": [
+      "sandbox-setup",
+      "fab-small",
+      "fab-medium",
+      "hero-overview",
+      "operations-analysis",
+      "fab-large",
+      "congestion-observation",
+      "fleet-high-load",
+      "trip-request",
+      "transport-loaded",
+      "trip-dropoff"
+    ],
+    "not_refreshed": [
+      "policy-comparison"
+    ]
+  }
 }
