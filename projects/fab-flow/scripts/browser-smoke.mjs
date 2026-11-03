@@ -15,6 +15,12 @@ for (const name of images) {
   const info = await fs.stat(path.join(project, 'dist-pages', 'media', name));
   if (info.size < 1000) throw Error('Missing/empty production image: ' + name);
 }
+const motionFiles = ['hero-overview.mp4', 'hero-overview.webm', 'hero-motion-poster.jpg'];
+for (const name of motionFiles) {
+  const info = await fs.stat(path.join(project, 'dist-pages', 'media', name));
+  const minimumBytes = name.endsWith('.jpg') ? 100000 : 500000;
+  if (info.size < minimumBytes) throw Error('Missing/undersized 1080p hero motion asset: ' + name + ', ' + info.size);
+}
 const screenshots = path.join(project, 'evidence');
 await fs.mkdir(screenshots, { recursive:true });
 const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-article-'));
@@ -48,33 +54,30 @@ try {
     await expect(page.getByRole('link',{name:/FAB FLOW 플레이하기/})).toHaveCount(2);
     await expect(page.getByRole('heading',{name:'작은 반도체 공장'})).toHaveCount(1);
     await expect(page.getByRole('heading',{name:'수백 대의 차량을 브라우저에서 움직이기까지'})).toHaveCount(1);
-    const hero=page.getByTestId('native-fab-preview');
-    await hero.scrollIntoViewIfNeeded();
+    if(await page.locator('canvas').count())throw Error('Legacy simulation canvas remains');
+    const hero=page.locator('.hero-motion-surface video');
     await expect(hero).toBeVisible();
-    const canvas=hero.locator('canvas');
-    await expect(canvas).toBeVisible({timeout:20000});
-    const size=await canvas.evaluate(e=>({width:e.width,height:e.height}));
-    if(size.width<320||size.height<240)throw Error('Native preview canvas failed to render: '+JSON.stringify(size));
-    const startTime=Number(await hero.getAttribute('data-preview-time'));
-    if(!Number.isFinite(startTime)||startTime<50)throw Error('Native engine did not pre-run genuine ticks: '+startTime);
-    await page.waitForFunction(before=>{
-      const host=document.querySelector('[data-testid="native-fab-preview"]');
-      return Number(host?.getAttribute('data-preview-time'))>before;
-    },startTime,{timeout:15000});
-    await page.getByRole('button',{name:'실시간 미리보기 일시 정지'}).click();
-    await expect(page.getByRole('button',{name:'실시간 미리보기 재생'})).toBeVisible();
-    const pausedAt=await hero.getAttribute('data-preview-time');
-    await page.waitForTimeout(350);
-    if(await hero.getAttribute('data-preview-time')!==pausedAt)
-      throw Error('Native preview did not pause its engine.');
-    await page.getByRole('button',{name:'실시간 미리보기 재생'}).click();
-    await expect(page.getByRole('button',{name:'실시간 미리보기 일시 정지'})).toBeVisible();
+    const motionSources=await hero.locator('source').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('src')));
+    if(motionSources.length!==2||motionSources.some(url=>!url?.startsWith('/build-canvas/fab-flow-preview/media/')))
+      throw Error('Hero video source base mismatch: '+JSON.stringify(motionSources));
+    await page.waitForFunction(()=>{
+      const video=document.querySelector('.hero-motion-surface video');
+      return video && video.readyState>=2 && video.videoWidth>0 && video.videoHeight>0;
+    },null,{timeout:15000});
+    const videoProps=await hero.evaluate(video=>({muted:video.muted,loop:video.loop,autoplay:video.autoplay,playsInline:video.playsInline,width:video.videoWidth,height:video.videoHeight}));
+    if(!videoProps.muted||!videoProps.loop||!videoProps.autoplay||!videoProps.playsInline||videoProps.width<1920||videoProps.height<1080)
+      throw Error('Hero playback setup invalid: '+JSON.stringify(videoProps));
+    await hero.evaluate(video=>video.play());
+    await expect(page.getByRole('button',{name:'메인 영상 일시 정지'})).toBeVisible();
+    await page.getByRole('button',{name:'메인 영상 일시 정지'}).click();
+    await expect(hero).toHaveJSProperty('paused',true);
+    await page.getByRole('button',{name:'메인 영상 재생'}).click();
+    await expect(hero).toHaveJSProperty('paused',false);
     if(width===1440) {
       await page.emulateMedia({reducedMotion:'reduce'});
-      await expect(page.getByRole('button',{name:'실시간 미리보기 재생'})).toBeVisible();
+      await expect(hero).toHaveJSProperty('paused',true);
       await page.emulateMedia({reducedMotion:'no-preference'});
-      await page.getByRole('button',{name:'실시간 미리보기 재생'}).click();
-      await expect(page.getByRole('button',{name:'실시간 미리보기 일시 정지'})).toBeVisible();
+      await expect(hero).toHaveJSProperty('paused',false);
     }
     const state=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,viewport:innerWidth,ctas:[...document.querySelectorAll('.play-link')].map(a=>a.getAttribute('href')),base:[...document.querySelectorAll('.article-figure img')].slice(0,3).map(i=>i.getAttribute('src'))}));
     if(state.scrollWidth>state.viewport+1)throw Error('Horizontal overflow: '+JSON.stringify({width,state}));
@@ -88,7 +91,7 @@ try {
     await page.locator('#chapter-00').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(screenshots,'fab-flow-article-'+width+'.png'),fullPage:true});
     if(faults.length)throw Error('Console/network errors: '+faults.join(' | '));
-    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',nativeEngine:'ok',overflow:false,errors:0}));
+    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',heroVideo:'ok',overflow:false,errors:0}));
     await page.close();
   }
   const homePage=await browser.newPage();

@@ -1,10 +1,9 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const HOME_URL = '/build-canvas/';
 const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
 const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
-const NativeFabPreview = lazy(() => import('./NativeFabPreview'));
-const evidenceNote = 'FAB FLOW의 원본 V6 지도·엔진·OHT 이동 보간 코드를 사용하는 실시간 경량 2D 미리보기입니다. 전체 3D 시뮬레이터와 운영 분석 기능은 ‘FAB FLOW 플레이하기’에서 확인할 수 있습니다.';
+const evidenceNote = '실제 FAB FLOW Medium V6 시뮬레이션을 녹화한 5초 반복 영상입니다. 소리는 없으며, OHT 이동은 실제 엔진의 계산 결과입니다.';
 
 type FigureProps = {
   file: string;
@@ -18,6 +17,52 @@ function Figure({ file, alt, caption, className = '', eager = false }: FigurePro
     <div className="article-image-wrap"><img src={IMAGE_ROOT + file + '?v=20261103-2x'} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
     <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
   </figure>;
+}
+function HeroMotion() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncMotionPreference = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (preference.matches) {
+        video.pause();
+        video.currentTime = 0;
+        setPlaying(false);
+      } else {
+        void video.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      }
+    };
+    syncMotionPreference();
+    preference.addEventListener('change', syncMotionPreference);
+    return () => preference.removeEventListener('change', syncMotionPreference);
+  }, []);
+  const togglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      void video.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      video.pause();
+      setPlaying(false);
+    }
+  };
+  return <div className="hero-motion-surface">
+    <video ref={videoRef} autoPlay muted loop playsInline preload="metadata"
+      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
+      aria-label="실제 FAB FLOW Medium 시뮬레이션에서 OHT 차량들이 레일을 따라 움직이는 1080p 5초 반복 영상"
+      onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
+      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-1080p'} type="video/mp4" />
+      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-1080p'} type="video/webm" />
+      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
+        alt="FAB FLOW 실제 Medium V6 시뮬레이션 전체 화면. 장비와 레일, 운행 중인 OHT가 보이는 3D 공장" />
+    </video>
+    <button type="button" className="hero-motion-toggle" onClick={togglePlayback}
+      aria-label={playing ? '메인 영상 일시 정지' : '메인 영상 재생'}>
+      <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>{playing ? 'PAUSE' : 'PLAY'}
+    </button>
+  </div>;
 }
 function ChapterHead({ index, eyebrow, title, lead }: { index: string; eyebrow: string; title: string; lead?: string }) {
   return <div className="chapter-head">
@@ -92,9 +137,9 @@ export default function Work6() {
               <div className="hero-action"><PlayLink /><a className="hero-scroll" href="#chapter-01">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div>
             </div>
           </div>
-          <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> NATIVE ENGINE / LIVE</span><span>SMALL V6 / 2D PREVIEW</span></div>
-            <Suspense fallback={<img src={IMAGE_ROOT + 'hero-overview.png?v=20261103-2x'} alt="FAB FLOW 실제 운영 화면. 실시간 미리보기를 준비하고 있습니다." fetchPriority="high" />}><NativeFabPreview /></Suspense>
-            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL ENGINE / LIVE CANVAS</span></div>
+          <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
+            <HeroMotion />
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL FOOTAGE / 5S LOOP</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
         </div>
