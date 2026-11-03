@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/work6-policy-capture.yml'
-      - 'projects/fab-flow/scripts/capture-live-policy.mjs'
+      - 'projects/fab-flow/scripts/capture-policy-comparison.mjs'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
       - name: Install Chromium
         run: npx --prefix projects/fab-flow playwright install --with-deps chromium
       - name: Capture actual DBR-CBR policy comparison
-        run: node projects/fab-flow/scripts/capture-live-policy.mjs
+        run: node projects/fab-flow/scripts/capture-policy-comparison.mjs
       - name: Archive screenshot evidence
         if: always()
         uses: actions/upload-artifact@v4
