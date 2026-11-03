@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const HOME_URL = '/build-canvas/';
 const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
 const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
-const evidenceNote = 'FAB FLOW 개발·검증 과정의 실제 실행 캡처. 촬영 시점과 설정이 현재 배포 버전과 다를 수 있습니다.';
+const evidenceNote = '실제 FAB FLOW Experience 도입부에서 움직이는 OHT를 녹화한 5초 반복 영상입니다. 소리는 없으며, 촬영 당시의 앱 화면입니다.';
 
 type FigureProps = {
   file: string;
@@ -17,6 +17,52 @@ function Figure({ file, alt, caption, className = '', eager = false }: FigurePro
     <div className="article-image-wrap"><img src={IMAGE_ROOT + file + '?v=20261103-2x'} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
     <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
   </figure>;
+}
+function HeroMotion() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncMotionPreference = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (preference.matches) {
+        video.pause();
+        video.currentTime = 0;
+        setPlaying(false);
+      } else {
+        void video.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      }
+    };
+    syncMotionPreference();
+    preference.addEventListener('change', syncMotionPreference);
+    return () => preference.removeEventListener('change', syncMotionPreference);
+  }, []);
+  const togglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      void video.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      video.pause();
+      setPlaying(false);
+    }
+  };
+  return <div className="hero-motion-surface">
+    <video ref={videoRef} autoPlay muted loop playsInline preload="metadata"
+      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-motion'}
+      aria-label="실제 FAB FLOW Experience 화면에서 OHT 차량들이 레일을 따라 움직이는 5초 반복 영상"
+      onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
+      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-motion'} type="video/mp4" />
+      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-motion'} type="video/webm" />
+      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-motion'}
+        alt="FAB FLOW 실제 Experience 실행 화면. 레일 위에서 OHT 차량들이 움직이는 3D 공장" />
+    </video>
+    <button type="button" className="hero-motion-toggle" onClick={togglePlayback}
+      aria-label={playing ? '메인 영상 일시 정지' : '메인 영상 재생'}>
+      <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>{playing ? 'PAUSE' : 'PLAY'}
+    </button>
+  </div>;
 }
 function ChapterHead({ index, eyebrow, title, lead }: { index: string; eyebrow: string; title: string; lead?: string }) {
   return <div className="chapter-head">
@@ -92,8 +138,8 @@ export default function Work6() {
             </div>
           </div>
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
-            <img src={IMAGE_ROOT + 'hero-overview.png?v=20261103-2x'} alt="FAB FLOW 실제 실행 화면. 장비와 레일, 이동하는 OHT와 운영 현황이 보이는 시뮬레이터 화면." fetchPriority="high" decoding="async" />
-            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL CAPTURE / LIVE APP</span></div>
+            <HeroMotion />
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL FOOTAGE / 5S LOOP</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
         </div>
