@@ -50,12 +50,12 @@ function HeroMotion() {
   };
   return <div className="hero-motion-surface">
     <video ref={videoRef} autoPlay muted loop playsInline preload="metadata"
-      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd'}
+      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd-acf8a7e'}
       aria-label="실제 FAB FLOW Medium 시뮬레이션에서 OHT 차량들이 레일을 따라 움직이는 QHD 8초 반복 영상"
       onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
-      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-3d-closeup-qhd'} type="video/mp4" />
-      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-3d-closeup-qhd'} type="video/webm" />
-      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd'}
+      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-3d-closeup-qhd-acf8a7e'} type="video/mp4" />
+      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-3d-closeup-qhd-acf8a7e'} type="video/webm" />
+      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd-acf8a7e'}
         alt="FAB FLOW 실제 Medium V6 시뮬레이션 전체 화면. 장비와 레일, 운행 중인 OHT가 보이는 3D 공장" />
     </video>
     <button type="button" className="hero-motion-toggle" onClick={togglePlayback}
