@@ -14,7 +14,7 @@ type FigureProps = {
 };
 function Figure({ file, alt, caption, className = '', eager = false }: FigureProps) {
   return <figure className={'article-figure ' + className}>
-    <div className="article-image-wrap"><img src={IMAGE_ROOT + file} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
+    <div className="article-image-wrap"><img src={IMAGE_ROOT + file + '?v=20261103-2x'} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
     <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
   </figure>;
 }
@@ -92,7 +92,7 @@ export default function Work6() {
             </div>
           </div>
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
-            <img src={IMAGE_ROOT + 'hero-overview.png'} alt="FAB FLOW 실제 실행 화면. 장비와 레일, 이동하는 OHT와 운영 현황이 보이는 시뮬레이터 화면." fetchPriority="high" decoding="async" />
+            <img src={IMAGE_ROOT + 'hero-overview.png?v=20261103-2x'} alt="FAB FLOW 실제 실행 화면. 장비와 레일, 이동하는 OHT와 운영 현황이 보이는 시뮬레이터 화면." fetchPriority="high" decoding="async" />
             <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL CAPTURE / LIVE APP</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
