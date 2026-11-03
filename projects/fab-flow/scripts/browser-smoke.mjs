@@ -15,12 +15,11 @@ for (const name of images) {
   const info = await fs.stat(path.join(project, 'dist-pages', 'media', name));
   if (info.size < 1000) throw Error('Missing/empty production image: ' + name);
 }
-const motionFiles = ['hero-overview.mp4', 'hero-overview.webm', 'hero-motion-poster.jpg'];
-for (const name of motionFiles) {
-  const info = await fs.stat(path.join(project, 'dist-pages', 'media', name));
-  const minimumBytes = name.endsWith('.jpg') ? 100000 : 500000;
-  if (info.size < minimumBytes) throw Error('Missing/undersized QHD hero motion asset: ' + name + ', ' + info.size);
-}
+const stillFile=await fs.readFile(path.join(project,'dist-pages','media','hero-overview.png'));
+if(stillFile.subarray(1,4).toString()!=='PNG') throw Error('Hero file is not PNG');
+const stillWidth=stillFile.readUInt32BE(16),stillHeight=stillFile.readUInt32BE(20);
+if(stillWidth<2560||stillHeight<1440||stillFile.length<150_000)
+  throw Error('Hero screenshot must be real QHD or higher: '+stillWidth+'x'+stillHeight);
 const screenshots = path.join(project, 'evidence');
 await fs.mkdir(screenshots, { recursive:true });
 const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), 'work6-article-'));
@@ -55,30 +54,17 @@ try {
     await expect(page.getByRole('heading',{name:'작은 반도체 공장'})).toHaveCount(1);
     await expect(page.getByRole('heading',{name:'수백 대의 차량을 브라우저에서 움직이기까지'})).toHaveCount(1);
     if(await page.locator('canvas').count())throw Error('Legacy simulation canvas remains');
-    const hero=page.locator('.hero-motion-surface video');
+    const hero=page.locator('.hero-visual > img.hero-still');
     await expect(hero).toBeVisible();
-    const motionSources=await hero.locator('source').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('src')));
-    if(motionSources.length!==2||motionSources.some(url=>!url?.startsWith('/build-canvas/fab-flow-preview/media/')))
-      throw Error('Hero video source base mismatch: '+JSON.stringify(motionSources));
     await page.waitForFunction(()=>{
-      const video=document.querySelector('.hero-motion-surface video');
-      return video && video.readyState>=2 && video.videoWidth>0 && video.videoHeight>0;
+      const image=document.querySelector('.hero-visual > img.hero-still');
+      return image && image.complete && image.naturalWidth>=2560 && image.naturalHeight>=1440;
     },null,{timeout:15000});
-    const videoProps=await hero.evaluate(video=>({muted:video.muted,loop:video.loop,autoplay:video.autoplay,playsInline:video.playsInline,width:video.videoWidth,height:video.videoHeight}));
-    if(!videoProps.muted||!videoProps.loop||!videoProps.autoplay||!videoProps.playsInline||videoProps.width<2560||videoProps.height<1440)
-      throw Error('Hero playback setup invalid: '+JSON.stringify(videoProps));
-    await hero.evaluate(video=>video.play());
-    await expect(page.getByRole('button',{name:'메인 영상 일시 정지'})).toBeVisible();
-    await page.getByRole('button',{name:'메인 영상 일시 정지'}).click();
-    await expect(hero).toHaveJSProperty('paused',true);
-    await page.getByRole('button',{name:'메인 영상 재생'}).click();
-    await expect(hero).toHaveJSProperty('paused',false);
-    if(width===1440) {
-      await page.emulateMedia({reducedMotion:'reduce'});
-      await expect(hero).toHaveJSProperty('paused',true);
-      await page.emulateMedia({reducedMotion:'no-preference'});
-      await expect(hero).toHaveJSProperty('paused',false);
-    }
+    const natural=await hero.evaluate(image=>({width:image.naturalWidth,height:image.naturalHeight,src:image.getAttribute('src')}));
+    if(!natural.src?.startsWith('/build-canvas/fab-flow-preview/media/hero-overview.png'))
+      throw Error('Hero still source base mismatch: '+JSON.stringify(natural));
+    if(await page.locator('.hero-visual video,.hero-visual canvas').count())
+      throw Error('Hero video or dynamic canvas remains');
     const state=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,viewport:innerWidth,ctas:[...document.querySelectorAll('.play-link')].map(a=>a.getAttribute('href')),base:[...document.querySelectorAll('.article-figure img')].slice(0,3).map(i=>i.getAttribute('src'))}));
     if(state.scrollWidth>state.viewport+1)throw Error('Horizontal overflow: '+JSON.stringify({width,state}));
     if(state.ctas.some(href=>href!=='https://fabflow-yoon.vercel.app/'))throw Error('Play link mismatch: '+JSON.stringify(state.ctas));
@@ -91,7 +77,7 @@ try {
     await page.locator('#chapter-00').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(screenshots,'fab-flow-article-'+width+'.png'),fullPage:true});
     if(faults.length)throw Error('Console/network errors: '+faults.join(' | '));
-    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',heroVideo:'ok',overflow:false,errors:0}));
+    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',heroStill:'qhd',overflow:false,errors:0}));
     await page.close();
   }
   const homePage=await browser.newPage();
