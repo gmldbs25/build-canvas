@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 const HOME_URL = '/build-canvas/';
 const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
 const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
-const evidenceNote = '실제 FAB FLOW Medium V6 시뮬레이션을 녹화한 5초 반복 영상입니다. 소리는 없으며, OHT 이동은 실제 엔진의 계산 결과입니다.';
+const evidenceNote = '실제 FAB FLOW 브라우저의 3D 전체화면 모드에서 OHT와 장비를 확대해 녹화한 8초 반복 영상입니다. 별도 2D 구현이나 생성 영상이 아닙니다.';
 
 type FigureProps = {
   file: string;
@@ -50,12 +50,12 @@ function HeroMotion() {
   };
   return <div className="hero-motion-surface">
     <video ref={videoRef} autoPlay muted loop playsInline preload="metadata"
-      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
-      aria-label="실제 FAB FLOW Medium 시뮬레이션에서 OHT 차량들이 레일을 따라 움직이는 1080p 5초 반복 영상"
+      poster={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd'}
+      aria-label="실제 FAB FLOW Medium 시뮬레이션에서 OHT 차량들이 레일을 따라 움직이는 QHD 8초 반복 영상"
       onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>
-      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-1080p'} type="video/mp4" />
-      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-1080p'} type="video/webm" />
-      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-1080p'}
+      <source src={IMAGE_ROOT + 'hero-overview.mp4?v=20261103-3d-closeup-qhd'} type="video/mp4" />
+      <source src={IMAGE_ROOT + 'hero-overview.webm?v=20261103-3d-closeup-qhd'} type="video/webm" />
+      <img src={IMAGE_ROOT + 'hero-motion-poster.jpg?v=20261103-3d-closeup-qhd'}
         alt="FAB FLOW 실제 Medium V6 시뮬레이션 전체 화면. 장비와 레일, 운행 중인 OHT가 보이는 3D 공장" />
     </video>
     <button type="button" className="hero-motion-toggle" onClick={togglePlayback}
@@ -139,7 +139,7 @@ export default function Work6() {
           </div>
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
             <HeroMotion />
-            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL FOOTAGE / 5S LOOP</span></div>
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL 3D FOOTAGE / 8S LOOP</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
         </div>
