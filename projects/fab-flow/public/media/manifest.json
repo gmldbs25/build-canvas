@@ -246,7 +246,7 @@
   "hero_motion": {
     "source_url": "https://fabflow-yoon.vercel.app/",
     "capture_type": "real-time screen recording of public FAB FLOW native simulator (not a GIF or AI animation)",
-    "captured_at_utc": "2026-11-03T03:33:46.405Z",
+    "captured_at_utc": "2026-11-03T03:49:01.759Z",
     "application_deployment_sha": "not independently verified",
     "scenario": {
       "mode": "Sandbox",
@@ -254,21 +254,21 @@
       "fleet": 32,
       "policy": "DBR",
       "demand_preset": "congested",
-      "camera": "full FAB overview",
-      "simulation_time_begin": 11.5,
-      "simulation_time_end": 48.5
+      "camera": "native fullscreen, overview with 3-step 3D camera zoom",
+      "simulation_time_begin": 27.5,
+      "simulation_time_end": 70.5
     },
     "viewport": {
       "width": 2560,
       "height": 1440,
       "device_pixel_ratio": 1,
       "source_canvas": {
-        "width": 1920,
-        "height": 1039
+        "width": 2560,
+        "height": 1440
       }
     },
     "clip": {
-      "seconds": 5,
+      "seconds": 8,
       "fps": 30,
       "width": 2560,
       "height": 1440,
@@ -279,28 +279,28 @@
     "videos": [
       {
         "file": "hero-overview.mp4",
-        "bytes": 1821462,
-        "duration": 5,
+        "bytes": 2849405,
+        "duration": 8,
         "width": 2560,
         "height": 1440,
-        "frames": 150,
-        "distinct_motion_samples": 10,
-        "sha256": "150d3635dd611116f802a36a573aa0c21d044dfa64422b80dc63f01ee4962637"
+        "frames": 240,
+        "distinct_motion_samples": 16,
+        "sha256": "72d017cc84f18a6deac9f0b43e52656218d4b87d209521e38e7512b9d79222ba"
       },
       {
         "file": "hero-overview.webm",
-        "bytes": 1644586,
-        "duration": 5,
+        "bytes": 2555525,
+        "duration": 8,
         "width": 2560,
         "height": 1440,
         "frames": 0,
-        "distinct_motion_samples": 10,
-        "sha256": "37a2087b6b439cb9fa6e05598e0aa39099b6c57c012ef961cbedfba4c20b2997"
+        "distinct_motion_samples": 16,
+        "sha256": "80e5286ebce9a772936113be14c5d5dd84c0208349c71c7799f39cbadc4ebdb1"
       }
     ],
     "poster": {
       "file": "hero-motion-poster.jpg",
-      "bytes": 273566
+      "bytes": 109065
     }
   }
 }
