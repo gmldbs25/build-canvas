@@ -94,7 +94,7 @@ export default function Work6() {
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
             <img
               className="hero-still"
-              src={IMAGE_ROOT + 'hero-overview.png?v=20261103-qhd-still'}
+              src={IMAGE_ROOT + 'hero-overview.png?v=20261103-native-qhd-6d2520'}
               alt="실제 FAB FLOW Medium V6 시뮬레이션 캡처. 3D 장비, 레일과 OHT 운행 장면."
               fetchPriority="high"
               decoding="async"
