@@ -242,5 +242,60 @@
       "policy-comparison"
     ],
     "not_refreshed": []
+  },
+  "hero_motion": {
+    "source_url": "https://fabflow-yoon.vercel.app/",
+    "capture_type": "actual live FAB FLOW Chromium recording, not AI-generated animation",
+    "captured_at_utc": "2026-11-03T02:21:36.825Z",
+    "application_deployment_sha": "not independently verified",
+    "scenario": {
+      "mode": "Experience Intro / Scene 01",
+      "layout": "Large V6 native simulation",
+      "fleet": 32,
+      "seed": 47,
+      "distribution": "hotspot",
+      "camera": "native fixed tableau",
+      "opening_moving_vehicles": 27,
+      "opening_local_vehicles": 3
+    },
+    "viewport": {
+      "width": 1600,
+      "height": 900,
+      "device_pixel_ratio": 1
+    },
+    "clip": {
+      "seconds": 5,
+      "fps": 20,
+      "width": 1440,
+      "height": 810,
+      "muted": true,
+      "loop": true
+    },
+    "videos": [
+      {
+        "file": "hero-overview.mp4",
+        "bytes": 194314,
+        "duration": 5,
+        "width": 1440,
+        "height": 810,
+        "frames": 100,
+        "distinct_motion_samples": 10,
+        "sha256": "0c2e28481b534ceeb90894db779ad71f35cabcb85ca83414e2cc290eb8dc9ad0"
+      },
+      {
+        "file": "hero-overview.webm",
+        "bytes": 143150,
+        "duration": 5,
+        "width": 1440,
+        "height": 810,
+        "frames": 0,
+        "distinct_motion_samples": 10,
+        "sha256": "42faa1b2ab0b34f36965d273c6c8b884418fcf0ef40587428cddb9c6d8593a04"
+      }
+    ],
+    "poster": {
+      "file": "hero-motion-poster.jpg",
+      "bytes": 97428
+    }
   }
 }
