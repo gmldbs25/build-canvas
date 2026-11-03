@@ -1,0 +1,67 @@
+name: Work6 native QHD hero screenshot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/work6-hero-still.yml'
+      - 'projects/fab-flow/scripts/capture-hero-still.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: work6-still-capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - name: Install real Chromium browser and dependencies
+        run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Capture true QHD screenshot of running FAB FLOW
+        env:
+          FAB_FLOW_URL: https://fabflow-yoon.vercel.app/
+        run: node projects/fab-flow/scripts/capture-hero-still.mjs
+      - name: Archive evidence (two zoom choices and provenance)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-real-qhd-still
+          path: |
+            projects/fab-flow/evidence/hero-overview-zoom2-qhd.png
+            projects/fab-flow/public/media/hero-overview.png
+            projects/fab-flow/public/media/manifest.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Commit QHD screenshot and provenance to main
+        run: |
+          test -s projects/fab-flow/public/media/hero-overview.png
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects/fab-flow/public/media/hero-overview.png projects/fab-flow/public/media/manifest.json
+          if git diff --cached --quiet; then
+            echo "No screenshot changes were produced"
+            exit 1
+          fi
+          git commit -m "assets(work6): replace hero with true QHD native 3D FAB FLOW screenshot"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Deploy Actions-authored screenshot commit to Pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST repos/${{ github.repository }}/actions/workflows/deploy-pages.yml/dispatches -f ref=main
