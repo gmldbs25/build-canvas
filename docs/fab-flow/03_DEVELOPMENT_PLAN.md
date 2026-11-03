@@ -141,7 +141,7 @@ FAB FLOW is **private**, so the public build must not link asset URLs hosted in 
 - Preserve H shortcut and home link, current site base URL and portfolio integration.
 - Add minimal Figure/Disclosure components; **no Native Engine import**.
 - Use only approved media; if missing, mark development-only placeholder text and **do not deploy** placeholder.
-- **Gate:** all 11 chapters readable with JS on/off where possible; static build functional with no missing assets.
+- **Gate:** all 11 chapters readable with JS on/off where possible; the parallel article build works without missing assets; the existing public Work6 entrypoint and `fab-flow-preview/` output remain unchanged until the approved final cutover.
 
 ### P4 — Media, diagrams and technical polish
 
