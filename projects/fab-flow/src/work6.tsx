@@ -92,8 +92,8 @@ export default function Work6() {
             </div>
           </div>
           <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
-            <img src={IMAGE_ROOT + 'hero-overview.png'} alt="FAB FLOW 실행 화면. 대형 반도체 물류 공장의 장비와 레일, 이동하는 OHT가 등각 시점으로 보인다." fetchPriority="high" decoding="async" />
-            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL CAPTURE / REFERENCE BUILD</span></div>
+            <img src={IMAGE_ROOT + 'hero-overview.png'} alt="FAB FLOW 실제 실행 화면. 장비와 레일, 이동하는 OHT와 운영 현황이 보이는 시뮬레이터 화면." fetchPriority="high" decoding="async" />
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL CAPTURE / LIVE APP</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
         </div>
@@ -131,7 +131,7 @@ export default function Work6() {
         <div className="feature-split"><div className="feature-side"><div className="prose"><p>FAB 크기를 선택하고 OHT 수와 물류 요청량을 정하면 새로운 운영 실험이 시작됩니다. 작은 공장에서 천천히 관찰할 수도, 더 많은 차량과 요청을 투입해 혼잡을 만들어 볼 수도 있습니다.</p>
           <p>시뮬레이션이 시작된 뒤에도 수요의 흐름을 바꾸거나 차량을 추가하고, 실행 속도를 조절하며 결과를 지켜볼 수 있습니다.</p></div>
           <div className="setting-list"><div><span>01</span><b>FAB SIZE</b><small>Small · Medium · Large</small></div><div><span>02</span><b>FLEET</b><small>초기 OHT 1–300대</small></div><div><span>03</span><b>DEMAND</b><small>요청량과 운영 중 수요 변경</small></div><div><span>04</span><b>POLICY & TIME</b><small>DBR / CBR · 표시 속도 1× / 2× / 4×</small></div></div>
-        </div><Figure file="sandbox-setup.png" alt="FAB FLOW의 새 시뮬레이션 설정 창. FAB 크기, OHT 수, MCS 정책을 선택할 수 있는 실제 UI" caption="ACTUAL UI / 새 시뮬레이션 설정 · 이전 검증 화면" className="feature-shot" /></div>
+        </div><Figure file="sandbox-setup.png" alt="FAB FLOW의 새 시뮬레이션 설정 창. FAB 크기, OHT 수, MCS 정책을 선택할 수 있는 실제 UI" caption="ACTUAL UI / 실제 FAB FLOW의 새 시뮬레이션 설정" className="feature-shot" /></div>
         <p className="source-note">표시 속도와 실제 진행 속도는 다를 수 있습니다. 엔진 목표 매핑은 4 / 8 / 16 시뮬레이션 초/실제 초이며 기기 부하에 따라 달라집니다.</p>
       </div></section>
 
@@ -139,7 +139,7 @@ export default function Work6() {
         <ChapterHead index="04" eyebrow="WHEN THE SYSTEM GETS BUSY" title="공장이 막히기 시작하면" lead="차량을 더 넣으면, 물류는 언제나 더 빨라질까요?" />
         <div className="prose"><p>이동 요청이 늘어나는 순간, 더 많은 OHT가 레일을 공유하고 앞 차량이나 Port를 기다리는 시간이 쌓입니다. 아직 완료되지 않은 요청도 남기 시작합니다.</p>
           <p>FAB FLOW의 혼잡은 화면에 덧씌운 무작위 효과가 아닙니다. 이동과 자원 점유, 대기, 경로 선택을 실제 엔진이 계산한 결과입니다. 하지만 차량이 많다고 언제나 느려지는 것은 아닙니다. 배치와 수요, 정책에 따라 결과는 달라집니다.</p></div></div>
-        <Figure file="congestion-observation.png" alt="FAB FLOW 과거 고부하 시뮬레이션에서 운송 차량과 레일을 관찰한 실제 화면" caption="STRESS SCENARIO / 과거 고부하 실험 관찰 장면 · 저부하와 동일 조건의 통제 A/B 비교가 아닙니다" className="pressure-figure" />
+        <Figure file="congestion-observation.png" alt="FAB FLOW Large 고부하 시뮬레이션에서 운송 차량과 레일을 관찰한 실제 화면" caption="STRESS SCENARIO / Large · 120 OHT 실행 장면 · 저부하와 동일 조건의 통제 A/B 비교는 아닙니다" className="pressure-figure" />
         <div className="observation-line"><span>LOOK FOR</span><b>레일 대기</b><b>미완료 요청</b><b>최근 처리 속도</b><b>운송 시간</b></div>
       </div></section>
 
@@ -148,9 +148,9 @@ export default function Work6() {
         <div className="prose prose-narrow"><p>공장의 상태는 단지 차량이 움직이는 모습만으로는 설명되지 않습니다. 완료한 운송 건수, 아직 남은 요청, 최근 완료 속도, 운송에 걸린 시간을 함께 보아야 운영이 보입니다.</p>
           <p>운영 분석 화면은 최근 흐름과 주목할 레일을 보여줍니다. DBR과 CBR은 서로 다른 경로 비용 정책이며, 동일한 입력 조건으로 실행한 별도 정책 비교 실험에서 결과를 나란히 살펴볼 수 있습니다.</p>
           <p>관찰된 전후 차이가 반드시 하나의 조작 때문에 생겼다고 단정할 수는 없습니다. 그래서 비교의 조건과 관찰 범위도 중요합니다.</p></div>
-        <Figure file="operations-analysis.png" alt="FAB FLOW의 실제 운영 분석 패널. 레일 대기와 미완료 요청, 완료 속도, 운송 시간, 추세 그래프가 보임" caption="ANALYSIS / 운영 분석 패널 · Operations Analysis 1.1 검증 시점 캡처" className="analysis-wide" />
+        <Figure file="operations-analysis.png" alt="FAB FLOW의 실제 운영 분석 패널. 레일 대기와 미완료 요청, 완료 속도, 운송 시간, 추세 그래프가 보임" caption="ANALYSIS / 실제 FAB FLOW 운영 분석 화면" className="analysis-wide" />
         <div className="analysis-lower"><div className="policy-card"><span>ROUTING POLICIES</span><div><b>DBR</b><p>Distance Based Routing<br/>이동 거리 중심의 경로 비용</p></div><div><b>CBR</b><p>Congestion Based Routing<br/>혼잡 비용을 함께 고려하는 경로</p></div><small>CBR이 항상 더 좋은 처리량을 보장하는 것은 아닙니다.</small></div>
-          <Figure file="policy-comparison.png" alt="FAB FLOW에서 두 경로 정책을 나란히 비교하는 실제 실험 화면" caption="POLICY WORLDS / 별도 조건 일치 실행을 나란히 비교한 이전 검증 화면" /></div>
+          <Figure file="policy-comparison.png" alt="FAB FLOW에서 두 경로 정책을 나란히 비교하는 실제 실험 화면" caption="POLICY WORLDS / Small · 동일 입력 조건 DBR·CBR 실행 비교" /></div>
         <DeepDive title="분석 수치와 정책 비교는 무엇이 다른가요?"><p>운영 분석은 하나의 실행에서 최근 레일 대기, 완료 속도, 평균 운송 시간, 개입 이력을 관찰합니다. 정책 비교는 동일한 초기 조건의 별도 시뮬레이션 세계를 구성해 DBR과 CBR을 살펴봅니다. 관찰 기록과 통제된 실험 결과를 동일하게 취급하지 않는 것이 중요합니다.</p></DeepDive>
       </div></section>
 
