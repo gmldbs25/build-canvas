@@ -44,9 +44,13 @@ function draw(canvas: HTMLCanvasElement, world: World, fraction: number) {
   ctx.fillStyle = '#e6eee7';
   ctx.fillRect(0,0,width,height);
   const {layout,engine} = world;
-  const scale = Math.min((width-34)/layout.width, (height-70)/layout.height);
+  const compact = width < 600;
+  // On phone screens, center the real first bay rather than shrinking both bays to tiny dots.
+  const visibleWidth = compact ? layout.width * .53 : layout.width;
+  const visibleHeight = layout.height;
+  const scale = Math.min((width-34)/visibleWidth, (height-70)/visibleHeight);
   const px = (n: number) => n / scale;
-  ctx.translate((width-layout.width*scale)/2,(height-layout.height*scale)/2);
+  ctx.translate((width-visibleWidth*scale)/2,(height-visibleHeight*scale)/2);
   ctx.scale(scale,scale);
 
   ctx.fillStyle = '#f9fbf6';
