@@ -28,13 +28,19 @@ function mediaInfo(file) {
 async function verifyVideo(file) {
   const stat = await fs.stat(file);
   const probe = mediaInfo(file);
-  if (stat.size < 130_000 || stat.size > 12_000_000 ||
+  if (stat.size < 70_000 || stat.size > 12_000_000 ||
       probe.duration < 4.6 || probe.duration > 5.25 ||
       probe.width !== 1440 || probe.height !== 810 ||
       (probe.frames > 0 && probe.frames < 75)) {
     throw new Error('Video quality gate failed: ' + JSON.stringify({file, bytes: stat.size, ...probe}));
   }
+  const frameHashes=command('ffmpeg', ['-hide_banner','-loglevel','error','-i',file,
+    '-vf','fps=2,scale=180:100','-f','framemd5','-'])
+    .split('\n').filter(line=>line.trim() && !line.startsWith('#'))
+    .map(line=>line.trim().split(',').at(-1));
+  if(new Set(frameHashes).size<3)throw Error('Encoded video appears static: '+file);
   return {file: path.basename(file), bytes: stat.size, ...probe,
+    distinct_motion_samples:new Set(frameHashes).size,
     sha256: createHash('sha256').update(await fs.readFile(file)).digest('hex')};
 }
 let browser;
@@ -92,7 +98,7 @@ try {
   const webm=path.join(TMP,'hero-overview.webm');
   command('ffmpeg',[...common,'-c:v','libx264','-preset','medium','-crf','22',
     '-pix_fmt','yuv420p','-movflags','+faststart',mp4]);
-  command('ffmpeg',[...common,'-c:v','libvpx-vp9','-b:v','0','-crf','34',
+  command('ffmpeg',[...common,'-c:v','libvpx-vp9','-b:v','0','-crf','28',
     '-deadline','good','-cpu-used','4','-pix_fmt','yuv420p',webm]);
   const poster=path.join(TMP,'hero-motion-poster.jpg');
   command('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',mp4,'-frames:v','1','-q:v','3',poster]);
