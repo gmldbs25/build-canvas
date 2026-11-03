@@ -1,0 +1,72 @@
+name: Capture Work6 real FAB FLOW hero video
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/work6-hero-video.yml'
+      - 'projects/fab-flow/scripts/capture-hero-video.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: work6-live-hero-video
+  cancel-in-progress: false
+
+jobs:
+  capture-and-publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Check out Build Canvas
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Work6 capture dependencies
+        run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - name: Install Chromium
+        run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Ensure FFmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+      - name: Record and encode real FAB FLOW motion
+        run: node projects/fab-flow/scripts/capture-hero-video.mjs
+      - name: Archive generated videos and provenance for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work6-live-hero-video-evidence
+          path: |
+            projects/fab-flow/public/media/hero-overview.mp4
+            projects/fab-flow/public/media/hero-overview.webm
+            projects/fab-flow/public/media/manifest.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Commit verified video files to main
+        run: |
+          test -s projects/fab-flow/public/media/hero-overview.mp4
+          test -s projects/fab-flow/public/media/hero-overview.webm
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects/fab-flow/public/media/hero-overview.mp4 \
+                  projects/fab-flow/public/media/hero-overview.webm \
+                  projects/fab-flow/public/media/manifest.json
+          git diff --cached --quiet && { echo "Nothing captured"; exit 1; }
+          git commit -m "feat(work6): add real five-second FAB FLOW motion hero"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Dispatch Pages build for Actions-originated commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST repos/${{ github.repository }}/actions/workflows/deploy-pages.yml/dispatches -f ref=main
