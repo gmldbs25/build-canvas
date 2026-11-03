@@ -1,6 +1,11 @@
-name: Work6 native engineering checks
+name: Work6 FAB FLOW article validation
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/fab-flow/**'
+      - '.github/workflows/work6-ci.yml'
   pull_request:
     paths:
       - 'projects/fab-flow/**'
@@ -11,30 +16,28 @@ permissions:
   contents: read
 
 jobs:
-  typecheck-and-browser:
+  article-build-and-browser:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - name: Install Work6 dependencies
+          node-version: '24'
+      - name: Install article dependencies
         run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
-      - name: Typecheck Work6
+      - name: Typecheck
         run: npm run typecheck --prefix projects/fab-flow
-      - name: Build Work6 GitHub Pages output
+      - name: Build published route
         run: GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build --prefix projects/fab-flow
-      - name: Install Chromium for Playwright
-        run: npx --prefix projects/fab-flow playwright install chromium --with-deps
-      - name: Native browser regression
+      - name: Install Chromium
+        run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Article browser and responsive smoke
         run: npm run test:browser --prefix projects/fab-flow
-      - name: Upload browser evidence
+      - name: Upload article screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: work6-engineering-browser-evidence
+          name: work6-article-browser-screenshots
           path: projects/fab-flow/evidence/
           if-no-files-found: ignore

@@ -1,647 +1,221 @@
-'use client';
+import { useEffect } from 'react';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ThreeFacilityScene from './components/ThreeFacilityScene';
-import { Engine } from './sim/engine';
-import { SCENES } from './work6-scenes';
-import { usePressureWorld } from './usePressureWorld';
-import { useAmbientIntro } from './useAmbientIntro';
-import { buildNativeRouteStudy, type NativeRouteStudy } from './routeStudy';
-import { chooseNativeGraphExample } from './nativeGraphExample';
-import { operationalScenario } from './sim/experiments';
-import { chooseLocalIntroDemand } from './introScenario';
-import { publicationCopy } from './sim/publication';
-import {
-  TutorialCommandLayer, TUTORIAL_REQUEST_ID, tutorialRequest, tutorialVehicle,
-  type TutorialCommand, type TutorialStage,
-} from './sim/tutorial';
-import type { Scenario, SimulationState } from './sim/types';
-import type { CameraCommand } from './components/fabCamera';
+const HOME_URL = '/build-canvas/';
+const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
+const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
+const evidenceNote = 'FAB FLOW 개발·검증 과정의 실제 실행 캡처. 촬영 시점과 설정이 현재 배포 버전과 다를 수 있습니다.';
 
-const STEP_ORDER: TutorialCommand[] = ['request', 'dispatch', 'empty-travel', 'pickup', 'route', 'loaded-travel', 'dropoff'];
-
-/**
- * Presentation-only explanatory language: the underlying Native transport commands
- * are unchanged. FAB FLOW simulates transport logistics, not wafer fabrication.
- * Each completed command remains visible until the user triggers the next one.
- */
-const BEGINNER_STEPS: Record<TutorialCommand, { question: string; explanation: string; button: string }> = {
-  request: {
-    question: '왜 옮겨야 할까요?',
-    explanation: '반도체는 한 장비에서 완성되지 않아요. 다음 장비에서 작업할 수 있도록 웨이퍼를 담은 보호 상자(FOUP)를 보내야 하는 상황을 상상해 볼게요. 먼저 물류 시스템에 이동을 부탁합니다.',
-    button: '다음 장비로 보내기',
-  },
-  dispatch: {
-    question: '누가 옮겨 줄까요?',
-    explanation: '옮겨 달라는 요청이 접수됐어요. 하지만 아직 담당 차량은 없어요. 천장 레일을 달리는 운반 차량(OHT) 중 한 대를 골라 볼까요?',
-    button: '담당 차량 정하기',
-  },
-  'empty-travel': {
-    question: '차량은 어디로 가야 할까요?',
-    explanation: '운반 차량 한 대가 배정됐어요. 이렇게 담당 차량을 고르는 일을 배차라고 해요. 아직 FOUP를 싣지 않았으니 빈 차량이 출발 장비로 찾아가야 해요.',
-    button: '빈 차량이 가지러 가는 모습 보기',
-  },
-  pickup: {
-    question: '이제 무엇을 실을까요?',
-    explanation: '빈 OHT가 출발 장비에 도착했어요. 웨이퍼가 담긴 FOUP는 아직 장비의 물건을 주고받는 자리(Port)에 있어요. 이제 직접 들어 올릴 차례예요.',
-    button: 'FOUP 싣는 모습 보기',
-  },
-  route: {
-    question: '어떤 길로 가면 될까요?',
-    explanation: 'FOUP를 실었어요. 목적지까지 가는 길은 천장 레일로 연결돼 있어요. 물류 시스템이 지금 가능한 경로를 계산하도록 해볼까요?',
-    button: '이동할 길 살펴보기',
-  },
-  'loaded-travel': {
-    question: '이제 다음 장비로 출발!',
-    explanation: '운송 경로가 정해졌어요. OHT가 FOUP를 싣고 실제로 계산한 레일 경로를 따라 목적지까지 이동하는 모습을 지켜보세요.',
-    button: '운송 따라가기',
-  },
-  dropoff: {
-    question: '도착하면 무엇을 할까요?',
-    explanation: '목적지 장비 앞에 도착했어요. FOUP를 다음 장비가 주고받는 자리(Port)에 내려놓으면 이번 운송은 끝나요.',
-    button: 'FOUP 내려놓기',
-  },
+type FigureProps = {
+  file: string;
+  alt: string;
+  caption: string;
+  className?: string;
+  eager?: boolean;
 };
-const OBSERVED_RESULTS: Record<TutorialCommand, string> = {
-  request: '물류 시스템에 “이 FOUP를 다음 장비로 옮겨 주세요”라는 요청이 등록됐어요. 아직 차량은 움직이지 않았어요.',
-  dispatch: '여러 OHT 중 한 대가 이번 운송을 맡게 됐어요. 이 결정이 바로 배차예요.',
-  'empty-travel': '선택된 OHT가 빈 상태로 출발 장비까지 이동했어요. FOUP는 아직 장비에 있습니다.',
-  pickup: '출발 장비에 있던 FOUP가 OHT에 실렸어요. 이제 목적지까지 이동할 준비가 됐습니다.',
-  route: '물류 제어 시스템이 실제 레일망에서 목적지로 갈 길을 선택했어요.',
-  'loaded-travel': 'FOUP를 실은 OHT가 목적지 장비 앞에 도착했어요. 아직 내려놓는 과정이 남아 있어요.',
-  dropoff: 'FOUP를 목적지 장비에 내려놓았어요. 한 건의 물류 운송이 실제 엔진에서 완료됐습니다.',
-};
-
-
-function createWork6Tutorial() {
-  // The same native Engine/TutorialCommandLayer used by FAB FLOW, with its Large V6
-  // facility to make the scale reveal meaningful. No synthetic OHT path or tween.
-  const scenario: Scenario = {
-    ...operationalScenario('large'),
-    fleet: 9,
-    demand: 1,
-    duration: 1800,
-    demandWindow: 60,
-    seed: 1,
-    pattern: 'steady',
-    distribution: 'balanced' as const,
-  };
-  // Only the seeded demand is selected; FAB FLOW's own Engine still generates
-  // the request and makes every dispatch, routing and movement decision.
-  const selection = chooseLocalIntroDemand(new Engine({ ...scenario, seed: 1 }, { analysis: false }).layout, scenario);
-  const engine = new Engine({ ...scenario, seed: selection.seed });
-  const plannedIngress = engine.getNextDemand();
-  if (plannedIngress?.source !== selection.source || plannedIngress?.destination !== selection.destination) {
-    throw new Error('Native demand generation changed: local tutorial selection must be revalidated.');
-  }
-  if (!plannedIngress || plannedIngress.at !== 0) throw new Error('The native tutorial needs an initial demand at time zero.');
-  engine.enableTutorialControl();
-  return { engine, plannedIngress, selection };
+function Figure({ file, alt, caption, className = '', eager = false }: FigureProps) {
+  return <figure className={'article-figure ' + className}>
+    <div className="article-image-wrap"><img src={IMAGE_ROOT + file} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
+    <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
+  </figure>;
 }
-
-function createClockEngine(): Engine {
-  // Separate genuine native experiment; the tutorial remains command-owned.
-  const scenario: Scenario = { ...operationalScenario('large'), fleet: 12, demand: 2,
-    duration: 1800, seed: 17, pattern: 'steady' };
-  const engine = new Engine(scenario, { analysis: false });
-  // Genuine 0.5-second steps: start at an observable active point, not t=0 parking.
-  // Both fresh runs replay the exact same 300 native ticks.
-  engine.step(300);
-  return engine;
+function ChapterHead({ index, eyebrow, title, lead }: { index: string; eyebrow: string; title: string; lead?: string }) {
+  return <div className="chapter-head">
+    <div className="chapter-meta"><span>{index} / 10</span><span>{eyebrow}</span></div>
+    <h2>{title}</h2>{lead && <p className="chapter-lead">{lead}</p>}
+  </div>;
 }
-
-function freezeState(engine: Engine): SimulationState {
-  return publicationCopy({ version: 1, scenario: engine.scenario, state: engine.state }).state;
+function DeepDive({ title, children }: { title: string; children: React.ReactNode }) {
+  return <details className="tech-detail"><summary><span className="detail-prefix">ENGINEERING NOTE</span><span>{title}</span><span className="detail-plus" aria-hidden="true">+</span></summary><div className="detail-body">{children}</div></details>;
 }
-
+const steps = [
+  { no: '01', name: '요청 생성', detail: 'FOUP를 다음 장비로 옮겨 달라는 요청' },
+  { no: '02', name: 'OHT 배차', detail: '운송을 담당할 차량 결정' },
+  { no: '03', name: '빈 차 이동', detail: '출발 Port로 차량 이동' },
+  { no: '04', name: '픽업', detail: 'FOUP를 차량에 적재' },
+  { no: '05', name: '적재 운송', detail: '방향이 있는 레일 경로를 따라 이동' },
+  { no: '06', name: '하역 완료', detail: '목적 Port에 FOUP를 내려놓음' },
+];
+function GraphDiagram() {
+  return <div className="diagram-frame"><div className="diagram-caption-top">CONCEPT DIAGRAM / 실제 FAB 연결망을 단순화한 개념도</div>
+    <svg className="graph-svg" viewBox="0 0 760 340" role="img" aria-label="방향이 있는 레일 링크가 세 개의 노드를 연결하고, 가운데 노드에서 장비 포트로 이어지는 개념도">
+      <defs><marker id="graph-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#29816b" /></marker></defs>
+      <path d="M110 175 H340 H585" fill="none" stroke="#7bbba8" strokeWidth="14" strokeLinecap="round" opacity=".2" />
+      <path d="M110 175 H340 H585" fill="none" stroke="#29816b" strokeWidth="3" strokeDasharray="12 12" markerEnd="url(#graph-arrow)" />
+      <path d="M340 175 V270" stroke="#ba8748" strokeWidth="3" strokeDasharray="6 8" />
+      <g fill="#fffef9" stroke="#285648" strokeWidth="3"><circle cx="110" cy="175" r="15" /><circle cx="340" cy="175" r="15" /><circle cx="585" cy="175" r="15" /></g>
+      <rect x="282" y="267" width="116" height="49" rx="8" fill="#e1b16c" />
+      <text x="340" y="297" textAnchor="middle" fill="#213e33" fontSize="17" fontWeight="700">PORT</text>
+      <text x="110" y="127" textAnchor="middle" fill="#203e33" fontSize="15" fontWeight="700">NODE A</text>
+      <text x="340" y="127" textAnchor="middle" fill="#203e33" fontSize="15" fontWeight="700">NODE B</text>
+      <text x="585" y="127" textAnchor="middle" fill="#203e33" fontSize="15" fontWeight="700">NODE C</text>
+      <text x="450" y="145" textAnchor="middle" fill="#29816b" fontSize="14" fontWeight="700">DIRECTED LINK →</text>
+      <text x="380" y="39" textAnchor="middle" fill="#68756b" fontSize="14">보이는 선이 아니라, 실제로 이동 가능한 방향을 계산한다</text>
+    </svg>
+    <p className="diagram-bottom">교차해 보이는 레일도 연결된 Node가 없으면 진입할 수 없습니다. 이 그림은 실측 V6 지도 데이터가 아닌 설명용 개념도입니다.</p>
+  </div>;
+}
+function PlayLink({ closing = false }: { closing?: boolean }) {
+  return <a className={closing ? 'play-link play-link-light' : 'play-link'} href={PLAY_URL} target="_blank" rel="noopener noreferrer">
+    <span>FAB FLOW 플레이하기</span><span aria-hidden="true">↗</span>
+  </a>;
+}
+function AppHeader() {
+  return <header className="site-header"><a className="site-brand" href={HOME_URL} aria-label="Build Canvas 홈으로 이동">build <span>_</span> canvas</a>
+    <nav className="site-nav" aria-label="아티클 목차">
+      <a href="#chapter-01">DISCOVER</a><a href="#chapter-03">EXPLORE</a><a href="#chapter-06">ENGINEERING</a>
+    </nav><a className="header-play" href={PLAY_URL} target="_blank" rel="noopener noreferrer">PLAY <span aria-hidden="true">↗</span></a>
+  </header>;
+}
 export default function Work6() {
-  const initial = useMemo(() => createWork6Tutorial(), []);
-  const engineRef = useRef(initial.engine);
-  const plannedIngressRef = useRef(initial.plannedIngress);
-  const tutorialRef = useRef(new TutorialCommandLayer());
-  const timerRef = useRef<number | null>(null);
-  const runIdRef = useRef(0);
-  const [nativeState, setNativeState] = useState<SimulationState>(() => freezeState(initial.engine));
-  const [stage, setStage] = useState<TutorialStage>('request');
-  const [lastCompleted, setLastCompleted] = useState<TutorialCommand | null>(null);
-  const [sceneIndex, setSceneIndex] = useState(0);
-  const autoTransportRef = useRef(false);
-  const clockInitial = useMemo(() => createClockEngine(), []);
-  const clockRef = useRef(clockInitial);
-  const [clockState, setClockState] = useState<SimulationState>(() => freezeState(clockInitial));
-  const [clockPlaying, setClockPlaying] = useState(false);
-  const [networkLens, setNetworkLens] = useState(false);
-  const [trafficLens, setTrafficLens] = useState(true);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>(undefined);
-  const [decision, setDecision] = useState<ReturnType<Engine['inspectDecision']>>(undefined);
-  const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ sequence: 1, kind: 'opening' });
-  const scene = SCENES[sceneIndex];
-  // Shared original Large 3D renderer; independent scenarios are labelled.
-  const isPressure = scene.id === 6 || scene.id === 7;
-  const pressure = usePressureWorld(isPressure, false, isPressure);
-  const congestionVehicleId = pressure.railFocus?.vehicleId;
-  const congestionVehicle = pressure.state.vehicles.find(vehicle => vehicle.id === congestionVehicleId);
-  const realQueue = pressure.state.linkQueues?.find(queue => queue.vehicleIds.includes(congestionVehicleId ?? ''));
-  const waitingVehicles = pressure.state.vehicles.filter(vehicle => !vehicle.parked && vehicle.waitReason === 'rail' && vehicle.waiting > 0).length;
-  const activeTransports = pressure.state.vehicles.filter(vehicle => !vehicle.parked && !!vehicle.request).length;
-  const railIsBlocked = congestionVehicle?.waitReason === 'rail' && (congestionVehicle.waiting ?? 0) > 0;
-  const congestionDecision = congestionVehicleId ? pressure.engine.inspectDecision(congestionVehicleId) : undefined;
-  const isOpening = scene.id === 1 || scene.id === 2 || scene.id === 8;
-  const ambient = useAmbientIntro(initial.engine.scenario, isOpening);
-  const nativeGraphExample = useMemo(() => chooseNativeGraphExample(ambient.engine.layout, 0), [ambient.engine.layout]);
-  const [routeStudy, setRouteStudy] = useState<NativeRouteStudy | null>(null);
-  const [routeError, setRouteError] = useState('');
-  const [routeChoice, setRouteChoice] = useState<'selected' | 'alternative' | 'both'>('both');
-  const activeEngine = isPressure ? pressure.engine : isOpening ? ambient.engine :
-    scene.id === 4 ? clockRef.current :
-    scene.id === 5 && routeStudy ? routeStudy.engine : engineRef.current;
-  const activeState = isPressure ? pressure.state : isOpening ? ambient.state :
-    scene.id === 4 ? clockState :
-    scene.id === 5 && routeStudy ? routeStudy.state : nativeState;
   useEffect(() => {
-    if (scene.id !== 5 || routeStudy || routeError) return;
-    // Compute a real, separate long-range native case once on entry. Scene03
-    // keeps its short route and completed FOUP intact.
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      try {
-        const study = buildNativeRouteStudy();
-        if (!cancelled) setRouteStudy(study);
-      } catch (cause) {
-        if (!cancelled) setRouteError(cause instanceof Error ? cause.message : '경로 사례를 계산할 수 없어요.');
-      }
-    }, 30);
-    return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [scene.id, routeStudy, routeError]);
-
-  useEffect(() => {
-    if (scene.id !== 4 || !clockPlaying) return;
-    const timer = window.setInterval(() => {
-      try {
-        clockRef.current.step(1);
-        setClockState(freezeState(clockRef.current));
-      } catch (cause) {
-        setClockPlaying(false);
-        setError(cause instanceof Error ? cause.message : '네이티브 Tick 계산 오류');
-      }
-    }, 520);
-    return () => window.clearInterval(timer);
-  }, [scene.id, clockPlaying]);
-  const stepClock = () => {
-    if (clockPlaying) return;
-    try {
-      clockRef.current.step(1);
-      setClockState(freezeState(clockRef.current));
-      setError('');
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '네이티브 Tick 계산 오류'); }
-  };
-  const resetClock = () => {
-    setClockPlaying(false);
-    const engine = createClockEngine();
-    clockRef.current = engine;
-    setClockState(freezeState(engine));
-    setError('');
-  };
-
-  const publish = useCallback(() => {
-    const engine = engineRef.current;
-    setNativeState(freezeState(engine));
-    const assigned = tutorialVehicle(engine);
-    if (assigned) setSelectedVehicleId(assigned.id);
-  }, []);
-
-  const issueCamera = useCallback((kind: CameraCommand['kind'], vehicleId?: string, requestId?: string) => {
-    setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind, vehicleId, requestId }));
-  }, []);
-
-  const cancelRunning = useCallback(() => {
-    runIdRef.current += 1;
-    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    timerRef.current = null;
-    tutorialRef.current.fail();
-    setBusy(false);
-  }, []);
-
-  useEffect(() => () => {
-    runIdRef.current += 1;
-    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-  }, []);
-
-  const reset = () => {
-    autoTransportRef.current = false;
-    cancelRunning();
-    const next = createWork6Tutorial();
-    engineRef.current = next.engine;
-    plannedIngressRef.current = next.plannedIngress;
-    tutorialRef.current = new TutorialCommandLayer();
-    setStage('request');
-    setLastCompleted(null);
-    setSelectedVehicleId(undefined);
-    setDecision(undefined);
-    setError('');
-    setNativeState(freezeState(next.engine));
-    issueCamera('opening');
-  };
-
-  const runNext = () => {
-    if (busy) return;
-    const layer = tutorialRef.current;
-    const engine = engineRef.current;
-    const command = layer.stage as TutorialCommand;
-    if (!STEP_ORDER.includes(command)) return;
-    if (!layer.begin(command)) return;
-    const runId = ++runIdRef.current;
-    // Let people actually watch the hoist lower and raise the FOUP.
-    // Engine ticks still represent 0.5 simulated seconds; only playback pacing changes.
-    const tickPaceMs = command === 'pickup' || command === 'dropoff' ? 520 : 32;
-    setBusy(true);
-    setError('');
-    const complete = () => {
-      const next = layer.finish(engine);
-      setLastCompleted(command);
-      setStage(next);
-      publish();
-      setBusy(false);
-      timerRef.current = null;
-      const req = tutorialRequest(engine), vehicle = tutorialVehicle(engine);
-      if (next === 'empty-travel' && vehicle) issueCamera('follow', vehicle.id, req?.id);
-      if (autoTransportRef.current && next !== 'bay') {
-        timerRef.current = window.setTimeout(() => {
-          if (runId === runIdRef.current && autoTransportRef.current) runNext();
-        }, 700);
-      } else autoTransportRef.current = false;
+    const onKey = (event: KeyboardEvent) => {
+      const element = event.target as HTMLElement | null;
+      if (event.key.toLowerCase() !== 'h' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      if (element && (element.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A', 'SUMMARY'].includes(element.tagName))) return;
+      window.location.assign(HOME_URL);
     };
-    try {
-      if (command === 'route') {
-        const result = layer.executeRoute(engine);
-        setDecision(result);
-        complete();
-        return;
-      }
-      const tick = () => {
-        if (runId !== runIdRef.current) return;
-        try {
-          // A genuine FAB FLOW Native tick. The presentation does not alter
-          // vehicle pose, route choice, FOUP ownership or request phases.
-          layer.step(engine);
-          publish();
-          if (layer.reached(engine)) {
-            // The final native pickup/dropoff tick still has 520 ms of visual
-            // hoist travel to interpolate. Do not set running=false in the
-            // same React batch as the final state publication: that snaps
-            // the FOUP straight onto the OHT before the animation completes.
-            if (command === 'pickup' || command === 'dropoff') {
-              timerRef.current = window.setTimeout(() => {
-                if (runId === runIdRef.current) complete();
-              }, tickPaceMs);
-            } else complete();
-          } else {
-            timerRef.current = window.setTimeout(tick, tickPaceMs);
-          }
-        } catch (cause) {
-          layer.fail();
-          setBusy(false);
-          setError(cause instanceof Error ? cause.message : 'Native 운송 진행 오류');
-        }
-      };
-      tick();
-    } catch (cause) {
-      layer.fail();
-      setBusy(false);
-      setError(cause instanceof Error ? cause.message : 'Native 명령 실행 오류');
-    }
-  };
-
-  const showGraphLens = () => {
-    setNetworkLens(true);
-    if (nativeGraphExample) setCameraCommand(previous => ({ sequence: previous.sequence + 1,
-      kind: 'tableau', frame: nativeGraphExample.frame }));
-  };
-  const showFactoryLens = () => {
-    setNetworkLens(false);
-    setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 1100 }));
-  };
-
-  const nextScene = useCallback((delta: number) => {
-    setSceneIndex(current => Math.max(0, Math.min(SCENES.length - 1, current + delta)));
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
-  useEffect(() => {
-    if (scene.id !== 2) setNetworkLens(false);
-    if (scene.id !== 3) {
-      autoTransportRef.current = false;
-      cancelRunning();
-    }
-    if (scene.id !== 4) setClockPlaying(false);
-  }, [scene.id, cancelRunning]);
-
-  useEffect(() => {
-    const listener = (event: KeyboardEvent) => {
-      if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('input,textarea,select,[contenteditable="true"],[role="dialog"]')) return;
-      if (event.key.toLowerCase() === 'h') {
-        event.preventDefault(); window.location.href = '../'; return;
-      }
-      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-        event.preventDefault(); nextScene(event.key === 'ArrowRight' ? 1 : -1);
-      }
-    };
-    window.addEventListener('keydown', listener);
-    return () => window.removeEventListener('keydown', listener);
-  }, [nextScene]);
-
-  const request = nativeState.requests.find(item => item.id === TUTORIAL_REQUEST_ID);
-  const vehicle = nativeState.vehicles.find(item => item.id === request?.vehicle);
-  const currentDecision = decision ?? (vehicle && request?.phase !== 'completed' ? engineRef.current.inspectDecision(vehicle.id) : undefined);
-  const beginner = STEP_ORDER.includes(stage as TutorialCommand) ? BEGINNER_STEPS[stage as TutorialCommand] : null;
-  const transportFinished = stage === 'bay' && request?.phase === 'completed';
-  const isReveal = scene.id === 2;
-  const isDecision = scene.id === 5;
-  const presentationRoute = routeChoice;
-  const shownRoute = routeStudy ? presentationRoute === 'alternative' ? routeStudy.alternative : routeStudy.selected : null;
-  const isNetwork = scene.id === 2 && networkLens;
-  const focusMode = scene.id === 1 || scene.id === 3;
-  const pressureBeatLabel = '혼잡한 Large FAB · 실제 엔진';
-  const isTransportRouteVisible = scene.id === 3 &&
-    (['empty-travel', 'pickup', 'loaded-travel', 'dropoff', 'bay'].includes(stage));
-  const candidates = scene.id === 6 && congestionDecision
-    ? congestionDecision.candidates.filter(candidate => candidate.selected)
-    : isDecision && routeStudy && shownRoute
-      ? presentationRoute === 'both'
-        ? [{ ...routeStudy.alternative, selected: false }, { ...routeStudy.selected, selected: true }]
-        : [{ ...shownRoute, selected: true }]
-      : isTransportRouteVisible && currentDecision
-        ? currentDecision.candidates.filter(candidate => candidate.selected)
-        : undefined;
-  const beat = transportFinished ? 4 : stage === 'request' || stage === 'dispatch' ? 1
-    : stage === 'empty-travel' ? 2 : stage === 'dropoff' ? 4 : 3;
-  useEffect(() => {
-    const req = tutorialRequest(engineRef.current);
-    const owner = tutorialVehicle(engineRef.current);
-    const tracked = owner?.id, reqId = req?.id;
-    if (scene.id === 1) {
-      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame }));
-      return;
-    }
-    if (scene.id === 2) {
-      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'overview', transitionMs: 1500 }));
-      return;
-    }
-    if (scene.id === 3) {
-      issueCamera(tracked ? 'follow' : 'opening', tracked, reqId); return;
-    }
-    if (scene.id === 5) {
-      if (routeStudy) setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: routeStudy.frame }));
-      else issueCamera('overview');
-      return;
-    }
-    if (scene.id === 4) { issueCamera('opening'); return; }
-    if (scene.id === 8) {
-      // On narrow screens a whole-FAB overview shrinks OHTs to invisible dots.
-      // The original FAB FLOW native introductory tableau keeps real vehicles legible.
-      setCameraCommand(previous => ({ sequence: previous.sequence + 1, kind: 'tableau', frame: ambient.frame }));
-      return;
-    }
-    issueCamera('overview');
-  }, [scene.id, issueCamera, routeStudy?.seed]);
-
-
-  // The blocked vehicle and approach link were verified by the real Native
-  // warm-up. A wider fixed tableau keeps the occupied link and surrounding
-  // OHTs visible instead of following a single free-moving vehicle too close.
-  useEffect(() => {
-    if (scene.id !== 6 || !pressure.prepared || !pressure.railFocus) return;
-    setCameraCommand(previous => ({ sequence:previous.sequence + 1,
-      kind:'tableau',frame:pressure.railFocus!.frame }));
-  }, [scene.id, pressure.prepared, pressure.railFocus?.vehicleId]);
-  // The scanner is purely a way to visualize native rail occupancy / queues.
-  // Its color is not a computed AI diagnosis or prediction.
-  const observedRailView = scene.id === 6 && trafficLens;
-  // Keep the original port annotations stable through request/dispatch.
-  const planned = scene.id === 3 ? plannedIngressRef.current : undefined;
-
-  return <div className="w6-root" data-prototype="true"
-    data-intro-source-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.source)?.area}
-    data-intro-destination-bay={initial.engine.layout.ports.find(port => port.id === initial.selection.destination)?.area}
-    data-intro-selected-seed={initial.selection.seed}
-    data-intro-directed-distance={initial.selection.shortestDirectedDistance}
-    data-opening-moving={ambient.openingMovingVehicles}
-    data-opening-local-moving={ambient.openingLocalVehicles}
-    data-scene-count={SCENES.length} data-current-scene={scene.id}
-    data-scene2-network={scene.id === 2 ? (networkLens ? 'network' : 'factory') : ''}
-    data-clock-time={scene.id === 4 ? clockState.time : ''}
-    data-clock-tick={scene.id === 4 ? clockState.tick : ''}
-    data-route-study-seed={routeStudy?.seed ?? ''}
-    data-route-study-source={routeStudy?.sourceBay ?? ''}
-    data-route-study-destination={routeStudy?.destinationBay ?? ''}
-    data-route-study-distinct-fraction={routeStudy?.contrast.distinctFraction ?? ''}
-    data-route-study-separation={routeStudy?.contrast.maxSeparation ?? ''}
-    data-route-study-alternative-kind={routeStudy?.alternativeKind ?? ''}
-    data-pressure-prepared={scene.id === 6 ? String(pressure.prepared) : ''}
-    data-pressure-waiting={scene.id === 6 ? waitingVehicles : ''}
-    data-pressure-vehicle={scene.id === 6 ? congestionVehicleId ?? '' : ''}
-    data-pressure-queue={scene.id === 6 ? realQueue?.linkId ?? pressure.railFocus?.linkId ?? '' : ''}
-    data-pressure-start-wait={scene.id === 6 ? pressure.railFocus?.waitSeconds ?? 0 : ''}
-    data-pressure-verified={scene.id === 6 ? String(!!pressure.railFocus && pressure.railFocus.waitSeconds >= 3) : ''}
-    data-pressure-staging-clearance={scene.id === 6 ? pressure.railFocus?.stagingClearance ?? '' : ''}
-    data-pressure-fleet-changes={scene.id === 6 ? pressure.engine.scenario.fleetChanges?.length ?? 0 : ''}
-    data-pressure-vehicle-count={scene.id === 6 ? pressure.state.vehicles.length : ''}
-    data-pressure-rail-blocked={scene.id === 6 ? String(!!railIsBlocked) : ''}
-    data-pressure-active={scene.id === 6 ? activeTransports : ''}
-    data-pressure-fleet={scene.id === 6 ? pressure.engine.scenario.fleet : ''}
-    data-pressure-demand-interval={scene.id === 6 ? pressure.engine.scenario.demandChanges?.at(-1)?.intervalSeconds ?? pressure.engine.scenario.demandIntervalSeconds ?? '' : ''}
-    data-fab-layout={(scene.id >= 4 && scene.id <= 8) ? activeEngine.layout.id : ''}
-    data-mcs-lens={scene.id === 6 ? (trafficLens ? 'traffic' : 'normal') : ''}
-    data-story-version="behind-the-simulation-v3">
-    <header className="w6-header">
-      <a className="w6-brand" href="../" aria-label="Build Canvas 홈으로">BUILD<span>_</span>CANVAS</a>
-      <span className="w6-workname">WORK 06 <span className="w6-header-divider">/</span> FAB FLOW</span>
-      <span className="w6-prototype">BEHIND THE SIMULATION</span>
-    </header>
-    <main className="w6-stage">
-      <div className="w6-viewport" aria-label="Live FAB FLOW 3D world">
-        <ThreeFacilityScene
-          layout={activeEngine.layout}
-          state={activeState}
-          floor={0}
-          failures={activeEngine.scenario.failures}
-          storageCapacity={activeEngine.scenario.storageCapacity}
-          running={isPressure ? pressure.prepared : isOpening ? true : scene.id === 4 ? clockPlaying : busy}
-          tickMs={isPressure ? pressure.tickMs : isOpening ? ambient.tickMs : scene.id === 4 ? 520 : busy && (stage === 'pickup' || stage === 'dropoff') ? 520 : 32}
-          selected={scene.id === 6 && congestionVehicleId ? 'vehicle:' + congestionVehicleId : isDecision && routeStudy ? 'vehicle:' + routeStudy.vehicleId
-            : !isOpening && !isPressure && selectedVehicleId ? 'vehicle:' + selectedVehicleId : undefined}
-          trackedVehicle={isPressure ? (scene.id === 6 ? congestionVehicleId : undefined) : isDecision && routeStudy ? routeStudy.vehicleId : isOpening ? undefined : selectedVehicleId}
-          trackedRequest={isOpening || isPressure || isDecision || scene.id === 4 || request?.phase === 'completed' ? undefined : request?.id}
-          plannedTutorialIngress={scene.id === 3 ? planned : undefined}
-          tutorialStage={scene.id === 3 ? stage : undefined}
-          softTokenEntrance={scene.id === 3}
-          cameraCommand={cameraCommand}
-          cameraLocked={focusMode}
-          heatmap={observedRailView}
-          view={observedRailView ? 'traffic' : isDecision || isNetwork ? 'network' : 'overview'}
-          networkFocus={isNetwork}
-          routeCandidates={candidates}
-          onSelect={(kind, id) => { if (kind === 'vehicle') setSelectedVehicleId(id); }}
-          onFloorChange={() => {}}
-        />
-        <div className="w6-scene-label" aria-hidden="true">{scene.eyebrow}</div>
-        {isNetwork && <div className="w6-route-note" role="status"><span aria-hidden="true"/> 실제 Node · 방향성 Link · Port를 표시 중</div>}
-        {focusMode && <div className="w6-focus-note" role="note">{isOpening ? 'FAB FLOW 엔진에서 계산한 운송을 관찰해요' : '실제 한 건의 운송 상태를 따라가요'}</div>}
-        {(scene.id === 3 || isDecision || scene.id === 6) && candidates?.length ? <div className="w6-route-note" role="status"><span aria-hidden="true"/> {scene.id === 5 ? '실제 선택 경로 · 다른 경로는 비교용' : '실제 OHT 이동 경로'}</div> : null}
-        {scene.id === 6 && <div className="w6-mcs-lens-note" aria-label="현재 레일 운행 신호">
-          <span aria-hidden="true" className={trafficLens ? 'is-scanning' : ''}/>
-          {trafficLens ? '실제 레일 점유·대기 신호' : '기본 FAB 화면'}
-        </div>}
-        {isReveal && <div className="w6-reveal-note" aria-live="polite">{networkLens ? '실제 Port · Link · Node 구조 확대' : '원본 3D FAB · 공장의 모습'}</div>}
-        {scene.id === 6 && !pressure.prepared && <div className="w6-pressure-loading" role="status">
-          <strong>운영 중인 FAB를 준비하고 있어요.</strong>
-          <span>실제 엔진으로 운송이 진행된 상태를 계산하고 있습니다.</span>
-        </div>}
-        {scene.id === 6 && pressure.prepared && <div className="w6-pressure-caption" aria-live="off">
-          <span className="is-busy" aria-hidden="true"/>
-          {pressureBeatLabel}
-        </div>}
-      </div>
-      <section className={'w6-narrative ' + (isReveal ? 'w6-narrative-reveal' : '') + (scene.id >= 4 && scene.id <= 8 ? ' w6-narrative-v2' : '')} aria-label="장면 설명">
-        <p className="w6-chapter">{scene.chapter}</p>
-        <h1>{scene.title}</h1>
-        <p className="w6-description">{scene.body}</p>
-
-
-        {scene.id === 1 && <div className="w6-inner-controls w6-story-controls">
-          <p className="w6-context-line">화면 속 움직임은 실제 FAB FLOW 엔진에서 계산됩니다. 작은 차량들이 어떤 규칙을 따라가는지 살펴보세요.</p>
-          <button type="button" className="w6-primary" onClick={() => nextScene(1)}>레일의 규칙 살펴보기 ↗</button>
-        </div>}
-        {scene.id === 2 && <div className="w6-inner-controls w6-story-controls">
-          <div className="w6-action-row" role="group" aria-label="공장과 네트워크 보기">
-            <button type="button" className={!networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!networkLens} onClick={showFactoryLens}>공장 보기</button>
-            <button type="button" className={networkLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={networkLens} onClick={showGraphLens}>길찾기 구조 보기</button>
-          </div>
-          <p className="w6-microcopy" aria-live="polite">{networkLens
-            ? '공장 속 실제 한 구간을 확대했어요. 동그란 지점은 Node, 화살표는 이동 방향이 있는 Link, 호박색 표시는 FOUP를 주고받는 Port입니다.'
-            : '먼저 FAB FLOW가 보여주는 장비와 OHT를 살펴보세요. 그래프 보기를 누르면 같은 공장의 실제 Node·Link·Port 구조를 확대해 보여줘요.'}</p>
-          {networkLens && <div className="w6-graph-legend" aria-label="실제 FAB 그래프 데이터 설명">
-            <div><span className="w6-graph-symbol is-node" aria-hidden="true"/><p><strong>Node</strong><small>차량이 거치는 실제 연결 지점</small></p></div>
-            <div><span className="w6-graph-symbol is-link" aria-hidden="true">→</span><p><strong>Link</strong><small>이동 가능한 레일과 그 방향</small></p></div>
-            <div><span className="w6-graph-symbol is-port" aria-hidden="true"/><p><strong>Port</strong><small>장비와 FOUP를 주고받는 접점</small></p></div>
-          </div>}
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 그래프 모델링</summary>
-            <p>장비의 3D 외형은 사람이 이해하기 위한 표현입니다. Native 엔진은 방향성 Node·Link로 경로를 탐색하고 Port를 운송의 시작·도착 접점으로 사용합니다. 가까운 지점이라도 링크가 연결되지 않았거나 방향이 맞지 않으면 직접 이동할 수 없습니다. 표시된 지점과 화살표는 실제 FAB FLOW 레이아웃 데이터에서 읽어왔습니다.</p>
-          </details>
-        </div>}
-        {scene.id === 3 && <div className="w6-inner-controls w6-story-controls">
-          <div className="w6-story-steps" aria-label="운송의 네 단계">
-            {['요청·배차','빈 차 이동','픽업·적재 운송','하역 완료'].map((label, index) =>
-              <span key={label} className={beat === index + 1 ? 'current' : beat > index + 1 ? 'past' : ''}>{index + 1}. {label}</span>)}
-          </div>
-          {lastCompleted && <div className="w6-observed" role="status"><strong>방금 일어난 변화</strong><p>{OBSERVED_RESULTS[lastCompleted]}</p></div>}
-          {beginner ? <p className="w6-step-explanation">{beginner.question} {beginner.explanation}</p>
-            : <p className="w6-result-takeaway">요청부터 하역까지, 네이티브 엔진에서 한 건의 운송이 완료됐습니다.</p>}
-          <div className="w6-action-row">
-            <button type="button" className="w6-primary" disabled={busy || !beginner} onClick={() => { autoTransportRef.current = true; runNext(); }}>
-              {busy ? '실제 운송을 관찰하는 중…' : '끝까지 자동 관찰하기'}
-            </button>
-            <button type="button" className="w6-secondary" disabled={busy || !beginner} onClick={() => { autoTransportRef.current = false; runNext(); }}>한 단계씩</button>
-            <button type="button" className="w6-secondary" onClick={reset}>다시 보기</button>
-          </div>
-          {transportFinished && <button type="button" className="w6-primary" onClick={() => nextScene(1)}>움직임을 만든 시간의 규칙 ↗</button>}
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 운송 상태</summary>
-            <p>물류 요청은 담당 차량이 정해지기 전부터 존재합니다. OHT가 빈 상태로 출발 Port를 찾아가 FOUP를 싣고, 목적지 Port에 내려놓습니다. 엔진이 이 실제 소유권과 상태를 관리합니다.</p>
-            <p>{nativeState.time.toFixed(1)} 시뮬레이션 초 · {nativeState.tick} Tick · 요청: {request?.phase ?? '아직 없음'}</p>
-          </details>
-        </div>}
-        {scene.id === 4 && <div className="w6-inner-controls w6-story-controls">
-          <div className="w6-clock-readout" aria-live="off">
-            <div><span>SIMULATION TIME</span><strong>{clockState.time.toFixed(1)} <small>sec</small></strong></div>
-            <div><span>ENGINE TICK</span><strong>{clockState.tick}</strong></div>
-          </div>
-          <p className="w6-microcopy">별도로 시작한 동일 Large FAB의 실제 네이티브 실험입니다. 앞 장면의 운송 상태를 임의로 건너뛰지 않습니다.</p>
-          <div className="w6-action-row">
-            <button type="button" className="w6-primary" onClick={() => setClockPlaying(current => !current)}>{clockPlaying ? '일시정지' : '재생'}</button>
-            <button type="button" className="w6-secondary" disabled={clockPlaying} onClick={stepClock}>0.5초 한 Tick</button>
-            <button type="button" className="w6-secondary" onClick={resetClock}>같은 조건으로 다시</button>
-          </div>
-          <p className="w6-context-line">한 Tick 동안 차량은 조금 움직이거나 그대로일 수도 있어요. 그러나 엔진의 시뮬레이션 시간은 정확히 0.5초 진행합니다.</p>
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 결정적 실행</summary>
-            <p>FAB FLOW는 고정된 Tick과 Seed로 실험 입력을 재현합니다. 브라우저 재생 속도와 시뮬레이션 시간은 다르며, 3D 화면 보간은 운송 결과를 새로 결정하지 않습니다.</p>
-          </details>
-        </div>}
-        {scene.id === 5 && <div className="w6-inner-controls w6-story-controls">
-          {routeStudy ? <>
-            <span className="w6-overline">NATIVE MCS · LARGE 9 BAY</span>
-            <div className="w6-action-row" role="group" aria-label="실제 레일 경로 비교">
-              <button type="button" className={routeChoice === 'selected' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'selected'} onClick={() => setRouteChoice('selected')}>선택 경로</button>
-              <button type="button" className={routeChoice === 'alternative' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'alternative'} onClick={() => setRouteChoice('alternative')}>다른 길</button>
-              <button type="button" className={routeChoice === 'both' ? 'w6-primary' : 'w6-secondary'} aria-pressed={routeChoice === 'both'} onClick={() => setRouteChoice('both')}>함께 보기</button>
+  return <div className="article-page">
+    <a className="skip-link" href="#chapter-01">본문으로 건너뛰기</a>
+    <AppHeader />
+    <main id="main-content"><article>
+      <section id="chapter-00" className="hero" aria-labelledby="hero-title">
+        <div className="hero-background-grid" aria-hidden="true" />
+        <div className="hero-inner">
+          <div className="hero-topline"><span>BUILD CANVAS / WORK 06</span><span>AN INTERACTIVE LOGISTICS WORLD</span></div>
+          <div className="hero-copy"><p className="hero-eyebrow">A MINIATURE FAB SIMULATION</p>
+            <h1 id="hero-title">FAB<span className="hero-title-break"> </span>FLOW<span className="hero-period">.</span></h1>
+            <div className="hero-intro"><div><strong>반도체 물류 세상</strong><p>작은 공장 안에서,<br/>물류가 살아 움직인다.</p></div>
+              <div className="hero-action"><PlayLink /><a className="hero-scroll" href="#chapter-01">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div>
             </div>
-            <p className="w6-route-difference">{routeStudy.sourceBay} → {routeStudy.destinationBay} · 실제 방향성 레일망</p>
-            <p className="w6-microcopy">{routeStudy.alternativeKind === 'detour'
-              ? '다른 길은 일부 링크를 제외하고 다시 계산한 비교용 가정입니다. 실제 MCS가 선택한 길은 아닙니다.'
-              : '다른 길도 실제 MCS가 계산한 후보입니다. 실제로 선택된 경로와 구분해 표시합니다.'} 버튼은 실제 운송 상태를 바꾸지 않습니다.</p>
-          </> : <p className="w6-context-line" role="status">{routeError || '네이티브 MCS의 실제 경로를 계산하고 있어요.'}</p>}
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · Weighted Dijkstra</summary>
-            <p>DBR은 이동 거리를 중심으로 경로를 고릅니다. CBR은 거리와 현재 레일 점유·대기 비용을 함께 평가합니다. 예상 비용은 실제 도착 시간을 보장하지 않습니다.</p>
-          </details>
-        </div>}
-        {scene.id === 6 && <div className="w6-inner-controls w6-story-controls">
-          <span className="w6-overline">REAL NATIVE RAIL WAIT · LARGE V6</span>
-          <div className="w6-action-row" role="group" aria-label="혼잡 관찰">
-            <button type="button" className={!trafficLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={!trafficLens} onClick={() => setTrafficLens(false)}>전체 흐름</button>
-            <button type="button" className={trafficLens ? 'w6-primary' : 'w6-secondary'} aria-pressed={trafficLens} onClick={() => setTrafficLens(true)}>대기 구간</button>
           </div>
-          <div className="w6-traffic-metrics"><span><strong>{pressure.engine.scenario.fleet}</strong>대 OHT</span>
-            <span><strong>{activeTransports}</strong>대 운송 중</span>
-            <span><strong>{waitingVehicles}</strong>대 레일 대기</span></div>
-          <p className="w6-context-line">{!pressure.prepared
-            ? '실제 엔진에서 점유 중인 레일 앞에 대기하는 OHT를 찾고 있어요.'
-            : railIsBlocked ? (congestionVehicleId ?? '선택 차량') + ' · 현재 앞쪽 레일 점유로 대기 중'
-              : '확인된 대기 차량이 이후 어떻게 움직이는지 관찰하고 있어요.'}</p>
-          <p className="w6-microcopy">여기서 보여주는 것은 실제 레일 대기입니다. 대기 상태를 곧바로 Deadlock이라고 부르지는 않습니다.</p>
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 안전한 이동</summary>
-            <p>OHT는 레일 구간과 교차로 진입을 독점 예약합니다. 서로 기다리는 순환 의존이 지속되는 Deadlock은 별도로 진단하고 복구를 시도합니다. 개별 차량의 정지와 확인된 교착은 구분해야 합니다.</p>
-          </details>
-          {pressure.error && <p role="alert" className="w6-error">{pressure.error}</p>}
-        </div>}
-        {scene.id === 7 && <div className="w6-inner-controls w6-story-controls">
-          <span className="w6-overline">MATCHED BENCHMARK · OPERATIONAL 2.1 · SEED 17</span>
-          <div className="w6-benchmark" aria-label="검증된 이전 모델 정책 실험">
-            <div><span>DBR · 거리 중심</span><strong>131 <small>/ 240 완료</small></strong><p>미완료 109건</p></div>
-            <div><span>CBR · 혼잡 고려</span><strong>130 <small>/ 240 완료</small></strong><p>미완료 110건</p></div>
+          <div className="hero-visual"><div className="hero-visual-top"><span><i aria-hidden="true" /> ACTUAL GAMEPLAY</span><span>FAB FLOW / SIMULATION VIEW</span></div>
+            <img src={IMAGE_ROOT + 'hero-overview.png'} alt="FAB FLOW 실행 화면. 대형 반도체 물류 공장의 장비와 레일, 이동하는 OHT가 등각 시점으로 보인다." fetchPriority="high" decoding="async" />
+            <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL CAPTURE / REFERENCE BUILD</span></div>
           </div>
-          <p className="w6-context-line">OHT 48대, 요청 8건/분, 같은 Seed와 1,800 시뮬레이션 초. 같은 조건에서도 더 복잡한 정책이 항상 유리한 것은 아니었어요. 1건 차이로 일반적인 우열을 판단할 수는 없습니다.</p>
-          <p className="w6-microcopy">수치는 FAB FLOW의 검증된 이전 operational 2.1 실험에서 가져왔습니다. 배경의 현재 Large V6 3D는 이 결과의 실시간 Replay가 아닙니다.</p>
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 실험의 조건</summary>
-            <p>모델, Seed, 요청 일정, 차량 수, 실패 조건과 관찰 종료 시점을 고정하고 완료 및 미완료를 함께 기록했습니다. 알고리즘 계산 속도와 실제 운송 처리량은 서로 다른 측정 대상입니다.</p>
-          </details>
-        </div>}
-        {scene.id === 8 && <div className="w6-inner-controls w6-story-controls">
-          <div className="w6-architecture" aria-label="엔진과 화면의 역할">
-            <div><small>01 · ENGINE</small><strong>운송 규칙을 계산한다</strong></div>
-            <div><small>02 · STATE</small><strong>현재의 결과를 기록한다</strong></div>
-            <div><small>03 · THREE.JS</small><strong>그 결과를 3D로 보여준다</strong></div>
-          </div>
-          <p className="w6-context-line">실제 공장 전체를 똑같이 구현한 디지털 트윈은 아닙니다. 하지만 복잡한 물류를 관찰하고 질문할 수 있는 모델입니다.</p>
-          <details className="w6-native-details w6-deep"><summary>조금 더 깊게 · 엔진과 렌더러</summary>
-            <p>엔진은 Request, OHT 위치, 레일 점유, FOUP 소유권을 계산합니다. Three.js는 확인된 Geometry와 상태로 이를 보여주며, LOD·Instancing으로 렌더링 비용을 조절합니다. 화면이 물류 결과를 결정하지는 않습니다.</p>
-          </details>
-          <a className="w6-primary w6-explore-fabflow" href="https://fabflow-yoon.vercel.app/" target="_blank" rel="noopener noreferrer">FAB FLOW 직접 체험하기 ↗</a>
-          <button type="button" className="w6-secondary" onClick={() => setSceneIndex(0)}>처음부터 다시 보기</button>
-        </div>}
-        {error && <p className="w6-error" role="alert">{error}</p>}
+          <p className="hero-footnote">{evidenceNote}</p>
+        </div>
       </section>
-    </main>
-    <footer className="w6-footer">
-      <div className="w6-scene-pager" aria-label="전체 장면 탐색">
-        {SCENES.map((part, index) => <button key={part.id} type="button" className={index === sceneIndex ? 'active' : ''} onClick={() => setSceneIndex(index)} aria-label={'Scene '+String(part.id).padStart(2,'0')+': '+part.title} aria-current={index === sceneIndex ? 'step' : undefined}>{String(part.id).padStart(2,'0')}</button>)}
-      </div>
-      <div className="w6-navigation">
-        <button type="button" onClick={() => nextScene(-1)} disabled={sceneIndex === 0} aria-label="이전 장면">←</button>
-        <span>{String(sceneIndex+1).padStart(2,'0')} <em>/</em> {String(SCENES.length).padStart(2,'0')}</span>
-        <button type="button" onClick={() => nextScene(1)} disabled={sceneIndex === SCENES.length-1} aria-label="다음 장면">→</button>
-      </div>
-    </footer>
-    <div className="w6-prototype-disclaimer">WORK 06 · ORIGINAL FAB FLOW NATIVE 3D · EDUCATIONAL MODEL · NOT AN INDUSTRIAL DIGITAL TWIN</div>
+
+      <section className="part-marker" aria-label="Part 1: Discover"><span>PART ONE</span><strong>DISCOVER</strong><span>작은 공장에서 시작하는 이야기</span></section>
+
+      <section id="chapter-01" className="chapter chapter-intro"><div className="content-wide">
+        <ChapterHead index="01" eyebrow="MEET THE WORLD" title="작은 반도체 공장" lead="레일 위 작은 차량 한 대에서 시작되는, 커다란 물류 시스템의 이야기." />
+        <div className="copy-columns"><div className="prose"><p>반도체 공정의 여러 장비 사이에서는 웨이퍼를 안전하게 옮기는 일이 반복됩니다. FAB FLOW는 이 이동을 작은 3D 공장 안에 담았습니다. 천장 레일을 달리는 OHT가 FOUP라는 운반 용기를 출발 장비에서 받아 다음 장비의 Port까지 옮깁니다.</p>
+          <p>겉으로는 아기자기한 공장처럼 보이지만, 차량은 정해진 애니메이션을 반복하지 않습니다. 경로와 대기, 픽업과 하역은 시뮬레이션의 상태에 따라 달라집니다.</p></div>
+          <div className="glossary"><div><b>OHT</b><span>Overhead Hoist Transport<br/>레일을 따라 이동하는 운송 차량</span></div><div><b>FOUP</b><span>Front Opening Unified Pod<br/>웨이퍼를 담는 운반 용기</span></div><div><b>PORT</b><span>장비와 운송 시스템이 물건을 주고받는 지점</span></div></div></div>
+        <div className="size-gallery">
+          <Figure file="fab-small.png" alt="Small FAB의 실제 실행 캡처" caption="SMALL · V6 설계 기준 2 Bay / 16 Port" className="size-figure" />
+          <Figure file="fab-medium.png" alt="Medium FAB의 실제 실행 캡처" caption="MEDIUM · V6 설계 기준 4 Bay / 40 Port" className="size-figure" />
+          <Figure file="fab-large.png" alt="Large FAB의 실제 실행 캡처" caption="LARGE · V6 설계 기준 9 Bay / 108 Port" className="size-figure" />
+        </div><p className="source-note">V6 코드에 정의된 레이아웃 구성 수치이며 실제 반도체 공장의 규모나 처리 능력을 나타내지 않습니다. 비교 이미지는 과거 실행 캡처입니다.</p>
+      </div></section>
+
+      <section id="chapter-02" className="chapter chapter-transport"><div className="content-wide">
+        <ChapterHead index="02" eyebrow="ONE TRANSPORT" title="물류가 움직이는 순간" lead="요청 하나가 완료되기까지, 보이지 않는 판단이 이어집니다." />
+        <div className="prose prose-narrow"><p>이동 요청이 생겼다고 FOUP가 곧바로 움직이는 것은 아닙니다. 먼저 담당 OHT를 정하고, 빈 차량이 출발지로 향합니다. 출발 Port에 도착하면 FOUP를 들어 올리고, 방향이 정해진 레일을 따라 목적지로 운송합니다. 도착 후 FOUP를 내려놓으면 한 건의 이동이 완료됩니다.</p>
+          <p>어느 차를 배차할지, 어떤 길로 갈지, 앞에 차량이 있을 때 언제 멈출지. 이 작은 여정 뒤에는 서로 다른 판단이 숨어 있습니다.</p></div>
+        <div className="transport-sequence" aria-label="운송 과정 여섯 단계">{steps.map(step => <div className="transport-step" key={step.no}><span>{step.no}</span><b>{step.name}</b><small>{step.detail}</small></div>)}</div>
+        <div className="transport-gallery">
+          <Figure file="trip-request.png" alt="실제 FAB FLOW 튜토리얼에서 물류 운송 요청이 등록된 장면" caption="REQUEST / 요청이 만들어지다" />
+          <Figure file="transport-loaded.png" alt="OHT가 노란 FOUP를 싣고 실제 레일 위로 이동하는 확대 화면" caption="IN TRANSIT / FOUP를 실은 OHT" className="transport-feature" />
+          <Figure file="trip-dropoff.png" alt="실제 FAB FLOW 튜토리얼에서 도착 포트에 운송을 완료한 장면" caption="DROPOFF / 운송 한 건이 완료되다" />
+        </div><p className="source-note">세 장면은 제품 개발 과정에서 기록한 실제 운송 화면이며, 하나의 연속 촬영이나 현행 배포의 동일 조건 실험을 의미하지 않습니다.</p>
+      </div></section>
+
+      <section className="part-marker part-marker-light" aria-label="Part 2: Explore"><span>PART TWO</span><strong>EXPLORE</strong><span>사용자의 선택이 운영을 바꾸는 곳</span></section>
+      <section id="chapter-03" className="chapter chapter-sandbox"><div className="content-wide">
+        <ChapterHead index="03" eyebrow="YOUR FAB, YOUR RULES" title="나만의 FAB 운영하기" lead="정답을 맞히는 게임보다, 선택의 결과를 관찰하는 실험실." />
+        <div className="feature-split"><div className="feature-side"><div className="prose"><p>FAB 크기를 선택하고 OHT 수와 물류 요청량을 정하면 새로운 운영 실험이 시작됩니다. 작은 공장에서 천천히 관찰할 수도, 더 많은 차량과 요청을 투입해 혼잡을 만들어 볼 수도 있습니다.</p>
+          <p>시뮬레이션이 시작된 뒤에도 수요의 흐름을 바꾸거나 차량을 추가하고, 실행 속도를 조절하며 결과를 지켜볼 수 있습니다.</p></div>
+          <div className="setting-list"><div><span>01</span><b>FAB SIZE</b><small>Small · Medium · Large</small></div><div><span>02</span><b>FLEET</b><small>초기 OHT 1–300대</small></div><div><span>03</span><b>DEMAND</b><small>요청량과 운영 중 수요 변경</small></div><div><span>04</span><b>POLICY & TIME</b><small>DBR / CBR · 표시 속도 1× / 2× / 4×</small></div></div>
+        </div><Figure file="sandbox-setup.png" alt="FAB FLOW의 새 시뮬레이션 설정 창. FAB 크기, OHT 수, MCS 정책을 선택할 수 있는 실제 UI" caption="ACTUAL UI / 새 시뮬레이션 설정 · 이전 검증 화면" className="feature-shot" /></div>
+        <p className="source-note">표시 속도와 실제 진행 속도는 다를 수 있습니다. 엔진 목표 매핑은 4 / 8 / 16 시뮬레이션 초/실제 초이며 기기 부하에 따라 달라집니다.</p>
+      </div></section>
+
+      <section id="chapter-04" className="chapter chapter-pressure"><div className="content-wide"><div className="pressure-heading">
+        <ChapterHead index="04" eyebrow="WHEN THE SYSTEM GETS BUSY" title="공장이 막히기 시작하면" lead="차량을 더 넣으면, 물류는 언제나 더 빨라질까요?" />
+        <div className="prose"><p>이동 요청이 늘어나는 순간, 더 많은 OHT가 레일을 공유하고 앞 차량이나 Port를 기다리는 시간이 쌓입니다. 아직 완료되지 않은 요청도 남기 시작합니다.</p>
+          <p>FAB FLOW의 혼잡은 화면에 덧씌운 무작위 효과가 아닙니다. 이동과 자원 점유, 대기, 경로 선택을 실제 엔진이 계산한 결과입니다. 하지만 차량이 많다고 언제나 느려지는 것은 아닙니다. 배치와 수요, 정책에 따라 결과는 달라집니다.</p></div></div>
+        <Figure file="congestion-observation.png" alt="FAB FLOW 과거 고부하 시뮬레이션에서 운송 차량과 레일을 관찰한 실제 화면" caption="STRESS SCENARIO / 과거 고부하 실험 관찰 장면 · 저부하와 동일 조건의 통제 A/B 비교가 아닙니다" className="pressure-figure" />
+        <div className="observation-line"><span>LOOK FOR</span><b>레일 대기</b><b>미완료 요청</b><b>최근 처리 속도</b><b>운송 시간</b></div>
+      </div></section>
+
+      <section id="chapter-05" className="chapter chapter-analysis"><div className="content-wide">
+        <ChapterHead index="05" eyebrow="OPERATIONS ANALYSIS" title="운영을 분석하고 실험하다" lead="움직임을 보는 것에서, 결과를 읽는 것으로." />
+        <div className="prose prose-narrow"><p>공장의 상태는 단지 차량이 움직이는 모습만으로는 설명되지 않습니다. 완료한 운송 건수, 아직 남은 요청, 최근 완료 속도, 운송에 걸린 시간을 함께 보아야 운영이 보입니다.</p>
+          <p>운영 분석 화면은 최근 흐름과 주목할 레일을 보여줍니다. DBR과 CBR은 서로 다른 경로 비용 정책이며, 동일한 입력 조건으로 실행한 별도 정책 비교 실험에서 결과를 나란히 살펴볼 수 있습니다.</p>
+          <p>관찰된 전후 차이가 반드시 하나의 조작 때문에 생겼다고 단정할 수는 없습니다. 그래서 비교의 조건과 관찰 범위도 중요합니다.</p></div>
+        <Figure file="operations-analysis.png" alt="FAB FLOW의 실제 운영 분석 패널. 레일 대기와 미완료 요청, 완료 속도, 운송 시간, 추세 그래프가 보임" caption="ANALYSIS / 운영 분석 패널 · Operations Analysis 1.1 검증 시점 캡처" className="analysis-wide" />
+        <div className="analysis-lower"><div className="policy-card"><span>ROUTING POLICIES</span><div><b>DBR</b><p>Distance Based Routing<br/>이동 거리 중심의 경로 비용</p></div><div><b>CBR</b><p>Congestion Based Routing<br/>혼잡 비용을 함께 고려하는 경로</p></div><small>CBR이 항상 더 좋은 처리량을 보장하는 것은 아닙니다.</small></div>
+          <Figure file="policy-comparison.png" alt="FAB FLOW에서 두 경로 정책을 나란히 비교하는 실제 실험 화면" caption="POLICY WORLDS / 별도 조건 일치 실행을 나란히 비교한 이전 검증 화면" /></div>
+        <DeepDive title="분석 수치와 정책 비교는 무엇이 다른가요?"><p>운영 분석은 하나의 실행에서 최근 레일 대기, 완료 속도, 평균 운송 시간, 개입 이력을 관찰합니다. 정책 비교는 동일한 초기 조건의 별도 시뮬레이션 세계를 구성해 DBR과 CBR을 살펴봅니다. 관찰 기록과 통제된 실험 결과를 동일하게 취급하지 않는 것이 중요합니다.</p></DeepDive>
+      </div></section>
+
+      <section className="part-marker part-marker-engineering" aria-label="Part 3: Behind the simulation"><span>PART THREE</span><strong>BEHIND THE SIMULATION</strong><span>이 작은 세계를 실제로 움직이는 규칙들</span></section>
+      <section id="chapter-06" className="chapter chapter-engineering"><div className="content-wide">
+        <ChapterHead index="06" eyebrow="THE NETWORK" title="3D 공장을 코드로 표현하는 방법" lead="보이는 레일과 이동 가능한 레일은 같은 말이 아닙니다." />
+        <div className="prose prose-narrow"><p>화면 속 공장은 입체적인 레일과 장비의 풍경입니다. 그러나 경로를 계산하는 엔진에게 중요한 것은 예쁜 모양이 아니라 ‘어디서 어디로 이동할 수 있는가’입니다.</p>
+          <p>FAB FLOW는 공장을 Node, 방향이 있는 Link, 장비와 연결된 Port로 표현합니다. 차량이 왼쪽으로 보여도 그 방향으로 진입하는 Link가 없다면 실제 이동은 허용되지 않습니다. 이 연결 관계가 경로 탐색의 출발점입니다.</p>
+          <p>렌더링 경로와 시뮬레이션은 같은 기하 데이터를 읽도록 연결되어야 차량이 레일 밖을 달리는 일을 막을 수 있습니다.</p></div>
+        <div className="graph-pair"><Figure file="fab-small.png" alt="실제 FAB FLOW의 Small 레일 및 설비가 드러난 화면" caption="REAL GAMEPLAY / 실제 레일 네트워크" /><GraphDiagram /></div>
+        <DeepDive title="Node, Link, Port를 구분하는 이유"><p><strong>Node</strong>는 이동 가능한 위치의 접속점, <strong>Link</strong>는 이동 방향과 길이를 가진 연결, <strong>Port</strong>는 장비와 운송 작업의 접점을 의미합니다. 교차해 보이는 레일도 그래프상 연결되지 않았다면 진입할 수 없습니다. 경로 탐색과 3D 표시는 같은 지형·기하 정의를 참조하도록 설계합니다.</p><p className="source-note">검증 기반: FAB FLOW src/sim/types.ts, topology-default-v6.ts, geometry.ts, layouts.ts.</p></DeepDive>
+      </div></section>
+
+      <section id="chapter-07" className="chapter chapter-engineering chapter-route"><div className="content-wide">
+        <ChapterHead index="07" eyebrow="MATERIAL CONTROL SYSTEM" title="OHT를 움직이는 물류 제어 시스템" lead="최단 경로를 찾는 것과 실제로 이동할 수 있는 것은 다른 문제입니다." />
+        <div className="prose prose-narrow"><p>운송 요청을 처리하려면 어떤 OHT가 맡을지 먼저 결정해야 합니다. 그다음 빈 차량이 픽업 지점까지 가는 길과 FOUP를 실어 목적지까지 이동하는 경로가 필요합니다.</p>
+          <p>FAB FLOW의 MCS 로직은 방향성 레일 그래프에서 도달 가능한 경로를 찾고, 거리뿐 아니라 차량의 점유와 대기 비용을 반영할 수 있습니다. DBR은 거리 중심, CBR은 혼잡 비용까지 보는 정책입니다.</p>
+          <p>경로를 찾았다고 바로 전진할 수 있는 것은 아닙니다. 다른 차량이 자원을 사용 중이라면 기다려야 하고, 레일의 점유와 예약, 안전한 진입 순서가 중요해집니다.</p></div>
+        <div className="routing-flow" aria-label="운송 제어의 네 가지 개념적 단계">
+          <div><span>INPUT</span><b>운송 요청</b><small>출발지 · 목적지</small></div>
+          <div><span>01 / DISPATCH</span><b>차량 배차</b><small>담당 OHT 선택</small></div>
+          <div><span>02 / ROUTE</span><b>경로 탐색</b><small>방향 그래프 · 비용</small></div>
+          <div><span>03 / ADMISSION</span><b>점유 판단</b><small>예약 · 대기 · 이동</small></div>
+        </div><p className="source-note">개념적 결정 구조입니다. 한 Tick 내부의 실제 호출 순서를 그대로 도식화한 것은 아닙니다.</p>
+        <DeepDive title="다익스트라 탐색만으로 해결되지 않는 이유"><p>엔진은 방향성을 가진 Link의 경로 비용을 대상으로 다익스트라 계열 최단 경로 탐색을 사용합니다. 실제 주행에는 차량 점유, 링크 예약, 대기 및 이동 가능 조건이 더해집니다. ‘경로를 계산했다’는 사실은 곧바로 ‘전진이 허용됐다’는 뜻이 아닙니다. 모든 결정에서 탐색을 매번 처음부터 수행한다고 단정하지 않습니다.</p></DeepDive>
+      </div></section>
+
+      <section id="chapter-08" className="chapter chapter-engineering chapter-tick"><div className="content-wide">
+        <ChapterHead index="08" eyebrow="THE ENGINE" title="시뮬레이션 엔진의 내부" lead="브라우저가 몇 번 그렸는지와 관계없이, 가상 세계의 시간은 별도로 흐릅니다." />
+        <div className="prose prose-narrow"><p>FAB FLOW의 가상 시간은 브라우저가 화면을 몇 번 그렸는지로 결정되지 않습니다. 엔진은 고정된 <strong>0.5초 Tick</strong>을 진행하며, 그 경계에서 새로운 요청과 차량 이동, 서비스 및 대기 상태를 갱신합니다.</p>
+          <p>동일한 초기 조건과 Seed, 정책, 개입 일정이라면 같은 과정이 다시 실행되어야 합니다. 이 결정성은 서로 다른 운영 실험을 비교하고, 저장된 상태가 정확히 이어지는지 검사하는 토대입니다.</p>
+          <p>실제 브라우저 시간은 그 Tick을 언제 실행할지 예약할 뿐입니다. 렌더링이 느려져도 상태 전이를 임의로 건너뛰어 결과를 바꾸어서는 안 됩니다.</p></div>
+        <div className="tick-diagram" role="img" aria-label="시뮬레이션 시간은 0, 0.5, 1, 1.5, 2초의 균일한 Tick으로 진행하고 별도로 브라우저가 화면을 그리는 시간 축이 존재한다">
+          <div className="tick-heading"><span>SIMULATION TIME</span><strong>Fixed 0.5s Tick</strong></div>
+          <div className="tick-track">{['0.0','0.5','1.0','1.5','2.0'].map((t,i)=><div key={t}><b>{t}s</b><span>TICK {String(i).padStart(2,'0')}</span></div>)}</div>
+          <div className="tick-wall"><span>WALL-CLOCK & RENDER</span><div className="wall-rects" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/><i/></div><span>실제 실행 간격은 기기 부하에 영향을 받음</span></div>
+        </div>
+        <DeepDive title="Seed, Snapshot, Replay는 무엇을 보장하나?"><p>동일한 엔진 버전과 조건에서 Seed를 고정하면 난수에 의존하는 입력을 재현할 수 있습니다. 저장된 Snapshot으로 상태를 이어가는 일과 처음부터 같은 시나리오 및 운영 개입 기록을 재실행하는 일은 서로 다른 복원 방식입니다. 버전 간 모든 과거 저장 데이터의 호환성을 보장한다는 의미는 아닙니다.</p></DeepDive>
+      </div></section>
+
+      <section id="chapter-09" className="chapter chapter-engineering chapter-performance"><div className="content-wide">
+        <ChapterHead index="09" eyebrow="PERFORMANCE & TRADE-OFFS" title="수백 대의 차량을 브라우저에서 움직이기까지" lead="엔진이 계산하는 시간과 화면을 그리는 시간, 그 둘을 따로 살펴보기." />
+        <div className="prose prose-narrow"><p>차량이 몇 대일 때는 보이지 않던 비용이 수백 대가 되면 병목으로 드러납니다. 물류 경로 계산과 3D 렌더링, React 상태 전달은 서로 다른 층의 비용입니다.</p>
+          <p>FAB FLOW는 엔진과 렌더링을 분리하고, OHT 표시에는 InstancedMesh와 거리별 상세도를 활용했습니다. 레일 분석 화면에서도 필요한 시각 정보만 갱신하는 접근을 검증했습니다.</p>
+          <p>개선이 모든 조건에서 빠르다는 뜻은 아닙니다. 어떤 부하에서는 나아졌고 다른 부하에서는 비용이 남거나 회귀했습니다.</p></div>
+        <Figure file="fleet-high-load.png" alt="FAB FLOW Large 크기에서 300대 차량을 사용하는 테스트 설정의 실제 실행 화면" caption="HIGH-FLEET TEST / Large · 300 OHT 테스트 캡처 · 실제 화면에 전 차량이 동시에 보인다는 뜻은 아닙니다" className="performance-shot" />
+        <div className="benchmark">
+          <div className="benchmark-intro"><span>MEASURED / HISTORICAL</span><h3>Native Tick 성능 측정</h3><p>Operations Analysis 1.1 검증 기록. Large · congested · 300 OHT 조건의 평균 엔진 Tick 비용이며, FPS나 실제 브라우저 화면 속도가 아닙니다.</p></div>
+          <div className="benchmark-bars">
+            <div className="bench-row"><div><b>DBR</b><span>20.248 → 14.912 ms/tick</span></div><div className="bar-pair"><span style={{width:'100%'}}/><span style={{width:'73.65%'}}/></div></div>
+            <div className="bench-row"><div><b>CBR</b><span>18.623 → 14.694 ms/tick</span></div><div className="bar-pair"><span style={{width:'91.97%'}}/><span style={{width:'72.57%'}}/></div></div>
+            <div className="bench-key"><span><i/>이전 측정</span><span><i/>개선 후 측정</span></div>
+            <p className="bench-regression"><b>함께 기록된 회귀</b> · Small · relaxed · 8 OHT · DBR에서는 평균 0.102 → 0.123 ms/tick으로 증가했습니다.</p>
+          </div>
+        </div><p className="source-note">출처: FAB FLOW 개발 저장소 docs/operations-analysis/1.1/FINAL_REPORT.md. 특정 테스트 환경·버전의 기록입니다. 모든 기기에서 300 OHT / 20ms 목표를 달성했다는 뜻이 아니며, 브라우저 회귀 검증도 일부 알려진 실패가 포함됩니다.</p>
+        <DeepDive title="왜 InstancedMesh와 상태 갱신을 나눴을까?"><p>동일한 모양의 차량이 늘어날 때 메쉬마다 별도의 제출 비용을 발생시키는 대신 InstancedMesh로 묶을 수 있습니다. 하지만 모델을 그리는 비용만 줄여도 엔진 경로 탐색, 분석 집계, UI 갱신의 비용이 남습니다. 엔진 Tick, 브라우저 프레임, 입력 반응성을 서로 다른 측정값으로 관리해야 합니다.</p></DeepDive>
+      </div></section>
+
+      <section id="chapter-10" className="ending"><div className="content-wide ending-inner"><div className="ending-copy"><div className="chapter-meta"><span>10 / 10</span><span>KEEP BUILDING</span></div>
+        <h2>이제 직접,<br/><em>공장을 움직일 차례.</em></h2>
+        <p>FAB FLOW에서 중요했던 선택은 공장이 움직이는 것처럼 보이게 하는 일이 아니라, 실제로 움직이는 규칙을 먼저 만드는 것이었습니다.</p><p>이 프로젝트는 산업용 물류 제어 시스템의 대체재가 아닙니다. 물류의 핵심 현상을 바꾸고 관찰할 수 있도록 만든 교육용 시뮬레이션이자, 결정적 엔진과 운영 분석, 브라우저 렌더링 사이의 선택을 기록한 개발 프로젝트입니다.</p>
+        <PlayLink closing /><a className="ending-back" href={HOME_URL}>BACK TO BUILD CANVAS ↗</a></div>
+        <Figure file="hero-overview.png" alt="FAB FLOW 공장 전체를 내려다보는 실제 실행 캡처" caption="FAB FLOW · 실제 실행 기록 이미지" className="ending-shot" />
+      </div></section>
+    </article></main>
+    <footer className="page-footer"><span>BUILD _ CANVAS / WORK 06</span><span>FAB FLOW — 반도체 물류 세상</span><a href={HOME_URL}>HOME (H) ↗</a></footer>
   </div>;
 }
