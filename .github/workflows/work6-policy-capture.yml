@@ -49,6 +49,7 @@ jobs:
           git add projects/fab-flow/public/media/policy-comparison.png projects/fab-flow/public/media/manifest.json
           git diff --cached --quiet && { echo "No new capture"; exit 1; }
           git commit -m "fix(work6): capture actual DBR-CBR comparison at 2x density"
+          git pull --rebase origin main
           git push origin HEAD:main
       - name: Trigger Pages deployment for Actions commit
         env:
