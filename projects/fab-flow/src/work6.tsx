@@ -1,9 +1,54 @@
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const HOME_URL = '/build-canvas/';
 const PLAY_URL = 'https://fabflow-yoon.vercel.app/';
 const IMAGE_ROOT = import.meta.env.BASE_URL + 'media/';
 const evidenceNote = '실제 FAB FLOW 배포본의 3D 화면을 고해상도로 캡처한 정지 이미지입니다. 동영상이나 별도 재현 화면이 아닙니다.';
+
+
+type ViewerImage = { src: string; alt: string; caption: string };
+const ImageZoomContext = createContext<((image: ViewerImage) => void) | null>(null);
+
+function ImageLightbox({ image, onClose }: { image: ViewerImage | null; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [actualSize, setActualSize] = useState(false);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (image) {
+      setActualSize(false);
+      if (!dialog.open) dialog.showModal();
+    } else if (dialog.open) {
+      dialog.close();
+    }
+  }, [image]);
+
+  return <dialog
+    ref={dialogRef}
+    className="image-lightbox"
+    aria-label="FAB FLOW 실제 화면 확대"
+    onClose={onClose}
+    onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }}
+  >
+    {image && <div className="lightbox-content">
+      <div className="lightbox-toolbar">
+        <strong>FAB FLOW / 실제 화면</strong>
+        <div className="lightbox-actions">
+          <button type="button" onClick={() => setActualSize(value => !value)}>
+            {actualSize ? '화면에 맞추기' : '원본 크기 보기'}
+          </button>
+          <a href={image.src} target="_blank" rel="noopener noreferrer">원본 열기 ↗</a>
+          <button type="button" className="lightbox-close" onClick={() => dialogRef.current?.close()} autoFocus aria-label="확대 화면 닫기">닫기 ×</button>
+        </div>
+      </div>
+      <div className={'lightbox-image-scroll' + (actualSize ? ' is-actual' : '')} tabIndex={0} role="region" aria-label="확대 이미지. 원본 크기에서는 스크롤하여 전체를 볼 수 있습니다.">
+        <img src={image.src} alt={image.alt} />
+      </div>
+      <p className="lightbox-caption">{image.caption}</p>
+    </div>}
+  </dialog>;
+}
 
 type FigureProps = {
   file: string;
@@ -13,8 +58,16 @@ type FigureProps = {
   eager?: boolean;
 };
 function Figure({ file, alt, caption, className = '', eager = false }: FigureProps) {
+  const showImage = useContext(ImageZoomContext);
+  const src = IMAGE_ROOT + file + '?v=20261103-2x';
   return <figure className={'article-figure ' + className}>
-    <div className="article-image-wrap"><img src={IMAGE_ROOT + file + '?v=20261103-2x'} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
+    <div className="article-image-wrap">
+      <button className="figure-zoom-button" type="button" aria-label={'이미지 확대: ' + alt}
+        onClick={() => showImage?.({ src, alt, caption })}>
+        <img src={src} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+        <span className="figure-zoom-hint" aria-hidden="true">확대 보기 ↗</span>
+      </button>
+    </div>
     <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
   </figure>;
 }
@@ -67,6 +120,7 @@ function AppHeader() {
   </header>;
 }
 export default function Work6() {
+  const [activeImage, setActiveImage] = useState<ViewerImage | null>(null);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const element = event.target as HTMLElement | null;
@@ -77,7 +131,7 @@ export default function Work6() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
-  return <div className="article-page">
+  return <ImageZoomContext.Provider value={setActiveImage}><div className="article-page">
     <a className="skip-link" href="#chapter-01">본문으로 건너뛰기</a>
     <AppHeader />
     <main id="main-content"><article>
@@ -99,6 +153,12 @@ export default function Work6() {
               fetchPriority="high"
               decoding="async"
             />
+            <button type="button" className="hero-expand" aria-label="메인 공장 화면 확대"
+              onClick={() => setActiveImage({
+                src: IMAGE_ROOT + 'hero-overview.png?v=20261103-native-qhd-6d2520',
+                alt: '실제 FAB FLOW Medium V6 시뮬레이션의 3D 공장, 레일과 OHT 운행 장면',
+                caption: 'HERO / Medium V6 · 실제 앱 QHD 캡처 · 2560×1440',
+              })}>원본 확대 ↗</button>
             <div className="hero-visual-bottom"><span>01 — THE WORLD</span><span>REAL APP / QHD STILL CAPTURE</span></div>
           </div>
           <p className="hero-footnote">{evidenceNote}</p>
@@ -219,9 +279,9 @@ export default function Work6() {
         <h2>이제 직접,<br/><em>공장을 움직일 차례.</em></h2>
         <p>FAB FLOW에서 중요했던 선택은 공장이 움직이는 것처럼 보이게 하는 일이 아니라, 실제로 움직이는 규칙을 먼저 만드는 것이었습니다.</p><p>이 프로젝트는 산업용 물류 제어 시스템의 대체재가 아닙니다. 물류의 핵심 현상을 바꾸고 관찰할 수 있도록 만든 교육용 시뮬레이션이자, 결정적 엔진과 운영 분석, 브라우저 렌더링 사이의 선택을 기록한 개발 프로젝트입니다.</p>
         <PlayLink closing /><a className="ending-back" href={HOME_URL}>BACK TO BUILD CANVAS ↗</a></div>
-        <Figure file="hero-overview.png" alt="FAB FLOW 공장 전체를 내려다보는 실제 실행 캡처" caption="FAB FLOW · 실제 실행 기록 이미지" className="ending-shot" />
+        <Figure file="fab-large.png" alt="FAB FLOW Large V6 레이아웃을 내려다본 실제 3D 시뮬레이션 실행 화면" caption="FINAL VIEW / Large V6 · 실제 실행 캡처" className="ending-shot" />
       </div></section>
     </article></main>
     <footer className="page-footer"><span>BUILD _ CANVAS / WORK 06</span><span>FAB FLOW — 반도체 물류 세상</span><a href={HOME_URL}>HOME (H) ↗</a></footer>
-  </div>;
+  </div><ImageLightbox image={activeImage} onClose={() => setActiveImage(null)} /></ImageZoomContext.Provider>;
 }

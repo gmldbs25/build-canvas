@@ -40,7 +40,7 @@ try {
   }
   if(!ready)throw Error('Server timeout: '+logs.join(''));
   browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-  for (const [width,height] of [[1440,900],[1366,768],[390,844],[360,740]]) {
+  for (const [width,height] of [[1440,900],[1366,768],[844,390],[390,844],[360,740],[320,720]]) {
     const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
     const faults=[];
     page.on('pageerror',e=>faults.push('JS '+String(e)));
@@ -69,6 +69,26 @@ try {
     if(state.scrollWidth>state.viewport+1)throw Error('Horizontal overflow: '+JSON.stringify({width,state}));
     if(state.ctas.some(href=>href!=='https://fabflow-yoon.vercel.app/'))throw Error('Play link mismatch: '+JSON.stringify(state.ctas));
     if(state.base.some(src=>!src?.startsWith('/build-canvas/fab-flow-preview/media/')))throw Error('Pages asset base mismatch: '+JSON.stringify(state.base));
+
+    const endingImage = page.locator('.ending-shot img');
+    await expect(endingImage).toHaveAttribute('src', /fab-large\.png/);
+    const opener = page.locator('.size-figure .figure-zoom-button').first();
+    await opener.click();
+    const lightbox = page.getByRole('dialog', { name: 'FAB FLOW 실제 화면 확대' });
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.getByRole('link', { name: /원본 열기/ })).toHaveAttribute('href', /fab-small\.png/);
+    await lightbox.getByRole('button', { name: '원본 크기 보기' }).click();
+    await expect(lightbox.locator('.lightbox-image-scroll')).toHaveClass(/is-actual/);
+    await lightbox.getByRole('button', { name: '화면에 맞추기' }).click();
+    await expect(lightbox.locator('.lightbox-image-scroll')).not.toHaveClass(/is-actual/);
+    await page.keyboard.press('Escape');
+    await expect(lightbox).toBeHidden();
+    const captionPx = await page.locator('.size-figure figcaption').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    if (captionPx < 13) throw Error('Small screenshot caption font: ' + captionPx);
+    if (width <= 390) {
+      const timeline = await page.locator('.tick-diagram').evaluate(el => ({viewport:el.clientWidth, content:el.scrollWidth}));
+      if (timeline.content <= timeline.viewport) throw Error('Mobile tick timeline must be inspectable via horizontal scroll: ' + JSON.stringify(timeline));
+    }
     await page.locator('#chapter-07 details').scrollIntoViewIfNeeded();
     const disclosure=page.locator('#chapter-07 details');
     await expect(disclosure).not.toHaveAttribute('open','');
@@ -77,7 +97,7 @@ try {
     await page.locator('#chapter-00').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(screenshots,'fab-flow-article-'+width+'.png'),fullPage:true});
     if(faults.length)throw Error('Console/network errors: '+faults.join(' | '));
-    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',heroStill:'qhd',overflow:false,errors:0}));
+    console.log('article-smoke',JSON.stringify({width,height,chapters:11,image:'ok',heroStill:'qhd',zoom:'ok',caption:'ok',overflow:false,errors:0}));
     await page.close();
   }
   const homePage=await browser.newPage();

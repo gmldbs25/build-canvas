@@ -272,3 +272,52 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e4
  .page-footer{flex-wrap:wrap;line-height:1.7}
 }
 @media(max-width:390px){.hero h1{font-size:17vw}.hero-scroll{font-size:9px}.chapter h2{font-size:33px}.transport-gallery{gap:10px}.article-figure figcaption{font-size:10px}.setting-list>div{grid-template-columns:28px 86px 1fr}.setting-list small{font-size:12px}.routing-flow b{font-size:18px}.bench-row span{font-size:11px}}
+
+/* Work6 editorial polish: native high-resolution screenshot inspection */
+.figure-zoom-button{position:relative;display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:inherit;cursor:zoom-in}
+.figure-zoom-button img{display:block;width:100%}
+.figure-zoom-hint,.hero-expand{position:absolute;bottom:13px;right:13px;z-index:2;padding:9px 12px;border:1px solid rgba(255,255,255,.38);background:rgba(14,40,31,.92);color:#fffef8;font:700 13px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.02em}
+.figure-zoom-button:hover .figure-zoom-hint,.figure-zoom-button:focus-visible .figure-zoom-hint,.hero-expand:hover,.hero-expand:focus-visible{background:#f6f6ed;color:#1b4231;border-color:#f6f6ed}
+.hero-expand{bottom:54px;right:20px;cursor:zoom-in}
+.figure-zoom-button:focus-visible,.hero-expand:focus-visible{outline:3px solid #e4aa57;outline-offset:4px}
+.article-figure figcaption,.source-note{font-size:13px}
+.transport-step>small,.setting-list small,.policy-card>small,.benchmark-intro p{font-size:13px}
+.image-lightbox{box-sizing:border-box;width:min(calc(100vw - 24px),1500px);height:min(calc(100dvh - 24px),1050px);max-width:1500px;max-height:1050px;margin:auto;padding:0;overflow:hidden;border:1px solid #6f947e;background:#122e25;color:#fffef8;box-shadow:0 30px 110px rgba(0,0,0,.5)}
+.image-lightbox::backdrop{background:rgba(3,17,12,.89)}
+.lightbox-content{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%;min-height:0}
+.lightbox-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 18px;background:#173b2f}
+.lightbox-toolbar strong{font:700 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;white-space:nowrap}
+.lightbox-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.lightbox-actions button,.lightbox-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid #7da88f;border-radius:0;background:transparent;color:#f6fff8;text-decoration:none;white-space:nowrap;cursor:pointer;font-size:13px;font-weight:650;line-height:1.3;font-family:inherit}
+.lightbox-actions button:hover,.lightbox-actions a:hover{background:#e1edd9;color:#153e2e}
+.lightbox-actions button:focus-visible,.lightbox-actions a:focus-visible{outline:3px solid #e4aa57;outline-offset:2px}
+.lightbox-image-scroll{min-width:0;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;background:#071811;overscroll-behavior:contain}
+.lightbox-image-scroll img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
+.lightbox-image-scroll.is-actual{display:block}
+.lightbox-image-scroll.is-actual img{max-width:none;max-height:none}
+.lightbox-caption{margin:0;padding:12px 18px;color:#bed6c5;background:#173b2f;font-size:13px;line-height:1.5}
+.diagram-frame{min-width:0}
+.benchmark .bench-key span{font-size:13px}
+@media(max-width:740px){
+  .article-figure figcaption,.source-note{font-size:13px;line-height:1.65}
+  .setting-list small{font-size:13px}
+  .hero-footnote{font-size:12px}
+  .diagram-frame{overflow-x:auto;overscroll-behavior-x:contain}
+  .graph-svg{min-width:560px}
+  .diagram-bottom{min-width:0;font-size:13px}
+  .tick-diagram{overflow-x:auto;overscroll-behavior-x:contain}
+  .tick-track,.tick-wall{min-width:470px}
+  .tick-track span{font-size:11px}
+  .tick-track b{font-size:18px}
+  .bench-row span,.bench-key span{font-size:13px}
+  .figure-zoom-hint,.hero-expand{font-size:12px;padding:8px 10px}
+  .hero-expand{right:10px;bottom:42px}
+  .lightbox-toolbar{align-items:stretch;flex-direction:column;gap:12px;padding:13px}
+  .lightbox-actions{justify-content:space-between;gap:6px}
+  .lightbox-actions button,.lightbox-actions a{font-size:12px;padding:8px;min-height:40px}
+  .lightbox-caption{padding:11px 13px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .figure-zoom-button,.hero-expand,.lightbox-actions button,.lightbox-actions a{transition:none}
+}
