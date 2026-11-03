@@ -11,18 +11,20 @@
       "id": "hero-overview",
       "media_path": "media/hero-overview.png",
       "source_path": "https://fabflow-yoon.vercel.app/",
-      "source_reference": "Live application capture / GitHub Actions Chromium / high DPI",
+      "source_reference": "Native QHD Playwright screenshot of real FAB FLOW 3D full-screen renderer; not resized or AI-generated",
       "source_sha": null,
-      "captured_at_utc": "2026-11-03T01:43:28.152Z",
-      "scenario": "Medium V6 actual live simulator full viewport",
+      "captured_at_utc": "2026-11-03T04:00:13.163Z",
+      "scenario": "Medium V6 / 32 OHT / congested demand / DBR / native 3D fullscreen / 3 zoom clicks",
       "viewport": {
-        "css_width": 1800,
-        "css_height": 1000,
-        "device_pixel_ratio": 2,
-        "png_width": 3600,
-        "png_height": 2000
+        "css_width": 2560,
+        "css_height": 1440,
+        "device_pixel_ratio": 1,
+        "png_width": 2560,
+        "png_height": 1440
       },
-      "privacy_review": "Public Vercel app; clean isolated browser profile, no account logged in",
+      "screenshot_sha256": "ca51602d3f1ccf3fdb36805aa869e6af8e3816e030ca646c2edaa87a8bcca7a8",
+      "screenshot_bytes": 478646,
+      "privacy_review": "Public deployed app in isolated Chromium profile; no account data",
       "status": "live_capture"
     },
     {
@@ -242,65 +244,5 @@
       "policy-comparison"
     ],
     "not_refreshed": []
-  },
-  "hero_motion": {
-    "source_url": "https://fabflow-yoon.vercel.app/",
-    "capture_type": "real-time screen recording of public FAB FLOW native simulator (not a GIF or AI animation)",
-    "captured_at_utc": "2026-11-03T03:49:01.759Z",
-    "application_deployment_sha": "not independently verified",
-    "scenario": {
-      "mode": "Sandbox",
-      "layout": "Medium V6",
-      "fleet": 32,
-      "policy": "DBR",
-      "demand_preset": "congested",
-      "camera": "native fullscreen, overview with 3-step 3D camera zoom",
-      "simulation_time_begin": 27.5,
-      "simulation_time_end": 70.5
-    },
-    "viewport": {
-      "width": 2560,
-      "height": 1440,
-      "device_pixel_ratio": 1,
-      "source_canvas": {
-        "width": 2560,
-        "height": 1440
-      }
-    },
-    "clip": {
-      "seconds": 8,
-      "fps": 30,
-      "width": 2560,
-      "height": 1440,
-      "muted": true,
-      "loop": true,
-      "encoding": "high quality"
-    },
-    "videos": [
-      {
-        "file": "hero-overview.mp4",
-        "bytes": 2849405,
-        "duration": 8,
-        "width": 2560,
-        "height": 1440,
-        "frames": 240,
-        "distinct_motion_samples": 16,
-        "sha256": "72d017cc84f18a6deac9f0b43e52656218d4b87d209521e38e7512b9d79222ba"
-      },
-      {
-        "file": "hero-overview.webm",
-        "bytes": 2555525,
-        "duration": 8,
-        "width": 2560,
-        "height": 1440,
-        "frames": 0,
-        "distinct_motion_samples": 16,
-        "sha256": "80e5286ebce9a772936113be14c5d5dd84c0208349c71c7799f39cbadc4ebdb1"
-      }
-    ],
-    "poster": {
-      "file": "hero-motion-poster.jpg",
-      "bytes": 109065
-    }
   }
 }
