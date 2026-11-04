@@ -11,7 +11,7 @@
 ## Validation
 
 - `npm run lint`: passed with no errors and 7 repository warnings (3 existing standalone article `<img>` recommendations; 4 warnings in other Works).
-- `npm test`: passed, 3/3 tests.
+- `npm test`: passed across all 3 test files (7 test cases).
 - `npm run build:pages`: passed, including the home, existing Works and Work 6 TypeScript check and production Vite build.
 - `npm run typecheck --prefix projects/fab-flow` and `npm run build --prefix projects/fab-flow`: passed.
 - Built artifact route smoke: served `dist-pages` with the Pages project-base alias and fetched `/build-canvas/fab-flow-preview/`, its JavaScript and CSS assets; all returned HTTP 200.
@@ -23,4 +23,5 @@
 
 - Production Pages and FAB FLOW game URLs returned CONNECT 403 under the available network policy. No bypass was attempted. Local build and browser results do not establish deployed content parity or live production interaction.
 - No new FAB FLOW screenshot, simulation benchmark, or gameplay video was captured. Historical screenshots and performance figures retain their original dates and test conditions.
-- Direct main deployment, final commit SHA, and GitHub Actions status are pending the release step.
+- Direct main push completed as commit `b86133dae48070ffa55322f3bb73b0b4a7132d5b`; a post-push fetch confirmed `origin/main` points to that exact SHA.
+- GitHub Actions run status could not be retrieved: GitHub combined status had no reported status checks, and `gh run list` returned HTTP 403 from the Actions API. The Pages and game host requests also returned the environment's CONNECT 403. The direct push is confirmed; successful production deployment and remote interaction remain unverified.
