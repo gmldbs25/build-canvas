@@ -14,7 +14,7 @@
 
 ### 결정적 0.5초 Tick과 순서
 
-`src/sim/engine.ts:23–26`에서 tick은 0.5초, 이동 속도는 4m/s, 포트 픽업/하역 service는 각각 1.5초다. 한 일반 rail tick에서 차량은 최대 `4 × 0.5 = 2m`를 진행하며, 더 짧게 남은 링크는 해당 남은 길이만큼 이동해 다음 node에 도착한다 (`:1175–1185`). 서비스는 3 tick 분량이다. 이 값은 공개 교육용 모델 가정이지 현장 속도/서비스 측정이 아니다.
+`src/sim/engine.ts:23–26`에서 tick은 0.5초, 이동 속도는 4m/s, 포트 픽업/하역 service는 각각 1.5초다. 한 일반 rail tick에서 차량은 최대 `4 × 0.5 = 2m`를 진행하며, 더 짧게 남은 링크는 해당 남은 길이만큼 이동해 다음 node에 도착한다 (`:1175–1185`). Dock 도착 시 serviceRemaining을 1.5초로 설정하고 이후 node 처리 tick에서 이를 감소시킨다. 따라서 service duration을 도착·진입 tick까지 포함한 고정 세 tick으로 표현하지 않는다. 이 값은 공개 교육용 모델 가정이지 현장 속도/서비스 측정이 아니다.
 
 한 native tick의 핵심 순서는 코드상 다음과 같다 (`engine.ts:1118–1142,1154–1187,1189–1224`):
 
@@ -23,7 +23,7 @@
 3. Tick protection/점유 현황 및 혼잡 비용 계산, pending 요청 dispatch.
 4. 차량 ID 정렬 순서로 각 차량 1회 처리: 기존 link에서 이동/대기하거나 node에서 서비스·경로·link admission.
 5. busy/waiting 회계, 요청 timing 합계 보존 검사, FIFO queue와 operational cycle 갱신; 20번째 tick마다 cycle recovery hook.
-6. 현재 시각까지의 fleet/intervention 변경 반영, 이후 invariants.
+6. transient protection 정리 뒤 fleet 변경과 intervention 반영 및 fleet accounting.
 
 주의: dispatch된 차량은 그 tick의 이동 루프에서 건너뛴다 (`:1154–1157`). 따라서 그림에서 배차와 첫 이동을 동일 순간으로 그리지 말고, “이번 tick에 배차 → 이후 tick에서 이동 처리”로 표시한다. 시뮬레이션 논리는 브라우저 프레임율에 종속되지 않고 fixed step을 실행한다.
 
@@ -47,8 +47,8 @@
 
 ### Snapshot / restore / replay
 
-- `Engine.snapshot()`은 `version:1`, scenario, state의 clone과 analysis 활성 시 복사된 analysis를 내보낸다 (`engine.ts:1024–1026`). `Engine.restore()`는 snapshot version/schema, 정책·scenario time 일치, 시간/tick 정합성, analysis event 일치 및 전체 복원 invariant를 검사하며 last completed tick 경계를 재설정한다 (`:1033–1068`, `:1077–1079`).
-- 결정적 재생의 단위는 Native tick이다. 동일 scenario/seed/schedule 및 같은 intervention history의 같은 snapshot 경계에서 진행하면 동일 snapshot 결과가 테스트/감사에서 비교된다. snapshot은 단순 renderer frame screenshot이나 전체 application DOM 상태가 아니다.
+- `Engine.snapshot()`은 `version:1`, scenario, state의 clone과 analysis 활성 시 복사된 analysis를 내보낸다 (`engine.ts:1024–1026`). `Engine.restore()`는 snapshot version/schema, 정책·scenario time 일치, 시간/tick 정합성, analysis event 일치 및 복원 invariant를 검사하며 last completed tick 경계를 재설정한다 (`:1033–1068`, `:1077–1079`).
+- Replay와 restore는 다르다. Restore는 저장된 Tick 경계의 state에서 계속하고, replay는 `interventionHistoryComplete`가 true일 때만 초기 scenario/policy와 난수 seed, 기록된 개입을 사용해 새 Engine을 실행한다. 이는 renderer frame을 재생하지 않는다. 동일 조건 비교에는 scenario, seed, policy, schedules, intervention history, engine version이 같아야 한다.
 - UI publication은 `publicationCopy`로 valid plain data를 독립 복사해 React에 건네며, JSON stringify/parse를 쓰지 않는다 (`src/sim/publication.ts:1–19`; `FabFlow.tsx:41–43`). `Engine.snapshot` 및 저장/restore 검증과는 별개의 경로다. IndexedDB 저장은 full state structured clone을 계속 사용한다 (`docs/V3_5_PERFORMANCE_REPORT.md:73,81`).
 - scheduler는 monotonic wall-time credit만 관리한다. 500ms simulation credit당 native 0.5s tick 1회이며 task callback 하나에 tick 하나, catch-up 때 16ms yield, 지연 debt는 최대 3 full ticks+fraction으로 제한한다. 숨김 탭과 >1s event-loop gap에서는 debt를 버리고 새 시각 기준으로 재개한다 (`src/sim/playback.ts:1–2,81–123`). 따라서 selected playback speed는 목표이고 보장 속도가 아니다. Native time은 scheduler가 frame 수로 보정하지 않는다.
 
@@ -57,6 +57,13 @@
 - 시각화 경로는 WebGL Three.js 장면이며 렌더마다 3D world를 그린다. WebGL 초기화 실패 시 accessible 2D `FacilityScene` fallback이 표시된다 (`src/components/ThreeFacilityScene.tsx:19,2137`). animation은 Native state의 연속된 확인 tick 사이에서 보간하며, 누락/비연속 endpoint 사이를 가짜 경로로 만들지 않는 adjacency/semantic guard가 있다 (`docs/V3_5_PERFORMANCE_REPORT.md:83`).
 - rail traffic 수는 렌더 측에서 `vehicle.link`를 세고, 대기열은 Native `state.linkQueues`에서 가져온다 (`ThreeFacilityScene.tsx:1800–1802`). 뷰는 현재 vehicle traffic, queue, closure, selection, 분석 모드에 따라 rail 색상/opacity를 갱신한다 (`:1808–1834`). 이 색상은 순간 차량/대기 현황 시각화이며 엔진 cost 그 자체, 예측 미래 점유, 정책 승리 판정이 아니다. Analysis mode에서는 분석 데이터를 사용해 색을 정한다.
 - native 엔진은 OHT 위치, FOUP/request 상태 및 이동 권위다. Three renderer는 those state를 draw/interpolate하고 traffic visualization을 만든다. 아티클 다이어그램은 화살표를 UI에서 Engine 방향으로 두기보다 Engine state → React publication → renderer; user command → Engine input으로 분리한다.
+
+### 타입 관계와 모듈 경계
+
+- `Layout`은 `nodes[]`, `links[]`, `ports[]`를 담는다. 각 `Link.from/to`는 Node 하나를 참조하고 선택적 `path: Point[]`와 resource key를 포함한다. Link resource는 독립 Resource 객체/table이 아니다 (`src/sim/types.ts`, `topology-default-v6.ts`). V6 Port의 `node`는 dock node이며 Equipment는 `portId`로 Port를 참조한다.
+- Vehicle은 현재 Node와 optional Link/progress를 보유한다. `route: string[]`는 남은 Node ID 경로다. `RouteCandidate { nodes, links, distance, cost, selected }`는 경로 계산 결과이며 persistent Route 서비스/엔티티가 아니다 (`engine.ts` route type 근처).
+- `control.ts`는 tick protection과 static control geometry를 제공합니다. `analysis.ts`는 simulation 내부 KPI/집계를 관리합니다. `FabFlow.tsx`가 Engine ref와 UI publication 경계를 연결하고 `PlaybackScheduler`가 Tick callback을 예약합니다. 이 모듈들은 독립 process/서비스가 아닙니다.
+- `Engine.state`는 public입니다. Native Engine이 권위이고 React에 detached publication을 전달하는 호출 규약은 확인했지만, TypeScript private/immutable encapsulation을 주장하지 않습니다. `engine.ts`에는 여러 책임이 함께 있어 유지보수성은 module name만으로 과장하지 않습니다.
 
 ## 성능 자료: 인용 가능 범위와 제한
 
@@ -74,17 +81,22 @@
 
 이 문안에서 “합법”은 그래프/용량/대기/점유/admission guard 준수라는 구현 의미다. “산업 인증 안전”으로 확장하면 안 된다.
 
-## 그림 제작 제안
+## Implemented architecture views
 
-1. **V6 포트 진입/이탈 도식:** 한 bay의 북·남 service lane, 중앙 forward/return spine, port node와 장비 dock, `entry→dock`, `dock→exit` 단방향 arrow, 실제 one-way guideway arrows 표시. Small에는 central cross transfer가 없고 Medium/Large 중앙 bay에는 존재하므로 범례/주석. 범위는 한 bay 상세도 + 생략된 bay로 표시; 레이아웃 비율 및 총 node/link를 임의로 꾸미지 말 것. 근거 `topology-default-v6.ts:218–245,284–299`.
-2. **요청 lifecycle/state ownership swimlane:** Request phase와 OHT phase를 분리한 두 lane; Engine이 Native event로 phase 전환하고 FOUP 소유자 source→vehicle→destination storage로 이동. pickup/dropoff 1.5s service 및 저장 기본 dwell 24s를 별도 clock label로. 근거 `types.ts:37–41`, `engine.ts:1348–1370`.
-3. **단일 0.5s tick timeline:** 시간 경계 이동 → failure/demand/release → queue/occupancy/cost → dispatch → vehicle ID order movement/service/admission → request/fleet/KPI/queue/cycle/invariants. Dispatch 차량은 같은 tick 이동 생략함을 callout. scheduler의 wall clock credit은 외곽 별도 레이어로 그려 native tick이 wall-frame와 별개임을 나타낸다. 근거 `engine.ts:1118–1224`, `playback.ts:81–123`.
-4. **DBR/CBR cost split panel:** `edge cost = w_d·length`와 `+ w_c·(4m/s × estimated delay)` 나란히. delay 하위 항목은 남은 occupied distance, FIFO section queue, downstream service/movement estimate. 분기 후 route ranking으로 표현하고 “estimated model; not live factory travel-time guarantee” 주석. legacy cost formula를 제품 기본식과 혼합하지 않는다. 근거 `engine.ts:1253–1278`.
-5. **시스템 경계 diagram:** deterministic scenario + seed + demand/failure/intervention → Native Engine (authoritative state) → independent publication copy → React/UI → Three.js WebGL / 2D fallback; save/load은 canonical snapshot/IndexedDB 별도 선, restore validation 후 tick continuation. Render feedback arrow가 Native logistics state를 변경하는 것처럼 보이지 않게 한다. 근거 `FabFlow.tsx:41–43,304–339`, `engine.ts:1024–1068`, `publication.ts:6–19`.
+The original proposal below has been replaced with source-linked diagrams and tables in `projects/fab-flow/src/ArchitectureViews.tsx` and `architecture-views.css`. The source is still not modified; Build Canvas explains the pinned Engine behavior.
+
+- **A–B · Module ownership and interfaces:** `FabFlow.tsx`, `playback.ts`, `engine.ts`, `control.ts`, `analysis.ts`, `publication.ts`, Three/2D scene and storage responsibilities with input/output direction. The diagram says these are same-app module boundaries, not independent services. `Engine.state` is public; the ownership rule is a current calling convention, not TS-enforced immutability.
+- **C · Data model:** `Layout` owns Node/Link/Port arrays; links reference two Nodes and carry optional sampled paths/resource keys. Vehicles keep optional current Link/progress and remaining Node IDs. `RouteCandidate` is temporary. `StoredFoup` records request/port/release time; no general `Foup.phase` entity exists.
+- **D–F · Tick execution and transport state:** Source order comes from `engine.ts:1118–1248`, with request dispatch at `1296+`, node handling at `1326+`, admission at `1562+`, and waiting at `1605+`. The table distinguishes dispatch, zero-progress link admission, later movement, arrival, dock service, loaded routing, destination storage and post-Tick accounting. A newly dispatched vehicle skips same-Tick movement; admission does not add distance; link arrival does not also execute next-node service.
+- **Routing and admission view:** `buildOperationalEdgeCosts`, `v2BestPath`, `v2PathsToTarget`, `dispatchOperational` and `admitOperational` separate cost ranking, legal route availability, destination reservation and resource entry. Reverse search materializes routes for reachable starts, so the route phase is not summarized solely by the heap bound. Cycle mitigation does not guarantee global liveness.
+- **H · Persistence / replay / publication:** `snapshot()/restore()` continues a validated saved state; Replay starts a new Engine only when intervention history is complete; `publicationCopy()` is a per-Tick UI payload; `confirmedMotion` only interpolates confirmed endpoints. These paths are displayed separately.
+- **Existing chapter figures:** `EngineeringDiagrams.tsx` retains a V6 service-lane/Port dock relationship sketch, DBR/CBR estimated-cost example, wait/admission example and fixed-Tick context. These are explanatory schematics, not runtime captures or exact V6 coordinates.
+
+The views were reviewed at desktop and mobile widths; their accessible tables and horizontally scrollable diagrams preserve detail without turning the entire page into a wide canvas. The detailed five-lens evidence/visual review and browser results are in `ARCHITECTURE_2_REVIEW.md`. The broader evidence and historical performance limits in this memo remain applicable.
 
 ## 확인 한계
 
 - `HEAD`가 원격 main과 일치했다. `/workspace/fab_flow/AGENTS.md` 읽었다.
 - 실행 환경에 `tsx` 패키지가 없어 topology runtime count probe는 실패했다. 그래서 구조상 포트 총수만 preset 수식으로 기재했고 node/link total은 생략했다.
 - 성능 수치는 기존 저장된 V3.5/stability audit 문서 근거로만 적었다. 이번 검토에서 simulation benchmark/browser capture를 새로 돌리지 않았다.
-- 원본 저장소에는 변경하지 않았다. 새 산출물은 이 scratch report뿐이다.
+- FAB FLOW source repository was not modified. Build Canvas article and evidence documentation link back to this pinned read-only source SHA.

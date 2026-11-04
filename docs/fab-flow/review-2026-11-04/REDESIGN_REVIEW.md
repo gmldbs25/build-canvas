@@ -41,3 +41,9 @@ See `ENGINEERING_EVIDENCE.md` for source paths/functions and implementation limi
 3. Korean copy pass: simplify abstract hooks and repeated caveats; keep adjacent provenance where it affects interpretation.
 4. Visual pass: inspect original and redesigned browser captures at desktop/mobile; correct diagram connections, typography, page overflow, Hero composition and modal behavior when found.
 5. Final reader: perform the regression/viewport suite and a second rendered review after integration. Actual commands, outcomes and remaining limits are recorded in the delivery report.
+
+## Architecture deepening follow-up
+
+After the editorial redesign reached main, Work 6 chapters 06–09 were deepened from its updated base (`d4c6c395f9f0ed3342aed2ac2aa2d20218a090b8`) against the unchanged FAB FLOW source `7cfb6c58073a80df5c3d310c6ce9584679edc277`. New architecture views distinguish static Layout/topology, Engine-owned SimulationState and temporary route results; show actual module interfaces and data-flow direction; trace dispatch, admission, link movement and pickup/dropoff state mutation across Tick boundaries; and separate view publication, snapshot restore and input replay.
+
+Five article ADR summaries identify fixed-step ownership, directed V6 graph and shared path geometry, route cost versus movement admission, UI publication versus persistence, and the historical rationale for keeping ordinary live playback in the app execution context. `../ARCHITECTURE_DECISIONS.md` separates current-code behavior from historical design intent. A quality evidence table distinguishes source-verified structure, historical performance measurements and unverified production claims. The diagrams are source-based schematics, not captured runtime traces.
