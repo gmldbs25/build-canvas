@@ -1,0 +1,31 @@
+name: Work6 genuine gameplay evidence
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/work6-gameplay.yml'
+      - 'projects/fab-flow/scripts/capture-gameplay.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Record actual deployed Three.js app; no auto-publication
+        run: node projects/fab-flow/scripts/capture-gameplay.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: work6-gameplay-review-required
+          path: projects/fab-flow/evidence/gameplay/
+          retention-days: 14
+          if-no-files-found: warn
