@@ -1,0 +1,21 @@
+{
+  "environment": "Local Chromium 151, DPR1, unthrottled HTTP; not production/network or user performance",
+  "measurements": [
+    {
+      "width": 1440,
+      "initial_cls": 0,
+      "initial_resource_transfer_bytes": 663190,
+      "initial_hero": "hero-overview-1280.webp",
+      "axe_default_violations": 0,
+      "axe_expanded_violations": 0
+    },
+    {
+      "width": 390,
+      "initial_cls": 0,
+      "initial_resource_transfer_bytes": 485251,
+      "initial_hero": "hero-overview-1280.webp",
+      "axe_default_violations": 0,
+      "axe_expanded_violations": 0
+    }
+  ]
+}

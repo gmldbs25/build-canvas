@@ -1,5 +1,7 @@
 # FAB FLOW — Work6 Content Structure & Evidence Register
 
+> 2026-11-04 redesign implementation: see [review and evidence](review-2026-11-04/REDESIGN_REVIEW.md) and [delivery validation](review-2026-11-04/DELIVERY.md). Current engine analysis is based on `7cfb6c58`; media retain their original November 3 provenance. The current user request explicitly authorizes implementation and direct main deployment; old proposal approval gates below are historical.
+
 > Status: **Published article copy v1 / historical screenshots remain version-labeled** · 2026-11-03  
 > Product: **FAB FLOW / 반도체 물류 세상** · Deep-dive theme: **Behind the Simulation**  
 > Build Canvas baseline `gmldbs25/build-canvas@457e9e895673b175ab7ed319b5fa27385f4c7751` · FAB FLOW source baseline `gmldbs25/fab_flow@7a1ad9b36ccbf2c173a3676d85b7f790111378f7`.  

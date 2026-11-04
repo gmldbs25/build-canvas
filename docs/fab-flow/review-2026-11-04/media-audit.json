@@ -1,0 +1,260 @@
+[
+  {
+    "file": "transport-loaded.png",
+    "width": 3600,
+    "height": 1646,
+    "png_bytes": 1375028,
+    "lossless_webp_bytes": 584312,
+    "derivatives": [
+      {
+        "file": "transport-loaded-800.webp",
+        "width": 800,
+        "height": 366,
+        "bytes": 34098
+      },
+      {
+        "file": "transport-loaded-1600.webp",
+        "width": 1600,
+        "height": 732,
+        "bytes": 76606
+      }
+    ],
+    "original_sha256": "6e39f0a2a38be0694fd9db891ec0cb22f37fa9beaa8bd45a9c49400fde94fe63"
+  },
+  {
+    "file": "hero-overview.png",
+    "width": 2560,
+    "height": 1440,
+    "png_bytes": 478646,
+    "lossless_webp_bytes": 174142,
+    "derivatives": [
+      {
+        "file": "hero-overview-1280.webp",
+        "width": 1280,
+        "height": 720,
+        "bytes": 136276
+      }
+    ],
+    "original_sha256": "ca51602d3f1ccf3fdb36805aa869e6af8e3816e030ca646c2edaa87a8bcca7a8"
+  },
+  {
+    "file": "trip-request.png",
+    "width": 3600,
+    "height": 1646,
+    "png_bytes": 1331897,
+    "lossless_webp_bytes": 553754,
+    "derivatives": [
+      {
+        "file": "trip-request-800.webp",
+        "width": 800,
+        "height": 366,
+        "bytes": 32540
+      },
+      {
+        "file": "trip-request-1600.webp",
+        "width": 1600,
+        "height": 732,
+        "bytes": 75880
+      }
+    ],
+    "original_sha256": "57b472107b068cfdc6530c6002e3a178f8b1e4c87e155e79c26a47ef21f2058a"
+  },
+  {
+    "file": "trip-dropoff.png",
+    "width": 3600,
+    "height": 1646,
+    "png_bytes": 1315020,
+    "lossless_webp_bytes": 560610,
+    "derivatives": [
+      {
+        "file": "trip-dropoff-800.webp",
+        "width": 800,
+        "height": 366,
+        "bytes": 33298
+      },
+      {
+        "file": "trip-dropoff-1600.webp",
+        "width": 1600,
+        "height": 732,
+        "bytes": 76468
+      }
+    ],
+    "original_sha256": "1f9d7bdb0714f712f9707aa4a68779de1f3b274b2228ed637fcc2da058364168"
+  },
+  {
+    "file": "fab-small.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 918998,
+    "lossless_webp_bytes": 516344,
+    "derivatives": [
+      {
+        "file": "fab-small-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 34066
+      },
+      {
+        "file": "fab-small-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 82220
+      }
+    ],
+    "original_sha256": "f0da95043fe048008776377dfbb91ddee84f906684253a1f341a00bc413a5cc9"
+  },
+  {
+    "file": "sandbox-setup.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 1008178,
+    "lossless_webp_bytes": 571404,
+    "derivatives": [
+      {
+        "file": "sandbox-setup-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 34690
+      },
+      {
+        "file": "sandbox-setup-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 92970
+      }
+    ],
+    "original_sha256": "2c630d6dfbae5b6ed95c5f8352cc56584a8d67089d436a5aa74592d16ba49c8a"
+  },
+  {
+    "file": "policy-comparison.png",
+    "width": 3600,
+    "height": 2000,
+    "png_bytes": 800612,
+    "lossless_webp_bytes": 524508,
+    "derivatives": [
+      {
+        "file": "policy-comparison-800.webp",
+        "width": 800,
+        "height": 444,
+        "bytes": 36520
+      },
+      {
+        "file": "policy-comparison-1600.webp",
+        "width": 1600,
+        "height": 889,
+        "bytes": 92430
+      }
+    ],
+    "original_sha256": "9c3f80f651edc73cb946f2613c4e26779f4ea4d4209ee97534eaf7ca3af5e372"
+  },
+  {
+    "file": "congestion-observation.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 1023982,
+    "lossless_webp_bytes": 411494,
+    "derivatives": [
+      {
+        "file": "congestion-observation-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 38258
+      },
+      {
+        "file": "congestion-observation-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 86370
+      }
+    ],
+    "original_sha256": "269c88209bdae31104e9a36e5e6fa637132c4a379ede1433e3fa0a5d7329260d"
+  },
+  {
+    "file": "fleet-high-load.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 897005,
+    "lossless_webp_bytes": 360668,
+    "derivatives": [
+      {
+        "file": "fleet-high-load-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 33766
+      },
+      {
+        "file": "fleet-high-load-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 76752
+      }
+    ],
+    "original_sha256": "556a5a55c5935a9fc6e204a35985b968d2768e9d121764a704e033c80ecdeb2b"
+  },
+  {
+    "file": "fab-medium.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 906041,
+    "lossless_webp_bytes": 511476,
+    "derivatives": [
+      {
+        "file": "fab-medium-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 34594
+      },
+      {
+        "file": "fab-medium-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 82954
+      }
+    ],
+    "original_sha256": "42889ad2aaf08d3a10661bce11a7945811f620738d137120b4b7d02bc2cca48e"
+  },
+  {
+    "file": "operations-analysis.png",
+    "width": 3600,
+    "height": 2000,
+    "png_bytes": 1074916,
+    "lossless_webp_bytes": 677554,
+    "derivatives": [
+      {
+        "file": "operations-analysis-800.webp",
+        "width": 800,
+        "height": 444,
+        "bytes": 44418
+      },
+      {
+        "file": "operations-analysis-1600.webp",
+        "width": 1600,
+        "height": 889,
+        "bytes": 112224
+      }
+    ],
+    "original_sha256": "9ab35a0216cd62021ad405ffd2226f8d90f901bafb7ef4403c9e4700520783f9"
+  },
+  {
+    "file": "fab-large.png",
+    "width": 3600,
+    "height": 1892,
+    "png_bytes": 882966,
+    "lossless_webp_bytes": 494140,
+    "derivatives": [
+      {
+        "file": "fab-large-800.webp",
+        "width": 800,
+        "height": 420,
+        "bytes": 34190
+      },
+      {
+        "file": "fab-large-1600.webp",
+        "width": 1600,
+        "height": 841,
+        "bytes": 80490
+      }
+    ],
+    "original_sha256": "c6e77d2c91e7d9c887d4a1a61ac34cb63202493b9619bdac5bd5750fa64165a7"
+  }
+]

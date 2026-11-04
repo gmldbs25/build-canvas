@@ -1,5 +1,7 @@
 # FAB FLOW — Work6 Article Design
 
+> 2026-11-04 redesign implementation: see [review and evidence](review-2026-11-04/REDESIGN_REVIEW.md) and [delivery validation](review-2026-11-04/DELIVERY.md). Current engine analysis is based on `7cfb6c58`; media retain their original November 3 provenance. The current user request explicitly authorizes implementation and direct main deployment; old proposal approval gates below are historical.
+
 > Status: **Published 1st article implementation / live iteration authorized** · 2026-11-03  
 > Scope: `gmldbs25/build-canvas` · `projects/fab-flow/` · public URL `/build-canvas/fab-flow-preview/`  
 > Source of truth: this document + [02_CONTENT_STRUCTURE.md](02_CONTENT_STRUCTURE.md) + [03_DEVELOPMENT_PLAN.md](03_DEVELOPMENT_PLAN.md). Historical Scene plans in [archive/](archive/) are **not** implementation instructions.
