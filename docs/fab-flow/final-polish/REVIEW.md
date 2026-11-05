@@ -10,9 +10,7 @@ These saved baseline captures were rendered from the initial commit in local Chr
 
 ![Initial Chapter 06 at 390px](round-1/initial-chapter-06-mobile.webp)
 
-The first actual sequence-viewer capture, after its first implementation, showed that the “fit” view shrank to width but left its lower steps below the viewport. This intermediate screenshot is the round-one correction target. The mobile original-size view also needed an explicit touch instruction. This led to fitting SVGs to both viewer dimensions, leaving mobile viewers in original-size scroll mode, and adding arrow/Page/Home/End keyboard scrolling plus a touch-drag hint.
-
-![Round 1: sequence diagram clipped at the bottom in the first fit implementation](round-1/sequence-viewer-before-height-fit.png)
+The first actual sequence-viewer capture, after its first implementation, showed that the “fit” view shrank to width but left its lower steps below the viewport. That observed intermediate defect was the round-one correction target; its temporary screenshot was overwritten during the corrected review, so it is not retained as before evidence. The mobile original-size view also needed an explicit touch instruction. This led to fitting SVGs to both viewer dimensions, leaving mobile viewers in original-size scroll mode, and adding arrow/Page/Home/End keyboard scrolling plus a touch-drag hint.
 
 ## Round 2 · corrected viewer and phone review
 
@@ -24,7 +22,7 @@ The second local Chromium review checked Chapters 06–09 inline and opened the 
 
 ![After: mobile Chapter 06 reading hierarchy](round-2/engineering-mobile-inline.png)
 
-Additional [desktop inline](round-2/engineering-desktop-inline.png) and [desktop viewer](round-2/diagram-viewer-desktop-fit.png) captures show the same review state. The earlier sequence viewer and its final fit-mode version are also preserved under [screenshots](screenshots/).
+Additional [desktop inline](round-2/engineering-desktop-inline.png) and [desktop viewer](round-2/diagram-viewer-desktop-fit.png) captures show the same review state. The final sequence viewer screenshots are also preserved under [screenshots](screenshots/).
 
 ## Interaction and accessibility checks
 

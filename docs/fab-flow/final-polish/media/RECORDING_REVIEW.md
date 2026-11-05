@@ -51,3 +51,5 @@ Final shipped file:
 Decision: keep the sharper established static Hero and offer the real 9.6-second clip as a user-initiated Chapter 02 video with native controls/fullscreen. `preload=none` and no autoplay protect the initial transfer and reduced-motion/data-saver experience. A 1280px WebP poster is a static fallback; video failure retains an image. Playback on a physical mobile device and mobile Safari remains unverified.
 
 Evidence: `capture-report.json` (source candidate metadata), `final-metadata.json` (30fps delivery), `final-motion-audit.json`, and `contact.png`. The full raw/source and decoded PNG collection are in Actions artifacts with 14-day retention; shipped MP4, poster and persistent review evidence remain in Git.
+
+One additional pre-normalization recording retry ([41939228587](https://github.com/gmldbs25/build-canvas/actions/runs/41939228587)) concluded cancelled; its subsequent compact-packaging job had no completed artifact to package and failed. No media from that retry is used. The packaging workflow now runs automatically only for successful captures. These outcomes do not supersede the accepted source run and shipped-file hash above.

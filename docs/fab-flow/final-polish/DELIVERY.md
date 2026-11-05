@@ -32,3 +32,9 @@ Final implementation SHA, Actions outcomes and production review are recorded in
 - Native gameplay playback and all-frame analysis are recorded under `media/`; only the final 30fps delivery candidate is shipped.
 - Final lint after test cleanup: zero errors, eight warnings (four native article `<img>` optimization recommendations, including the new error-fallback poster; four existing other-Work warnings). No new unused-variable warnings remain.
 - Corrected sequence fit was re-rendered and visually inspected: all Tick/service/completion content now fits at 1440×900. Root screenshots are in `screenshots/sequence-viewer-desktop-root.png` and `screenshots/sequence-viewer-mobile-root.png`.
+
+## Confirmed remote implementation delivery
+
+Implementation commit: `242042dfd5ed55f9640e951a609bd0c607080c08` was pushed directly to `main` without force push. Work6 CI [41941293205](https://github.com/gmldbs25/build-canvas/actions/runs/41941293205) completed successfully, including TypeScript, production build and the nine-viewport browser smoke. Pages run [41941293199](https://github.com/gmldbs25/build-canvas/actions/runs/41941293199) completed with both build and deploy jobs successful. Public-route browser verification runs separately after this deployment.
+
+A documentation/workflow follow-up removes an incorrectly labeled intermediate screenshot (it duplicated the final corrected screenshot), preserves genuine initial baseline/after images, and skips compact-media packaging for unsuccessful recording runs. This does not change the deployed UI or shipped media.
