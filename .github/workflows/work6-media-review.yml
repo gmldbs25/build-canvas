@@ -1,0 +1,44 @@
+name: Work6 compact gameplay review package
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/work6-media-review.yml']
+  workflow_run:
+    workflows: ['Work6 genuine gameplay evidence']
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Resolve latest completed capture
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          capture_run="$EVENT_RUN_ID"
+          if [ -z "$capture_run" ]; then
+            capture_run=$(gh api repos/${{ github.repository }}/actions/workflows/work6-gameplay.yml/runs --jq '[.workflow_runs[] | select(.conclusion == "success")][0].id')
+          fi
+          echo "run_id=$capture_run" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: work6-gameplay-review-required
+          run-id: ${{ steps.source.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: review
+      - uses: actions/upload-artifact@v4
+        with:
+          name: work6-gameplay-compact-review
+          path: |
+            review/gameplay.mp4
+            review/capture-report.json
+            review/contact.png
+            review/ready.png
+            review/end.png
+          retention-days: 14
+          if-no-files-found: error
