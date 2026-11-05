@@ -1,13 +1,6 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
-    index: "07",
-    title: "GitHub Profile",
-    type: "PROFILE README · DEVELOPMENT JOURNAL",
-    year: "2026.11",
-    href: "./github-profile/",
-  },
-  {
     index: "06",
     title: "FAB FLOW",
     type: "SEMICONDUCTOR LOGISTICS · INTERACTIVE DOCUMENTARY",
