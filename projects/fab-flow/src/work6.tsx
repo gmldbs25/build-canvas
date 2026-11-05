@@ -91,6 +91,21 @@ function Figure({ file, alt, caption, className = '', eager = false }: FigurePro
     <figcaption><span className="figure-dot" aria-hidden="true" />{caption}</figcaption>
   </figure>;
 }
+function GameplayClip() {
+  const [failed, setFailed] = useState(false);
+  const poster = IMAGE_ROOT + 'gameplay-poster.webp';
+  const video = IMAGE_ROOT + 'gameplay-overview.mp4';
+  const alt = '실제 FAB FLOW 공장 화면에서 여러 OHT와 FOUP가 레일을 따라 이동하는 연속 장면';
+  return <figure className="article-figure gameplay-clip">
+    {failed ? <div className="gameplay-fallback" role="img" aria-label={alt}>
+      <img src={poster} alt="" />
+      <p>동영상을 재생할 수 없어 대표 장면을 표시합니다.</p>
+    </div> : <video controls playsInline muted preload="none" poster={poster} aria-label={alt} onError={() => setFailed(true)}>
+      <source src={video} type="video/mp4" />
+    </video>}
+    <figcaption><span className="figure-dot" aria-hidden="true" />LIVE CAPTURE / 실제 FAB FLOW에서 OHT와 FOUP의 이동을 연속 촬영 · 9.6초 · 2560 × 1440 · <a href={video} target="_blank" rel="noopener noreferrer">MP4 원본 열기 ↗</a></figcaption>
+  </figure>;
+}
 function ChapterHead({ index, eyebrow, title, lead }: { index: string; eyebrow: string; title: string; lead?: string }) {
   return <div className="chapter-head">
     <div className="chapter-meta"><span>{index} / 10</span><span>{eyebrow}</span></div>
@@ -188,6 +203,7 @@ export default function Work6() {
         <div className="prose prose-narrow"><p>운송 요청이 들어와도 FOUP가 곧바로 움직이지는 않습니다. 먼저 담당 OHT를 정하고, 빈 차량을 출발 Port로 보냅니다. 도착한 차량은 FOUP를 싣고 방향이 정해진 레일을 따라 목적지로 이동합니다. 마지막으로 장비 Port에 내려놓으면 운송 한 건이 끝납니다.</p>
           <p>어느 차량을 보낼지, 어떤 경로를 택할지, 앞 차량이 길을 차지했을 때 언제 기다릴지. 짧은 이동에도 여러 결정이 필요합니다.</p></div>
         <div className="transport-sequence" aria-label="운송 과정 여섯 단계">{steps.map(step => <div className="transport-step" key={step.no}><span>{step.no}</span><b>{step.name}</b><small>{step.detail}</small></div>)}</div>
+        <GameplayClip />
         <div className="transport-gallery">
           <Figure file="trip-request.png" alt="실제 FAB FLOW 튜토리얼에서 물류 운송 요청이 등록된 장면" caption="REQUEST / 요청이 만들어지다" />
           <Figure file="transport-loaded.png" alt="OHT가 노란 FOUP를 싣고 실제 레일 위로 이동하는 확대 화면" caption="IN TRANSIT / FOUP를 실은 OHT" className="transport-feature" />

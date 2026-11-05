@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import './engineering-diagrams.css';
+import { DiagramViewer } from './DiagramViewer';
 import { ArchitectureExecutionView, ArchitectureModelView, ArchitecturePersistenceView, ArchitectureRuntimeView } from './ArchitectureViews';
 
 const SHA = '7cfb6c58';
@@ -13,7 +14,7 @@ function Panel({ kicker, title, children, notes }: { kicker: string; title: stri
 }
 
 function Scroll({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="ed-scroll" tabIndex={0} role="region" aria-label={label}>{children}</div>;
+  return <DiagramViewer label={label}>{children}</DiagramViewer>;
 }
 
 function Architecture() {
@@ -43,8 +44,8 @@ function TransportSequence() {
   return <div className="ed-sequence"><h4>한 요청을 따라가는 처리 시퀀스</h4><p className="ed-caption">소스 기반 논리적 상호작용 · 여러 Tick에 걸친 요청이며 네트워크 API 호출을 나타내지 않습니다.</p>
     <Scroll label="수요, Engine, OHT, Port, 분석 사이의 운송 처리 시퀀스"><svg className="ed-svg ed-sequence-svg" viewBox="0 0 900 520" role="img" aria-label="수요가 Engine에 요청을 등록하고 배차, 픽업, 하역을 거쳐 분석에 완료가 반영되는 시퀀스">
       <defs><marker id="ed-seq-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#39836c"/></marker></defs>
-      {lanes.map((lane,i)=><g key={lane}><rect x={20+i*180} y="20" width="140" height="42" rx="3" fill="#e0ead8"/><text x={90+i*180} y="46" textAnchor="middle">{lane}</text><path d={`M${90+i*180} 65V500`} stroke="#b6cbb8" strokeDasharray="6 7"/></g>)}
-      {messages.map(([from,to,label],i)=><g key={label}><path d={`M${90+from*180} ${110+i*58}H${90+to*180}`} stroke="#39836c" strokeWidth="2" markerEnd="url(#ed-seq-arrow)"/><text x={90+(from+to)*90} y={100+i*58} textAnchor="middle">{label}</text></g>)}
+      {lanes.map((lane,i)=><g className="ed-seq-lane" key={lane}><rect x={20+i*180} y="20" width="140" height="42" rx="3" fill="#e0ead8"/><text x={90+i*180} y="46" textAnchor="middle">{lane}</text><path d={`M${90+i*180} 65V500`} stroke="#b6cbb8" strokeDasharray="6 7"/></g>)}
+      {messages.map(([from,to,label],i)=><g className="ed-seq-message" key={label}><path d={`M${90+from*180} ${110+i*58}H${90+to*180}`} stroke="#39836c" strokeWidth="2.5" markerEnd="url(#ed-seq-arrow)"/><text x={90+(from+to)*90} y={100+i*58} textAnchor="middle">{label}</text></g>)}
     </svg></Scroll>
     <Notes title="단계별 상태와 소유권"><ol>{rows.map(([actor,phase,detail])=><li key={phase}><span>{actor}</span><code>{phase}</code><p>{detail}</p></li>)}</ol><p>FOUP는 매 순간 독립 엔티티 상태를 갖지 않습니다. 요청 단계와 차량의 적재 여부에서 소유 위치를 해석하고, 하역 뒤에는 목적 Port 저장 기록으로 이동합니다. <code>releaseAt</code>에 저장 점유가 해제됩니다. 다음 수요는 독립 외생 일정에서 생성되며, 같은 FOUP를 연쇄 재운송하는 모델은 아닙니다.</p></Notes></div>;
 }

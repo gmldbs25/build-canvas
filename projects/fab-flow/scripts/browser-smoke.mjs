@@ -10,7 +10,7 @@ const images = [
   'hero-overview.png', 'operations-analysis.png', 'fab-small.png', 'fab-medium.png',
   'fab-large.png', 'sandbox-setup.png', 'transport-loaded.png', 'trip-request.png',
   'trip-dropoff.png', 'congestion-observation.png', 'policy-comparison.png', 'fleet-high-load.png',
-  'hero-overview.webp', 'hero-overview-1280.webp', ...[
+  'hero-overview.webp', 'hero-overview-1280.webp', 'gameplay-overview.mp4', 'gameplay-poster.webp', ...[
     'operations-analysis', 'fab-small', 'fab-medium', 'fab-large', 'sandbox-setup',
     'transport-loaded', 'trip-request', 'trip-dropoff', 'congestion-observation',
     'policy-comparison', 'fleet-high-load'
@@ -47,9 +47,12 @@ try {
   browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage'], ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } : {})});
   for (const [width,height] of [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[844,390],[390,844],[360,740],[320,720]]) {
     const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});
+    if(width===320)await page.route('**/gameplay-overview.mp4',route=>route.abort('failed'));
     const faults=[];
+    const videoRequests=[];
     page.on('pageerror',e=>faults.push('JS '+String(e)));
     page.on('response',r=>{if(r.status()>=400)faults.push('HTTP '+r.status()+' '+r.url())});
+    page.on('request',r=>{if(/gameplay-overview\.mp4(?:$|\?)/.test(r.url()))videoRequests.push(r.url())});
     const response=await page.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/',{waitUntil:'networkidle'});
     if(response?.status()!==200)throw Error('Page HTTP: '+response?.status());
     await expect(page.locator('html')).toHaveAttribute('lang','ko');
@@ -61,10 +64,16 @@ try {
     if(await page.locator('canvas').count())throw Error('Legacy simulation canvas remains');
     const hero=page.locator('.hero-visual > img.hero-still');
     await expect(hero).toBeVisible();
+    const gameplayVideo=page.locator('.gameplay-clip video');
+    await expect(gameplayVideo).toHaveCount(1);
+    await expect(gameplayVideo).toHaveAttribute('preload','none');
+    await expect(gameplayVideo).toHaveAttribute('playsinline','');
+    await expect(gameplayVideo).toHaveJSProperty('muted',true);
     await page.waitForFunction(()=>{
       const image=document.querySelector('.hero-visual > img.hero-still');
       return image && image.complete && image.naturalWidth>0 && image.naturalHeight>0;
     },null,{timeout:15000});
+    if(videoRequests.length)throw Error('Gameplay video was transferred before a play request: '+videoRequests.join(', '));
     const natural=await hero.evaluate(image=>({width:image.naturalWidth,height:image.naturalHeight,src:image.currentSrc}));
     if(!natural.src?.startsWith('http://127.0.0.1:4179/build-canvas/fab-flow-preview/media/hero-overview'))
       throw Error('Hero still source base mismatch: '+JSON.stringify(natural));
@@ -97,11 +106,53 @@ try {
     const afterModal = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));
     if (Math.abs(afterModal.x - beforeModal.x) > 1 || Math.abs(afterModal.y - beforeModal.y) > 1)
       throw Error('Lightbox did not restore page scroll: ' + JSON.stringify({ beforeModal, afterModal }));
+
+    const diagramOpener = page.locator('#chapter-06 .ed-visual-tools button').first();
+    await diagramOpener.scrollIntoViewIfNeeded();
+    await diagramOpener.evaluate(el => { el.focus({ preventScroll: true }); el.click(); });
+    const diagramDialog = page.getByRole('dialog', { name: 'V6 service lane과 port dock 연결 개념도. 실제 좌표를 재현하지 않습니다.' });
+    await expect(diagramDialog).toBeVisible();
+    await expect(page.locator('html')).toHaveCSS('overflow', 'hidden');
+    const originalDiagram = diagramDialog.locator('.diagram-viewer-scroll');
+    await diagramDialog.getByRole('button', { name: '원본 크기' }).click();
+    await expect(originalDiagram).toHaveClass(/is-original/);
+    await diagramDialog.getByRole('button', { name: '화면에 맞추기' }).click();
+    await expect(originalDiagram).toHaveClass(/is-fit/);
+    const duplicateIds = await diagramDialog.evaluate(() => {
+      const ids = [...document.querySelectorAll('[id]')].map(el => el.id);
+      return ids.filter((id, index) => ids.indexOf(id) !== index);
+    });
+    if (duplicateIds.length) throw Error('Diagram viewer duplicated DOM ids: ' + duplicateIds.join(', '));
+    await page.keyboard.press('Escape');
+    await expect(diagramDialog).toBeHidden();
+    await expect(page.locator('html')).not.toHaveCSS('overflow', 'hidden');
+    await expect(diagramOpener).toBeFocused();
+    if (width <= 640) {
+      await diagramOpener.evaluate(el => { el.focus({ preventScroll: true }); el.click(); });
+      const mobileDialog = page.getByRole('dialog', { name: 'V6 service lane과 port dock 연결 개념도. 실제 좌표를 재현하지 않습니다.' });
+      const mobileRegion = mobileDialog.locator('.diagram-viewer-scroll');
+      await expect(mobileRegion).toHaveClass(/is-original/);
+      await mobileRegion.focus();
+      const scrollBefore = await mobileRegion.evaluate(el => el.scrollLeft);
+      await page.keyboard.press('ArrowRight');
+      const mobileScrollState = await mobileRegion.evaluate(el => ({ before:el.scrollLeft,clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,childWidth:el.firstElementChild?.getBoundingClientRect().width }));
+      const scrollAfter = mobileScrollState.before;
+      if (scrollAfter <= scrollBefore) throw Error('ArrowRight did not scroll the original-size diagram: '+JSON.stringify(mobileScrollState));
+      await page.keyboard.press('Escape');
+      await expect(mobileDialog).toBeHidden();
+      await expect(diagramOpener).toBeFocused();
+      await expect(page.locator('html')).not.toHaveCSS('overflow', 'hidden');
+    }
     const captionPx = await page.locator('.size-figure figcaption').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
     if (captionPx < 13) throw Error('Small screenshot caption font: ' + captionPx);
     if (width <= 390) {
       const timeline = await page.locator('.tick-diagram').evaluate(el => ({viewport:el.clientWidth, content:el.scrollWidth}));
       if (timeline.content <= timeline.viewport) throw Error('Mobile tick timeline must be inspectable via horizontal scroll: ' + JSON.stringify(timeline));
+    }
+    if(width===320){
+      await gameplayVideo.evaluate(video=>video.play().catch(()=>{}));
+      await expect(page.locator('.gameplay-fallback')).toBeVisible({timeout:10000});
+      await expect(page.locator('.gameplay-clip video')).toHaveCount(0);
     }
     await page.locator('#chapter-07 details').first().scrollIntoViewIfNeeded();
     const disclosure=page.locator('#chapter-07 details').first();
@@ -143,8 +194,17 @@ try {
   console.log('home-shortcut','ok');
   await homePage.close();
   const touch=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true,reducedMotion:'reduce'});
+  const touchVideoRequests=[];
+  touch.on('request',request=>{if(/gameplay-overview\.mp4(?:$|\?)/.test(request.url()))touchVideoRequests.push(request.url())});
   await touch.goto('http://127.0.0.1:4179/build-canvas/fab-flow-preview/',{waitUntil:'networkidle'});
   await expect(touch.locator('html')).toHaveCSS('scroll-behavior','auto');
+  const touchVideo=touch.locator('.gameplay-clip video');
+  await expect(touchVideo).toHaveAttribute('preload','none');
+  if(touchVideoRequests.length)throw Error('Mobile video transferred before interaction');
+  await touchVideo.evaluate(video=>video.play());
+  await touch.waitForFunction(()=>{const video=document.querySelector('.gameplay-clip video');return video && video.currentTime>0.25},null,{timeout:10000});
+  if(!touchVideoRequests.length)throw Error('Mobile playback did not request the MP4');
+  console.log('mobile-gameplay-playback','ok');
   await touch.locator('.hero-expand').tap();
   const dialog=touch.getByRole('dialog');await expect(dialog).toBeVisible();
   await dialog.getByRole('button',{name:'원본 크기 보기'}).tap();

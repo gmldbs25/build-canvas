@@ -575,5 +575,22 @@
     ],
     "not_refreshed": []
   },
-  "optimization_note": "2026-11-04: same original captures; lossless full-resolution WebP verified pixel-identical; 800/1600px (hero 1280px) quality-92 previews. Original PNG retained for zoom. No new live capture or deployment parity claim."
+  "optimization_note": "2026-11-04: same original captures; lossless full-resolution WebP verified pixel-identical; 800/1600px (hero 1280px) quality-92 previews. Original PNG retained for zoom. No new live capture or deployment parity claim.",
+  "gameplay_motion": {
+    "media_path": "media/gameplay-overview.mp4",
+    "poster_path": "media/gameplay-poster.webp",
+    "source_url": "https://fabflow-yoon.vercel.app/",
+    "source_sha": null,
+    "captured_at_utc": "2026-11-05T00:05:44.132Z",
+    "source_workflow_run": "https://github.com/gmldbs25/build-canvas/actions/runs/41938470560",
+    "recording_method": "Actual deployed Three.js canvas captureStream / MediaRecorder, reencoded H.264 at 30 fps without resizing",
+    "scenario": "Medium V6 / 32 OHT / congested demand / DBR / high quality / fullscreen / three zoom clicks",
+    "width": 2560,
+    "height": 1440,
+    "duration_seconds": 9.6,
+    "delivery_fps": 30,
+    "bytes": 2376445,
+    "sha256": "165c651d9fbe4a21bf6988a9791252c9e4726203cb6a50953757ce2763e3fc57",
+    "review": "Decoded final frames and actual Chromium playback inspected; genuine OHT and FOUP motion. User-initiated Chapter02 playback; no autoplay or loop. Browser playback counters are not a physical-device performance measurement."
+  }
 }

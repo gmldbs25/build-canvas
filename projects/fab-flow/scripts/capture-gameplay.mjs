@@ -20,7 +20,7 @@ watchdog.unref();
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
-  // Fix both viewport AND recorder dimensions before creating the page. Never resize.
+  // Fix viewport before creating the page. Record the native canvas only after setup.
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1,
     reducedMotion: 'no-preference' });
   const page = await context.newPage();
@@ -88,8 +88,8 @@ try {
   if (!Number.isFinite(start) || !Number.isFinite(end) || end - start < 6) throw Error('Native simulation did not advance sufficiently');
   if (faults.length) throw Error('Runtime errors: ' + faults.join('; '));
   await context.close();
-  // Keep final 10 seconds, removing all navigation/setup/warm-up; no scaling.
-  execFileSync('ffmpeg', ['-y', '-i', raw, '-an', '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', path.join(out, 'gameplay.mp4')]);
+  // Normalize the genuine ten-second canvas stream to 30fps; no scaling or synthetic motion.
+  execFileSync('ffmpeg', ['-y', '-i', raw, '-vf', 'fps=30', '-an', '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', path.join(out, 'gameplay.mp4')]);
   const clip = path.join(out, 'gameplay.mp4');
   report.metadata = JSON.parse(execFileSync('ffprobe', ['-v', 'quiet', '-show_format', '-show_streams', '-of', 'json', clip], { encoding: 'utf8' }));
   report.geometry = { before, after }; report.simulationTime = { start, end };

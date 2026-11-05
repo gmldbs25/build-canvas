@@ -1,0 +1,42 @@
+[
+  {
+    "frame": "decoded-01.png",
+    "near_gray_fraction": 0.4065353732638889
+  },
+  {
+    "frame": "decoded-02.png",
+    "near_gray_fraction": 0.40649305555555554
+  },
+  {
+    "frame": "decoded-03.png",
+    "near_gray_fraction": 0.40651421440972224
+  },
+  {
+    "frame": "decoded-04.png",
+    "near_gray_fraction": 0.40673828125
+  },
+  {
+    "frame": "decoded-05.png",
+    "near_gray_fraction": 0.8665397135416667
+  },
+  {
+    "frame": "decoded-06.png",
+    "near_gray_fraction": 0.41459852430555555
+  },
+  {
+    "frame": "decoded-07.png",
+    "near_gray_fraction": 0.8678851996527778
+  },
+  {
+    "frame": "decoded-08.png",
+    "near_gray_fraction": 0.8677362738715277
+  },
+  {
+    "frame": "decoded-09.png",
+    "near_gray_fraction": 0.8678469509548611
+  },
+  {
+    "frame": "decoded-10.png",
+    "near_gray_fraction": 0.0011759440104166666
+  }
+]
