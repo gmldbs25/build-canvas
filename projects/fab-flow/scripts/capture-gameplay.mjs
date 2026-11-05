@@ -11,6 +11,12 @@ const viewport = { width: 2560, height: 1440 };
 await fs.mkdir(out, { recursive: true });
 const report = { source: url, capturedAt: new Date().toISOString(), viewport, published: false,
   reviewRequired: 'Inspect decoded frames and play final file. Metadata and frame differences alone do not prove OHT motion or quality.' };
+const watchdog = setTimeout(async () => {
+  report.status = 'failed'; report.error = 'Capture exceeded the 120-second total recording budget';
+  await fs.writeFile(path.join(out, 'capture-report.json'), JSON.stringify(report, null, 2) + '\n');
+  process.exit(1);
+}, 120000);
+watchdog.unref();
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
@@ -96,5 +102,6 @@ try {
   report.status = 'failed'; report.error = String(e); process.exitCode = 1;
 } finally {
   await browser.close();
+  clearTimeout(watchdog);
   await fs.writeFile(path.join(out, 'capture-report.json'), JSON.stringify(report, null, 2) + '\n');
 }

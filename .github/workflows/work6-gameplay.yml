@@ -21,6 +21,7 @@ jobs:
       - run: npx --prefix projects/fab-flow playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Record actual deployed Three.js app; no auto-publication
+        timeout-minutes: 4
         run: node projects/fab-flow/scripts/capture-gameplay.mjs
       - uses: actions/upload-artifact@v4
         if: always()
