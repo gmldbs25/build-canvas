@@ -8,6 +8,7 @@ const works = [
   ["ORCA", "../projects/orca/app/page.tsx"],
   ["LLM to AGENT", "../projects/transformer-to-agent/app/page.tsx"],
   ["KotoMachi article", "../projects/kotomachi/reading.js"],
+  ["GitHub Profile article", "../projects/github-profile/index.html"],
 ];
 
 for (const [name, relativePath] of works) {

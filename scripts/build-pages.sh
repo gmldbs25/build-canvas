@@ -56,4 +56,8 @@ GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build -
 mkdir -p dist-pages/fab-flow-preview
 cp -R projects/fab-flow/dist-pages/. dist-pages/fab-flow-preview/
 
+# Work 07 is a standalone editorial HTML page.
+mkdir -p dist-pages/github-profile
+cp projects/github-profile/index.html dist-pages/github-profile/
+
 find dist-pages -name ".DS_Store" -delete
