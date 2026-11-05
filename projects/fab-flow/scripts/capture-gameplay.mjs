@@ -68,7 +68,10 @@ try {
     recorder.start(1000);
     setTimeout(() => recorder.stop(), 10000);
   });
-  const encoded = await page.evaluate(() => window.__gameplayRecording);
+  const encoded = await Promise.race([
+    page.evaluate(() => window.__gameplayRecording),
+    new Promise((_, reject) => { const timer = setTimeout(() => reject(Error('Canvas MediaRecorder did not finish within 60 seconds')), 60000); timer.unref(); }),
+  ]);
   const raw = path.join(out, 'native-canvas.webm');
   await fs.writeFile(raw, Buffer.from(encoded, 'base64'));
   report.recordingMethod = 'HTMLCanvasElement.captureStream(30) / MediaRecorder VP9 of deployed Three.js canvas';

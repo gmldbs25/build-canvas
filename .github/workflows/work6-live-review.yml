@@ -1,0 +1,28 @@
+name: Work6 deployed Pages review
+on:
+  workflow_run:
+    workflows: ['Deploy to GitHub Pages']
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --prefix projects/fab-flow --package-lock=false --no-audit --no-fund
+      - run: npx --prefix projects/fab-flow playwright install --with-deps chromium
+      - name: Inspect the actual public Pages route
+        run: node projects/fab-flow/scripts/live-pages-review.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: work6-deployed-pages-review
+          path: projects/fab-flow/evidence/live-pages/
+          retention-days: 14
