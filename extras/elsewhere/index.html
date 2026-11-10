@@ -8,8 +8,8 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content="한 문장씩 기록하기." />
     <title>elsewhere. — by heeyoon</title>
-    <link rel="stylesheet" href="./style.css" />
-    <script type="module" src="./main.js"></script>
+    <link rel="stylesheet" href="./style.css?v=poster-viewer-1" />
+    <script type="module" src="./main.js?v=poster-viewer-1"></script>
   </head>
   <body>
     <main class="archive">
@@ -30,5 +30,13 @@
         <p class="no-script">작품 목록을 보려면 JavaScript를 켜주세요.</p>
       </noscript>
     </main>
+
+    <dialog class="poster-dialog" id="poster-viewer" aria-labelledby="poster-viewer-title">
+      <div class="poster-viewer-content">
+        <button class="poster-close" id="poster-viewer-close" type="button" aria-label="포스터 확대 보기 닫기">×</button>
+        <img class="poster-viewer-image" id="poster-viewer-image" alt="" />
+        <p class="poster-viewer-title" id="poster-viewer-title"></p>
+      </div>
+    </dialog>
   </body>
 </html>

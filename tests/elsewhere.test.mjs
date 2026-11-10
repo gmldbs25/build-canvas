@@ -48,6 +48,16 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(home, /href="\.\/elsewhere\//);
   const renderer = await readFile(new URL("../extras/elsewhere/main.js", import.meta.url), "utf8");
   assert.match(renderer, /frame\.className = "poster-frame"/);
+  assert.match(renderer, /document\.createElement\("button"\)/);
+  assert.match(renderer, /viewer\.showModal\(\)/);
+  assert.match(renderer, /event\.target === viewer/);
+  assert.match(renderer, /lastPosterTrigger\.focus\(\)/);
+  assert.match(renderer, /viewer\?\.open/);
+  assert.match(page, /<dialog class="poster-dialog"/);
+  assert.match(page, /id="poster-viewer-close"/);
+  assert.match(page, /main\.js\?v=poster-viewer-1/);
+  assert.match(stylesheet, /\.poster-viewer-image/);
+  assert.match(stylesheet, /max-height: calc\(100dvh - 140px\)/);
   assert.match(renderer, /if \(entry\.review && entry\.review\.trim\(\)\)/);
   assert.doesNotMatch(renderer, /document\.createElement\("a"\)/);
   assert.doesNotMatch(stylesheet, /\.poster-link/);
