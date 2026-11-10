@@ -96,3 +96,11 @@ GitHub Pages 배포 자동화는 `.github/workflows/`에서 관리합니다.
 - `docs/<work>/`: 개별 Work의 설계, 콘텐츠, UX 및 구현 의도
 
 Codex 작업 지침은 `AGENTS.md`를 따르되, 실제 프로젝트 구조와 공통 개발 규칙의 기준은 이 `README.md`입니다.
+
+## Elsewhere (hidden personal archive)
+
+The home page's `by heeyoon. ✦` text links to the unlisted `/build-canvas/elsewhere/` page. It is **not** a numbered Work or part of the Works list.
+
+To add a media entry, append one object to `extras/elsewhere/entries.js` with a unique `id`, `title`, `review`, and `image`; optionally include `imageSource` and `imageAlt`. The card layout, staggered animation, and mobile rendering are automatic. Keep personal reviews verbatim, select a suitable official key visual, verify image use/attribution, and check the image link still loads. No homepage or build configuration edits are needed for new entries.
+
+The archive is standalone HTML/CSS/JS and is copied into `dist-pages/elsewhere/` by `scripts/build-pages.sh`. Its styles do not affect the homepage or other Works. The page requests `noindex` but remains publicly accessible to anyone with its URL.

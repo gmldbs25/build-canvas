@@ -52,7 +52,7 @@ export default function Home() {
           build <span className="cursor-mark" aria-hidden="true">_</span> canvas
         </h1>
         <p className="statement">
-          <span>by heeyoon. ✦</span>
+          <a className="identity-link" href="./elsewhere/" aria-label="elsewhere 페이지 열기">by heeyoon. ✦</a>
         </p>
       </section>
 

@@ -85,6 +85,21 @@ a {
   letter-spacing: -0.035em;
 }
 
+.identity-link {
+  display: inline-block;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.identity-link:hover {
+  text-decoration: underline;
+}
+
+.identity-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+
 .works {
   width: min(100%, 75rem);
   margin-top: auto;
