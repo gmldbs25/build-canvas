@@ -27,5 +27,9 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(stylesheet, /prefers-reduced-motion/);
   assert.match(buildFile, /cp -R extras\/elsewhere\/\. dist-pages\/elsewhere\//);
   assert.match(home, /href="\.\/elsewhere\//);
+  const renderer = await readFile(new URL("../extras/elsewhere/main.js", import.meta.url), "utf8");
+  assert.match(renderer, /frame\.className = "poster-frame"/);
+  assert.doesNotMatch(renderer, /document\.createElement\("a"\)/);
+  assert.doesNotMatch(stylesheet, /\.poster-link/);
   assert.doesNotMatch(home, /index:\s*["']07["']/);
 });

@@ -100,7 +100,7 @@ a { color: inherit; }
   animation-delay: calc(120ms + var(--enter-index, 0) * 95ms);
 }
 
-.poster-link, .poster-fallback {
+.poster-frame, .poster-fallback {
   display: block;
   overflow: hidden;
   width: 100%;
@@ -109,7 +109,7 @@ a { color: inherit; }
   background: #e6e0d5;
 }
 
-.poster-link img {
+.poster-frame img {
   display: block;
   width: 100%;
   height: 100%;
@@ -155,7 +155,7 @@ a { color: inherit; }
   word-break: keep-all;
 }
 
-.back-link:focus-visible, .poster-link:focus-visible {
+.back-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }

@@ -101,6 +101,6 @@ Codex 작업 지침은 `AGENTS.md`를 따르되, 실제 프로젝트 구조와 �
 
 The home page's `by heeyoon. ✦` text links to the unlisted `/build-canvas/elsewhere/` page. It is **not** a numbered Work or part of the Works list.
 
-To add a media entry, append one object to `extras/elsewhere/entries.js` with a unique `id`, `title`, `review`, and `image`; optionally include `imageSource` and `imageAlt`. The card layout, staggered animation, and mobile rendering are automatic. Keep personal reviews verbatim, select a suitable official key visual, verify image use/attribution, and check the image link still loads. No homepage or build configuration edits are needed for new entries.
+To add a media entry, append one object to `extras/elsewhere/entries.js` with a unique `id`, `title`, `review`, and `image`; optionally include `imageSource` (source metadata only; the poster is not clickable) and `imageAlt`. The card layout, staggered animation, and mobile rendering are automatic. Keep personal reviews verbatim, select a suitable official key visual, verify image use/attribution, and check the image link still loads. No homepage or build configuration edits are needed for new entries.
 
 The archive is standalone HTML/CSS/JS and is copied into `dist-pages/elsewhere/` by `scripts/build-pages.sh`. Its styles do not affect the homepage or other Works. The page requests `noindex` but remains publicly accessible to anyone with its URL.

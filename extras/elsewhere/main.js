@@ -19,20 +19,10 @@ function makePoster(entry, index) {
     poster.parentElement?.replaceWith(fallback);
   }, { once: true });
 
-  if (!entry.imageSource) {
-    const frame = document.createElement("div");
-    frame.className = "poster-link";
-    frame.append(poster);
-    return frame;
-  }
-  const link = document.createElement("a");
-  link.className = "poster-link";
-  link.href = entry.imageSource;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.setAttribute("aria-label", `${entry.title} 공식 이미지 출처 열기 (새 탭)`);
-  link.append(poster);
-  return link;
+  const frame = document.createElement("div");
+  frame.className = "poster-frame";
+  frame.append(poster);
+  return frame;
 }
 
 function makeCard(entry, index) {
