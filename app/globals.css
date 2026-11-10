@@ -87,12 +87,15 @@ a {
 
 .identity-link {
   display: inline-block;
-  text-underline-offset: 0.18em;
-  text-decoration-thickness: 1px;
+  align-self: flex-start;
+  cursor: default;
+  text-decoration: none;
 }
 
-.identity-link:hover {
-  text-decoration: underline;
+.identity-link:hover,
+.identity-link:active {
+  color: inherit;
+  text-decoration: none;
 }
 
 .identity-link:focus-visible {
