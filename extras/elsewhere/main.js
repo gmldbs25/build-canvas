@@ -34,9 +34,12 @@ function makeCard(entry, index) {
   copy.className = "card-copy";
   const heading = document.createElement("h2");
   heading.textContent = entry.title;
-  const review = document.createElement("p");
-  review.textContent = entry.review;
-  copy.append(heading, review);
+  copy.append(heading);
+  if (entry.review && entry.review.trim()) {
+    const review = document.createElement("p");
+    review.textContent = entry.review;
+    copy.append(review);
+  }
 
   card.append(makePoster(entry, index), copy);
   return card;
