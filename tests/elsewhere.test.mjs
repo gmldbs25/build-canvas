@@ -14,8 +14,16 @@ test("elsewhere cards stay data-driven and valid", () => {
     "헌터x헌터",
     "강철의 연금술사",
   ]);
-  assert.equal(mediaEntries[0].review, "인간 세상에는 영원한 악역도 영원한 선인도 없다.");
-  assert.ok(mediaEntries.slice(1).every((entry) => entry.review === ""));
+  const expectedReviews = [
+    "거인이라는 자극적 소재 뒤의 “인간” 이야기. 인간 세상엔 영원한 악역도, 선인도 없다. 그냥 “만화” 로만 보기엔 너무 아까울 작품.",
+    "정든 캐릭터들이 매 번 목숨을 걸고 싸운다, 과몰입러는 너무 사무치고 눈물난다. + 야무진 액션 작화는 봐도봐도 계속 보고싶음.",
+    "가장 현실적인 두근거림이 느껴진다, 중고생으로 돌아간다면 온 마음 바쳐서 축구부활동 하고싶어요.",
+    "소년 성장 스토리 정석, A반 전체에 애정 한가득 줘버림. 마지막시즌 작화 환상 + 바쿠고의 서사는 정말 ..",
+    "모든게 느린 만화가 보는 내내 치유해주는 기분, “시간”에 대해 생각해보기 좋았다. + 전부 너무 귀여움",
+    "곤과 키르아의 성장 이야기 만으로도 애정이 듬뿍 생긴다. 특히 키르아가 변해가는 모습을 아빠의 마음으로 본 느낌.",
+    "현대에 진격거가 있다면 과거엔 강연금이 있다. 파괴, 복수, 용서하는 “인간”에 대해 계속 생각하게 한다."
+];
+  assert.deepEqual(mediaEntries.map((entry) => entry.review), expectedReviews);
   assert.equal(new Set(mediaEntries.map((entry) => entry.id)).size, mediaEntries.length);
   for (const entry of mediaEntries) {
     assert.ok(entry.id && entry.title && typeof entry.review === "string" && entry.image);
