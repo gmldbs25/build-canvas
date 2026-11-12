@@ -1,4 +1,4 @@
-import { mediaEntries } from "./entries.js";
+import { mediaEntries } from "./entries.js?v=aot-poster-hd-1";
 
 const list = document.querySelector("#media-list");
 const viewer = document.querySelector("#poster-viewer");

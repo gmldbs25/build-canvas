@@ -5,6 +5,8 @@ import { mediaEntries } from "../extras/elsewhere/entries.js";
 
 test("elsewhere cards stay data-driven and valid", () => {
   assert.equal(mediaEntries.length, 7);
+  assert.match(mediaEntries[0].image, /^https:\/\/a\.storyblok\.com\//);
+  assert.match(mediaEntries[0].image, /\/4090x5784\/.*\/m\/1200x0\/filters:quality\(88\):format\(webp\)$/);
   assert.deepEqual(mediaEntries.map((item) => item.title), [
     "진격의 거인",
     "귀멸의 칼날",
@@ -55,7 +57,8 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(renderer, /viewer\?\.open/);
   assert.match(page, /<dialog class="poster-dialog"/);
   assert.match(page, /id="poster-viewer-close"/);
-  assert.match(page, /main\.js\?v=poster-viewer-1/);
+  assert.match(page, /main\.js\?v=aot-poster-hd-1/);
+  assert.match(renderer, /entries\.js\?v=aot-poster-hd-1/);
   assert.match(stylesheet, /\.poster-viewer-image/);
   assert.match(stylesheet, /max-height: calc\(100dvh - 140px\)/);
   assert.match(renderer, /if \(entry\.review && entry\.review\.trim\(\)\)/);
