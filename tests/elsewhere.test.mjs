@@ -41,6 +41,11 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
   ]);
   assert.match(page, /<h1>elsewhere\.<\/h1>/);
+  assert.match(page, /rel="icon" type="image\/svg\+xml" href="\.\/favicon\.svg\?v=star-1"/);
+  const favicon = await readFile(new URL("../extras/elsewhere/favicon.svg", import.meta.url), "utf8");
+  assert.match(favicon, /viewBox="0 0 64 64"/);
+  assert.match(favicon, /fill="#f4f1ea"/);
+  assert.match(favicon, /fill="#c86f52"/);
   assert.match(page, /한 문장씩 기록하기\./);
   assert.match(page, /name="viewport"/);
   assert.match(page, /noindex/);
