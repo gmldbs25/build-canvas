@@ -46,7 +46,8 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(favicon, /viewBox="0 0 64 64"/);
   assert.match(favicon, /fill="#f4f1ea"/);
   assert.match(favicon, /fill="#c86f52"/);
-  assert.match(page, /한 문장씩 기록하기\./);
+  assert.doesNotMatch(page, /한 문장씩 기록하기/);
+  assert.match(page, /<header class="intro">\s*<h1>elsewhere\.<\/h1>\s*<\/header>/);
   assert.match(page, /name="viewport"/);
   assert.match(page, /noindex/);
   assert.match(stylesheet, /grid-template-columns:\s*94px/);
