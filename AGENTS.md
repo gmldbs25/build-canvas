@@ -12,14 +12,14 @@ Follow the repository conventions in `README.md`. When working on an existing Wo
 
 Use a **Sol-orchestrated, Luna-executed** workflow.
 
-- **GPT-6.1 Sol — root orchestrator.** Own task understanding, decomposition, coordination, integration, and final decisions. Keep orchestration lightweight. Read only enough code and documentation to define the work; avoid duplicating repository exploration that a worker can do.
+- **GPT-6.2 Sol — root orchestrator.** Own task understanding, decomposition, coordination, integration, and final decisions. Keep orchestration lightweight. Read only enough code and documentation to define the work; avoid duplicating repository exploration that a worker can do.
 - **GPT-6 Luna — primary worker.** Delegate most bounded implementation, repository exploration, UI work, targeted debugging, tests, documentation edits, build verification, and routine Git operations to Luna. Use High reasoning by default. Use XHigh only when the bounded implementation itself is unusually difficult.
 - Sol may perform trivial one-step changes directly when delegation would cost more than doing the work.
 - Prefer one Luna worker for a normal implementation task. Use a second worker only for genuinely independent workstreams. Never have multiple agents edit the same files or mutable state concurrently.
 - Give workers a clear goal, relevant constraints, and acceptance criteria. Do not duplicate large amounts of context when the worker can read the relevant repository files directly.
 - A successful bounded worker task does not require a mandatory second review. Use the worker's final diff summary and validation results for completion unless risk, uncertainty, or failed validation warrants deeper inspection.
 - If Luna is blocked or uncertain, Sol should investigate, narrow the task, retry with stronger reasoning when useful, or handle the difficult portion directly.
-- **Astra — critical escalation only.** Reserve Astra for fundamental architecture decisions, high-risk compatibility changes, or structurally unresolved problems after Sol analysis.
+- **GPT-6.2 Astra (`astra`) — critical escalation only.** Reserve Astra for fundamental architecture decisions, high-risk compatibility changes, or structurally unresolved problems after Sol analysis.
 
 Escalate because reasoning difficulty requires it, not because a task feels important.
 Optimize for total work and token efficiency, not agent count.
