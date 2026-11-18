@@ -4,60 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="1993년의 하이퍼링크, 1998년의 개인 홈페이지, 2013년의 웹앱을 직접 탐험하는 Build Canvas Work 7.">
-  <meta name="theme-color" content="#f5f2eb">
+  <meta name="theme-color" content="#151a21">
   <title>The Evolution of the Web · Build Canvas</title>
   <link rel="stylesheet" href="./style.css">
   <script type="module" src="./main.js"></script>
 </head>
 <body>
-  <header class="masthead">
-    <div class="site-width masthead-inner">
-      <a class="brand" href="../"><span aria-hidden="true">✳</span> build _ canvas</a>
-      <span class="work-label">WORK 07 <span>/</span> PROTOTYPE</span>
-    </div>
+  <header class="exhibit-bar">
+    <h1 class="exhibit-title" lang="en"><span class="exhibit-mark" aria-hidden="true"></span>The Evolution of the Web</h1>
+    <nav class="timeline" aria-label="시대 선택">
+      <a href="?era=1993" data-era="1993" aria-current="true"><span class="era-year">1993</span><span class="era-name">초기 웹</span></a>
+      <a href="?era=1998" data-era="1998"><span class="era-year">1998</span><span class="era-name">개인 홈페이지</span></a>
+      <a href="?era=2013" data-era="2013"><span class="era-year">2013</span><span class="era-name">웹앱</span></a>
+    </nav>
+    <a class="home-link" href="../" aria-label="Build Canvas 홈으로" aria-keyshortcuts="H"><span aria-hidden="true">←</span> 홈 <kbd aria-hidden="true">H</kbd></a>
   </header>
-  <main class="site-width">
-    <section class="intro" aria-labelledby="work-title">
-      <p class="eyebrow"><span class="record-dot" aria-hidden="true"></span> AN INTERACTIVE WEB ARCHIVE</p>
-      <h1 id="work-title" lang="en">The Evolution <i>of the Web.</i></h1>
-      <div class="intro-bottom">
-        <p class="subtitle" lang="en">From Hyperlinks to AI Agents</p>
-        <p class="intro-copy">링크를 따라가고, 방명록을 남기고, 작업 카드를 옮겨 보세요.<br>세 시대의 웹을 직접 열어 보는 첫 번째 실험입니다.</p>
-      </div>
+  <main id="display" class="display" data-era="1993">
+    <section id="window" class="browser-window" aria-label="시대별 브라우저">
+      <div id="chrome"></div>
+      <div id="screen" class="screen" lang="en" role="region" aria-label="Web page" tabindex="0"></div>
+      <div id="status" class="browser-status"></div>
+      <noscript><p>시대별 웹을 탐험하려면 JavaScript를 켜 주세요.</p></noscript>
     </section>
-    <section class="exhibit" aria-label="시대별 웹 탐험">
-      <aside class="rail">
-        <h2 class="eyebrow rail-heading">TIMELINE</h2>
-        <nav class="timeline" aria-label="시대 선택">
-          <a href="?era=1993" data-era="1993" aria-current="true"><span class="era-year">1993</span><span class="era-name">초기 웹</span><span class="era-arrow" aria-hidden="true">↗</span></a>
-          <a href="?era=1998" data-era="1998"><span class="era-year">1998</span><span class="era-name">개인 홈페이지</span><span class="era-arrow" aria-hidden="true">↗</span></a>
-          <a href="?era=2013" data-era="2013"><span class="era-year">2013</span><span class="era-name">웹 애플리케이션</span><span class="era-arrow" aria-hidden="true">↗</span></a>
-        </nav>
-        <div id="field-notes" class="field-notes"></div>
-      </aside>
-      <div class="workspace">
-        <div class="workspace-bar">
-          <div class="workspace-title"><span class="record-dot" aria-hidden="true"></span><span id="era-caption"></span></div>
-          <fieldset class="view-picker">
-            <legend class="sr-only">브라우저 프레임 표시</legend>
-            <label><input type="radio" name="view" value="frame" checked><span>브라우저</span></label>
-            <label><input type="radio" name="view" value="page"><span>페이지</span></label>
-          </fieldset>
-        </div>
-        <div id="display" class="display">
-          <section id="window" class="browser-window" aria-label="시대별 웹 화면">
-            <div id="chrome"></div>
-            <div id="screen" class="screen" lang="en"></div>
-            <div id="status" class="browser-status"></div>
-          </section>
-        </div>
-        <div class="workspace-footer">
-          <p id="try-it"></p>
-          <a href="../" title="키보드 H">홈으로 <kbd>H</kbd></a>
-        </div>
-      </div>
-    </section>
-    <noscript><p>시대별 웹을 탐험하려면 JavaScript를 켜 주세요.</p></noscript>
   </main>
+  <dialog id="field-notes" class="field-notes" aria-labelledby="notes-title">
+    <form method="dialog"><button type="submit" aria-label="자료 닫기" autofocus>×</button></form>
+    <h2 id="notes-title"></h2>
+    <p id="notes-copy"></p>
+    <ul id="notes-sources" aria-label="역사 자료"></ul>
+  </dialog>
 </body>
 </html>

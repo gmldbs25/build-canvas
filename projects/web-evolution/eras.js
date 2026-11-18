@@ -2,7 +2,6 @@ export const eras = {
   1993: {
     caption: 'NCSA Mosaic · X Window System',
     notes: '웹은 연구 문서를 찾고 연결하는 데서 출발했습니다. 1993년 Mosaic은 글과 이미지를 한 화면에 배치해 웹을 읽는 경험을 바꿨습니다.',
-    prompt: '파란 링크를 따라가거나 브라우저의 Back으로 돌아가 보세요.',
     sources: [
       ['CERN · World Wide Web', 'https://info.cern.ch/hypertext/WWW/TheProject.html'],
       ['NCSA · Mosaic', 'https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/'],
@@ -19,7 +18,6 @@ export const eras = {
   1998: {
     caption: 'Internet Explorer 4 · Windows 98',
     notes: 'GeoCities에서는 관심사에 따라 동네를 골라 홈페이지를 만들었습니다. SF를 좋아하는 사람은 Area51에 자리를 잡고, 방명록을 통해 방문자를 만날 수 있었습니다.',
-    prompt: '방명록에 한 줄을 남겨 보세요. 이 브라우저에만 저장됩니다.',
     sources: [
       ['Web Design Museum · GeoCities', 'https://www.webdesignmuseum.org/all-websites/geocities-1998'],
       ['Web Design Museum · Internet Explorer 4', 'https://www.webdesignmuseum.org/software/internet-explorer-4-0-in-1997'],
@@ -35,7 +33,6 @@ export const eras = {
   2013: {
     caption: 'Chrome 29 · Desktop',
     notes: '브라우저 안에서 문서를 읽는 데 그치지 않고, 작업을 정리하고 함께 편집할 수 있게 됐습니다. 초기 Trello처럼 카드를 옮겨 작업의 진행 상태를 바꿔 보세요.',
-    prompt: '카드를 끌어 옮기거나, 카드를 열어 목록을 바꾸고 직접 추가해 보세요.',
     sources: [
       ['Google · Chrome 29', 'https://chromereleases.googleblog.com/2013/08/stable-channel-update.html'],
       ['TidBITS · Trello in 2013', 'https://tidbits.com/2013/08/30/catching-up-with-trello/'],
@@ -106,7 +103,7 @@ export function orbitPage(page) {
   const pages = {
     home: `
       <h2><small>WELCOME TO</small>The Orbit Room</h2>
-      <img class="saturn" src="./media/saturn.webp" alt="Pixel-art Saturn with bright rings and stars" width="240" height="96">
+      <img class="saturn" src="./media/saturn.webp" alt="Pixel-art Saturn with bright rings and stars" width="156" height="102">
       <p>Hi, I’m Alex. This is my little corner of the universe!<br>Come on in and make yourself at home. :)</p>
       ${nav}
       <div class="visitor"><span>You are visitor no.</span> <strong>001287</strong></div>

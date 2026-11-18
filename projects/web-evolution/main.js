@@ -6,6 +6,7 @@ const chrome = document.querySelector('#chrome');
 const status = document.querySelector('#status');
 const display = document.querySelector('#display');
 const board = createBoard();
+const notesDialog = document.querySelector('#field-notes');
 const timeline = document.querySelector('.timeline');
 const trails = new Map();
 let era;
@@ -24,7 +25,7 @@ function pageUrl(page) {
 }
 
 function tool(action, icon, label, enabled = true) {
-  return `<button type="button" data-action="${action}" aria-label="${label}" title="${label}" ${enabled ? '' : 'disabled'}>
+  return `<button type="button" data-action="${action}" aria-label="${label}" title="${label}" ${action === 'info' ? 'aria-haspopup="dialog"' : ''} ${enabled ? '' : 'disabled'}>
     <span aria-hidden="true">${icon}</span><span class="tool-label">${label}</span>
   </button>`;
 }
@@ -64,22 +65,28 @@ function renderChrome() {
   }
 }
 
-function renderNotes() {
-  const { caption, notes, prompt, sources } = eras[era];
-  document.querySelector('#era-caption').textContent = `${era} / ${caption}`;
-  document.querySelector('#try-it').textContent = prompt;
-  document.querySelector('#field-notes').innerHTML = `
-    <h2 class="eyebrow" id="notes-title" tabindex="-1">FIELD NOTES</h2>
-    <p>${notes}</p>
-    <details><summary>역사 자료</summary>
-      <ul>${sources.map(([label, url]) => `<li><a href="${url}" target="_blank" rel="noopener">${label} ↗</a></li>`).join('')}</ul>
-    </details>`;
+function showNotes() {
+  const { caption, notes, sources } = eras[era];
+  document.querySelector('#notes-title').textContent = `${era} · ${caption}`;
+  document.querySelector('#notes-copy').textContent = notes;
+  document.querySelector('#notes-sources').replaceChildren(...sources.map(([label, url]) => {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = `${label} ↗`;
+    item.append(link);
+    return item;
+  }));
+  notesDialog.showModal();
 }
 
 function renderPage(focusPage = false) {
   const page = trail.pages[trail.index];
   renderChrome();
   const content = document.createElement('div');
+  content.className = 'page-content';
   if (era === '1993') content.innerHTML = mosaicPage(page);
   if (era === '1998') content.innerHTML = orbitPage(page);
   if (era === '2013') content.innerHTML = board.markup();
@@ -109,7 +116,6 @@ function selectEra(id, page, restore = false) {
     if (link.dataset.era === era) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');
   }
-  renderNotes();
   renderPage();
 }
 
@@ -123,8 +129,7 @@ function goTo(page) {
 
 function browserAction(action) {
   if (action === 'info') {
-    document.querySelector('#field-notes details').open = true;
-    document.querySelector('#notes-title').focus();
+    showNotes();
   } else if (action === 'home') {
     goTo('home');
   } else if (action === 'reload') {
@@ -226,13 +231,6 @@ display.addEventListener('click', (event) => {
     browserAction(control.dataset.action);
   }
 });
-
-for (const radio of document.querySelectorAll('input[name="view"]')) {
-  radio.addEventListener('change', () => {
-    display.classList.toggle('page-only', radio.value === 'page');
-  });
-}
-display.classList.toggle('page-only', document.querySelector('input[name="view"]:checked').value === 'page');
 
 function isEditingTarget(target) {
   return target instanceof Element &&
