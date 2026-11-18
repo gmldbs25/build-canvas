@@ -14,7 +14,6 @@ const display = document.querySelector('#display');
 const stage = display.querySelector('.browser-window');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let sceneAnimation;
-let reloadState = null;
 const board = createBoard();
 const modern = createModern(board);
 const notesDialog = document.querySelector('#field-notes');
@@ -43,7 +42,6 @@ function isModernEra(id = era) {
 
 function showIntro() {
   sceneAnimation?.cancel();
-  cancelReload('', false);
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -72,7 +70,7 @@ function renderChrome() {
   const page = trail.pages[trail.index];
   const [title, path] = eras[era].pages[page];
   setCurrentPage(page);
-  chrome.render({ era, title, base: eras[era].base, path, page, index: trail.index, length: trail.pages.length, zoom: browserState?.zoom || 1, tabs: browserState?.tabs, activeTab: browserState?.activeTab, loading: Boolean(reloadState) });
+  chrome.render({ era, title, base: eras[era].base, path, page, index: trail.index, length: trail.pages.length, zoom: browserState?.zoom || 1, tabs: browserState?.tabs, activeTab: browserState?.activeTab });
 }
 
 function showNotes() {
@@ -98,8 +96,14 @@ function showNotes() {
 }
 
 function renderPage(focusPage = false) {
-  const page = trail.pages[trail.index];
   renderChrome();
+  renderPageBody(focusPage);
+}
+
+function renderPageBody(focusPage = false, preserveScroll = false) {
+  const page = trail.pages[trail.index];
+  const scrollTop = preserveScroll ? screen.scrollTop : 0;
+  const scrollLeft = preserveScroll ? screen.scrollLeft : 0;
   const content = document.createElement('div');
   content.className = 'page-content';
   if (era === '1993') content.innerHTML = mosaicPage(page);
@@ -110,13 +114,13 @@ function renderPage(focusPage = false) {
   const zoom = browserState?.zoom || 1;
   content.style.zoom = `${Math.round(zoom * 100)}%`;
   screen.replaceChildren(content);
-  screen.scrollTop = 0;
-  screen.scrollLeft = 0;
   if (era === '2013') board.init(content);
   if (era === '2005') initPhoto(content, page);
   if (Object.hasOwn(modernEras, era)) modern.init(content, era, page, goTo);
   if (era === '1998' && page === 'home') showVisitorCount();
   if (era === '1998' && page === 'guestbook') initGuestbook();
+  screen.scrollTop = scrollTop;
+  screen.scrollLeft = scrollLeft;
   if (focusPage) {
     const heading = screen.querySelector('h2');
     if (heading) {
@@ -124,82 +128,18 @@ function renderPage(focusPage = false) {
       heading.focus({ preventScroll: true });
     }
   }
+  return content;
 }
 
-function reloadMessage(id) {
-  return ({
-    1993: 'Retrieving this document from the server…',
-    1998: 'Contacting the site…',
-    2005: 'Checking the photo page…',
-    2013: 'Refreshing the board page…',
-    2023: 'Refreshing the search page…',
-    2025: 'Refreshing the observatory workspace…',
-  })[id] || 'Loading this page…';
-}
-
-function mountReloadIndicator() {
-  screen.setAttribute('aria-busy', 'true');
-  const indicator = document.createElement('div');
-  indicator.id = 'reload-indicator';
-  indicator.className = 'reload-indicator';
-  indicator.setAttribute('role', 'status');
-  indicator.setAttribute('aria-live', 'polite');
-  const label = document.createElement('span');
-  label.className = 'reload-indicator-label';
-  label.textContent = reloadMessage(era);
-  const meter = document.createElement('span');
-  meter.className = 'reload-meter';
-  meter.setAttribute('aria-hidden', 'true');
-  indicator.append(label, meter);
-  screen.prepend(indicator);
-}
-
-function startReload() {
-  if (reloadState) return;
-  const page = trail.pages[trail.index];
-  const state = {
-    era,
-    page,
-    tabId: browserState?.activeTab,
-    scrollTop: screen.scrollTop,
-    scrollLeft: screen.scrollLeft,
-    timer: null,
-  };
-  reloadState = state;
-  mountReloadIndicator();
-  renderChrome();
-  chromeRoot.querySelector('.browser-tools [data-action="stop-reload"]')?.focus({ preventScroll: true });
-  const delay = ({ 1993: 1100, 1998: 930, 2005: 820, 2013: 700, 2023: 670, 2025: 620 })[era] || 700;
-  state.timer = setTimeout(() => completeReload(state), delay);
-}
-
-function cancelReload(message = '', renderShell = true) {
-  if (!reloadState) return;
-  clearTimeout(reloadState.timer);
-  reloadState = null;
-  screen.removeAttribute('aria-busy');
-  screen.querySelector('#reload-indicator')?.remove();
-  if (renderShell && era && trail) renderChrome();
-  if (message) showToast(message);
-}
-
-function completeReload(state) {
-  if (reloadState !== state) return;
-  if (era !== state.era || currentTab()?.id !== state.tabId || trail.pages[trail.index] !== state.page) {
-    cancelReload();
-    return;
+function reloadPage() {
+  const content = renderPageBody(false, true);
+  if (!reducedMotion.matches && typeof content.animate === 'function') {
+    content.animate([{ opacity: .86 }, { opacity: 1 }], { duration: 140, easing: 'ease-out' });
   }
-  const stopHadFocus = chromeRoot.querySelector('.browser-tools [data-action="stop-reload"]') === document.activeElement;
-  cancelReload('', false);
-  renderPage();
-  screen.scrollTop = state.scrollTop;
-  screen.scrollLeft = state.scrollLeft;
-  if (stopHadFocus) chromeRoot.querySelector('.browser-tools [data-action="reload"]')?.focus({ preventScroll: true });
 }
 
 function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
   if (!Object.hasOwn(eras, id)) return;
-  cancelReload('', false);
   const entering = exhibit.hidden;
   const changingEra = id !== era;
   const fromIntroControl = entering && intro.contains(document.activeElement);
@@ -253,7 +193,6 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
 
 function goTo(page, focusPage = true) {
   if (!Object.hasOwn(eras[era].pages, page) || trail.pages[trail.index] === page) return;
-  cancelReload('', false);
   trail.pages.splice(trail.index + 1, Infinity, page);
   trail.index += 1;
   if (isModernEra() && currentTab()) {
@@ -285,7 +224,6 @@ function navigateAddress(value) {
 function switchTab(id) {
   const next = browserState?.tabs.find((tab) => tab.id === id);
   if (!next || next.id === browserState.activeTab) return;
-  cancelReload('', false);
   browserState.activeTab = id;
   trail = next.trail;
   window.history.replaceState({ era, page: trail.pages[trail.index], tab: id }, '', pageUrl());
@@ -303,7 +241,6 @@ function browserAction(action, detail = {}) {
   if (action === 'back' || action === 'forward') {
     const nextIndex = trail.index + (action === 'back' ? -1 : 1);
     if (nextIndex < 0 || nextIndex >= trail.pages.length) return;
-    cancelReload('', false);
     trail.index = nextIndex;
     const page = trail.pages[nextIndex];
     if (isModernEra() && currentTab()) currentTab().trail = trail;
@@ -311,20 +248,13 @@ function browserAction(action, detail = {}) {
     return renderPage(true);
   }
   if (action === 'home') return goTo('home');
-  if (action === 'reload') return startReload();
-  if (action === 'stop-reload') {
-    cancelReload('Loading stopped.');
-    chromeRoot.querySelector('.browser-tools [data-action="reload"]')?.focus({ preventScroll: true });
-    return;
-  }
+  if (action === 'reload') return reloadPage();
   if (action === 'zoom-in' || action === 'zoom-out' || action === 'zoom-reset') {
-    cancelReload('', false);
     browserState.zoom = action === 'zoom-reset' ? 1 : Math.min(1.5, Math.max(.7, browserState.zoom + (action === 'zoom-in' ? .1 : -.1)));
     return renderPage();
   }
   if (action === 'new-tab') {
     if (!isModernEra()) return showToast('New windows are represented by exhibit tabs in this scene.');
-    cancelReload('', false);
     const id = `tab-${Date.now()}`;
     const newTrail = { pages: ['home'], index: 0 };
     browserState.tabs.push({ id, title: 'New tab', trail: newTrail });
@@ -338,7 +268,6 @@ function browserAction(action, detail = {}) {
     const id = detail.id || browserState.activeTab;
     const index = browserState.tabs.findIndex((tab) => tab.id === id);
     if (index < 0) return;
-    cancelReload('', false);
     browserState.tabs.splice(index, 1);
     if (id === browserState.activeTab) browserState.activeTab = browserState.tabs[Math.max(0, index - 1)].id;
     trail = currentTab().trail;
