@@ -11,6 +11,9 @@ const screen = document.querySelector('#screen');
 const chromeRoot = document.querySelector('#chrome');
 const status = document.querySelector('#status');
 const display = document.querySelector('#display');
+const stage = display.querySelector('.browser-window');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let sceneAnimation;
 const board = createBoard();
 const modern = createModern(board);
 const notesDialog = document.querySelector('#field-notes');
@@ -38,6 +41,7 @@ function isModernEra(id = era) {
 }
 
 function showIntro() {
+  sceneAnimation?.cancel();
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -118,6 +122,9 @@ function renderPage(focusPage = false) {
 
 function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
   if (!Object.hasOwn(eras, id)) return;
+  const entering = exhibit.hidden;
+  const changingEra = id !== era;
+  const fromIntroControl = entering && intro.contains(document.activeElement);
   era = id;
   const bookmarkPanel = document.querySelector('#bookmark-panel');
   if (bookmarkPanel) bookmarkPanel.hidden = true;
@@ -147,6 +154,7 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
     }
   }
   display.dataset.era = era;
+  exhibit.dataset.era = era;
   for (const link of document.querySelectorAll('a[data-era]')) {
     if (link.dataset.era === era) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');
@@ -155,6 +163,14 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
   if (hint) hint.textContent = eras[era].hint || 'Explore the page links and browser menus in this scene.';
   showExhibit();
   renderPage();
+  if (fromIntroControl) exhibit.querySelector('.timeline a[aria-current]').focus({ preventScroll: true });
+  if ((entering || changingEra) && !reducedMotion.matches && typeof stage.animate === 'function') {
+    sceneAnimation?.cancel();
+    sceneAnimation = stage.animate([
+      { opacity: .55, transform: 'translateY(6px) scale(.997)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)' },
+    ], { duration: entering ? 500 : 345, easing: 'cubic-bezier(.2, .82, .25, 1)' });
+  }
 }
 
 function goTo(page, focusPage = true) {
@@ -437,6 +453,7 @@ document.querySelector('#intro-link')?.addEventListener('click', (event) => {
   event.preventDefault();
   window.history.pushState({}, '', './');
   showIntro();
+  intro.querySelector('.cover-start').focus({ preventScroll: true });
 });
 document.querySelector('#scene-help')?.addEventListener('click', showNotes);
 

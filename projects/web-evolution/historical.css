@@ -48,11 +48,13 @@
 .flickr-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 17px; color: #869196; font-size: 12px; }
 .photo-detail-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, .8fr); gap: clamp(18px, 3vw, 32px); align-items: start; }
 .photo-large { margin: 0; padding: 7px; background: white; border: 1px solid #d1d4d3; box-shadow: 0 2px 7px #0002; }
-.photo-large img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; }
+.photo-large img { display: block; width: 100%; height: auto; max-height: 70vh; aspect-ratio: auto; object-fit: contain; background: #101722; }
 .photo-large figcaption { padding: 8px 3px 1px; color: #79868a; font-size: 12px; }
 .photo-info h2, .moon-page > h2 { margin: 0 0 7px; color: #2f5367; font-size: clamp(23px, 3vw, 32px); line-height: 1.15; }
 .photo-info p { margin: 8px 0; }
 .photo-info .photo-byline { font-size: 15px; }
+.photo-info .photo-credit { margin-top: 15px; padding-top: 9px; border-top: 1px solid #d5d9d9; color: #69787d; font-size: 11px; }
+.photo-info .photo-credit a { font-weight: bold; }
 .photo-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 17px 0; }
 .photo-tags strong { margin-right: 3px; }
 .tag-chip { display: inline-block; padding: 2px 8px; border-radius: 12px; color: #455b66; background: #dce6e8; font-size: 12px; }
@@ -68,7 +70,7 @@
 .moon-card { min-width: 0; padding: 5px; border: 1px solid #cbd1d2; background: white; color: #34454c; text-align: left; box-shadow: 0 1px 3px #0002; }
 .moon-card:has(figcaption) { margin: 0; }
 .moon-card:hover, .moon-card[aria-pressed="true"] { border-color: #6391a5; box-shadow: 0 2px 8px #40627635; }
-.moon-card img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.moon-card img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; }
 .moon-caption { display: grid; gap: 2px; padding: 7px 3px 3px; }
 .moon-caption strong { color: #31546a; font-size: 13px; }
 .moon-caption span { color: #56666d; font-size: 12px; }

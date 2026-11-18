@@ -1,6 +1,6 @@
 # Work 7 — The Evolution of the Web
 
-Build Canvas에서 Work 7을 열면 짧은 소개와 연도 선택이 보인다. 기본 시작 버튼은 1993년을 열고 연도 링크는 해당 장면으로 바로 들어간다. 체험 중에는 상단에서 시대를 오갈 수 있다. 시대별 브라우저 프레임이 화면 대부분을 차지하고, 영어로 된 웹사이트 바깥에 한국어 행동 안내와 도움말이 있다. 기존 `?era=1998&page=guestbook` 같은 장면 주소는 장면을 바로 연다.
+Build Canvas에서 Work 7을 열면 짧은 소개와 1993년 웹을 여는 시작 버튼이 보인다. 체험 중에는 상단에서 시대를 오갈 수 있다. 선택한 연도로 반투명 강조 표시가 이동하고 장면이 부드럽게 바뀐다. 기기에서 동작 줄이기를 켜면 전환 없이 즉시 바뀐다. 시대별 브라우저 프레임이 화면 대부분을 차지하고, 영어로 된 웹사이트 바깥에 한국어 행동 안내와 도움말이 있다. 기존 `?era=1998&page=guestbook` 같은 장면 주소는 장면을 바로 연다.
 
 ## 장면
 
@@ -26,4 +26,4 @@ Build Canvas에서 Work 7을 열면 짧은 소개와 연도 선택이 보인다.
 - [Microsoft의 2023년 Bing과 Edge 공개](https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-microsoft-bing-and-edge-your-copilot-for-the-web/)
 - [2025년 ChatGPT 에이전트 공개](https://openai.com/index/introducing-chatgpt-agent/) · [2026년 Chrome auto browse](https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/) · [WebMCP 실험](https://developer.chrome.com/blog/ai-webmcp-origin-trial)
 
-토성 픽셀 아트, 사진 커뮤니티의 달 사진 및 North Ridge Observatory의 표지 이미지는 이 작품용 생성 이미지다. 달 사진에 붙은 인물, 날짜, 장소는 재연용 설정이다.
+토성 픽셀 아트와 North Ridge Observatory 표지는 이 작품용 생성 이미지다. 사진 커뮤니티에는 실제 천체 사진을 사용한다. 사진 상세에서 실제 촬영자, 촬영 정보, 라이선스와 원본 링크를 볼 수 있다.

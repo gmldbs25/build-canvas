@@ -1,3 +1,11 @@
-# Photo community images
+# Moonstream photo credits
 
-`moon-harbor.webp`, `moon-roof.webp`, and `moon-desert.webp` are original vector illustrations made for this prototype and rasterized to WebP. They depict fictional 2005 community member photographs and are not archival photographs. No remote image URLs or external artwork are used.
+The 2005 scene is a Flickr-inspired exhibit reconstruction. These actual community and observatory photographs were taken in 2014, 2018, and 2025; the photo detail pages show their real dates and credits. Each source was checked against its Commons file record and downloaded from its original-file link, then resized without cropping to a 1280 px maximum edge and converted to WebP. No remote images are hotlinked.
+
+| Local file | Photograph | Author and date | License | Source record and downloadable original |
+| --- | --- | --- | --- | --- |
+| `moon-harbor.webp` | Visitors observing a total lunar eclipse at Prishtina Observatory, Kosovo | REDONCE · 7 September 2025 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | [Commons record](https://commons.wikimedia.org/wiki/File:Total_lunar_eclipse_observed_from_Prishtina_Observatory_07.jpg) · [Original JPEG](https://commons.wikimedia.org/wiki/Special:Redirect/file/Total_lunar_eclipse_observed_from_Prishtina_Observatory_07.jpg) |
+| `moon-roof.webp` | Total lunar eclipse photographed through a Sky-Watcher Dob 8, Glazov, Russia | Bagorws · 28 July 2018 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | [Commons record](https://commons.wikimedia.org/wiki/File:Lunar_eclipse_through_a_telescope._Glazov._28.07.2018_01.21.jpg) · [Original JPEG](https://commons.wikimedia.org/wiki/Special:Redirect/file/Lunar_eclipse_through_a_telescope._Glazov._28.07.2018_01.21.jpg) |
+| `moon-desert.webp` | Total lunar eclipse over the Very Large Telescope at Paranal Observatory, Chile | D. Schreiner and S. Degezelle / ESO · 15 April 2014 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | [Commons record](https://commons.wikimedia.org/wiki/File:Eclipse_from_Paranal_Observatory_(VLT).jpg) · [ESO source](https://www.eso.org/public/images/img_3903/) · [Original JPEG](https://commons.wikimedia.org/wiki/Special:Redirect/file/Eclipse_from_Paranal_Observatory_(VLT).jpg) |
+
+The Paranal record points back to ESO's original publication. ESO's site licenses public images CC BY 4.0 unless noted; attribution to D. Schreiner and S. Degezelle/ESO is retained here. The other two Commons records identify the photographer as the uploader and explicitly release each photograph under CC BY 4.0. WebP outputs preserve the full source frame; changes are limited to resizing and format conversion.
