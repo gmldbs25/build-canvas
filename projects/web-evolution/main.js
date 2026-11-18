@@ -1,7 +1,8 @@
 import { eras as historicalEras, mosaicPage, orbitPage } from './eras.js';
 import { photoPage, initPhoto } from './photo.js';
+import { createClassicSearch } from './classic-search.js';
 import { modernEras, createModern } from './modern.js';
-import { createBoard } from './board.js';
+import { createPoster } from './poster.js';
 import { createChrome, pageAddress } from './chrome.js';
 
 const eras = { ...historicalEras, ...modernEras };
@@ -15,8 +16,9 @@ const stage = display.querySelector('.browser-window');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let sceneAnimation;
 let redrawState = null;
-const board = createBoard();
-const modern = createModern(board);
+const classicSearch = createClassicSearch();
+const poster = createPoster();
+const modern = createModern(poster);
 const notesDialog = document.querySelector('#field-notes');
 const browserStates = new Map();
 const bookmarks = new Map();
@@ -111,13 +113,15 @@ function renderPageBody(focusPage = false, preserveScroll = false) {
   content.className = 'page-content';
   if (era === '1993') content.innerHTML = mosaicPage(page);
   else if (era === '1998') content.innerHTML = orbitPage(page);
+  else if (era === '2001') content.innerHTML = classicSearch.markup(page);
   else if (era === '2005') content.innerHTML = photoPage(page);
-  else if (era === '2013') content.innerHTML = board.markup();
+  else if (era === '2013') content.innerHTML = poster.markup();
   else content.innerHTML = modern.markup(era, page);
   const zoom = browserState?.zoom || 1;
   content.style.zoom = `${Math.round(zoom * 100)}%`;
   screen.replaceChildren(content);
-  if (era === '2013') board.init(content);
+  if (era === '2001') classicSearch.init(content, goTo);
+  if (era === '2013') poster.init(content);
   if (era === '2005') initPhoto(content, page);
   if (Object.hasOwn(modernEras, era)) modern.init(content, era, page, goTo);
   if (era === '1998' && page === 'home') showVisitorCount();
@@ -137,6 +141,7 @@ function renderPageBody(focusPage = false, preserveScroll = false) {
 const reloadTiming = {
   1993: { blank: 180, step: 92, steps: 10 },
   1998: { blank: 140, step: 95, steps: 8 },
+  2001: { blank: 115, step: 94, steps: 7 },
   2005: { blank: 90, step: 96, steps: 5 },
   2013: { blank: 60, step: 68, steps: 4 },
   2023: { blank: 32, step: 56, steps: 3 },
@@ -260,7 +265,7 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
   }
   display.dataset.era = era;
   exhibit.dataset.era = era;
-  for (const link of document.querySelectorAll('a[data-era]')) {
+  for (const link of exhibit.querySelectorAll('.timeline a[data-era]')) {
     if (link.dataset.era === era) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');
   }
@@ -482,7 +487,7 @@ function initGuestbook() {
   const form = screen.querySelector('#guestbook-form');
   const list = screen.querySelector('#guestbook-entries');
   const showEntries = () => {
-    const entries = [...guestbook, { name: 'Stargazer42', message: 'Cool Saturn! See you in Area51.' }];
+    const entries = [...guestbook, { name: 'Stargazer42', message: 'The same bright edge showed up in my binoculars. Clear skies!' }];
     list.replaceChildren(...entries.map(({ name, message }) => {
       const item = document.createElement('li');
       const author = document.createElement('b');

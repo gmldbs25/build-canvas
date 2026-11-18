@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="1993년의 하이퍼링크부터 2025–26년의 AI 에이전트까지, 여섯 시대의 웹을 직접 탐험하는 Build Canvas Work 7.">
+  <meta name="description" content="달을 관측하는 사람들과 함께 1993년 하이퍼링크부터 2025–26년 AI 에이전트까지 일곱 시대의 웹을 체험하는 Build Canvas Work 7.">
   <meta name="theme-color" content="#10151b">
   <title>The Evolution of the Web · Build Canvas</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./historical.css">
   <link rel="stylesheet" href="./chrome.css">
   <link rel="stylesheet" href="./exhibit.css">
+  <link rel="stylesheet" href="./classic-search.css">
+  <link rel="stylesheet" href="./poster.css">
   <link rel="stylesheet" href="./modern.css">
   <script type="module" src="./main.js"></script>
 </head>
@@ -24,32 +26,16 @@
         <div class="cover-copy">
           <h1 lang="en">The Evolution<br>of the Web<span>.</span></h1>
           <p class="cover-subtitle" lang="en">From Hyperlinks to AI Agents</p>
-          <p class="cover-lede">여섯 시대의 웹을 직접 열어 보세요.<br>링크를 따라가던 때부터 AI에게 일을 맡기는 순간까지.</p>
+          <p class="cover-lede">같은 달을 보면서, 우리는 어떻게 기록하고 나눠 왔을까?<br>천문대를 따라 일곱 시대의 웹을 직접 열어 보세요.</p>
           <a class="cover-start" href="?era=1993" data-era="1993" data-page="home">1993년 웹 열기 <span aria-hidden="true">→</span></a>
         </div>
-        <div class="cover-stack" aria-hidden="true">
-          <div class="cover-app">
-            <div class="cover-app-tabs"><span>Observing Night · Fieldwork</span></div>
-            <div class="cover-app-address">◈ &nbsp; https://fieldwork.example/b/observing-night</div>
-            <div class="cover-app-brand">▥ fieldwork</div>
-          </div>
-          <div class="cover-orbit">
-            <div class="cover-orbit-title">ℯ &nbsp; The Orbit Room — Internet Explorer <span>_ &nbsp; □ &nbsp; ×</span></div>
-            <div class="cover-orbit-body"><img alt="" src="./media/saturn.webp" width="156" height="102"></div>
-          </div>
-          <div class="cover-mosaic">
-            <div class="cover-mosaic-title"><i></i> NCSA Mosaic <i></i></div>
-            <div class="cover-mosaic-menu">File &nbsp; Options &nbsp; Navigate &nbsp; Hotlist</div>
-            <div class="cover-mosaic-address"><span>Document URL:</span><span>http://info.cern.ch/hypertext/WWW/</span></div>
-            <div class="cover-mosaic-content" lang="en">
-              <strong>World Wide Web</strong>
-              <span>What’s out there?</span>
-              <span>Hypertext and HTML</span>
-              <span>People behind the Web</span>
-            </div>
-            <div class="cover-mosaic-footer"><span>← Back</span><span>Reload</span><small>Document Done</small></div>
-          </div>
-        </div>
+        <figure class="cover-photo">
+          <img src="./media/eclipse-2004-a.webp" width="1600" height="1584" alt="지구 그림자에 들어가 붉게 보이는 달" fetchpriority="high">
+          <figcaption>
+            <span>2004년 10월 28일 개기월식</span>
+            <span lang="en"><a href="https://commons.wikimedia.org/wiki/File:2004.10.28_Pimennys_(28866343308).jpg">Auvo Korpi</a> · <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></span>
+          </figcaption>
+        </figure>
       </div>
     </main>
   </div>
@@ -59,6 +45,7 @@
       <nav class="timeline" aria-label="시대 선택">
         <a href="?era=1993" data-era="1993"><span class="era-year">1993</span><span class="era-name">문서</span></a>
         <a href="?era=1998" data-era="1998"><span class="era-year">1998</span><span class="era-name">개인 홈페이지</span></a>
+        <a href="?era=2001" data-era="2001"><span class="era-year">2001</span><span class="era-name">키워드 검색</span></a>
         <a href="?era=2005" data-era="2005"><span class="era-year">2005</span><span class="era-name">사진 커뮤니티</span></a>
         <a href="?era=2013" data-era="2013"><span class="era-year">2013</span><span class="era-name">웹앱</span></a>
         <a href="?era=2023" data-era="2023"><span class="era-year">2023</span><span class="era-name">AI 검색</span></a>

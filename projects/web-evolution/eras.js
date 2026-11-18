@@ -1,8 +1,8 @@
 export const eras = {
   1993: {
     caption: 'NCSA Mosaic · X Window System',
-    hint: '파란 research memo from another server 링크를 눌러 주소가 어떻게 바뀌는지 보세요.',
-    notes: '웹은 연구 문서를 찾고 연결하는 데서 출발했습니다. 1993년 Mosaic은 글과 이미지를 한 화면에 배치해 웹을 읽는 경험을 바꿨습니다.',
+    hint: '파란 North Ridge Observatory lunar log 링크를 눌러 다른 서버의 관측 기록을 여세요.',
+    notes: 'Mosaic은 월드 와이드 웹 프로젝트 문서를 읽고 다른 서버의 기록으로 이동하는 경험을 보여 줍니다. North Ridge Observatory와 관측 기록은 이 전시를 위해 만든 가상 자료입니다.',
     sources: [
       ['CERN · World Wide Web', 'https://info.cern.ch/hypertext/WWW/TheProject.html'],
       ['NCSA · Mosaic', 'https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/'],
@@ -15,7 +15,7 @@ export const eras = {
       guide: ['How does a link work?', 'WhatIs.html'],
       people: ['People behind the Web', 'People.html'],
       history: ['A short history', 'History.html'],
-      memo: ['Research memo: linking laboratory notes', 'http://library.cern.example/memos/1993/linking-notes.html'],
+      memo: ['Lunar observing log · North Ridge Observatory', 'http://observatory.northridge.example/logs/moon/1993-10-23.html'],
     },
   },
   1998: {
@@ -35,36 +35,55 @@ export const eras = {
       links: ['Space Links', 'links.html'],
     },
   },
+  2001: {
+    caption: 'Netscape Navigator 6 · North Ridge Search Desk',
+    hint: '검색창에 North Ridge public observing night을 입력하고 검색 결과 두 곳을 열어 보세요.',
+    notes: '검색 포털이 웹사이트의 제목과 짧은 요약을 나열하던 시기의 화면을 새로 구성했습니다. North Ridge Search Desk와 2001년 행사 자료는 전시를 위해 만든 가상 사이트입니다.',
+    sources: [
+      ['Web Design Museum · AltaVista in 2001', 'https://www.webdesignmuseum.org/gallery/altavista-2001'],
+      ['Web Design Museum · Netscape 6.0', 'https://www.webdesignmuseum.org/software/netscape-6-0-in-2000'],
+      ['Wired · Search in 2001', 'https://www.wired.com/2001/08/relevant-info-on-search-engines'],
+    ],
+    base: 'http://search.northridge.example/',
+    pages: {
+      home: ['North Ridge Search Desk', 'index.html'],
+      results: ['Search results · North Ridge Search Desk', 'search'],
+      bulletin: ['Observing Night bulletin · North Ridge Observatory', 'http://www.northridge.example/observatory/bulletins/2001-10-13.html'],
+      club: ['North Ridge Astronomy Club · Public nights', 'http://www.northridgeastro.example/events/2001-calendar.html'],
+    },
+  },
   2005: {
     caption: 'Firefox 1.5 · Moonstream photo community',
-    notes: '2005년의 Flickr는 사진을 올리고, 사람을 팔로우하고, 태그를 눌러 다른 사람의 사진을 발견하는 커뮤니티였습니다. 달 사진에 붙은 moon 태그를 따라가 보세요.',
-    hint: '사진을 열고 moon 태그를 눌러 다른 사람의 달 사진을 찾아보세요.',
+    notes: '2005년 Flickr 사진 커뮤니티를 바탕으로 만든 Moonstream입니다. 세 장의 사진은 실제 2004년 10월 28일 개기월식 사진이며, 상세 화면에서 촬영자와 라이선스를 확인할 수 있습니다.',
+    hint: '사진을 열고 lunar eclipse 태그를 누른 뒤 촬영자별 사진을 살펴보세요.',
     sources: [
       ['Flickr · The New New Things (1 Aug 2005)', 'https://blog.flickr.net/en/2005/08/01/the-new-new-things/'],
       ['Mozilla · Firefox 1.5 release notes', 'https://www.mozilla.org/en-US/firefox/releases/1.5.html'],
     ],
     base: 'http://moonstream.example/',
     pages: {
-      home: ['Your photostream', '/photos/fieldnotes/'],
-      photo: ['Lunar eclipse at Prishtina Observatory', '/photos/fieldnotes/142805/'],
-      roof: ['Blood Moon through a Dobsonian', '/photos/danprice/87142/'],
-      desert: ['Eclipsed Moon over Paranal', '/photos/ashap/19006/'],
-      moon: ['Photos tagged “moon”', '/photos/tags/moon/'],
-      sets: ['Sets · Lunar eclipses', '/photos/fieldnotes/sets/lunar-eclipses/'],
-      favorites: ['Favorites', '/photos/fieldnotes/favorites/'],
+      home: ['Your photostream', '/photos/moonstream/'],
+      photo: ['Lunar eclipse at Prishtina Observatory', '/photos/moonstream/legacy-harbor/'],
+      roof: ['Blood Moon through a Dobsonian', '/photos/moonstream/legacy-roof/'],
+      desert: ['Eclipsed Moon over Paranal', '/photos/moonstream/legacy-desert/'],
+      'eclipse-a': ['A copper-red lunar eclipse', '/photos/moonstream/2004-eclipse-a/'],
+      'eclipse-b': ['Stages of a lunar eclipse', '/photos/moonstream/2004-eclipse-b/'],
+      'eclipse-c': ['Partial eclipse sequence', '/photos/moonstream/2004-eclipse-c/'],
+      moon: ['Photos tagged “lunar eclipse”', '/photos/tags/moon/'],
+      sets: ['Sets · Lunar eclipses', '/photos/moonstream/sets/lunar-eclipses/'],
+      favorites: ['Favorites', '/photos/moonstream/favorites/'],
     },
   },
   2013: {
     caption: 'Chrome 29 · Desktop',
-    hint: 'Confirm the meeting time 카드를 Done(완료)으로 옮겨 진행률을 바꿔 보세요.',
-    notes: '브라우저 안에서 문서를 읽는 데 그치지 않고, 작업을 정리하고 함께 편집할 수 있게 됐습니다. 초기 Trello처럼 카드를 옮겨 작업의 진행 상태를 바꿔 보세요.',
+    hint: '포스터의 사진을 옮기고 제목과 행사 정보를 편집한 뒤 PNG로 저장해 보세요.',
+    notes: '2010년에 출시된 HTML5 사진 편집기는 Flickr 안에 간단한 자르기·보정 도구를 넣었습니다. 이 장면은 2013년 브라우저에서 이미지를 움직이고 밝기를 조정해 포스터 결과물을 저장하는 과정을 전시용으로 재구성합니다.',
     sources: [
       ['Google · Chrome 29', 'https://chromereleases.googleblog.com/2013/08/stable-channel-update.html'],
-      ['TidBITS · Trello in 2013', 'https://tidbits.com/2013/08/30/catching-up-with-trello/'],
-      ['Trello · The 2012 tech stack', 'https://www.atlassian.com/blog/trello/the-trello-tech-stack'],
+      ['Flickr Engineering · Building an HTML5 Photo Editor (2012)', 'https://code.flickr.net/2012/04/18/building-an-html5-photo-editor/'],
     ],
     base: 'https://fieldwork.example/',
-    pages: { home: ['Observing Night · Fieldwork', 'b/observing-night'] },
+    pages: { home: ['Observing Night poster · Fieldwork', 'b/observing-night-poster'] },
   },
 };
 
@@ -75,12 +94,12 @@ function link(era, page, label = eras[era].pages[page][0]) {
 export function mosaicPage(page) {
   const home = link(1993, 'home', 'World Wide Web project');
   const pages = {
-    home: `
+      home: `
       <h2>World Wide Web</h2>
       <p>The World Wide Web is a way to publish and read documents across a network.
         A document can point to another by means of a ${link(1993, 'guide', 'hypertext link')}.</p>
-      <p>Start here to find information about the project and resources on the Web.</p>
-      <p>One CERN laboratory has sent a ${link(1993, 'memo', 'research memo from another server')} about linking its instrument notes.</p>
+      <p>This is the maintained entry for the World Wide Web project. Follow its links to learn how documents work, then visit a separate observatory server for a dated lunar record.</p>
+      <p>${link(1993, 'memo', 'North Ridge Observatory lunar observing log')} — an example of a research note kept at its own address.</p>
       <dl>
         <dt>${link(1993, 'directory')}</dt><dd>Find information by subject or follow pointers to other servers.</dd>
         <dt>${link(1993, 'guide', 'Hypertext and HTML')}</dt><dd>How documents are linked, with an example of HTML markup.</dd>
@@ -94,7 +113,7 @@ export function mosaicPage(page) {
       <p>Before search engines were commonplace, people kept lists of the servers they knew about.</p>
       <ul>
         <li><strong>High-energy physics</strong> — CERN published notes and software for researchers.</li>
-        <li><strong>Astronomy</strong> — observatories shared instruments, data and observing plans, including this ${link(1993, 'memo', 'CERN laboratory memo')}.</li>
+        <li><strong>Astronomy</strong> — ${link(1993, 'memo', 'North Ridge Observatory’s dated lunar observing log')} is kept on a separate server.</li>
         <li><strong>Computing</strong> — NCSA published browser documentation and lists of new sites.</li>
       </ul>
       <p>These pointers are examples from the early Web. To see how a pointer is written, read ${link(1993, 'guide')}.</p>
@@ -122,12 +141,12 @@ export function mosaicPage(page) {
       </dl>
       <p>Return to the ${home}.</p>`,
     memo: `
-      <h2>Research memo: linking laboratory notes</h2>
-      <p><em>Computing and Networks Group, CERN · 14 September 1993</em></p>
-      <p>Colleagues in the detector group have asked for a reliable way to cite the latest instrument log without mailing a new copy to every laboratory.</p>
-      <p>Our proposal is to keep the note at its home server and place a link to it in the subject directory. Readers can follow the pointer back to the source, then use their browser’s Back command to return here.</p>
-      <ul><li>Keep one maintained copy of the calibration note.</li><li>Link the apparatus name to the relevant entry.</li><li>Include author and revision date in every document.</li></ul>
-      <p>This memo is served from <code>library.cern.example</code>, a different simulated host. Continue through the ${link(1993, 'directory', 'subject directory')} or return to the ${home}.</p>`,
+      <h2>Lunar observing log</h2>
+      <p><em>North Ridge Observatory · 23 October 1993 · West Terrace</em></p>
+      <p>At 21:10 local time the bright Moon cleared the eastern roofline. Thin cloud softened its northern limb for several minutes; Mare Imbrium and the bright rim of Copernicus remained easy to pick out at low power.</p>
+      <p><strong>Observer’s note:</strong> keep this entry at the observatory’s own address and link to it from the maintained World Wide Web project page. A reader can follow the link here, then use the browser’s Back command to return to the directory.</p>
+      <ul><li>Target: lunar surface near Mare Imbrium.</li><li>Instrument: 90 mm refractor, 40×.</li><li>Conditions: thin cloud, steady intervals; handwritten field sheet filed in the west room.</li></ul>
+      <p>This fictional North Ridge record is served from <code>observatory.northridge.example</code>, a different simulated host. Return to the ${link(1993, 'home', 'World Wide Web project entry')} or browse the ${link(1993, 'directory', 'subject directory')}.</p>`,
   };
   return `<article class="mosaic-page">${pages[page]}</article>`;
 }
@@ -139,10 +158,11 @@ export function orbitPage(page) {
       <h2><small>WELCOME TO</small>The Orbit Room</h2>
       <img class="saturn" src="./media/saturn.webp" alt="Pixel-art Saturn with bright rings and stars" width="156" height="102">
       <p>Hi, I’m Alex. This is my little corner of the universe!<br>Come on in and make yourself at home. :)</p>
+      <div class="orbit-diary"><strong>Alex’s moon diary · November 21, 1998</strong><p>Clouds opened for ten minutes tonight. Through my small telescope I could see a sharp line of shadow along the cratered edge. I used the Moon chart I picked up at North Ridge Observatory, and I’m keeping these notes here so we can compare what we saw.</p></div>
       ${nav}
       <div class="visitor"><span>You are visitor no.</span> <strong>001287</strong></div>
-      <p class="orbit-discovery">New! <span>☆</span> Check the ${link(1998, 'links', 'space links')} and leave a note in the ${link(1998, 'guestbook')}.</p>
-      <p class="orbit-footer">Last updated October 17, 1998 <span aria-hidden="true">★</span> Area51 neighborhood</p>`,
+      <p class="orbit-discovery">Seen the Moon tonight? <span>☆</span> Tell me what it looked like in the ${link(1998, 'guestbook', 'guestbook')} or check the ${link(1998, 'links', 'space links')}.</p>
+      <p class="orbit-footer">Last updated November 21, 1998 <span aria-hidden="true">★</span> Area51 neighborhood</p>`,
     guestbook: `
       <h2><small>THE ORBIT ROOM</small>Guestbook</h2>
       ${nav}

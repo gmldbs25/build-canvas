@@ -14,6 +14,18 @@
 }
 .orbit-discovery span { color: #ffe15e; }
 .orbit-page .orbit-discovery a { color: #68fff2; }
+.orbit-diary {
+  width: min(520px, 94%);
+  margin: 14px auto;
+  padding: 10px 12px;
+  border: 1px solid #d6d0b0;
+  color: #39362d;
+  background: #fffbe7;
+  box-shadow: 2px 2px 0 #25194b;
+  font: 13px/1.4 Georgia, 'Times New Roman', serif;
+}
+.orbit-diary strong { color: #584623; }
+.orbit-diary p { margin: 5px 0 0; }
 .orbit-links li { padding-block: 4px; }
 .orbit-page .orbit-links a { display: inline-block; padding: 1px 2px; }
 
@@ -35,15 +47,6 @@
 .photo-tabs a { color: #4d6069; }
 .photo-tabs a[aria-current] { color: #b95323; font-weight: bold; }
 .photo-intro { margin: 17px 0; color: #4c575d; }
-.stream-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2vw, 19px); align-items: start; }
-.stream-photo { display: block; padding: 5px; border: 1px solid #d0d4d4; background: white; box-shadow: 0 1px 3px #0002; }
-.stream-grid figure.stream-photo { margin: 0; }
-.stream-photo:hover { box-shadow: 0 3px 10px #0003; text-decoration: none !important; transform: translateY(-1px); }
-.stream-photo img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #d4d8d9; }
-.stream-photo span, .stream-photo figcaption { display: grid; gap: 2px; padding: 7px 3px 3px; }
-.stream-photo strong { color: #344f60; font-size: 13px; }
-.stream-photo small { color: #818b8e; font-size: 11px; }
-.stream-photo-2 { margin-top: 16px; }
 .stream-note { margin-top: 13px; color: #788489; font-size: 11px; }
 .flickr-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 17px; color: #869196; font-size: 12px; }
 .photo-detail-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, .8fr); gap: clamp(18px, 3vw, 32px); align-items: start; }
@@ -69,7 +72,7 @@
 .moon-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .moon-card { min-width: 0; padding: 5px; border: 1px solid #cbd1d2; background: white; color: #34454c; text-align: left; box-shadow: 0 1px 3px #0002; }
 .moon-card:has(figcaption) { margin: 0; }
-.moon-card:hover, .moon-card[aria-pressed="true"] { border-color: #6391a5; box-shadow: 0 2px 8px #40627635; }
+.moon-card:hover { border-color: #6391a5; box-shadow: 0 2px 8px #40627635; }
 .moon-card img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; }
 .moon-caption { display: grid; gap: 2px; padding: 7px 3px 3px; }
 .moon-caption strong { color: #31546a; font-size: 13px; }
@@ -86,42 +89,12 @@
 .upload-form > button { justify-self: start; padding: 6px 10px; border: 1px solid #a44d25; border-radius: 3px; color: white; background: #d36a32; }
 .upload-feedback { min-height: 16px; margin: 0; color: #3f734d; font-size: 12px; }
 .empty-favorites { padding: 18px; background: #e8edec; color: #64747a; }
-.moon-spotlight { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); align-items: center; gap: 17px; min-height: 95px; margin-top: 17px; padding: 10px; border: 1px solid #d5dada; background: #eaedeb; }
-.moon-spotlight:has(img) { grid-template-columns: minmax(180px, .8fr) minmax(0, 1fr); }
-.moon-spotlight img { width: 100%; max-height: 190px; object-fit: cover; }
-.moon-spotlight h3 { margin: 0 0 4px; color: #31546a; }
-.moon-spotlight p { margin: 4px 0; }
-
-.board-page { min-height: 100%; padding-bottom: 12px; }
-.board-heading { justify-content: space-between; gap: 12px 22px; }
-.progress-wrap { display: grid; grid-template-columns: minmax(90px, 160px) auto; align-items: center; gap: 8px; color: #e7f0f7; font-size: 11px; }
-.board-progress { width: 100%; height: 8px; accent-color: #70bc88; }
-.board-activity { min-height: 23px; margin: 0 0 8px; padding: 4px clamp(11px, 2vw, 26px); color: #f0f7ff; background: #31577b; font-size: 11px; }
-.board-heading > div:first-child { display: grid; gap: 2px; }
-.card-description { color: #65727b; font-size: 11px; font-weight: normal; line-height: 1.35; }
-.card-due { color: #556877; font-size: 10px; }
-.board-card { position: relative; padding: 8px; }
-.board-card:hover .card-title { color: #235780; }
-.board-card:focus-visible { outline-color: #205982; }
-.card-dialog { max-height: min(90vh, 660px); overflow-y: auto; }
-.dialog-close { float: right; }
-.detail-form { display: grid; gap: 11px; clear: both; }
-.detail-form h3 { margin: 0 0 2px; }
-.detail-form label { display: grid; gap: 4px; color: #425463; font-size: 12px; font-weight: bold; }
-.detail-form input, .detail-form textarea, .detail-form select { width: 100%; min-width: 0; padding: 6px; border: 1px solid #aebac5; border-radius: 3px; color: #273644; background: white; font-size: 13px; font-weight: normal; }
-.detail-form textarea { resize: vertical; }
-.detail-form .save-details { justify-self: end; padding: 6px 10px; border: 1px solid #274d70; border-radius: 3px; color: white; background: #315f89; }
-
 @media (max-width: 650px) {
-  .stream-grid, .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stream-photo-2 { margin-top: 0; }
+  .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-detail-grid { grid-template-columns: minmax(0, 1fr); }
-  .moon-spotlight, .moon-spotlight:has(img) { grid-template-columns: minmax(0, 1fr); }
-  .moon-spotlight img { max-height: 230px; }
 }
 @media (max-width: 420px) {
   .photo-page { padding: 15px; }
-  .stream-grid, .moon-grid { grid-template-columns: minmax(0, 1fr); }
+  .moon-grid { grid-template-columns: minmax(0, 1fr); }
   .photo-community-head { align-items: start; }
-  .progress-wrap { grid-template-columns: 1fr; gap: 3px; }
 }

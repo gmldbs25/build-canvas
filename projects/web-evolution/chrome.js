@@ -13,6 +13,14 @@ const menuSets = {
     ['Favorites', [['Add to Favorites', 'bookmark'], ['Show Favorites', 'bookmarks']]],
     ['Help', [['About this exhibit', 'info']]],
   ],
+  '2001': [
+    ['File', [['Open Web Location…', 'open-address'], ['Save Page As…', 'save-page']]],
+    ['Edit', [['Copy address', 'copy-address'], ['Select All', 'select-all']]],
+    ['View', [['Text Zoom In', 'zoom-in'], ['Text Zoom Out', 'zoom-out'], ['Normal Size', 'zoom-reset'], ['Reload', 'reload']]],
+    ['Go', [['Back', 'back'], ['Forward', 'forward'], ['Home', 'home']]],
+    ['Bookmarks', [['Bookmark This Page', 'bookmark'], ['Show Bookmarks', 'bookmarks']]],
+    ['Help', [['About this exhibit', 'info']]],
+  ],
   'modern': [
     ['File', [['New tab', 'new-tab'], ['Close tab', 'close-tab'], ['Save this page', 'save-page']]],
     ['Edit', [['Copy address', 'copy-address'], ['Select all text', 'select-all']]],
@@ -122,6 +130,9 @@ export function createChrome({ root, status, onAction, onAddress, onTab }) {
     } else if (era === '1998') {
       root.innerHTML = `<div class="ie-title"><span class="ie-mark" aria-hidden="true">e</span><span>${title} – Explorer</span><span class="window-buttons" aria-hidden="true"><b>_</b><b>□</b><b>×</b></span></div>${menus}<div class="browser-tools">${back}${forward}${home}${reload}${info}</div>${address}`;
       status.innerHTML = '<span class="status-text">Done</span><span aria-hidden="true">◉ Internet zone</span>';
+    } else if (era === '2001') {
+      root.innerHTML = `<div class="navigator-title"><span class="navigator-mark" aria-hidden="true">N</span><span>${title} — Netscape</span></div>${menus}<div class="navigator-location"><div class="browser-tools">${back}${forward}${reload}${home}</div>${address}<div class="browser-tools">${info}</div></div>`;
+      status.innerHTML = '<span class="status-text">Document: Done</span><span aria-hidden="true">Navigator</span>';
     } else {
       const location = `<div class="chrome-location"><div class="browser-tools">${back}${forward}${reload}</div>${address}<div class="browser-tools">${home}${info}</div></div>`;
       root.innerHTML = era === '2005'

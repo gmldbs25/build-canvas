@@ -28,6 +28,22 @@
 .display[data-era="1998"] .address-form label { font-weight: bold; }
 .display[data-era="1998"] .address-form button { border: 2px outset #eee; }
 .display[data-era="1998"] .menu-popup { border: 2px outset #ddd; box-shadow: 2px 3px 5px #0007; }
+.display[data-era="2001"] { --desk: #485c59; }
+.display[data-era="2001"] .browser-window { border: 2px outset #b5c3cb; color: #202e38; background: #ccd5dc; font: 12px/1.4 Arial, sans-serif; }
+.navigator-title { display: flex; gap: 7px; align-items: center; padding: 3px 8px; color: #fff; background: linear-gradient(90deg, #264354, #446573); font-weight: 700; }
+.navigator-title > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.navigator-mark { display: grid; place-items: center; width: 19px; height: 17px; flex: none; border: 1px solid #8cc4b5; color: #f6fffa; background: #2b7169; font: bold italic 13px Georgia, serif; }
+.display[data-era="2001"] .period-menu { border-bottom: 1px solid #94a5b0; background: #dbe2e9; }
+.navigator-location { min-width: 0; display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-block: 1px solid #ebeff2; background: linear-gradient(#e2e9ef, #b9c7d5); }
+.navigator-location .browser-tools button { display: flex; flex-direction: column; align-items: center; min-width: 33px; padding: 1px 4px; border: 1px solid #798e9e; border-radius: 3px; color: #27524f; background: linear-gradient(#f7fafb, #c2ccd9); font-weight: 700; }
+.navigator-location .browser-tools button:active:not(:disabled) { background: #b3c4cf; }
+.navigator-location .browser-tools button span:first-child { font-size: 17px; line-height: 1.05; }
+.navigator-location .tool-label { font-size: 9px; font-weight: 400; color: #293b47; }
+.navigator-location .address-form { flex: 1; padding-inline: 0; }
+.navigator-location .address-form input { border: 1px solid #7c91a1; border-radius: 2px; }
+.navigator-location .address-form button { border-radius: 2px; }
+.display[data-era="2001"] .screen { background: white; }
+.display[data-era="2001"] .browser-status { padding: 3px 8px; border-top: 1px solid #91a3b1; background: #d5dee8; }
 .display[data-era="2005"] .browser-window { border: 1px solid #7c8c9d; background: #e8edf2; font: 13px/1.35 Arial, sans-serif; }
 .display[data-era="2005"] .period-menu, .display[data-era="2013"] .period-menu, .display[data-era="2023"] .period-menu, .display[data-era="2025"] .period-menu { padding-inline: 9px; background: linear-gradient(#edf2f7, #d8e1eb); color: #34475c; border-bottom: 1px solid #b6c3d1; }
 .display[data-era="2005"] .chrome-location, .display[data-era="2013"] .chrome-location, .display[data-era="2023"] .chrome-location, .display[data-era="2025"] .chrome-location { min-width: 0; }
@@ -76,6 +92,9 @@
   .address-form { gap: 3px; padding-inline: 3px; }
   .address-form label { max-width: 54px; overflow: hidden; }
   .display[data-era="1998"] .address-form { min-width: 0; }
+  .navigator-location { gap: 4px; padding-inline: 3px; }
+  .navigator-location .address-form label { display: none; }
+  .navigator-location .browser-tools button { min-width: 25px; padding-inline: 2px; }
 }
 
 .display[data-era="2005"] .firefox-title {
