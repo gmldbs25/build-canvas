@@ -63,6 +63,8 @@
 .bookmark-list p { margin: 0; color: #586879; }
 .bookmark-list button { padding: 7px 8px; border: 1px solid #c4ccd6; border-radius: 3px; color: #263a50; background: #fff; text-align: left; }
 .bookmark-list button:hover { background: #e8eff8; }
+.reload-blank { pointer-events: none; }
+.page-content[data-reload-content] { will-change: clip-path; }
 @media (max-width: 560px) {
   .period-menu { gap: 0; padding-inline: 2px; overflow: visible; flex-wrap: wrap; }
   .menu-trigger { padding-inline: 5px; font-size: 11px; }

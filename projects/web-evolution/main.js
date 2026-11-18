@@ -14,6 +14,7 @@ const display = document.querySelector('#display');
 const stage = display.querySelector('.browser-window');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let sceneAnimation;
+let redrawState = null;
 const board = createBoard();
 const modern = createModern(board);
 const notesDialog = document.querySelector('#field-notes');
@@ -42,6 +43,7 @@ function isModernEra(id = era) {
 
 function showIntro() {
   sceneAnimation?.cancel();
+  cancelRedraw();
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -96,6 +98,7 @@ function showNotes() {
 }
 
 function renderPage(focusPage = false) {
+  cancelRedraw();
   renderChrome();
   renderPageBody(focusPage);
 }
@@ -131,11 +134,95 @@ function renderPageBody(focusPage = false, preserveScroll = false) {
   return content;
 }
 
-function reloadPage() {
-  const content = renderPageBody(false, true);
-  if (!reducedMotion.matches && typeof content.animate === 'function') {
-    content.animate([{ opacity: .86 }, { opacity: 1 }], { duration: 140, easing: 'ease-out' });
+const reloadTiming = {
+  1993: { blank: 180, step: 92, steps: 10 },
+  1998: { blank: 140, step: 95, steps: 8 },
+  2005: { blank: 90, step: 96, steps: 5 },
+  2013: { blank: 60, step: 68, steps: 4 },
+  2023: { blank: 32, step: 56, steps: 3 },
+  2025: { blank: 32, step: 56, steps: 3 },
+};
+
+function cancelRedraw() {
+  if (!redrawState) return;
+  redrawState.timers.forEach(clearTimeout);
+  redrawState = null;
+  delete screen.dataset.reloadPhase;
+  delete screen.dataset.reloadStep;
+}
+
+function scheduleRedraw(state, delay, callback) {
+  const timer = setTimeout(() => {
+    state.timers = state.timers.filter((pending) => pending !== timer);
+    if (redrawState === state) callback();
+  }, delay);
+  state.timers.push(timer);
+}
+
+function blankPageCanvas(pageContent, height) {
+  const canvas = document.createElement('div');
+  canvas.className = 'page-content reload-blank';
+  canvas.setAttribute('aria-hidden', 'true');
+  canvas.style.minHeight = `${Math.max(screen.clientHeight, height)}px`;
+  const source = pageContent?.firstElementChild;
+  const style = source ? getComputedStyle(source) : getComputedStyle(screen);
+  for (const property of ['backgroundColor', 'backgroundImage', 'backgroundPosition', 'backgroundSize', 'backgroundRepeat', 'color']) {
+    canvas.style[property] = style[property];
   }
+  return canvas;
+}
+
+function reloadPage() {
+  cancelRedraw();
+  if (reducedMotion.matches) {
+    renderPageBody(false, true);
+    return;
+  }
+
+  const oldContent = screen.querySelector('.page-content');
+  const savedHeight = oldContent?.scrollHeight || screen.clientHeight;
+  const savedScrollTop = screen.scrollTop;
+  const savedScrollLeft = screen.scrollLeft;
+  const state = { timers: [], scrollTop: savedScrollTop, scrollLeft: savedScrollLeft };
+  redrawState = state;
+  screen.replaceChildren(blankPageCanvas(oldContent, savedHeight));
+  screen.scrollTop = savedScrollTop;
+  screen.scrollLeft = savedScrollLeft;
+  screen.dataset.reloadPhase = 'blank';
+  screen.dataset.reloadStep = '0';
+  const timing = reloadTiming[era] || reloadTiming[2023];
+
+  scheduleRedraw(state, timing.blank, () => {
+    screen.dataset.reloadPhase = 'reveal';
+    screen.scrollTop = state.scrollTop;
+    screen.scrollLeft = state.scrollLeft;
+    const content = renderPageBody(false, true);
+    content.inert = true;
+    content.dataset.reloadContent = '';
+    const revealStep = (step) => {
+      if (!content.isConnected) {
+        cancelRedraw();
+        return;
+      }
+      screen.dataset.reloadStep = String(step);
+      const totalHeight = content.scrollHeight;
+      const visibleBottom = Math.min(totalHeight, screen.scrollTop + screen.clientHeight * (step / timing.steps));
+      const bottomInset = Math.max(0, totalHeight - visibleBottom);
+      content.style.clipPath = `inset(0 0 ${bottomInset}px 0)`;
+      if (step >= timing.steps) {
+        content.style.clipPath = '';
+        content.inert = false;
+        delete content.dataset.reloadContent;
+        delete screen.dataset.reloadPhase;
+        delete screen.dataset.reloadStep;
+        redrawState = null;
+        screen.scrollTop = state.scrollTop;
+        screen.scrollLeft = state.scrollLeft;
+      } else scheduleRedraw(state, timing.step, () => revealStep(step + 1));
+    };
+    content.style.clipPath = `inset(0 0 ${Math.max(0, content.scrollHeight - screen.scrollTop)}px 0)`;
+    revealStep(0);
+  });
 }
 
 function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
