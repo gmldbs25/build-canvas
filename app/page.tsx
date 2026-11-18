@@ -1,6 +1,13 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
   {
+    index: "07",
+    title: "The Evolution of the Web",
+    type: "WEB HISTORY · INTERACTIVE PROTOTYPE",
+    year: "2026.11",
+    href: "./web-evolution/",
+  },
+  {
     index: "06",
     title: "FAB FLOW",
     type: "SEMICONDUCTOR LOGISTICS · INTERACTIVE DOCUMENTARY",

@@ -56,6 +56,10 @@ GITHUB_PAGES=true PAGES_BASE_PATH=/build-canvas/fab-flow-preview npm run build -
 mkdir -p dist-pages/fab-flow-preview
 cp -R projects/fab-flow/dist-pages/. dist-pages/fab-flow-preview/
 
+# Work 07 is a standalone exhibit with relative asset paths.
+mkdir -p dist-pages/web-evolution
+cp -R projects/web-evolution/. dist-pages/web-evolution/
+
 # Personal, unlisted archive: isolated static page (not a numbered Work).
 mkdir -p dist-pages/elsewhere
 cp -R extras/elsewhere/. dist-pages/elsewhere/

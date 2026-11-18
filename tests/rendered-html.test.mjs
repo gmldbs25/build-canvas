@@ -25,6 +25,9 @@ test("renders the portfolio entry content", async () => {
   assert.equal(response.status, 200);
   assert.match(html, /<title>build _ canvas<\/title>/);
   assert.match(html, /생각, 그림,/);
+  assert.match(html, /href="\.\/web-evolution\/"/);
+  assert.match(html, />07<\/span><strong>The Evolution of the Web<\/strong>/);
+  assert.ok(html.indexOf("The Evolution of the Web") < html.indexOf("FAB FLOW"));
   assert.match(html, /href="\.\/orca\/"/);
   assert.match(html, /href="\.\/texas-trace\/"/);
   assert.match(html, /href="\.\/nand-flash\/"/);

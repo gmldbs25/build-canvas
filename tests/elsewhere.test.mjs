@@ -70,5 +70,7 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(renderer, /if \(entry\.review && entry\.review\.trim\(\)\)/);
   assert.doesNotMatch(renderer, /document\.createElement\("a"\)/);
   assert.doesNotMatch(stylesheet, /\.poster-link/);
-  assert.doesNotMatch(home, /index:\s*["']07["']/);
+  const workRegistry = home.match(/const works = \[([\s\S]*?)\];/)?.[1];
+  assert.ok(workRegistry, "The numbered Works are registered separately from the archive");
+  assert.doesNotMatch(workRegistry, /href:\s*["']\.\/elsewhere\//);
 });

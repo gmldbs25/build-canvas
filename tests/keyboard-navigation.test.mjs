@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const works = [
+  ["The Evolution of the Web", "../projects/web-evolution/main.js"],
   ["NAND Flash", "../projects/nand-flash/main.js"],
   ["Texas Trace", "../projects/texas-trace/assets/js/main.js"],
   ["ORCA", "../projects/orca/app/page.tsx"],
