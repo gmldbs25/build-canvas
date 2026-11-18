@@ -123,7 +123,12 @@ export function createChrome({ root, status, onAction, onAddress, onTab }) {
     const reload = toolbarAction('reload', '⟳', 'Reload');
     const address = `<form class="address-form"><label for="browser-address">${era === '1993' ? 'Document URL:' : 'Address'}</label><input id="browser-address" name="address" aria-label="Simulated address" value="${escapeHtml(pageAddress(base, path))}" spellcheck="false" autocomplete="off"><button type="submit" aria-label="Go to address">↵</button></form>`;
     const info = toolbarAction('info', '?', 'About this exhibit');
-    const tabsBar = modern ? `<div class="sim-tabs" role="tablist" aria-label="Exhibit browser tabs">${tabs.map((tab) => `<button type="button" role="tab" data-tab-id="${escapeHtml(tab.id)}" aria-selected="${tab.id === activeTab}" class="sim-tab ${tab.id === activeTab ? 'is-active' : ''}"><span aria-hidden="true">◈</span> ${escapeHtml(tab.title || 'New tab')}${tabs.length > 1 ? `<span class="sim-tab-close" aria-label="Close ${escapeHtml(tab.title || 'tab')}" data-action="close-tab" data-close-id="${escapeHtml(tab.id)}">×</span>` : ''}</button>`).join('')}<button type="button" data-action="new-tab" class="sim-tab-add" aria-label="New tab">+</button></div>` : '';
+    const tabMarkup = tabs.map((tab) => `<button type="button" role="tab" data-tab-id="${escapeHtml(tab.id)}" aria-selected="${tab.id === activeTab}" class="sim-tab ${tab.id === activeTab ? 'is-active' : ''}"><span class="sim-tab-icon" aria-hidden="true">◈</span><span class="sim-tab-title">${escapeHtml(tab.title || 'New tab')}</span>${tabs.length > 1 ? `<span class="sim-tab-close" aria-label="Close ${escapeHtml(tab.title || 'tab')}" data-action="close-tab" data-close-id="${escapeHtml(tab.id)}">×</span>` : ''}</button>`).join('');
+    const addTabButton = `<button type="button" data-action="new-tab" class="sim-tab-add" aria-label="New tab">+</button>`;
+    const tabsBar = modern ? String(era) === '2005'
+      ? `<div class="sim-tabs" role="tablist" aria-label="Exhibit browser tabs">${tabMarkup}${addTabButton}</div>`
+      : `<div class="chrome-tabs-row"><div class="sim-tabs" role="tablist" aria-label="Exhibit browser tabs">${tabMarkup}</div>${addTabButton}</div>`
+      : '';
     if (era === '1993') {
       root.innerHTML = `<div class="mosaic-title"><span class="motif-mark" aria-hidden="true"></span><span>NCSA Mosaic · ${title}</span><span class="motif-mark motif-end" aria-hidden="true"></span></div>${menus}<div class="mosaic-location"><div><div class="address-row"><span>Document Title:</span><strong>${title}</strong></div>${address}</div><span class="mosaic-globe" aria-hidden="true"><i></i></span></div><div class="browser-tools">${back}${forward}${home}${reload}${info}</div>`;
       status.innerHTML = `<span class="status-text">Document Done</span><span> ${index + 1} of ${length}</span>`;
@@ -139,6 +144,16 @@ export function createChrome({ root, status, onAction, onAddress, onTab }) {
         ? `<div class="firefox-title"><span aria-hidden="true">◉</span> ${title} — Firefox</div>${menus}${location}${tabsBar}`
         : `${tabsBar}${menus}${location}`;
       status.innerHTML = `<span>${title}</span><span>${Math.round((options.zoom || 1) * 100)}%</span>`;
+    }
+    if (modern && String(era) !== '2005') {
+      const strip = root.querySelector('.sim-tabs');
+      const selected = strip?.querySelector('.sim-tab[aria-selected="true"]');
+      if (strip && selected) {
+        const stripRect = strip.getBoundingClientRect();
+        const tabRect = selected.getBoundingClientRect();
+        if (tabRect.left < stripRect.left) strip.scrollLeft -= stripRect.left - tabRect.left;
+        else if (tabRect.right > stripRect.right) strip.scrollLeft += tabRect.right - stripRect.right;
+      }
     }
   }
   return { render };
