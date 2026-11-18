@@ -1,0 +1,125 @@
+/* Content that lives inside the simulated pages. Kept separate from browser chrome. */
+.mosaic-page .memo-meta { color: #4e514c; }
+.mosaic-page code { padding: 1px 3px; background: #deded7; }
+
+.orbit-discovery {
+  width: fit-content;
+  max-width: 94%;
+  margin: 10px auto !important;
+  padding: 4px 10px;
+  border: 1px dashed #f2cf53;
+  color: #ffe985;
+  background: #231448;
+  font-size: 14px;
+}
+.orbit-discovery span { color: #ffe15e; }
+.orbit-page .orbit-discovery a { color: #68fff2; }
+.orbit-links li { padding-block: 4px; }
+.orbit-page .orbit-links a { display: inline-block; padding: 1px 2px; }
+
+.photo-page {
+  min-height: 100%;
+  padding: clamp(18px, 3vw, 34px);
+  color: #30383d;
+  background: #f4f4f1;
+  font: 14px/1.45 Arial, Helvetica, sans-serif;
+}
+.photo-page a { color: #17658c; text-decoration: none; }
+.photo-page a:hover { color: #094767; text-decoration: underline; }
+.photo-community-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid #cdd2d4; padding-bottom: 18px; }
+.photo-community-head h2 { margin: 0; color: #2f5367; font-size: clamp(27px, 4vw, 40px); line-height: 1.1; }
+.photo-community-head p { margin: 4px 0 0; color: #69767c; }
+.photo-community-head .photo-kicker { margin: 0 0 4px; color: #9b512b; font-size: 11px; font-weight: bold; letter-spacing: .1em; text-transform: uppercase; }
+.upload-button { flex: none; padding: 7px 12px; color: white; background: #d36a32; border: 1px solid #a9481b; border-radius: 3px; font-weight: bold; }
+.photo-tabs { display: flex; gap: 18px; border-bottom: 1px solid #d7dbdc; padding: 10px 2px 8px; }
+.photo-tabs a { color: #4d6069; }
+.photo-tabs a[aria-current] { color: #b95323; font-weight: bold; }
+.photo-intro { margin: 17px 0; color: #4c575d; }
+.stream-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2vw, 19px); align-items: start; }
+.stream-photo { display: block; padding: 5px; border: 1px solid #d0d4d4; background: white; box-shadow: 0 1px 3px #0002; }
+.stream-grid figure.stream-photo { margin: 0; }
+.stream-photo:hover { box-shadow: 0 3px 10px #0003; text-decoration: none !important; transform: translateY(-1px); }
+.stream-photo img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #d4d8d9; }
+.stream-photo span, .stream-photo figcaption { display: grid; gap: 2px; padding: 7px 3px 3px; }
+.stream-photo strong { color: #344f60; font-size: 13px; }
+.stream-photo small { color: #818b8e; font-size: 11px; }
+.stream-photo-2 { margin-top: 16px; }
+.stream-note { margin-top: 13px; color: #788489; font-size: 11px; }
+.flickr-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 17px; color: #869196; font-size: 12px; }
+.photo-detail-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, .8fr); gap: clamp(18px, 3vw, 32px); align-items: start; }
+.photo-large { margin: 0; padding: 7px; background: white; border: 1px solid #d1d4d3; box-shadow: 0 2px 7px #0002; }
+.photo-large img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; }
+.photo-large figcaption { padding: 8px 3px 1px; color: #79868a; font-size: 12px; }
+.photo-info h2, .moon-page > h2 { margin: 0 0 7px; color: #2f5367; font-size: clamp(23px, 3vw, 32px); line-height: 1.15; }
+.photo-info p { margin: 8px 0; }
+.photo-info .photo-byline { font-size: 15px; }
+.photo-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 17px 0; }
+.photo-tags strong { margin-right: 3px; }
+.tag-chip { display: inline-block; padding: 2px 8px; border-radius: 12px; color: #455b66; background: #dce6e8; font-size: 12px; }
+.photo-fave { padding: 6px 9px; border: 1px solid #bcc7ca; border-radius: 3px; color: #475c66; background: #fff; }
+.photo-fave[aria-pressed="true"] { border-color: #d27777; color: #a43944; background: #fff4f3; }
+.photo-comments { margin-top: 23px; border-top: 1px solid #d5d9d9; padding-top: 10px; }
+.photo-comments h3 { margin: 0 0 8px; color: #435a65; font-size: 14px; }
+.photo-comments p { padding: 7px; background: #e9edec; font-size: 12px; }
+.photo-next { margin: 18px 0 0; padding: 10px; border-top: 1px solid #d5d9d9; }
+.moon-page > h2 { margin-bottom: 5px; }
+.moon-page > h2 .tag-chip { vertical-align: .12em; font-size: .58em; }
+.moon-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.moon-card { min-width: 0; padding: 5px; border: 1px solid #cbd1d2; background: white; color: #34454c; text-align: left; box-shadow: 0 1px 3px #0002; }
+.moon-card:has(figcaption) { margin: 0; }
+.moon-card:hover, .moon-card[aria-pressed="true"] { border-color: #6391a5; box-shadow: 0 2px 8px #40627635; }
+.moon-card img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.moon-caption { display: grid; gap: 2px; padding: 7px 3px 3px; }
+.moon-caption strong { color: #31546a; font-size: 13px; }
+.moon-caption span { color: #56666d; font-size: 12px; }
+.moon-caption small { color: #8b9699; font-size: 10px; }
+.upload-dialog { width: min(420px, 90vw); padding: 20px; border: 1px solid #9aabb1; border-radius: 4px; color: #34454c; background: #f8f8f5; box-shadow: 0 10px 40px #0004; }
+.upload-dialog::backdrop { background: #18263288; }
+.upload-close { float: right; }
+.upload-close button { width: 27px; height: 27px; border: 1px solid #bdc7ca; color: #42545b; background: white; }
+.upload-form { display: grid; gap: 10px; clear: both; }
+.upload-form h3 { margin: 0; color: #31566b; }
+.upload-form label { display: grid; gap: 4px; font-size: 12px; font-weight: bold; }
+.upload-form input { max-width: 100%; padding: 6px; border: 1px solid #c3ccce; background: white; font-size: 13px; font-weight: normal; }
+.upload-form > button { justify-self: start; padding: 6px 10px; border: 1px solid #a44d25; border-radius: 3px; color: white; background: #d36a32; }
+.upload-feedback { min-height: 16px; margin: 0; color: #3f734d; font-size: 12px; }
+.empty-favorites { padding: 18px; background: #e8edec; color: #64747a; }
+.moon-spotlight { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); align-items: center; gap: 17px; min-height: 95px; margin-top: 17px; padding: 10px; border: 1px solid #d5dada; background: #eaedeb; }
+.moon-spotlight:has(img) { grid-template-columns: minmax(180px, .8fr) minmax(0, 1fr); }
+.moon-spotlight img { width: 100%; max-height: 190px; object-fit: cover; }
+.moon-spotlight h3 { margin: 0 0 4px; color: #31546a; }
+.moon-spotlight p { margin: 4px 0; }
+
+.board-page { min-height: 100%; padding-bottom: 12px; }
+.board-heading { justify-content: space-between; gap: 12px 22px; }
+.progress-wrap { display: grid; grid-template-columns: minmax(90px, 160px) auto; align-items: center; gap: 8px; color: #e7f0f7; font-size: 11px; }
+.board-progress { width: 100%; height: 8px; accent-color: #70bc88; }
+.board-activity { min-height: 23px; margin: 0 0 8px; padding: 4px clamp(11px, 2vw, 26px); color: #f0f7ff; background: #31577b; font-size: 11px; }
+.board-heading > div:first-child { display: grid; gap: 2px; }
+.card-description { color: #65727b; font-size: 11px; font-weight: normal; line-height: 1.35; }
+.card-due { color: #556877; font-size: 10px; }
+.board-card { position: relative; padding: 8px; }
+.board-card:hover .card-title { color: #235780; }
+.board-card:focus-visible { outline-color: #205982; }
+.card-dialog { max-height: min(90vh, 660px); overflow-y: auto; }
+.dialog-close { float: right; }
+.detail-form { display: grid; gap: 11px; clear: both; }
+.detail-form h3 { margin: 0 0 2px; }
+.detail-form label { display: grid; gap: 4px; color: #425463; font-size: 12px; font-weight: bold; }
+.detail-form input, .detail-form textarea, .detail-form select { width: 100%; min-width: 0; padding: 6px; border: 1px solid #aebac5; border-radius: 3px; color: #273644; background: white; font-size: 13px; font-weight: normal; }
+.detail-form textarea { resize: vertical; }
+.detail-form .save-details { justify-self: end; padding: 6px 10px; border: 1px solid #274d70; border-radius: 3px; color: white; background: #315f89; }
+
+@media (max-width: 650px) {
+  .stream-grid, .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stream-photo-2 { margin-top: 0; }
+  .photo-detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .moon-spotlight, .moon-spotlight:has(img) { grid-template-columns: minmax(0, 1fr); }
+  .moon-spotlight img { max-height: 230px; }
+}
+@media (max-width: 420px) {
+  .photo-page { padding: 15px; }
+  .stream-grid, .moon-grid { grid-template-columns: minmax(0, 1fr); }
+  .photo-community-head { align-items: start; }
+  .progress-wrap { grid-template-columns: 1fr; gap: 3px; }
+}

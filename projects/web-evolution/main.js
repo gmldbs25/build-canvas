@@ -1,75 +1,77 @@
-import { eras, mosaicPage, orbitPage } from './eras.js';
+import { eras as historicalEras, mosaicPage, orbitPage } from './eras.js';
+import { photoPage, initPhoto } from './photo.js';
+import { modernEras, createModern } from './modern.js';
 import { createBoard } from './board.js';
+import { createChrome, pageAddress } from './chrome.js';
 
+const eras = { ...historicalEras, ...modernEras };
+const intro = document.querySelector('#intro-view');
+const exhibit = document.querySelector('#exhibit-view');
 const screen = document.querySelector('#screen');
-const chrome = document.querySelector('#chrome');
+const chromeRoot = document.querySelector('#chrome');
 const status = document.querySelector('#status');
 const display = document.querySelector('#display');
 const board = createBoard();
+const modern = createModern(board);
 const notesDialog = document.querySelector('#field-notes');
-const timeline = document.querySelector('.timeline');
-const trails = new Map();
+const browserStates = new Map();
+const bookmarks = new Map();
+const chrome = createChrome({ root: chromeRoot, status, onAction: browserAction, onAddress: navigateAddress, onTab: switchTab });
 let era;
 let trail;
+let browserState;
 
-function readRoute() {
+function route() {
   const search = new URLSearchParams(window.location.search);
   const id = search.get('era');
-  const era = Object.hasOwn(eras, id) ? id : '1993';
-  const page = search.get('page');
-  return { era, page: Object.hasOwn(eras[era].pages, page) ? page : 'home' };
+  if (!id || !Object.hasOwn(eras, id)) return { intro: true };
+  const requested = search.get('page');
+  return { intro: false, era: id, page: Object.hasOwn(eras[id].pages, requested) ? requested : 'home', tab: window.history.state?.tab };
 }
 
-function pageUrl(page) {
-  return `?era=${era}${page === 'home' ? '' : `&page=${page}`}`;
+function pageUrl(page = trail.pages[trail.index]) {
+  return `?era=${era}${page === 'home' ? '' : `&page=${encodeURIComponent(page)}`}`;
 }
 
-function tool(action, icon, label, enabled = true) {
-  return `<button type="button" data-action="${action}" aria-label="${label}" title="${label}" ${action === 'info' ? 'aria-haspopup="dialog"' : ''} ${enabled ? '' : 'disabled'}>
-    <span aria-hidden="true">${icon}</span><span class="tool-label">${label}</span>
-  </button>`;
+function isModernEra(id = era) {
+  return Number(id) >= 2005;
 }
 
-function renderChrome() {
-  const { base, pages } = eras[era];
-  const page = trail.pages[trail.index];
-  const [title, path] = pages[page];
-  const back = tool('back', '←', 'Back', trail.index > 0);
-  const forward = tool('forward', '→', 'Forward', trail.index + 1 < trail.pages.length);
-  const reload = tool('reload', '⟳', 'Reload');
-  const home = tool('home', '⌂', 'Home', page !== 'home');
-  const info = tool('info', '?', 'About this exhibit');
-  const address = (label) => `<div class="address-row"><span>${label}</span><span class="address" aria-label="Simulated address">${base}${path}</span></div>`;
+function showIntro() {
+  if (intro) intro.hidden = false;
+  if (exhibit) exhibit.hidden = true;
+  document.body.dataset.view = 'intro';
+}
 
-  if (era === '1993') {
-    chrome.innerHTML = `
-      <div class="mosaic-title"><span class="motif-mark" aria-hidden="true"></span><span>NCSA Mosaic</span><span class="motif-mark motif-end" aria-hidden="true"></span></div>
-      <div class="period-menu" aria-hidden="true"><span><u>F</u>ile</span><span><u>O</u>ptions</span><span><u>N</u>avigate</span><span><u>A</u>nnotate</span><span><u>H</u>otlist</span></div>
-      <div class="mosaic-location"><div>
-        <div class="address-row"><span>Document Title:</span><span class="address">${title}</span></div>
-        ${address('Document URL:')}
-      </div><span class="mosaic-globe" aria-hidden="true"><i></i></span></div>`;
-    status.innerHTML = `<div class="browser-tools">${back}${forward}${home}${reload}${info}</div><span class="status-text">Document Done</span>`;
-  } else if (era === '1998') {
-    chrome.innerHTML = `
-      <div class="ie-title"><span class="ie-mark" aria-hidden="true">e</span><span>${title} – Internet Explorer</span><span class="window-buttons" aria-hidden="true"><b>_</b><b>□</b><b>×</b></span></div>
-      <div class="period-menu" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span>F<u>a</u>vorites</span><span><u>H</u>elp</span></div>
-      <div class="browser-tools">${back}${forward}${reload}${home}${info}</div>
-      ${address('Address')}`;
-    status.innerHTML = '<span class="status-text">Done</span><span aria-hidden="true">◉ Internet zone</span>';
-  } else {
-    chrome.innerHTML = `
-      <div class="chrome-tabs"><span class="chrome-tab"><span aria-hidden="true">▥</span> ${title}</span><span class="tab-outline" aria-hidden="true"></span></div>
-      <div class="chrome-location"><div class="browser-tools">${reload}</div>${address('◈')}<div class="browser-tools">${info}</div></div>`;
-    status.replaceChildren();
+function showExhibit() {
+  if (intro) intro.hidden = true;
+  if (exhibit) exhibit.hidden = false;
+  document.body.dataset.view = 'exhibit';
+}
+
+function currentTab() {
+  return browserState?.tabs.find((tab) => tab.id === browserState.activeTab);
+}
+
+function setCurrentPage(page) {
+  if (isModernEra() && currentTab()) {
+    const tab = currentTab();
+    trail = tab.trail;
+    tab.title = eras[era].pages[page]?.[0] || 'New tab';
   }
+  if (isModernEra() && currentTab()) currentTab().trail = trail;
 }
 
 function showNotes() {
-  const { caption, notes, sources } = eras[era];
-  document.querySelector('#notes-title').textContent = `${era} · ${caption}`;
-  document.querySelector('#notes-copy').textContent = notes;
-  document.querySelector('#notes-sources').replaceChildren(...sources.map(([label, url]) => {
+  const data = eras[era];
+  document.querySelector('#notes-title').textContent = `${era === '2025' ? '2025–26' : era} · ${data.caption}`;
+  document.querySelector('#notes-copy').textContent = data.notes;
+  const guide = document.querySelector('#notes-guide');
+  if (guide) {
+    guide.textContent = data.hint || '';
+    guide.hidden = !data.hint;
+  }
+  document.querySelector('#notes-sources').replaceChildren(...data.sources.map(([label, url]) => {
     const item = document.createElement('li');
     const link = document.createElement('a');
     link.href = url;
@@ -84,61 +86,254 @@ function showNotes() {
 
 function renderPage(focusPage = false) {
   const page = trail.pages[trail.index];
-  renderChrome();
+  const [title, path] = eras[era].pages[page];
+  setCurrentPage(page);
+  const tabs = browserState?.tabs;
+  chrome.render({ era, title, base: eras[era].base, path, page, index: trail.index, length: trail.pages.length, zoom: browserState?.zoom || 1, tabs, activeTab: browserState?.activeTab });
   const content = document.createElement('div');
   content.className = 'page-content';
   if (era === '1993') content.innerHTML = mosaicPage(page);
-  if (era === '1998') content.innerHTML = orbitPage(page);
-  if (era === '2013') content.innerHTML = board.markup();
+  else if (era === '1998') content.innerHTML = orbitPage(page);
+  else if (era === '2005') content.innerHTML = photoPage(page);
+  else if (era === '2013') content.innerHTML = board.markup();
+  else content.innerHTML = modern.markup(era, page);
+  const zoom = browserState?.zoom || 1;
+  content.style.zoom = `${Math.round(zoom * 100)}%`;
   screen.replaceChildren(content);
   screen.scrollTop = 0;
   screen.scrollLeft = 0;
   if (era === '2013') board.init(content);
+  if (era === '2005') initPhoto(content, page);
+  if (Object.hasOwn(modernEras, era)) modern.init(content, era, page, goTo);
   if (era === '1998' && page === 'home') showVisitorCount();
   if (era === '1998' && page === 'guestbook') initGuestbook();
   if (focusPage) {
     const heading = screen.querySelector('h2');
-    heading.tabIndex = -1;
-    heading.focus({ preventScroll: true });
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   }
 }
 
-function selectEra(id, page, restore = false) {
+function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
+  if (!Object.hasOwn(eras, id)) return;
   era = id;
-  const previous = trails.get(era);
-  if (!previous || (restore && page !== previous.pages[previous.index])) {
-    const pages = page === 'home' ? ['home'] : ['home', page];
-    trails.set(era, { pages, index: pages.length - 1 });
+  const bookmarkPanel = document.querySelector('#bookmark-panel');
+  if (bookmarkPanel) bookmarkPanel.hidden = true;
+  let state = browserStates.get(era);
+  if (!state) {
+    const firstTrail = { pages: page === 'home' ? ['home'] : ['home', page], index: page === 'home' ? 0 : 1 };
+    state = { trail: firstTrail, tabs: [{ id: 'tab-1', title: eras[era].pages[page]?.[0] || 'New tab', trail: firstTrail }], activeTab: 'tab-1', zoom: 1 };
+    browserStates.set(era, state);
   }
-  trail = trails.get(era);
+  browserState = state;
+  if (tabId && browserState.tabs.some((tab) => tab.id === tabId)) browserState.activeTab = tabId;
+  if (restore && page !== currentTab().trail.pages[currentTab().trail.index]) {
+    trail = currentTab().trail;
+    const existingIndex = trail.pages.lastIndexOf(page);
+    if (existingIndex >= 0) trail.index = existingIndex;
+    else {
+      trail.pages = page === 'home' ? ['home'] : ['home', page];
+      trail.index = trail.pages.length - 1;
+    }
+  } else trail = currentTab().trail;
+  if (navigate && trail.pages[trail.index] !== page) {
+    trail.pages.splice(trail.index + 1, Infinity, page);
+    trail.index += 1;
+    if (isModernEra() && currentTab()) {
+      currentTab().trail = trail;
+      currentTab().title = eras[era].pages[page][0];
+    }
+  }
   display.dataset.era = era;
-  for (const link of timeline.querySelectorAll('[data-era]')) {
+  for (const link of document.querySelectorAll('a[data-era]')) {
     if (link.dataset.era === era) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');
   }
+  const hint = document.querySelector('#scene-hint');
+  if (hint) hint.textContent = eras[era].hint || 'Explore the page links and browser menus in this scene.';
+  showExhibit();
   renderPage();
 }
 
-function goTo(page) {
-  if (trail.pages[trail.index] === page) return;
+function goTo(page, focusPage = true) {
+  if (!Object.hasOwn(eras[era].pages, page) || trail.pages[trail.index] === page) return;
   trail.pages.splice(trail.index + 1, Infinity, page);
   trail.index += 1;
-  window.history.replaceState(null, '', pageUrl(page));
-  renderPage(true);
+  if (isModernEra() && currentTab()) {
+    currentTab().trail = trail;
+    currentTab().title = eras[era].pages[page][0];
+  }
+  window.history.replaceState({ era, page }, '', pageUrl(page));
+  renderPage(focusPage);
 }
 
-function browserAction(action) {
-  if (action === 'info') {
-    showNotes();
-  } else if (action === 'home') {
-    goTo('home');
-  } else if (action === 'reload') {
-    renderPage(true);
-  } else {
-    trail.index += action === 'back' ? -1 : 1;
-    window.history.replaceState(null, '', pageUrl(trail.pages[trail.index]));
-    renderPage(true);
+function navigateAddress(value) {
+  const address = String(value || '').trim();
+  if (!address) return;
+  const info = eras[era];
+  let absolute;
+  try {
+    absolute = new URL(address, info.base).href;
+  } catch {
+    showToast('This exhibit only opens its featured pages.');
+    return;
   }
+  const found = Object.entries(info.pages).find(([, [, path]]) => (
+    absolute === new URL(pageAddress(info.base, path)).href
+  ));
+  if (found) goTo(found[0]);
+  else showToast('This exhibit only opens its featured pages.');
+}
+
+function switchTab(id) {
+  const next = browserState?.tabs.find((tab) => tab.id === id);
+  if (!next || next.id === browserState.activeTab) return;
+  browserState.activeTab = id;
+  trail = next.trail;
+  window.history.replaceState({ era, page: trail.pages[trail.index], tab: id }, '', pageUrl());
+  renderPage();
+}
+
+function browserAction(action, detail = {}) {
+  if (action === 'info') return showNotes();
+  if (action === 'open-address') {
+    const target = document.querySelector('#browser-address');
+    target.focus();
+    target.select();
+    return;
+  }
+  if (action === 'back' || action === 'forward') {
+    const nextIndex = trail.index + (action === 'back' ? -1 : 1);
+    if (nextIndex < 0 || nextIndex >= trail.pages.length) return;
+    trail.index = nextIndex;
+    const page = trail.pages[nextIndex];
+    if (isModernEra() && currentTab()) currentTab().trail = trail;
+    window.history.replaceState({ era, page }, '', pageUrl(page));
+    return renderPage(true);
+  }
+  if (action === 'home') return goTo('home');
+  if (action === 'reload') return renderPage();
+  if (action === 'zoom-in' || action === 'zoom-out' || action === 'zoom-reset') {
+    browserState.zoom = action === 'zoom-reset' ? 1 : Math.min(1.5, Math.max(.7, browserState.zoom + (action === 'zoom-in' ? .1 : -.1)));
+    return renderPage();
+  }
+  if (action === 'new-tab') {
+    if (!isModernEra()) return showToast('New windows are represented by exhibit tabs in this scene.');
+    const id = `tab-${Date.now()}`;
+    const newTrail = { pages: ['home'], index: 0 };
+    browserState.tabs.push({ id, title: 'New tab', trail: newTrail });
+    browserState.activeTab = id;
+    trail = newTrail;
+    window.history.replaceState({ era, page: 'home', tab: id }, '', pageUrl('home'));
+    return renderPage();
+  }
+  if (action === 'close-tab') {
+    if (!isModernEra() || browserState.tabs.length < 2) return showToast('Keep one exhibit tab open to continue exploring.');
+    const id = detail.id || browserState.activeTab;
+    const index = browserState.tabs.findIndex((tab) => tab.id === id);
+    if (index < 0) return;
+    browserState.tabs.splice(index, 1);
+    if (id === browserState.activeTab) browserState.activeTab = browserState.tabs[Math.max(0, index - 1)].id;
+    trail = currentTab().trail;
+    window.history.replaceState({ era, page: trail.pages[trail.index], tab: browserState.activeTab }, '', pageUrl());
+    return renderPage();
+  }
+  if (action === 'bookmark') {
+    const list = bookmarks.get(era) || [];
+    const page = trail.pages[trail.index];
+    if (!list.some((item) => item.page === page)) list.push({ page, title: eras[era].pages[page][0] });
+    bookmarks.set(era, list);
+    return showToast(`Saved “${eras[era].pages[page][0]}” to this browser’s favorites.`);
+  }
+  if (action === 'bookmarks') {
+    return showBookmarks();
+  }
+  if (action === 'copy-address') {
+    const { base, pages } = eras[era];
+    const address = pageAddress(base, pages[trail.pages[trail.index]][1]);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(address).then(() => showToast('Simulated address copied.')).catch(() => showToast(address));
+    } else {
+      showToast(address);
+    }
+    return;
+  }
+  if (action === 'save-page') return saveCurrentPage();
+  if (action === 'select-all') return selectPageText();
+}
+
+function showToast(message) {
+  let toast = document.querySelector('#browser-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'browser-toast';
+    toast.className = 'browser-toast';
+    toast.setAttribute('role', 'status');
+    document.body.append(toast);
+  }
+  toast.textContent = message;
+  toast.hidden = false;
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => { toast.hidden = true; }, 2600);
+}
+
+function showBookmarks() {
+  let panel = document.querySelector('#bookmark-panel');
+  if (!panel) {
+    panel = document.createElement('section');
+    panel.id = 'bookmark-panel';
+    panel.className = 'bookmark-panel';
+    panel.setAttribute('aria-labelledby', 'bookmark-title');
+    panel.innerHTML = '<div class="bookmark-heading"><h2 id="bookmark-title">Favorites</h2><button type="button" data-bookmark-close aria-label="Close favorites">×</button></div><div class="bookmark-list"></div>';
+    panel.addEventListener('click', (event) => {
+      if (event.target.closest('[data-bookmark-close]')) panel.hidden = true;
+    });
+    document.body.append(panel);
+  }
+  const list = panel.querySelector('.bookmark-list');
+  const items = bookmarks.get(era) || [];
+  list.replaceChildren();
+  if (!items.length) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No saved pages yet. Choose Add to Favorites from a browser menu.';
+    list.append(empty);
+  } else {
+    for (const item of items) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.bookmarkPage = item.page;
+      button.textContent = item.title;
+      list.append(button);
+    }
+  }
+  panel.hidden = false;
+  panel.querySelector('.bookmark-list button')?.focus();
+}
+
+function saveCurrentPage() {
+  const page = trail.pages[trail.index];
+  const title = eras[era].pages[page][0];
+  const contents = `${title}\n${'='.repeat(title.length)}\n\n${screen.innerText.trim()}\n`;
+  const file = new Blob([contents], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${era}-${page}.txt`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(`Saved “${title}” as a text file.`);
+}
+
+function selectPageText() {
+  const selection = window.getSelection();
+  if (!selection) return;
+  const range = document.createRange();
+  range.selectNodeContents(screen);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  showToast('Page text selected. Copy it with your keyboard shortcut.');
 }
 
 let visitorCount;
@@ -148,13 +343,9 @@ function showVisitorCount() {
     try {
       const key = 'build-canvas:web-evolution:visitors';
       const previous = Number(localStorage.getItem(key));
-      if (Number.isSafeInteger(previous) && previous >= 1287 && previous < 999999) {
-        visitorCount = previous + 1;
-      }
+      if (Number.isSafeInteger(previous) && previous >= 1287 && previous < 999999) visitorCount = previous + 1;
       localStorage.setItem(key, visitorCount);
-    } catch {
-      // Show the starting value if browser storage is unavailable.
-    }
+    } catch { /* Storage is optional in the exhibit. */ }
   }
   screen.querySelector('.visitor strong').textContent = String(visitorCount).padStart(6, '0');
 }
@@ -163,18 +354,13 @@ let guestbook = [];
 const guestbookKey = 'build-canvas:web-evolution:guestbook';
 try {
   const saved = JSON.parse(localStorage.getItem(guestbookKey));
-  if (Array.isArray(saved)) {
-    guestbook = saved.filter((entry) => typeof entry?.name === 'string' && typeof entry.message === 'string').slice(0, 20);
-  }
-} catch {
-  // The guestbook still works for the current visit if storage is unavailable.
-}
+  if (Array.isArray(saved)) guestbook = saved.filter((entry) => typeof entry?.name === 'string' && typeof entry.message === 'string').slice(0, 20);
+} catch { /* The guestbook still works during this visit. */ }
 
 function initGuestbook() {
-  const form = document.querySelector('#guestbook-form');
-  const list = document.querySelector('#guestbook-entries');
-
-  function showEntries() {
+  const form = screen.querySelector('#guestbook-form');
+  const list = screen.querySelector('#guestbook-entries');
+  const showEntries = () => {
     const entries = [...guestbook, { name: 'Stargazer42', message: 'Cool Saturn! See you in Area51.' }];
     list.replaceChildren(...entries.map(({ name, message }) => {
       const item = document.createElement('li');
@@ -183,8 +369,7 @@ function initGuestbook() {
       item.append(author, document.createTextNode(` wrote: ${message}`));
       return item;
     }));
-  }
-
+  };
   showEntries();
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -193,11 +378,7 @@ function initGuestbook() {
     const message = data.get('message').trim();
     if (!name || !message) return;
     guestbook = [{ name, message }, ...guestbook].slice(0, 20);
-    try {
-      localStorage.setItem(guestbookKey, JSON.stringify(guestbook));
-    } catch {
-      // Keep the entry in memory for this visit.
-    }
+    try { localStorage.setItem(guestbookKey, JSON.stringify(guestbook)); } catch { /* Keep this visit's entry in memory. */ }
     form.reset();
     showEntries();
   });
@@ -207,44 +388,58 @@ function isModifiedClick(event) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
 }
 
-timeline.addEventListener('click', (event) => {
-  const link = event.target.closest('[data-era]');
-  if (!link || isModifiedClick(event)) return;
-  event.preventDefault();
-  if (link.dataset.era === era) return;
-  selectEra(link.dataset.era, 'home');
-  window.history.pushState(null, '', pageUrl(trail.pages[trail.index]));
-});
-
-window.addEventListener('popstate', () => {
-  const { era, page } = readRoute();
-  selectEra(era, page, true);
-});
-
-display.addEventListener('click', (event) => {
-  const link = event.target.closest('[data-page]');
-  const control = event.target.closest('[data-action]');
+document.addEventListener('click', (event) => {
+  const savedPage = event.target.closest('#bookmark-panel [data-bookmark-page]');
+  if (savedPage) {
+    const panel = document.querySelector('#bookmark-panel');
+    if (panel) panel.hidden = true;
+    goTo(savedPage.dataset.bookmarkPage);
+    return;
+  }
+  const link = event.target.closest('a[data-era]');
   if (link && !isModifiedClick(event)) {
     event.preventDefault();
-    goTo(link.dataset.page);
-  } else if (control) {
-    browserAction(control.dataset.action);
+    const targetEra = link.dataset.era;
+    const targetPage = link.dataset.page || 'home';
+    if (targetEra === era && exhibit && !exhibit.hidden) {
+      if (link.dataset.page) goTo(targetPage);
+      return;
+    }
+    selectEra(targetEra, targetPage, false, Boolean(link.dataset.page));
+    window.history.pushState({ era, page: trail.pages[trail.index], tab: browserState.activeTab }, '', pageUrl());
+    return;
+  }
+  const pageLink = event.target.closest('#screen [data-page]');
+  if (pageLink && !isModifiedClick(event)) {
+    event.preventDefault();
+    goTo(pageLink.dataset.page);
   }
 });
 
+window.addEventListener('popstate', () => {
+  const next = route();
+  if (next.intro) return showIntro();
+  selectEra(next.era, next.page, true, false, next.tab);
+});
+
 function isEditingTarget(target) {
-  return target instanceof Element &&
-    Boolean(target.closest('input, textarea, select, [contenteditable], [role="textbox"], [data-code-editor], .monaco-editor, .CodeMirror'));
+  return target instanceof Element && Boolean(target.closest('input, textarea, select, [contenteditable], [role="textbox"], [data-code-editor], .monaco-editor, .CodeMirror'));
 }
 
 window.addEventListener('keydown', (event) => {
-  if (event.key.toLowerCase() === 'h' &&
-      !event.metaKey && !event.ctrlKey && !event.altKey && !event.isComposing &&
-      !isEditingTarget(event.target) && !event.defaultPrevented) {
+  if (event.key.toLowerCase() === 'h' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.isComposing && !isEditingTarget(event.target) && !event.defaultPrevented) {
     const homeUrl = new URL('../', window.location.href);
     window.location.assign(homeUrl.href);
   }
 });
 
-const initial = readRoute();
-selectEra(initial.era, initial.page);
+document.querySelector('#intro-link')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  window.history.pushState({}, '', './');
+  showIntro();
+});
+document.querySelector('#scene-help')?.addEventListener('click', showNotes);
+
+const initial = route();
+if (initial.intro) showIntro();
+else selectEra(initial.era, initial.page);

@@ -2,12 +2,12 @@ const lanes = ['To do', 'In progress', 'Done'];
 const labels = { planning: 'Planning', design: 'Design', research: 'Research' };
 
 const initialCards = [
-  { id: 1, lane: 0, title: 'Interview beta testers', label: 'research', owner: 'AL' },
-  { id: 2, lane: 0, title: 'Write the launch post', label: 'planning' },
-  { id: 3, lane: 0, title: 'Make a feedback form', label: 'design' },
-  { id: 4, lane: 1, title: 'Sketch the landing page', label: 'design', owner: 'MK' },
-  { id: 5, lane: 1, title: 'Collect early feedback', label: 'research' },
-  { id: 6, lane: 2, title: 'Set up the project board', label: 'planning', owner: 'AL' },
+  { id: 1, key: 'confirm-meeting-time', lane: 0, title: 'Confirm the meeting time', description: 'Agree on a start time with everyone coming to the ridge. Check sunset and the last bus back.', due: '2013-10-18T18:00', label: 'planning', owner: 'AL' },
+  { id: 2, key: 'check-weather', lane: 0, title: 'Check the weekend forecast', description: 'Look for cloud cover and wind before we pack the telescope.', due: '2013-10-18T12:00', label: 'research' },
+  { id: 3, key: 'print-star-chart', lane: 0, title: 'Print a star chart', description: 'Bring a chart for the northern sky and mark the planets visible this month.', due: '', label: 'design' },
+  { id: 4, key: 'charge-camera', lane: 1, title: 'Charge the camera batteries', description: 'Pack the spare battery and memory card for moon photos.', due: '2013-10-19T16:00', label: 'planning', owner: 'MK' },
+  { id: 5, key: 'borrow-binoculars', lane: 1, title: 'Borrow binoculars', description: 'Ask the astronomy club if a second pair is available.', due: '', label: 'research' },
+  { id: 6, key: 'choose-site', lane: 2, title: 'Choose a dark-sky site', description: 'Ridge pull-off has a clear view and room to set up.', due: '', label: 'planning', owner: 'AL' },
 ];
 
 function escapeHtml(value) {
@@ -22,20 +22,43 @@ export function createBoard() {
   let filter = '';
   let draggedId;
   let activeCard;
+  let activity = 'Observing Night board is ready.';
+
+  function snapshot() {
+    return cards.map((card) => ({ ...card }));
+  }
+
+  function updateProgress(screen) {
+    const done = cards.filter(({ lane }) => lane === 2).length;
+    const progress = screen.querySelector('.board-progress');
+    progress.value = done;
+    progress.max = Math.max(cards.length, 1);
+    progress.setAttribute('aria-label', `${done} of ${cards.length} tasks complete`);
+    screen.querySelector('.progress-label').textContent = `${done} of ${cards.length} done`;
+    screen.querySelector('.board-activity').textContent = activity;
+  }
 
   function renderCards(screen) {
-    for (const [index, lane] of lanes.entries()) {
+    for (const [index] of lanes.entries()) {
       const visibleCards = cards.filter(({ lane, title }) => lane === index && title.toLowerCase().includes(filter));
       screen.querySelector(`[data-lane="${index}"] .cards`).innerHTML = visibleCards.map((card) => `
-        <button type="button" class="board-card" draggable="true" data-card="${card.id}">
+        <button type="button" class="board-card" draggable="true" data-card="${card.id}" aria-label="Open ${escapeHtml(card.title)}">
           ${card.label ? `<span class="card-tag ${card.label}">${labels[card.label]}</span>` : ''}
-          <span>${escapeHtml(card.title)}</span>
-          ${card.owner ? `<span class="card-owner" aria-label="Assigned to ${card.owner}">${card.owner}</span>` : ''}
+          <span class="card-title">${escapeHtml(card.title)}</span>
+          ${card.description ? `<span class="card-description">${escapeHtml(card.description)}</span>` : ''}
+          ${card.due ? `<time class="card-due" datetime="${escapeHtml(card.due)}">${new Date(card.due).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</time>` : ''}
+          ${card.owner ? `<span class="card-owner" aria-label="Assigned to ${escapeHtml(card.owner)}">${escapeHtml(card.owner)}</span>` : ''}
         </button>`).join('');
-      screen.querySelector(`[data-lane="${index}"] .card-count`).textContent = visibleCards.length;
-      screen.querySelector(`[data-lane="${index}"]`).setAttribute('aria-label', lane);
+      screen.querySelector(`[data-lane="${index}"] .card-count`).textContent = cards.filter(({ lane }) => lane === index).length;
+      screen.querySelector(`[data-lane="${index}"]`).setAttribute('aria-label', lanes[index]);
     }
     screen.querySelector('.board-empty').hidden = !filter || cards.some(({ title }) => title.toLowerCase().includes(filter));
+    updateProgress(screen);
+  }
+
+  function record(message, screen) {
+    activity = message;
+    updateProgress(screen);
   }
 
   function moveCard(screen, id, lane) {
@@ -45,13 +68,22 @@ export function createBoard() {
     cards.splice(cards.indexOf(card), 1);
     cards.push(card);
     renderCards(screen);
-    screen.querySelector('.board-feedback').textContent = `${card.title} moved to ${lanes[lane]}.`;
+    record(`${card.title} moved to ${lanes[lane]}.`, screen);
+  }
+
+  function addCard({ title, description = '', key } = {}) {
+    const cleanTitle = String(title || '').trim();
+    const cleanKey = key ? String(key).trim() : '';
+    if (!cleanTitle || cards.some((card) => (cleanKey && card.key === cleanKey) || card.title.toLocaleLowerCase() === cleanTitle.toLocaleLowerCase())) return false;
+    cards.push({ id: nextId++, key: cleanKey || `custom-${Date.now()}-${nextId}`, lane: 0, title: cleanTitle, description: String(description || '').trim() });
+    return true;
   }
 
   function init(screen) {
     const dialog = screen.querySelector('dialog');
-    const laneSelect = dialog.querySelector('select');
+    const laneSelect = dialog.querySelector('[name="lane"]');
     const search = screen.querySelector('input[type="search"]');
+    const detailForm = dialog.querySelector('.detail-form');
     search.value = filter;
     renderCards(screen);
     search.addEventListener('input', () => {
@@ -62,12 +94,33 @@ export function createBoard() {
       const button = event.target.closest('[data-card]');
       if (!button) return;
       activeCard = cards.find(({ id }) => id === Number(button.dataset.card));
-      dialog.querySelector('h3').textContent = activeCard.title;
+      if (!activeCard) return;
+      detailForm.elements.title.value = activeCard.title;
+      detailForm.elements.description.value = activeCard.description || '';
+      detailForm.elements.due.value = activeCard.due || '';
       laneSelect.value = activeCard.lane;
       dialog.showModal();
     });
+    detailForm.addEventListener('submit', (event) => {
+      if (event.submitter?.value === 'close') return;
+      event.preventDefault();
+      const title = detailForm.elements.title.value.trim();
+      if (!activeCard || !title) return;
+      const previousTitle = activeCard.title;
+      activeCard.title = title;
+      activeCard.description = detailForm.elements.description.value.trim();
+      activeCard.due = detailForm.elements.due.value;
+      activeCard.lane = Number(laneSelect.value);
+      cards.splice(cards.indexOf(activeCard), 1);
+      cards.push(activeCard);
+      renderCards(screen);
+      record(`${previousTitle === title ? title : `${previousTitle} renamed to ${title}`} updated.`, screen);
+      dialog.close();
+    });
     laneSelect.addEventListener('change', () => moveCard(screen, activeCard.id, Number(laneSelect.value)));
-    dialog.addEventListener('close', () => screen.querySelector(`[data-card="${activeCard.id}"]`)?.focus());
+    dialog.addEventListener('close', () => {
+      if (activeCard) screen.querySelector(`[data-card="${activeCard.id}"]`)?.focus();
+    });
 
     for (const form of screen.querySelectorAll('.add-card')) {
       form.addEventListener('submit', (event) => {
@@ -76,12 +129,20 @@ export function createBoard() {
         const title = input.value.trim();
         if (!title) return;
         const lane = Number(form.closest('[data-lane]').dataset.lane);
-        cards.push({ id: nextId++, lane, title });
+        const added = addCard({ title, key: `visit-${Date.now()}-${nextId}` });
+        if (!added) {
+          screen.querySelector('.board-feedback').textContent = `${title} is already on this board.`;
+          record(`${title} is already on this board; no duplicate was added.`, screen);
+          return;
+        }
         form.reset();
         filter = '';
         search.value = '';
         renderCards(screen);
-        screen.querySelector('.board-feedback').textContent = `${title} added to ${lanes[lane]}.`;
+        const card = cards[cards.length - 1];
+        card.lane = lane;
+        renderCards(screen);
+        record(`${title} added to ${lanes[lane]}.`, screen);
       });
     }
 
@@ -129,7 +190,8 @@ export function createBoard() {
         <label class="board-search"><span aria-hidden="true">⌕</span><span class="sr-only">Find cards</span><input type="search" placeholder="Find cards"></label>
         <span class="app-profile" title="Alex Lee">AL</span>
       </header>
-      <div class="board-heading"><h2>Launch board</h2><p>Studio workspace</p></div>
+      <div class="board-heading"><div><h2>Observing Night</h2><p>Ridge Observatory · Saturday, October 19</p></div><div class="progress-wrap"><progress class="board-progress" value="0" max="1" aria-label="0 of 6 tasks complete"></progress><span class="progress-label">0 of 6 done</span></div></div>
+      <p class="board-activity" aria-live="polite">${escapeHtml(activity)}</p>
       <p class="board-empty" hidden>No matching cards.</p>
       <div class="lanes">
         ${lanes.map((lane, index) => `<section class="lane" data-lane="${index}">
@@ -143,13 +205,19 @@ export function createBoard() {
         </section>`).join('')}
       </div>
       <p class="board-feedback sr-only" aria-live="polite"></p>
-      <dialog class="card-dialog" aria-labelledby="card-title">
-        <form method="dialog"><button type="submit" aria-label="Close card">×</button></form>
-        <h3 id="card-title"></h3>
-        <label>Move to list <select>${lanes.map((lane, index) => `<option value="${index}">${lane}</option>`).join('')}</select></label>
+      <dialog class="card-dialog" aria-labelledby="card-dialog-heading">
+        <form method="dialog" class="dialog-close"><button type="submit" value="close" aria-label="Close card">×</button></form>
+        <form class="detail-form">
+          <h3 id="card-dialog-heading">Edit task</h3>
+          <label>Title <input name="title" required maxlength="90"></label>
+          <label>Notes <textarea name="description" rows="3" maxlength="280"></textarea></label>
+          <label>Due <input type="datetime-local" name="due"></label>
+          <label>Move to list <select name="lane">${lanes.map((lane, index) => `<option value="${index}">${lane}</option>`).join('')}</select></label>
+          <button class="save-details" type="submit">Save changes</button>
+        </form>
       </dialog>
     </article>`;
   }
 
-  return { init, markup };
+  return { init, markup, addCard, snapshot };
 }

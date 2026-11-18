@@ -3,7 +3,7 @@ const works = [
   {
     index: "07",
     title: "The Evolution of the Web",
-    type: "WEB HISTORY · INTERACTIVE PROTOTYPE",
+    type: "WEB HISTORY · INTERACTIVE EXHIBIT",
     year: "2026.11",
     href: "./web-evolution/",
   },
