@@ -6,6 +6,7 @@ const works = [
     type: "WEB HISTORY · INTERACTIVE EXHIBIT",
     year: "2026.11",
     href: "./web-evolution/",
+    inProgress: true,
   },
   {
     index: "06",
@@ -69,7 +70,14 @@ export default function Home() {
           {works.map((work) => (
             <li key={work.index}>
               <a className="work-row" href={work.href}>
-                <span className="work-index">{work.index}</span>
+                <span className="work-index-group">
+                  <span className="work-index">{work.index}</span>
+                  {work.inProgress && (
+                    <span className="work-status">
+                      작업 중
+                    </span>
+                  )}
+                </span>
                 <strong>{work.title}</strong>
                 <span className="work-type">{work.type}</span>
                 <span className="work-year">{work.year}</span>
