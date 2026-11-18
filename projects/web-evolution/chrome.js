@@ -23,11 +23,14 @@ const menuSets = {
   ],
 };
 
-function menuMarkup(menus) {
+function menuMarkup(menus, loading = false) {
   return `<nav class="period-menu" aria-label="Browser menus">${menus.map(([label, items]) => `
     <div class="chrome-menu" data-menu>
       <button type="button" class="menu-trigger" aria-haspopup="menu" aria-expanded="false">${label}</button>
-      <div class="menu-popup" role="menu" hidden>${items.map(([name, action]) => `<button type="button" role="menuitem" data-action="${action}">${name}</button>`).join('')}</div>
+      <div class="menu-popup" role="menu" hidden>${items.map(([name, action]) => {
+        const stopped = loading && action === 'reload';
+        return `<button type="button" role="menuitem" data-action="${stopped ? 'stop-reload' : action}">${stopped ? 'Stop loading' : name}</button>`;
+      }).join('')}</div>
     </div>`).join('')}</nav>`;
 }
 
@@ -107,27 +110,28 @@ export function createChrome({ root, status, onAction, onAddress, onTab }) {
   function render(options) {
     const { era, base, path, page, index, length, tabs = [], activeTab = 'tab-1' } = options;
     const title = escapeHtml(options.title);
+    const loading = Boolean(options.loading);
     const modern = Number(era) >= 2005;
-    const menus = menuMarkup(menuSets[era] || menuSets[modern ? 'modern' : '1998']);
+    const menus = menuMarkup(menuSets[era] || menuSets[modern ? 'modern' : '1998'], loading);
     const back = toolbarAction('back', '←', 'Back', index <= 0);
     const forward = toolbarAction('forward', '→', 'Forward', index >= length - 1);
     const home = toolbarAction('home', '⌂', 'Home', page === 'home');
-    const reload = toolbarAction('reload', '⟳', 'Reload');
+    const reload = loading ? toolbarAction('stop-reload', '■', 'Stop loading') : toolbarAction('reload', '⟳', 'Reload');
     const address = `<form class="address-form"><label for="browser-address">${era === '1993' ? 'Document URL:' : 'Address'}</label><input id="browser-address" name="address" aria-label="Simulated address" value="${escapeHtml(pageAddress(base, path))}" spellcheck="false" autocomplete="off"><button type="submit" aria-label="Go to address">↵</button></form>`;
     const info = toolbarAction('info', '?', 'About this exhibit');
     const tabsBar = modern ? `<div class="sim-tabs" role="tablist" aria-label="Exhibit browser tabs">${tabs.map((tab) => `<button type="button" role="tab" data-tab-id="${escapeHtml(tab.id)}" aria-selected="${tab.id === activeTab}" class="sim-tab ${tab.id === activeTab ? 'is-active' : ''}"><span aria-hidden="true">◈</span> ${escapeHtml(tab.title || 'New tab')}${tabs.length > 1 ? `<span class="sim-tab-close" aria-label="Close ${escapeHtml(tab.title || 'tab')}" data-action="close-tab" data-close-id="${escapeHtml(tab.id)}">×</span>` : ''}</button>`).join('')}<button type="button" data-action="new-tab" class="sim-tab-add" aria-label="New tab">+</button></div>` : '';
     if (era === '1993') {
       root.innerHTML = `<div class="mosaic-title"><span class="motif-mark" aria-hidden="true"></span><span>NCSA Mosaic · ${title}</span><span class="motif-mark motif-end" aria-hidden="true"></span></div>${menus}<div class="mosaic-location"><div><div class="address-row"><span>Document Title:</span><strong>${title}</strong></div>${address}</div><span class="mosaic-globe" aria-hidden="true"><i></i></span></div><div class="browser-tools">${back}${forward}${home}${reload}${info}</div>`;
-      status.innerHTML = `<span class="status-text">Document ${options.loading ? 'Loading…' : 'Done'}</span><span> ${index + 1} of ${length}</span>`;
+      status.innerHTML = `<span class="status-text" role="status" aria-live="polite">${loading ? 'Loading document…' : 'Document Done'}</span><span> ${index + 1} of ${length}</span>`;
     } else if (era === '1998') {
       root.innerHTML = `<div class="ie-title"><span class="ie-mark" aria-hidden="true">e</span><span>${title} – Explorer</span><span class="window-buttons" aria-hidden="true"><b>_</b><b>□</b><b>×</b></span></div>${menus}<div class="browser-tools">${back}${forward}${home}${reload}${info}</div>${address}`;
-      status.innerHTML = '<span class="status-text">Done</span><span aria-hidden="true">◉ Internet zone</span>';
+      status.innerHTML = `<span class="status-text" role="status" aria-live="polite">${loading ? 'Contacting the server…' : 'Done'}</span><span aria-hidden="true">◉ Internet zone</span>`;
     } else {
       const location = `<div class="chrome-location"><div class="browser-tools">${back}${forward}${reload}</div>${address}<div class="browser-tools">${home}${info}</div></div>`;
       root.innerHTML = era === '2005'
         ? `<div class="firefox-title"><span aria-hidden="true">◉</span> ${title} — Firefox</div>${menus}${location}${tabsBar}`
         : `${tabsBar}${menus}${location}`;
-      status.innerHTML = `<span>${title}</span><span>${Math.round((options.zoom || 1) * 100)}%</span>`;
+      status.innerHTML = `<span role="status" aria-live="polite">${loading ? 'Refreshing this page…' : title}</span><span>${Math.round((options.zoom || 1) * 100)}%</span>`;
     }
   }
   return { render };
