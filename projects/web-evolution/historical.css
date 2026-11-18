@@ -1,6 +1,11 @@
 /* Content that lives inside the simulated pages. Kept separate from browser chrome. */
 .mosaic-page .memo-meta { color: #4e514c; }
-.mosaic-page code { padding: 1px 3px; background: #deded7; }
+.mosaic-page code { padding: 1px 3px; background: #deded7; overflow-wrap: anywhere; }
+.mosaic-page h3 { margin: 18px 0 6px; font-size: 1.05em; }
+.mosaic-page table { max-width: 100%; margin: 10px 0 14px; border-collapse: collapse; font-size: .88em; }
+.mosaic-page caption { padding: 3px; font-weight: bold; text-align: left; }
+.mosaic-page th, .mosaic-page td { padding: 3px 7px; border: 1px solid #9b9b92; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.mosaic-page blockquote { margin: 10px 22px; border-left: 3px solid #a2a299; padding-left: 10px; }
 
 .orbit-discovery {
   width: fit-content;
@@ -26,8 +31,27 @@
 }
 .orbit-diary strong { color: #584623; }
 .orbit-diary p { margin: 5px 0 0; }
+.orbit-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 8px 0 !important; }
+.orbit-badge { display: inline-grid; place-content: center; width: 78px; min-height: 33px; border: 2px outset #ddd; color: #fff; background: #263889; font: bold 8px/1.1 Verdana, sans-serif; text-shadow: 1px 1px #111; }
+.orbit-page a.orbit-badge { color: #fff; text-decoration: none; }
+.orbit-page a.orbit-badge:hover { filter: brightness(1.22); text-decoration: underline; }
+.orbit-badge-green { color: #a9ffbb; background: #15512c; }
+.orbit-badge-gold { color: #fff1a2; background: #76441b; }
+.orbit-update { width: fit-content; max-width: 96%; margin: 8px auto !important; padding: 6px 9px; border: 1px dotted #f0d972; color: #fff3a9; background: #171331; font: 12px/1.4 Verdana, sans-serif; }
+.orbit-ring { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 8px; margin: 14px auto; padding: 10px; border: 2px ridge #d7caed; background: #100d34; font: 12px/1.35 Verdana, sans-serif; }
+.orbit-ring span { color: #fff0a5; }
+.orbit-ring a:first-child { text-align: left; }
+.orbit-ring a:last-child { text-align: right; }
 .orbit-links li { padding-block: 4px; }
 .orbit-page .orbit-links a { display: inline-block; padding: 1px 2px; }
+.orbit-page pre {
+  width: fit-content; max-width: 100%; margin: 8px auto; padding: 8px;
+  overflow: auto; border: 1px inset #8b74b5; background: #100d34; color: #f4e8ff; text-align: left;
+}
+@media (max-width: 600px) {
+  .orbit-ring { grid-template-columns: minmax(0, 1fr); text-align: left; }
+  .orbit-ring a:first-child, .orbit-ring a:last-child { text-align: left; }
+}
 
 .photo-page {
   min-height: 100%;

@@ -45,20 +45,76 @@ body { display: block; height: auto; background: #10151b; }
 .cover-start:hover > span, .cover-start:focus-visible > span { transform: translateX(4px); }
 .intro-view :focus-visible, .scene-help:focus-visible { outline: 2px solid #bfdbff; outline-offset: 3px; }
 
-.cover-photo {
-  width: min(100%, 62svh); justify-self: center; margin: 0;
-  color: #a5afb9; font: 11px/1.5 var(--mono);
+.cover-stack {
+  position: relative; isolation: isolate; width: min(100%, 610px); min-width: 0; aspect-ratio: 1.34;
+  justify-self: center; font: clamp(8px, 1vw, 12px)/1.35 var(--sans);
 }
-.cover-photo img {
-  display: block; width: 100%; height: auto; aspect-ratio: 1600 / 1584;
-  border: 1px solid #353030; border-radius: 3px; box-shadow: 0 20px 70px #0007;
+.cover-window {
+  position: absolute; display: flex; flex-direction: column; overflow: hidden; min-width: 0;
+  box-shadow: 6px 14px 36px #03070db3;
 }
-.cover-photo figcaption {
-  display: flex; justify-content: space-between; flex-wrap: wrap;
-  gap: 4px 12px; margin-top: 12px;
+.cover-modern {
+  inset: 0 0 22% 17%; border: 1px solid #99a7b6; border-radius: 8px;
+  color: #263d46; background: #f1f5ee;
 }
-.cover-photo a { color: inherit; text-decoration-color: #69717a; text-underline-offset: 3px; }
-.cover-photo a:hover { color: #fff; }
+.cover-modern-tabs { padding: 5px 9px 0; background: #ccd6e0; }
+.cover-modern-tabs span { display: inline-block; padding: 4px 8px; border-radius: 6px 6px 0 0; background: #f1f5f8; }
+.cover-modern-tabs b { margin-inline-start: 5px; font-weight: 500; }
+.cover-modern-address {
+  display: flex; align-items: center; gap: 8px; padding: 3px 9px;
+  border-bottom: 1px solid #c3ced7; background: #e4eaf0; white-space: nowrap;
+}
+.cover-modern-address span:last-child {
+  flex: 1; min-width: 0; padding: 2px 7px; border-radius: 12px; background: #fff; overflow: hidden; text-overflow: ellipsis;
+}
+.cover-modern-content { display: grid; gap: 2px; justify-items: end; padding: 8px 11px; color: #1d513c; }
+.cover-modern-content strong { font-size: clamp(11px, 1.4vw, 18px); }
+.cover-modern-content span { font-size: .8em; }
+
+.cover-orbit {
+  inset: 20% 8% 11% 9%; border: 2px outset #dce0e4; padding: 2px;
+  color: #23282e; background: #c1c5c8;
+}
+.cover-orbit-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 5px; padding: 2px 5px;
+  color: #fff; background: linear-gradient(90deg,#18165b,#487ba8); white-space: nowrap; font-weight: bold;
+}
+.cover-orbit-title span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.cover-orbit-menu { padding: 3px 5px; }
+.cover-orbit-content {
+  flex: 1; position: relative; display: grid; align-content: start; justify-items: center; gap: 3px;
+  padding: 6px 15% 0 2%; border: 1px inset #d2d6d7;
+  color: #f6d294; background: radial-gradient(circle,#ccd5e3 1px,transparent 1px) 5px 7px / 47px 39px,#090922;
+}
+.cover-orbit-content strong { font: bold clamp(12px, 1.9vw, 25px)/1.1 var(--serif); }
+.cover-orbit-content img {
+  position: absolute; top: 12px; right: 0; width: 22%; height: auto; image-rendering: pixelated;
+}
+.cover-orbit-content span { color: #a0d9ff; }
+
+.cover-mosaic {
+  inset: 44% 17% 0 0; border: 3px ridge #dcdcd1; color: #181b19; background: #cccac1;
+}
+.cover-mosaic-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 4px;
+  border: 1px ridge #c9d0c8; color: #f6f6e9; background: #525f5c; font-family: var(--serif); font-weight: bold;
+}
+.cover-mosaic-title i { width: 10px; height: 9px; border: 2px ridge #b2c2b8; }
+.cover-mosaic-menu { padding: 3px 6px; border-bottom: 2px groove #e3e1d7; }
+.cover-mosaic-address { display: flex; gap: 5px; padding: 3px 6px; white-space: nowrap; }
+.cover-mosaic-address span:last-child {
+  flex: 1; min-width: 0; padding: 0 3px; border: 1px inset #d6d2c9; background: #eeece5; overflow: hidden; text-overflow: ellipsis;
+}
+.cover-mosaic-content {
+  flex: 1; min-height: 0; display: grid; align-content: start; gap: clamp(1px, .45vw, 5px); overflow: hidden;
+  padding: clamp(5px, 1.2vw, 17px); border: 2px inset #d3d1c7; background: #efefeb;
+  font: clamp(10px, 1.2vw, 16px)/1.23 var(--serif);
+}
+.cover-mosaic-content strong { font-size: clamp(18px, 2.7vw, 37px); }
+.cover-mosaic-content span { color: #1c2587; text-decoration: underline; }
+.cover-mosaic-footer { display: flex; align-items: center; gap: 4px; padding: 2px 3px; white-space: nowrap; }
+.cover-mosaic-footer span { padding: 0 4px; border: 2px outset #dfded5; }
+.cover-mosaic-footer small { margin-inline-start: auto; font-size: inherit; }
 
 .exhibit-bar {
   grid-template: "title timeline actions" auto "hint hint hint" auto / minmax(0, 1fr) auto minmax(0, 1fr);
@@ -124,13 +180,15 @@ body { display: block; height: auto; background: #10151b; }
 .no-js { padding: 20px; color: #e4edf7; }
 
 @media (max-width: 900px) {
+  .cover-stack { aspect-ratio: 1.18; min-height: 252px; }
+  .cover-mosaic { inset-block-start: 38%; }
   .exhibit-bar { grid-template: "title actions" auto "timeline timeline" auto "hint hint" auto / minmax(0, 1fr) auto; }
   .timeline { width: 100%; }
   .exhibit-actions kbd { display: none; }
 }
 @media (max-width: 640px) {
   .cover-hero { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-block: 40px 28px; }
-  .cover-photo { width: min(100%, 430px); }
+  .cover-stack { width: min(100%, 460px); aspect-ratio: 1.2; }
   .era-name { display: none; }
   .timeline a { padding: 6px 2px; }
 }
@@ -142,11 +200,13 @@ body { display: block; height: auto; background: #10151b; }
 
 
 @media (prefers-reduced-motion: no-preference) {
-  .cover-copy > *, .cover-photo { animation: cover-reveal 680ms cubic-bezier(.2,.82,.25,1) both; }
+  .cover-copy > *, .cover-window { animation: cover-reveal 680ms cubic-bezier(.2,.82,.25,1) both; }
   .cover-subtitle { animation-delay: 65ms; }
   .cover-lede { animation-delay: 110ms; }
   .cover-start { animation-delay: 155ms; }
-  .cover-photo { animation-delay: 100ms; }
+  .cover-modern { animation-delay: 85ms; }
+  .cover-orbit { animation-delay: 150ms; }
+  .cover-mosaic { animation-delay: 215ms; }
 }
 @keyframes cover-reveal {
   from { opacity: 0; transform: translateY(12px); }

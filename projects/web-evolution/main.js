@@ -1,11 +1,11 @@
 import { eras as historicalEras, mosaicPage, orbitPage } from './eras.js';
 import { photoPage, initPhoto } from './photo.js';
-import { createClassicSearch } from './classic-search.js';
+import { classicSearchEra, createClassicSearch } from './classic-search.js';
 import { modernEras, createModern } from './modern.js';
 import { createPoster } from './poster.js';
 import { createChrome, pageAddress } from './chrome.js';
 
-const eras = { ...historicalEras, ...modernEras };
+const eras = { ...historicalEras, 2001: classicSearchEra, ...modernEras };
 const intro = document.querySelector('#intro-view');
 const exhibit = document.querySelector('#exhibit-view');
 const screen = document.querySelector('#screen');
@@ -46,6 +46,7 @@ function isModernEra(id = era) {
 function showIntro() {
   sceneAnimation?.cancel();
   cancelRedraw();
+  classicSearch.cancel();
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -232,6 +233,7 @@ function reloadPage() {
 
 function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
   if (!Object.hasOwn(eras, id)) return;
+  if (era === '2001' && id !== '2001') classicSearch.cancel();
   const entering = exhibit.hidden;
   const changingEra = id !== era;
   const fromIntroControl = entering && intro.contains(document.activeElement);
