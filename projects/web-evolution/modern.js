@@ -1,9 +1,9 @@
 export const modernEras = {
   2023: {
-    caption: 'Edge-era browser · AI search',
-    hint: '검색창에서 관측회 시간을 물어본 뒤 답변의 출처 번호를 눌러 보세요.',
-    notes: 'AI 검색은 웹 문서를 찾아 읽고 답변과 출처를 한 화면에 보여 주었습니다. 답을 고른 근거는 출처를 열어 확인할 수 있습니다.',
-    sources: [['Microsoft · AI-powered Bing and Edge', 'https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-microsoft-bing-and-edge-your-copilot-for-the-web/']],
+    caption: 'Google Search Labs · Generative AI Search',
+    hint: '한국어 예시 질문을 검색하고, AI 요약이 나타난 뒤 아래 웹 결과도 열어 보세요.',
+    notes: '2023년 Search Labs에서 생성형 AI 검색 경험(SGE)이 실험됐습니다. 이 장면은 검색 결과 위에 요약과 출처를 보여 주던 방식을 가상의 Orbit Search로 재구성했습니다. 응답과 링크는 이 전시 안에서 동작하는 시뮬레이션입니다.',
+    sources: [['Google · Generative AI in Search (Search Labs)', 'https://blog.google/products-and-platforms/products/search/generative-ai-search/']],
     base: 'https://orbitsearch.example/',
     pages: {
       home: ['Orbit Search', ''],
@@ -50,26 +50,73 @@ function sceneLink(era, page, label, current = false) {
   return `<a href="?era=${era}&amp;page=${page}" data-page="${page}"${current ? ' aria-current="page"' : ''}>${label}</a>`;
 }
 
-function searchSources() {
-  return `<section class="search-sources" aria-label="Sources">
-    <h3>Sources</h3>
-    <div>
-      ${sceneLink(2023, 'notice', '<b>1</b><span>North Ridge Observatory<small>Observing Night · Official event notice</small></span>')}
-      ${sceneLink(2023, 'archive', '<b>2</b><span>Community Calendar<small>November 2023 · Public events</small></span>')}
+function searchAnswer(topic, progress) {
+  const time = topic !== 'place';
+  const first = time
+    ? 'North Ridge Observatory’s next public Observing Night is <strong>Saturday, 18 November 2023</strong>.'
+    : 'The public Observing Night takes place on the <strong>West Terrace at North Ridge Observatory</strong>.';
+  const second = time
+    ? 'The event begins at <strong>8:30 p.m.</strong>; the terrace opens at 8:15 p.m.'
+    : 'Use the <strong>north entrance on Ridge Road</strong> to reach the terrace.';
+  const third = time
+    ? 'The official notice and community calendar agree on the start time.'
+    : 'The observatory notice and public calendar both list the West Terrace.';
+  return `<article class="ai-overview" aria-labelledby="ai-overview-title">
+    <div class="ai-overview-heading"><div><span class="answer-label"><span aria-hidden="true">✦</span> Orbit Search AI overview</span><span class="experiment-label">Search Labs experiment · simulated</span></div><span class="overview-spark" aria-hidden="true">✧</span></div>
+    <h3 id="ai-overview-title">Observing Night</h3>
+    <div class="answer-copy">
+      ${progress >= 1 ? `<p>${first}</p>` : ''}
+      ${progress >= 2 ? `<p>${second}</p>` : ''}
+      ${progress >= 3 ? `<p>${third} <sup>${sceneLink(2023, 'notice', '<span class="sr-only">Source </span>1')} ${sceneLink(2023, 'archive', '<span class="sr-only">Source </span>2')}</sup></p>` : ''}
     </div>
+    ${progress >= 3 ? `<div class="overview-sources" aria-label="Cited sources">
+      ${sceneLink(2023, 'notice', '<span>1</span> North Ridge Observatory')}
+      ${sceneLink(2023, 'archive', '<span>2</span> Community Calendar')}
+    </div><p class="overview-disclaimer">AI-generated summary · Check the source pages for details.</p>` : ''}
+  </article>`;
+}
+
+function webResults(topic) {
+  const time = topic !== 'place';
+  const firstSnippet = time
+    ? 'Public observing begins Saturday, 18 November at 8:30 p.m. The terrace opens at 8:15 p.m.'
+    : 'Find the West Terrace using the north entrance on Ridge Road. Doors open before the program.';
+  const secondSnippet = time
+    ? 'This month’s calendar lists North Ridge Observatory’s public program for Saturday evening.'
+    : 'The observatory calendar lists the public program and points visitors to the official notice for updates.';
+  return `<section class="web-results" aria-label="Web results">
+    <h3>Web results</h3>
+    <article class="web-result">
+      <span class="result-domain">observatory.example <small>› news › 2023-observing-night</small></span>
+      ${sceneLink(2023, 'notice', time ? 'Observing Night · North Ridge Observatory' : 'Visit the West Terrace · North Ridge Observatory')}
+      <p>${firstSnippet}</p>
+    </article>
+    <article class="web-result">
+      <span class="result-domain">calendar.example <small>› 2023 › november</small></span>
+      ${sceneLink(2023, 'archive', time ? 'November public nights calendar' : 'Directions and public nights calendar')}
+      <p>${secondSnippet}</p>
+    </article>
   </section>`;
 }
 
-function searchAnswer(topic) {
-  const result = topic === 'place'
-    ? 'Observing Night takes place on the <strong>West Terrace at North Ridge Observatory</strong>. Use the north entrance from Ridge Road.'
-    : 'Observing Night starts on <strong>Saturday, 18 November at 8:30 p.m.</strong> The official notice and community calendar list the same start time.';
-  return `<article class="search-answer">
-    <div class="answer-label"><span aria-hidden="true">✦</span> AI answer</div>
-    <h3 tabindex="-1">Observing Night</h3>
-    <p>${result} <sup>${sceneLink(2023, 'notice', '<span class="sr-only">Source </span>1')} ${sceneLink(2023, 'archive', '<span class="sr-only">Source </span>2')}</sup></p>
-    ${searchSources()}
-  </article>`;
+function searchOutputMarkup(status, progress, topic) {
+  if (status === 'loading' && progress === 0) {
+    return `<div class="search-loading" data-search-stage="loading">
+      <div class="loading-title"><span class="search-loader" aria-hidden="true"></span><strong>Searching the web</strong></div>
+      <p>Finding useful pages for this question…</p>
+      <progress id="search-progress" max="100" value="4" aria-label="Search progress"></progress>
+    </div>`;
+  }
+  if (status === 'loading') {
+    return `<div class="search-generation" data-search-stage="answer-${progress}">
+      <progress id="search-progress" max="100" value="${progress * 27}" aria-label="Answer generation progress"></progress>
+      ${searchAnswer(topic, progress)}
+    </div>`;
+  }
+  return `<div class="search-ready" data-search-stage="complete">
+    ${searchAnswer(topic, 3)}
+    ${webResults(topic)}
+  </div>`;
 }
 
 function searchSourcePage(page) {
@@ -81,14 +128,14 @@ function searchSourcePage(page) {
       <p class="site-kicker">${official ? 'PUBLIC PROGRAMS / NOVEMBER 2023' : 'COMMUNITY EVENTS / NOVEMBER 2023'}</p>
       <h2>${official ? 'Observing Night' : 'November Schedule'}</h2>
       <p class="source-datetime"><time datetime="2023-11-18T20:30">Saturday, 18 November 2023 · 8:30 p.m.</time></p>
-      <p>Bring a warm layer and join local volunteers at the <strong>West Terrace, North Ridge Observatory</strong>. The entrance is on Ridge Road.</p>
-      <p>${official ? 'Telescopes will be available on the terrace. Visitors are welcome to bring a red flashlight.' : 'Calendar entry supplied by North Ridge Observatory. Please check the observatory notice for weather changes.'}</p>
+      <p>Bring a warm layer and join local volunteers at the <strong>West Terrace, North Ridge Observatory</strong>. Use the north entrance on Ridge Road.</p>
+      <p>${official ? 'The terrace opens at 8:15 p.m. Telescopes will be available, and visitors are welcome to bring a red flashlight.' : 'Calendar entry supplied by North Ridge Observatory. Please check the observatory notice for weather changes.'}</p>
       ${sceneLink(2023, official ? 'archive' : 'notice', official ? 'View the calendar listing →' : 'Read the official event notice →')}
     </div>
   </article>`;
 }
 
-function searchMarkup(page, question, topic) {
+function searchMarkup(page, question, topic, searchStatus, searchProgress) {
   if (page === 'notice' || page === 'archive') return searchSourcePage(page);
   const landing = page === 'home';
   return `<article class="search-page${landing ? ' is-landing' : ''}">
@@ -96,28 +143,41 @@ function searchMarkup(page, question, topic) {
       ${sceneLink(2023, 'home', '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search')}
       <nav aria-label="Search navigation">
         ${sceneLink(2023, 'home', 'Search', landing)}
-        ${sceneLink(2023, 'result', 'AI answer', !landing)}
       </nav>
     </header>
     <section class="search-body">
-      <h2>${landing ? '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search' : 'Search results'}</h2>
+      <div class="search-heading">
+        <h2>${landing ? '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search' : 'Search results'}</h2>
+        ${landing ? '<p>Search the web, then explore a generated overview.</p>' : ''}
+      </div>
       <form class="search-form">
         <label class="sr-only" for="search-question">Search the web</label>
         <input id="search-question" name="question" type="search" value="${escapeHtml(question)}" maxlength="160" required>
-        <button type="submit"><span aria-hidden="true">✦</span> Ask AI</button>
+        <button type="submit"><span aria-hidden="true">⌕</span> Search</button>
       </form>
       <p id="search-message" class="search-message" lang="ko" role="status"></p>
       ${landing ? `<div class="search-suggestions" lang="ko"><span>예시 질문</span>
         <button type="button" data-search="time">${timeQuestion}</button>
         <button type="button" data-search="place">${placeQuestion}</button>
-      </div>` : `<div class="search-output">${searchAnswer(topic)}</div>`}
+      </div><p class="search-hint" lang="ko">전시 자료로 검색 동작을 재현합니다.</p>` : `<div class="search-result-shell">
+        <p id="search-status" class="search-status" lang="ko" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(searchStatusMessage(searchStatus, searchProgress))}</p>
+        <div class="search-output">${searchOutputMarkup(searchStatus, searchProgress, topic)}</div>
+      </div>`}
     </section>
   </article>`;
 }
 
+function searchStatusMessage(status, progress) {
+  if (status === 'loading' && progress === 0) return '웹에서 이 질문과 관련된 페이지를 검색하고 있습니다.';
+  if (status === 'loading' && progress === 1) return 'AI 개요에 날짜 정보를 정리하고 있습니다.';
+  if (status === 'loading' && progress === 2) return '시작 시간과 장소 정보를 더하고 있습니다.';
+  if (status === 'loading') return '출처를 확인하고 요약을 마무리하고 있습니다.';
+  return 'AI 개요와 웹 검색 결과가 준비됐습니다.';
+}
+
 function classifyQuestion(value, fallback) {
   const text = value.toLowerCase();
-  const aboutEvent = /관측(?:회| 행사)|observing night|star party/.test(text);
+  const aboutEvent = /관측(?:회| 행사|소)|observing night|star party|observatory/.test(text);
   const followUp = /^(?:몇\s*시(?:야|예요)?|언제(?:야|예요)?|어디(?:야|예요)?|when|where)[?.!\s]*$/.test(text);
   if (!aboutEvent && !followUp) return null;
   if (/어디|장소|\bwhere\b|location|address/.test(text)) return 'place';
@@ -238,8 +298,76 @@ function agentMarkup(page, board, phase) {
 export function createModern(board) {
   let question = timeQuestion;
   let topic = 'time';
+  let searchStatus = 'complete';
+  let searchProgress = 3;
+  let searchGeneration = 0;
+  let searchTimers = [];
+  let activeSearchRoot = null;
   let phase = 'idle';
   let taskTimer;
+
+  function clearSearchTimers() {
+    searchGeneration += 1;
+    searchTimers.forEach(clearTimeout);
+    searchTimers = [];
+  }
+
+  function finishInterruptedSearch() {
+    clearSearchTimers();
+    if (searchStatus === 'loading') {
+      searchStatus = 'complete';
+      searchProgress = 3;
+    }
+  }
+
+  function updateSearchOutput(root) {
+    const status = root.querySelector('#search-status');
+    const output = root.querySelector('.search-output');
+    if (!status || !output) return;
+    status.textContent = searchStatusMessage(searchStatus, searchProgress);
+    output.innerHTML = searchOutputMarkup(searchStatus, searchProgress, topic);
+  }
+
+  function completeSearchOutput(root) {
+    const status = root.querySelector('#search-status');
+    const output = root.querySelector('.search-output');
+    const generation = output?.querySelector('.search-generation');
+    if (!status || !output || !generation || searchProgress < 3) {
+      updateSearchOutput(root);
+      return;
+    }
+    status.textContent = searchStatusMessage(searchStatus, searchProgress);
+    generation.dataset.searchStage = 'complete';
+    generation.querySelector('#search-progress')?.remove();
+    generation.insertAdjacentHTML('beforeend', webResults(topic));
+  }
+
+  function animateSearch(root) {
+    clearSearchTimers();
+    searchStatus = 'loading';
+    searchProgress = 0;
+    updateSearchOutput(root);
+    const generation = searchGeneration;
+    const stages = [
+      [450, 1],
+      [900, 2],
+      [1410, 3],
+      [1850, 4],
+    ];
+    for (const [delay, stage] of stages) {
+      searchTimers.push(setTimeout(() => {
+        if (generation !== searchGeneration || searchStatus !== 'loading') return;
+        if (stage === 4) {
+          searchStatus = 'complete';
+          searchProgress = 3;
+          searchTimers = [];
+        } else searchProgress = stage;
+        const target = activeSearchRoot?.isConnected ? activeSearchRoot : root;
+        if (stage === 4) completeSearchOutput(target);
+        else updateSearchOutput(target);
+      }, delay));
+    }
+  }
 
   function updateSidebar(focus = false) {
     const sidebar = document.querySelector('#exhibit-view:not([hidden]) [data-era="2025"] .agent-side');
@@ -266,11 +394,15 @@ export function createModern(board) {
   }
 
   function markup(era, page) {
-    return String(era) === '2023' ? searchMarkup(page, question, topic) : agentMarkup(page, board, phase);
+    return String(era) === '2023' ? searchMarkup(page, question, topic, searchStatus, searchProgress) : agentMarkup(page, board, phase);
   }
 
   function init(root, era, page, goTo) {
     if (String(era) === '2023') {
+      if (page !== 'result') {
+        activeSearchRoot = null;
+        finishInterruptedSearch();
+      } else activeSearchRoot = root;
       const form = root.querySelector('.search-form');
       if (!form) return;
       const search = form.elements.question;
@@ -284,12 +416,12 @@ export function createModern(board) {
         }
         topic = match;
         question = value;
-        if (page === 'result') {
-          root.querySelector('#search-message').textContent = '';
-          const output = root.querySelector('.search-output');
-          output.innerHTML = searchAnswer(topic);
-          output.querySelector('h3').focus();
-        } else {
+        root.querySelector('#search-message').textContent = '';
+        if (page === 'result') animateSearch(root);
+        else {
+          clearSearchTimers();
+          searchStatus = 'loading';
+          searchProgress = 0;
           goTo('result');
         }
       });
@@ -299,8 +431,12 @@ export function createModern(board) {
           form.requestSubmit();
         });
       }
+      if (page === 'result' && searchStatus === 'loading' && searchTimers.length === 0) animateSearch(root);
       return;
     }
+
+    activeSearchRoot = null;
+    finishInterruptedSearch();
 
     const sidebar = root.querySelector('.agent-side');
     sidebar.addEventListener('click', (event) => {
