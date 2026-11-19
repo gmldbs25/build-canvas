@@ -1,3 +1,5 @@
+import { createAgentReport } from './agent-report.js';
+
 const newsEndpoint = 'https://api.spaceflightnewsapi.net/v4/articles/';
 const weatherEndpoint = 'https://api.open-meteo.com/v1/forecast';
 const referencePlaces = {
@@ -118,16 +120,16 @@ function assignedTasks(region, interests) {
   if (interests.includes('moon')) {
     const place = referencePlaces[region];
     tasks.push({
-      label: 'Sky conditions', source: place.name,
+      id: 'weather', label: 'Sky conditions', source: place.name,
       load: (signal) => fetchWeather(place, signal),
       render: (data) => weatherMarkup(data, place),
     });
   }
   if (interests.includes('iss')) {
-    tasks.push({ label: 'Station updates', source: 'NASA · International Space Station', load: (signal) => fetchNews('international space station', signal), render: newsMarkup });
+    tasks.push({ id: 'iss', label: 'Station updates', source: 'NASA · International Space Station', load: (signal) => fetchNews('international space station', signal), render: newsMarkup });
   }
   if (interests.includes('research')) {
-    tasks.push({ label: 'Moon research', source: 'NASA · Moon', load: (signal) => fetchNews('moon', signal), render: newsMarkup });
+    tasks.push({ id: 'research', label: 'Moon research', source: 'NASA · Moon', load: (signal) => fetchNews('moon', signal), render: newsMarkup });
   }
   return tasks;
 }
@@ -163,6 +165,7 @@ export function createMonitor() {
     const tasksList = panel.querySelector('.monitor-tasks');
     const refreshButton = panel.querySelector('[data-monitor-refresh]');
     const jobs = assignedTasks(region, interests);
+    const report = createAgentReport(root, status, refresh, lifetime.signal);
     let running = false;
 
     function showClock() {
@@ -176,19 +179,20 @@ export function createMonitor() {
       if (jobs.length === 0) {
         status.textContent = 'Choose a briefing interest to assign a feed.';
         refreshButton.disabled = true;
+        report.unassigned();
         return;
       }
       running = true;
       panel.dataset.monitorState = 'checking';
       refreshButton.setAttribute('aria-disabled', 'true');
       status.textContent = `Checking ${jobs.length} public ${jobs.length === 1 ? 'source' : 'sources'}…`;
+      report.pending();
       const timeout = AbortSignal.timeout(8500);
       const signal = AbortSignal.any([timeout, lifetime.signal]);
       const tasks = jobs.map(showTask);
       tasksList.replaceChildren(...tasks.map(({ item }) => item));
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let completed = 0;
-      await Promise.all(jobs.map(async (job, index) => {
+      const results = await Promise.all(jobs.map(async (job, index) => {
         const { item, badge, output } = tasks[index];
         // Keep quick responses distinguishable while longer requests use actual network timing.
         const reveal = new Promise((resolve) => {
@@ -213,7 +217,7 @@ export function createMonitor() {
           const checked = element('p', 'Checked ', 'monitor-check-time');
           checked.append(timeNode(receivedAt));
           output.append(checked);
-          completed += 1;
+          return { id: job.id, source: job.source, data };
         } catch {
           if (lifetime.signal.aborted) return;
           const timedOut = timeout.aborted;
@@ -226,10 +230,13 @@ export function createMonitor() {
       }));
 
       if (lifetime.signal.aborted) return;
+      const checked = results.filter(Boolean);
+      const completed = checked.length;
       running = false;
       refreshButton.removeAttribute('aria-disabled');
       panel.dataset.monitorState = completed === jobs.length ? 'complete' : completed ? 'partial' : 'unavailable';
       status.textContent = completed === jobs.length ? 'Source check complete.' : `${completed} of ${jobs.length} sources checked. Try again for unavailable sources.`;
+      report.write(checked, jobs.length, reducedMotion);
     }
 
     const clockInterval = setInterval(showClock, 15000);

@@ -6,7 +6,6 @@ body { display: block; height: auto; background: #10151b; }
   grid-template: auto minmax(0, 1fr) / minmax(0, 1fr);
   height: 100vh;
   height: 100dvh;
-  background: radial-gradient(ellipse 72% 220px at 50% 0, #344456, #10151b);
 }
 
 #exhibit-view[data-era="1998"] { --era-light: #a6eddf; --era-index: 1; }

@@ -3,13 +3,18 @@ import { createMonitor } from './monitor.js';
 export const modernEras = {
   2023: {
     caption: 'Google Search Labs · Generative AI Search',
-    hint: '한국어 예시 질문을 검색하고, AI 요약이 나타난 뒤 아래 웹 결과도 열어 보세요.',
-    notes: '2023년 Search Labs에서 생성형 AI 검색 경험(SGE)이 실험됐습니다. 이 장면은 검색 결과 위에 요약과 출처를 보여 주던 방식을 가상의 Orbit Search로 재구성했습니다. 응답과 링크는 이 전시 안에서 동작하는 시뮬레이션입니다.',
-    sources: [['Google · Generative AI in Search (Search Labs)', 'https://blog.google/products-and-platforms/products/search/generative-ai-search/']],
+    hint: '한국어 관측회 예시를 눌러 전시 자료를 보거나, 월식·제임스 웹 같은 천문 검색어를 입력해 공개 검색 결과를 불러오세요.',
+    notes: '2023년 Search Labs에서 생성형 AI 검색 경험(SGE)이 실험됐습니다. Orbit Search의 관측회 질문은 전시용 요약과 내부 출처를 사용하고, 다른 천문 검색어는 NASA Image and Video Library와 Spaceflight News의 공개 검색 API를 조회해 결과를 구성합니다. 짧은 개요는 반환된 기록을 바탕으로 이 페이지에서 생성합니다.',
+    sources: [
+      ['Google · Generative AI in Search (Search Labs)', 'https://blog.google/products-and-platforms/products/search/generative-ai-search/'],
+      ['NASA · Image and Video Library API', 'https://images-api.nasa.gov/'],
+      ['Spaceflight News API', 'https://api.spaceflightnewsapi.net/'],
+    ],
     base: 'https://orbitsearch.example/',
     pages: {
       home: ['Orbit Search', ''],
       result: ['AI answer · Orbit Search', 'answers/observing-night'],
+      live: ['Live astronomy search · Orbit Search', 'search/live'],
       notice: ['Observing Night · Observatory Bulletin', 'https://observatory.example/news/2023-observing-night'],
       archive: ['November Schedule · Observatory Calendar', 'https://calendar.example/2023/november'],
     },
@@ -162,6 +167,41 @@ function searchOutputMarkup(status, progress, topic) {
   </div>`;
 }
 
+function liveSearchMarkup(state) {
+  const busy = state.status === 'loading';
+  const { results } = state;
+  const top = results[0];
+  const providers = [...new Set(results.map(({ providerLabel }) => providerLabel))].join(', ');
+  const summary = state.summaryStage > 0 && top
+    ? `<article class="live-ai-summary" aria-labelledby="live-summary-title">
+        <div class="live-ai-label"><span aria-hidden="true">✦</span> Orbit Search synthesis <span>from live sources</span></div>
+        <h3 id="live-summary-title">${escapeHtml(state.query)}</h3>
+        <div class="live-summary-copy">
+          <p>I found <strong>${results.length}</strong> ${results.length === 1 ? 'record' : 'records'} from ${escapeHtml(providers)}.</p>
+          ${state.summaryStage >= 2 ? `<p>One source to start with: <strong>${escapeHtml(top.title)}</strong>${top.published ? ` · ${top.provider === 'nasa' ? 'archived' : 'published'} ${escapeHtml(top.published)}` : ''}.</p>` : ''}
+          ${state.summaryStage >= 3 ? `<p>${escapeHtml(top.summary || top.title)} <a href="${escapeHtml(top.url)}" target="_blank" rel="noopener noreferrer">Open this source ↗</a></p>` : ''}
+        </div>
+        <p class="live-summary-note">A short generated orientation based on the linked records below; verify details on the source pages.</p>
+      </article>` : '';
+  const rows = state.resultsRevealed > 0
+    ? `<section class="live-web-results" aria-label="Live astronomy web results">
+        <h3>Web results <span>${results.length} live matches</span></h3>
+        <div class="live-result-list">${results.slice(0, state.resultsRevealed).map((item) => `<article class="live-result" data-provider="${escapeHtml(item.provider)}">
+          <span class="live-result-domain">${escapeHtml(item.domain)} <small>· ${escapeHtml(item.providerLabel)}</small></span>
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)} <span aria-hidden="true">↗</span></a>
+          <p>${escapeHtml(item.summary || 'Open the source record for details.')}</p>
+          <time>${item.published ? `${item.provider === 'nasa' ? 'Archive date' : 'Published'} ${escapeHtml(item.published)}` : `Retrieved ${escapeHtml(item.retrieved)}`}</time>
+        </article>`).join('')}</div>
+      </section>` : '';
+  const retry = state.status === 'error' || (state.status === 'complete' && !results.length)
+    ? '<div class="live-search-error"><button type="button" data-live-retry>Try again</button></div>' : '';
+  const progress = `<p class="live-search-status" id="live-search-status" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(state.message || 'Search live NASA and Spaceflight News sources for astronomy records.')}</p>`;
+  const waiting = busy && !state.summaryStage ? `<div class="live-search-wait" aria-hidden="true"><span></span><span></span><span></span></div>` : '';
+  return `<div class="live-search-results" data-live-stage="${state.status}">
+    ${progress}${waiting}${summary}${rows}${retry}
+  </div>`;
+}
+
 function searchSourcePage(page) {
   const official = page === 'notice';
   return `<article class="search-document">
@@ -178,9 +218,10 @@ function searchSourcePage(page) {
   </article>`;
 }
 
-function searchMarkup(page, question, topic, searchStatus, searchProgress) {
+function searchMarkup(page, question, topic, searchStatus, searchProgress, liveState) {
   if (page === 'notice' || page === 'archive') return searchSourcePage(page);
   const landing = page === 'home';
+  const livePage = page === 'live';
   return `<article class="search-page${landing ? ' is-landing' : ''}">
     <header class="search-header">
       ${sceneLink(2023, 'home', '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search')}
@@ -190,12 +231,12 @@ function searchMarkup(page, question, topic, searchStatus, searchProgress) {
     </header>
     <section class="search-body">
       <div class="search-heading">
-        <h2>${landing ? '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search' : 'Search results'}</h2>
+        <h2>${landing ? '<span class="orbit-search-mark" aria-hidden="true">◈</span> Orbit Search' : livePage ? 'Live astronomy search' : 'Search results'}</h2>
         ${landing ? '<p>Search the web, then explore a generated overview.</p>' : ''}
       </div>
       <form class="search-form">
         <label class="sr-only" for="search-question">Search the web</label>
-        <input id="search-question" name="question" type="search" value="${escapeHtml(question)}" maxlength="160" required>
+        <input id="search-question" name="question" type="search" value="${escapeHtml(livePage ? liveState.query : question)}" maxlength="160" placeholder="Try ‘James Webb telescope’ or ‘lunar eclipse’" required>
         <button type="submit"><span aria-hidden="true">⌕</span> Search</button>
       </form>
       <p id="search-message" class="search-message" lang="ko" role="status"></p>
@@ -203,9 +244,10 @@ function searchMarkup(page, question, topic, searchStatus, searchProgress) {
         <button type="button" data-search="both">${combinedQuestion}</button>
         <button type="button" data-search="time">${timeQuestion}</button>
         <button type="button" data-search="place">${placeQuestion}</button>
-      </div><p class="search-hint" lang="ko">전시 자료로 검색 동작을 재현합니다.</p>` : `<div class="search-result-shell">
-        <p id="search-status" class="search-status" lang="ko" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(searchStatusMessage(searchStatus, searchProgress))}</p>
-        <div class="search-output">${searchOutputMarkup(searchStatus, searchProgress, topic)}</div>
+        <button type="button" data-search-query="월식">월식</button>
+      </div><p class="search-hint" lang="ko">관측회 예시 질문은 전시 자료를 사용하고, 다른 천문 검색어는 NASA와 Spaceflight News의 공개 검색 API를 조회합니다.</p>` : `<div class="search-result-shell">
+        ${livePage ? liveSearchMarkup(liveState) : `<p id="search-status" class="search-status" lang="ko" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(searchStatusMessage(searchStatus, searchProgress))}</p>
+        <div class="search-output">${searchOutputMarkup(searchStatus, searchProgress, topic)}</div>`}
       </div>`}
     </section>
   </article>`;
@@ -221,9 +263,9 @@ function searchStatusMessage(status, progress) {
 
 function classifyQuestion(value, fallback) {
   const text = value.toLowerCase();
-  const aboutEvent = /관측(?:회| 행사|소)|observing night|star party|observatory/.test(text);
+  const aboutEvent = /관측회|관측 행사|공개 관측|observing night|star party|north ridge/.test(text);
   const followUp = /^(?:몇\s*시(?:야|예요)?|언제(?:야|예요)?|어디(?:야|예요)?|when|where)[?.!\s]*$/.test(text);
-  if (!aboutEvent && !followUp) return null;
+  if (!aboutEvent && !(followUp && ['both', 'time', 'place'].includes(fallback))) return 'live';
   const asksPlace = /어디|장소|\bwhere\b|location|address/.test(text);
   const asksTime = /시간|몇\s*시|언제|\bwhen\b|\btime\b|\bstart/.test(text);
   if (asksPlace && asksTime) return 'both';
@@ -570,6 +612,11 @@ export function createModern(poster) {
   let searchGeneration = 0;
   let searchTimers = [];
   let activeSearchRoot = null;
+  let liveState = { query: '', status: 'idle', message: '', results: [], summaryStage: 0, resultsRevealed: 0 };
+  let liveGeneration = 0;
+  let liveController = null;
+  let liveTimers = [];
+  let activeLiveRoot = null;
   let scenarioOpen = false;
   const monitor = createMonitor();
   const agentState = loadAgentState();
@@ -580,6 +627,155 @@ export function createModern(poster) {
     searchGeneration += 1;
     searchTimers.forEach(clearTimeout);
     searchTimers = [];
+  }
+
+  function cancelLiveSearch() {
+    liveGeneration += 1;
+    liveController?.abort();
+    liveController = null;
+    activeLiveRoot = null;
+    liveTimers.forEach(clearTimeout);
+    liveTimers = [];
+    if (liveState.status === 'loading') {
+      liveState.status = liveState.results.length ? 'complete' : 'error';
+      liveState.message = liveState.results.length ? 'Showing the sources already found.' : 'Search paused. Try again when you are back in Orbit Search.';
+      liveState.summaryStage = liveState.results.length ? 3 : 0;
+      liveState.resultsRevealed = liveState.results.length;
+    }
+  }
+
+  function renderLiveState() {
+    const root = activeLiveRoot;
+    const target = root?.isConnected ? root.querySelector('.live-search-results') : null;
+    if (target) target.outerHTML = liveSearchMarkup(liveState);
+  }
+
+  function apiQuery(query) {
+    const translations = [
+      [/^(?:월식|달\s*식)$/, 'lunar eclipse'],
+      [/^(?:제임스\s*웹(?:\s*(?:우주\s*)?망원경)?|웹\s*망원경)$/, 'James Webb Space Telescope'],
+      [/^화성$/, 'Mars'],
+      [/^목성$/, 'Jupiter'],
+      [/^토성$/, 'Saturn'],
+      [/^(?:국제\s*)?우주\s*정거장$/, 'International Space Station'],
+      [/^달$/, 'Moon'],
+    ];
+    for (const [pattern, replacement] of translations) if (pattern.test(query)) return replacement;
+    return query;
+  }
+
+  function displayDate(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(date);
+  }
+
+  function safeHttpUrl(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
+    } catch { return ''; }
+  }
+
+  async function fetchLiveSource(url, signal, getItems) {
+    const response = await fetch(url, { signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
+    if (!response.ok) throw new Error('Search API request failed');
+    const payload = await response.json();
+    const items = getItems(payload);
+    if (!Array.isArray(items)) throw new Error('Search API returned unreadable results');
+    return payload;
+  }
+
+  function normalizeLiveResults(nasaPayload, flightPayload) {
+    const retrieved = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
+    const records = [];
+    const nasaItems = nasaPayload?.collection?.items || [];
+    for (const item of nasaItems) {
+      const data = item?.data?.[0];
+      const id = data?.nasa_id;
+      const url = id ? `https://images.nasa.gov/details/${encodeURIComponent(id)}` : safeHttpUrl(item?.href);
+      if (typeof data?.title !== 'string' || !data.title.trim() || !url) continue;
+      records.push({
+        provider: 'nasa', providerLabel: 'NASA Image and Video Library', domain: 'images.nasa.gov',
+        title: data.title, summary: String(data.description || '').replace(/\s+/g, ' ').trim().slice(0, 360),
+        published: displayDate(data.date_created), retrieved, url,
+      });
+    }
+    for (const item of flightPayload?.results || []) {
+      const url = safeHttpUrl(item?.url);
+      if (typeof item?.title !== 'string' || !item.title.trim() || !url) continue;
+      const domain = new URL(url).hostname.replace(/^www\./, '');
+      records.push({
+        provider: 'spaceflight', providerLabel: item.news_site || 'Spaceflight News', domain,
+        title: item.title, summary: String(item.summary || '').replace(/\s+/g, ' ').trim().slice(0, 360),
+        published: displayDate(item.published_at), retrieved, url,
+      });
+    }
+    return records;
+  }
+
+  async function startLiveSearch(root, value = liveState.query) {
+    cancelLiveSearch();
+    const generation = liveGeneration;
+    const query = value.trim();
+    if (!query) return;
+    liveState = { query, status: 'loading', message: 'Searching live NASA and Spaceflight News sources…', results: [], summaryStage: 0, resultsRevealed: 0 };
+    activeLiveRoot = root;
+    renderLiveState();
+    const controller = new AbortController();
+    liveController = controller;
+    const q = encodeURIComponent(apiQuery(query));
+    let timeout;
+    try {
+      timeout = setTimeout(() => controller.abort(new Error('The live search timed out.')), 9000);
+      const requests = await Promise.allSettled([
+        fetchLiveSource(`https://images-api.nasa.gov/search?q=${q}&media_type=image&page_size=6`, controller.signal, (json) => json?.collection?.items),
+        fetchLiveSource(`https://api.spaceflightnewsapi.net/v4/articles/?search=${q}&limit=6&ordering=-published_at`, controller.signal, (json) => json?.results),
+      ]);
+      if (generation !== liveGeneration) return;
+      const results = normalizeLiveResults(requests[0].value, requests[1].value);
+      const failed = requests.flatMap((request, index) => request.status === 'rejected' ? [index === 0 ? 'NASA' : 'Spaceflight News'] : []);
+      if (failed.length === requests.length) {
+        throw new Error(`${failed.join(' and ')} could not be loaded. Try the search again.`);
+      }
+      liveState.results = results;
+      const sourceNote = failed.length ? ` ${failed.join(' and ')} could not be loaded.` : '';
+      const readyMessage = `Showing ${results.length} live source records for “${query}”.${sourceNote}`;
+      liveState.message = results.length
+        ? `${results.length} live records found. Preparing a source-based overview…${sourceNote}`
+        : `No live results found for “${query}”.${sourceNote}`;
+      liveController = null;
+      if (!results.length) {
+        liveState.status = 'complete';
+        renderLiveState();
+        return;
+      }
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const steps = reduced
+        ? [[0, 3, results.length, readyMessage]]
+        : [[240, 0, 0, liveState.message], [600, 1, 0, 'Identifying useful sources…'], [1030, 2, 0, 'Reading the first source summary…'], [1460, 3, Math.min(2, results.length), 'Showing the first source links…'], [1900, 3, results.length, readyMessage]];
+      for (const [delay, summaryStage, revealed, message] of steps) {
+        liveTimers.push(setTimeout(() => {
+          if (generation !== liveGeneration) return;
+          liveState.summaryStage = summaryStage;
+          liveState.resultsRevealed = Math.max(liveState.resultsRevealed, revealed);
+          liveState.message = message;
+          if (delay === steps.at(-1)[0]) {
+            liveState.status = 'complete';
+            liveTimers = [];
+          }
+          renderLiveState();
+        }, delay));
+      }
+    } catch (error) {
+      if (generation !== liveGeneration) return;
+      liveController = null;
+      liveState.status = 'error';
+      liveState.message = controller.signal.reason?.message || error.message || 'The live sources could not be reached.';
+      renderLiveState();
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   function finishInterruptedSearch() {
@@ -640,7 +836,7 @@ export function createModern(poster) {
   }
 
   function markup(era, page) {
-    return String(era) === '2023' ? searchMarkup(page, question, topic, searchStatus, searchProgress) : agentMarkup(page, agentState, poster, scenarioOpen);
+    return String(era) === '2023' ? searchMarkup(page, question, topic, searchStatus, searchProgress, liveState) : agentMarkup(page, agentState, poster, scenarioOpen);
   }
 
   function updatePlanCount(root) {
@@ -832,6 +1028,13 @@ export function createModern(poster) {
         activeSearchRoot = null;
         finishInterruptedSearch();
       } else activeSearchRoot = root;
+      if (page === 'live') {
+        activeLiveRoot = root;
+        if (liveState.status === 'loading' && !liveController && !liveTimers.length) startLiveSearch(root, liveState.query);
+      } else {
+        activeLiveRoot = null;
+        if (liveState.status === 'loading') cancelLiveSearch();
+      }
       const form = root.querySelector('.search-form');
       if (!form) return;
       const search = form.elements.question;
@@ -839,19 +1042,23 @@ export function createModern(poster) {
         event.preventDefault();
         const value = search.value.trim();
         const match = classifyQuestion(value, topic);
-        if (!match) {
-          root.querySelector('#search-message').textContent = '이 전시에서는 관측회 시간이나 장소를 물어볼 수 있어요.';
-          return;
-        }
-        topic = match;
-        question = value;
+        if (!match) return;
         root.querySelector('#search-message').textContent = '';
-        if (page === 'result') animateSearch(root);
-        else {
-          clearSearchTimers();
-          searchStatus = 'loading';
-          searchProgress = 0;
-          goTo('result');
+        if (match === 'live') {
+          liveState = { query: value, status: 'loading', message: 'Connecting to live astronomy sources…', results: [], summaryStage: 0, resultsRevealed: 0 };
+          if (page === 'live') startLiveSearch(root, value);
+          else goTo('live');
+        } else {
+          topic = match;
+          question = value;
+          cancelLiveSearch();
+          if (page === 'result') animateSearch(root);
+          else {
+            clearSearchTimers();
+            searchStatus = 'loading';
+            searchProgress = 0;
+            goTo('result');
+          }
         }
       });
       for (const button of root.querySelectorAll('[data-search]')) {
@@ -860,16 +1067,27 @@ export function createModern(poster) {
           form.requestSubmit();
         });
       }
+      for (const button of root.querySelectorAll('[data-search-query]')) {
+        button.addEventListener('click', () => {
+          search.value = button.dataset.searchQuery;
+          form.requestSubmit();
+        });
+      }
+      root.addEventListener('click', (event) => {
+        if (event.target.closest('[data-live-retry]')) startLiveSearch(root, liveState.query || search.value);
+      });
       if (page === 'result' && searchStatus === 'loading' && searchTimers.length === 0) animateSearch(root);
       return;
     }
 
     activeSearchRoot = null;
     finishInterruptedSearch();
+    activeLiveRoot = null;
+    if (liveState.status === 'loading') cancelLiveSearch();
 
     bindAgentPage(root, page, goTo);
     monitor.mount(root, agentState.region, agentState.interests);
   }
 
-  return { markup, init, cancelMonitor: monitor.cancel };
+  return { markup, init, cancelMonitor: monitor.cancel, cancelLiveSearch };
 }

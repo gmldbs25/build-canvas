@@ -48,6 +48,7 @@ function showIntro() {
   cancelRedraw();
   classicSearch.cancel();
   modern.cancelMonitor();
+  modern.cancelLiveSearch();
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -237,6 +238,7 @@ function reloadPage() {
 function selectEra(id, page = 'home', restore = false, navigate = false, tabId = null) {
   if (!Object.hasOwn(eras, id)) return;
   if (era === '2001' && id !== '2001') classicSearch.cancel();
+  if (era === '2023' && id !== '2023') modern.cancelLiveSearch();
   const entering = exhibit.hidden;
   const changingEra = id !== era;
   const fromIntroControl = entering && intro.contains(document.activeElement);
