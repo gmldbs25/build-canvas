@@ -70,15 +70,20 @@ export const eras = {
     },
   },
   2013: {
-    caption: 'Chrome 29 · Desktop',
-    hint: '포스터의 사진을 옮기고 제목과 행사 정보를 편집한 뒤 PNG로 저장해 보세요.',
-    notes: '2010년에 출시된 HTML5 사진 편집기는 Flickr 안에 간단한 자르기·보정 도구를 넣었습니다. 이 장면은 2013년 브라우저에서 이미지를 움직이고 밝기를 조정해 포스터 결과물을 저장하는 과정을 전시용으로 재구성합니다.',
+    caption: 'Chrome 29 · Social web apps',
+    hint: 'Pacebook 피드를 스크롤해 관측 사진을 열고, 좋아요를 누르거나 새 글과 댓글을 남겨 보세요.',
+    notes: '2013년 페이스북은 친구가 공유한 사진과 이야기를 크게 보여 주는 뉴스피드를 발표했고, 그해 말 월간 활성 이용자는 12억 3천만 명이었습니다. 당시 EarthSky의 페이스북 독자들은 페르세우스자리 유성우 사진을 공유했습니다. Pacebook은 이 시기의 피드와 소셜 기능을 독자적인 화면에서 체험하는 가상의 서비스입니다.',
     sources: [
       ['Google · Chrome 29', 'https://chromereleases.googleblog.com/2013/08/stable-channel-update.html'],
-      ['Flickr Engineering · Building an HTML5 Photo Editor (2012)', 'https://code.flickr.net/2012/04/18/building-an-html5-photo-editor/'],
+      ['Facebook · A New Look for News Feed (March 2013)', 'https://about.fb.com/news/2013/03/a-new-look-for-news-feed/'],
+      ['Facebook · Full Year 2013 Results', 'https://about.fb.com/news/2014/01/facebook-reports-fourth-quarter-and-full-year-2013-results/'],
+      ['EarthSky · A Facebook reader’s Perseid photo (August 2013)', 'https://earthsky.org/22minute/perseid-meteor-flying-over-texas/'],
     ],
-    base: 'https://fieldwork.example/',
-    pages: { home: ['Observing Night poster · Fieldwork', 'b/observing-night-poster'] },
+    base: 'https://www.pacebook.example/',
+    pages: {
+      home: ['News Feed · Pacebook', ''],
+      poster: ['Observing Night poster · Fieldwork', 'https://fieldwork.example/b/observing-night-poster'],
+    },
   },
 };
 

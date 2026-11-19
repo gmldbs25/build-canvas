@@ -136,7 +136,7 @@ export function createPoster() {
           </fieldset>
         </section>
       </div>
-      <p class="poster-next-scene"><span>Share the updated plan with the local search desk.</span><a href="?era=2023" data-era="2023">Find the next Observing Night →</a></p>
+      <p class="poster-next-scene"><a href="?era=2013" data-page="home">← Return to Pacebook</a><a href="?era=2023" data-era="2023">Find the next Observing Night →</a></p>
     </article>`;
   }
 

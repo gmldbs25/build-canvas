@@ -14,11 +14,13 @@
 | 1998 · 개인 홈페이지 | IE 4풍 브라우저의 The Orbit Room | 웹마스터가 쓴 HTML 제작 노트와 관측 일지, 웹링을 둘러보고 방명록에 글을 남긴다. |
 | 2001 · 키워드 검색 | Netscape 6풍 브라우저에서 초기 Google을 참고해 구성한 웹 검색 | `lunar eclipse` 같은 키워드를 입력하고, 검색 결과가 차례로 뜨면 천문 자료를 하나씩 연다. |
 | 2005 · 사진 커뮤니티 | Firefox 1.5풍 브라우저의 Moonstream | `lunar eclipse` 태그로 2004년 같은 개기월식의 기록을 비교하고 사진을 즐겨찾기에 저장한다. |
-| 2013 · 웹앱 | Chrome 29풍 브라우저의 Fieldwork 포스터 편집기 | 달 사진을 자르고 밝기와 문구를 조절해 관측회 포스터를 만든다. 전후 비교를 하고 PNG로 내려받는다. |
+| 2013 · 웹앱 | Chrome 29풍 브라우저의 소셜 네트워크 Pacebook | 친구들의 개인 글과 관측 사진이 이어지는 뉴스피드를 둘러보고, 사진을 크게 열고, 좋아요를 누르거나 댓글과 새 글을 올린다. |
 | 2023 · 생성형 검색 | Google의 Search Generative Experience를 참고한 Orbit Search | 질문을 제출하면 출처를 찾고, 요약이 이어서 나타난 뒤 검색 결과가 열린다. 천문 주제는 공개 자료를 조회하고, 전시의 관측회 질문은 역사 체험용 행사 공지로 연결한다. |
 | 2025–26 · AI 에이전트 | 최신 브라우저의 천문 모니터와 관측 계획 | 에이전트가 화면을 열면 저장된 관심사별로 공개 출처를 확인한다. 가져온 자료를 한 문구씩 설명하고 다음 작업을 제안한 뒤 다른 도움이 필요한지 묻는다. 관측 시나리오에서 하루를 넘겨 바뀐 예보와 공지를 확인하고, 계획을 저장하거나 캘린더를 내려받고 포스터 일정 변경안을 승인할 수 있다. |
 
-2001년 검색은 전시용 천문 자료 색인에서 키워드가 일치하는 웹페이지를 찾는다. 결과가 도착해 페이지에 차례로 나타나는 연출은 초기 웹 접속 환경에서의 기다림을 재연한다. 2023년 검색에서는 생성형 답변을 읽고 아래에 나열된 출처를 확인한다. 2013년 편집기에서는 2005년 사진을 사용한다. 마지막 장면에서 포스터 일정 변경을 승인하면 2013년으로 돌아가 수정 결과를 볼 수 있다. 앞 장면을 방문하지 않아도 기본 사진과 포스터로 체험할 수 있다.
+2001년 검색은 전시용 천문 자료 색인에서 키워드가 일치하는 웹페이지를 찾는다. 결과가 도착해 페이지에 차례로 나타나는 연출은 초기 웹 접속 환경에서의 기다림을 재연한다. 2023년 검색에서는 생성형 답변을 읽고 아래에 나열된 출처를 확인한다. 별도로 열 수 있는 2013년 Fieldwork 편집기에서는 2005년 사진을 사용한다. 마지막 장면에서 포스터 일정 변경을 승인하면 `?era=2013&page=poster`에서 수정 결과를 볼 수 있다.
+
+2013년 페이스북은 친구들이 공유하는 이야기에 더 큰 사진을 배치하고 사진 등 특정 유형으로 피드를 볼 수 있게 했다. 그해 말 월간 활성 이용자는 12억 3천만 명이었다. 2013년 페르세우스자리 유성우 사진을 페이스북에 공유한 EarthSky 독자 사례는 당시에도 이와 같은 교류가 있었음을 보여 준다. Pacebook은 시대의 피드 구조와 상호작용을 바탕으로 만든 가상 소셜 네트워크다. 게시물은 가상의 개인 이야기이며, 역사 사진은 출처를 표시한다. 방문자가 남긴 활동은 브라우저에 저장한다. [Facebook의 2013년 News Feed 발표](https://about.fb.com/news/2013/03/a-new-look-for-news-feed/) · [Facebook 2013년 실적](https://about.fb.com/news/2014/01/facebook-reports-fourth-quarter-and-full-year-2013-results/) · [EarthSky 독자의 유성우 사진](https://earthsky.org/22minute/perseid-meteor-flying-over-texas/)
 
 브라우저의 뒤로·앞으로, 주소 입력, 새로고침, 확대, 즐겨찾기 및 해당 시대의 탭을 사용할 수 있다. 새로고침은 브라우저 프레임을 유지하고 현재 탭의 페이지 내용만 다시 그린다. 초기에는 잠시 빈 화면을 보여 준 뒤 위에서 아래로 천천히 그려지고, 최신 브라우저에서는 빠르게 갱신된다. 동작 줄이기를 켜면 즉시 다시 그린다.
 
@@ -39,4 +41,4 @@
 - [Google의 2023년 생성형 검색 실험](https://blog.google/products-and-platforms/products/search/generative-ai-search/)
 - [2025년 ChatGPT 에이전트 공개](https://openai.com/index/introducing-chatgpt-agent/) · [2026년 Chrome auto browse](https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/) · [WebMCP 실험](https://developer.chrome.com/blog/ai-webmcp-origin-trial)
 
-월식 사진의 촬영자와 라이선스는 작품 화면과 [사진 출처](../../projects/web-evolution/media/PHOTO-CREDITS.md)에 기록한다. 토성 픽셀 아트와 노스리지 천문대 표지는 전시용 이미지다.
+월식과 Pacebook 사진의 촬영자 및 라이선스는 작품 화면과 출처 목록에 기록한다. 토성 픽셀 아트와 노스리지 천문대 표지는 전시용 이미지다. [월식 사진 출처](../../projects/web-evolution/media/PHOTO-CREDITS.md) · [Pacebook 사진 출처](../../projects/web-evolution/media/pacebook/CREDITS.md)

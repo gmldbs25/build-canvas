@@ -560,7 +560,7 @@ function planMarkup(state, poster) {
       <label class="poster-opt-in"><input type="checkbox" name="sync-poster" data-sync-poster ${state.syncPoster ? 'checked' : ''}><span>Also update the 2013 Fieldwork poster when saving this plan</span></label>
       ${posterHasUpdate ? `<p class="poster-updated" role="status">Poster schedule updated for ${escapeHtml(day.shortDate)}. ${sceneLink(2025, 'board', 'View the poster archive →')}</p>` : ''}
     </section>
-    <div class="plan-actions"><button type="button" class="plan-primary" data-agent-action="approve-plan" ${items.length ? '' : 'disabled'}>Save this observing plan</button><button type="button" class="plan-secondary" data-agent-action="download-ics" ${items.length ? '' : 'disabled'}>Download .ics calendar</button><a href="?era=2013" data-era="2013">Open the 2013 poster editor →</a></div><p id="plan-feedback" class="plan-feedback" role="status" aria-live="polite"></p>
+    <div class="plan-actions"><button type="button" class="plan-primary" data-agent-action="approve-plan" ${items.length ? '' : 'disabled'}>Save this observing plan</button><button type="button" class="plan-secondary" data-agent-action="download-ics" ${items.length ? '' : 'disabled'}>Download .ics calendar</button><a href="?era=2013&amp;page=poster" data-era="2013" data-page="poster">Open the 2013 poster editor →</a></div><p id="plan-feedback" class="plan-feedback" role="status" aria-live="polite"></p>
   </article>`;
 }
 
@@ -569,7 +569,7 @@ function boardArchiveMarkup(state, poster) {
   const key = agentDayKey(state);
   const approved = state.approvedPlans[key] || [];
   const items = selectedAgentItems(state).filter((item) => approved.includes(item.id));
-  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELDWORK / POSTER</p><h2>Observing Night poster</h2><p>Current poster schedule and the items saved from this evening’s briefing.</p><dl class="poster-current"><div><dt>Date</dt><dd>${escapeHtml(snapshot.date || '—')}</dd></div><div><dt>Time</dt><dd>${escapeHtml(snapshot.time || '—')}</dd></div><div><dt>Location</dt><dd>${escapeHtml(snapshot.location || '—')}</dd></div></dl>${items.length ? `<h3>Saved plan</h3><ul>${items.map((item) => `<li>${escapeHtml(item.time)} · ${escapeHtml(item.title)}</li>`).join('')}</ul>` : '<p>No plan from this day has been approved yet.</p>'}<a href="?era=2013" data-era="2013">Open the 2013 poster editor →</a></article>`;
+  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELDWORK / POSTER</p><h2>Observing Night poster</h2><p>Current poster schedule and the items saved from this evening’s briefing.</p><dl class="poster-current"><div><dt>Date</dt><dd>${escapeHtml(snapshot.date || '—')}</dd></div><div><dt>Time</dt><dd>${escapeHtml(snapshot.time || '—')}</dd></div><div><dt>Location</dt><dd>${escapeHtml(snapshot.location || '—')}</dd></div></dl>${items.length ? `<h3>Saved plan</h3><ul>${items.map((item) => `<li>${escapeHtml(item.time)} · ${escapeHtml(item.title)}</li>`).join('')}</ul>` : '<p>No plan from this day has been approved yet.</p>'}<a href="?era=2013&amp;page=poster" data-era="2013" data-page="poster">Open the 2013 poster editor →</a></article>`;
 }
 
 function toolsMarkup() {

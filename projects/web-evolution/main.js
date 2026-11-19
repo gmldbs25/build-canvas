@@ -2,6 +2,7 @@ import { eras as historicalEras, mosaicPage, orbitPage } from './eras.js';
 import { photoPage, initPhoto } from './photo.js';
 import { classicSearchEra, createClassicSearch } from './classic-search.js';
 import { modernEras, createModern } from './modern.js';
+import { createPacebook } from './pacebook.js';
 import { createPoster } from './poster.js';
 import { createChrome, pageAddress } from './chrome.js';
 
@@ -17,6 +18,7 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let sceneAnimation;
 let redrawState = null;
 const classicSearch = createClassicSearch();
+const pacebook = createPacebook();
 const poster = createPoster();
 const modern = createModern(poster);
 const notesDialog = document.querySelector('#field-notes');
@@ -119,13 +121,16 @@ function renderPageBody(focusPage = false, preserveScroll = false) {
   else if (era === '1998') content.innerHTML = orbitPage(page);
   else if (era === '2001') content.innerHTML = classicSearch.markup(page);
   else if (era === '2005') content.innerHTML = photoPage(page);
-  else if (era === '2013') content.innerHTML = poster.markup();
+  else if (era === '2013') content.innerHTML = page === 'poster' ? poster.markup() : pacebook.markup();
   else content.innerHTML = modern.markup(era, page);
   const zoom = browserState?.zoom || 1;
   content.style.zoom = `${Math.round(zoom * 100)}%`;
   screen.replaceChildren(content);
   if (era === '2001') classicSearch.init(content, goTo);
-  if (era === '2013') poster.init(content);
+  if (era === '2013') {
+    if (page === 'poster') poster.init(content);
+    else pacebook.init(content);
+  }
   if (era === '2005') initPhoto(content, page);
   if (Object.hasOwn(modernEras, era)) modern.init(content, era, page, goTo);
   if (era === '1998' && page === 'home') showVisitorCount();
