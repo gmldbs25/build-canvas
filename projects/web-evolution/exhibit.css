@@ -43,21 +43,22 @@ body { display: block; height: auto; background: #10151b; }
 .cover h1 { margin: 0; font: 700 clamp(42px, 6.35vw, 100px)/.97 system-ui, sans-serif; letter-spacing: -.075em; }
 .cover h1 span { color: var(--cover-gold); }
 .cover-subtitle { margin: 18px 0 0; color: var(--cover-gold); font: 500 clamp(13px, 1.45vw, 19px)/1.4 var(--mono); }
-.cover-lede { margin: 24px 0 23px; color: #c0ccd8; font-size: clamp(14px, 1.4vw, 17px); line-height: 1.75; word-break: keep-all; }
+.cover-lede { margin: 24px 0 12px; color: #c0ccd8; font-size: clamp(14px, 1.4vw, 17px); line-height: 1.75; word-break: keep-all; }
+.cover-context { max-width: 48ch; margin: 0 0 22px; color: #9eafc0; font-size: clamp(13px, 1.15vw, 15px); line-height: 1.65; word-break: keep-all; }
 .cover-start {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 31px;
-  min-height: 46px; padding: 10px 15px; border: 1px solid #ffe8be70; border-radius: 10px;
-  color: #fff4df; text-decoration: none; font-weight: 750;
-  background: linear-gradient(165deg, #fff2cf2c, transparent 56%, #ffdd9b14), #72532a85;
-  box-shadow: inset 0 1px #fff3d450, inset 0 -1px #ffc97020, 0 5px 16px #08070654;
+  min-height: 46px; padding: 10px 15px; border: 1px solid #d7e8ff56; border-radius: 10px;
+  color: #f1f6ff; text-decoration: none; font-weight: 750;
+  background: linear-gradient(165deg, #e8f3ff26, #d8e9ff0b 56%, #d6e7ff19), #a9c7e417;
+  box-shadow: inset 0 1px #f4f8ff38, inset 0 -1px #c0d9ff20, 0 5px 18px #050b1440;
   backdrop-filter: blur(12px) saturate(1.12);
   -webkit-backdrop-filter: blur(12px) saturate(1.12);
   transition: background-color 200ms ease, border-color 200ms ease, box-shadow 240ms ease;
 }
 .cover-start:hover {
-  border-color: #ffe8beaa;
-  background-color: #85612e9c;
-  box-shadow: inset 0 1px #fff4dc74, inset 0 -1px #ffc97038, 0 6px 20px #09070480;
+  border-color: #e3efff9c;
+  background-color: #c3dcf02b;
+  box-shadow: inset 0 1px #f4f8ff60, inset 0 -1px #c0d9ff34, 0 6px 20px #050b145c;
 }
 .cover-start > span { transition: transform 240ms cubic-bezier(.2, .82, .25, 1); }
 .cover-start:hover > span, .cover-start:focus-visible > span { transform: translateX(4px); }
@@ -228,6 +229,7 @@ body { display: block; height: auto; background: #10151b; }
   .cover-copy > *, .cover-window { animation: cover-reveal 680ms cubic-bezier(.2,.82,.25,1) both; }
   .cover-subtitle { animation-delay: 65ms; }
   .cover-lede { animation-delay: 110ms; }
+  .cover-context { animation-delay: 135ms; }
   .cover-start { animation-delay: 155ms; }
   .cover-modern { animation-delay: 85ms; }
   .cover-orbit { animation-delay: 150ms; }
