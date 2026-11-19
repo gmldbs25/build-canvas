@@ -111,6 +111,20 @@
 .live-summary-copy p { margin: 7px 0; color: #34445c; font-size: 13px; line-height: 1.55; }
 .live-summary-copy a { font-weight: 650; }
 .live-summary-note { margin: 11px 0 0; padding-top: 8px; border-top: 1px solid #e0e5ef; color: #65718a; font-size: 11px; }
+.live-image-results { margin: 0 0 17px; }
+.live-image-results > h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 10px; margin: 0 0 8px; color: #35435c; font-size: 15px; }
+.live-image-results > h3 span { color: #748098; font-size: 10px; font-weight: 500; }
+.live-image-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.live-image-card { min-width: 0; padding: 7px; border: 1px solid #d8e0ed; border-radius: 10px; background: #fff; }
+.live-image-card > a { display: block; color: #3349a4; text-decoration: none; }
+.live-image-card > a:hover strong { text-decoration: underline; }
+.live-image-frame { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 6px; background: linear-gradient(145deg, #e9eef7, #d3dcec); }
+.live-image-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.live-image-frame img[hidden] { display: none; }
+.live-image-fallback { display: none; position: absolute; inset: 0; place-items: center; padding: 8px; color: #65718a; text-align: center; font-size: 11px; }
+.live-image-frame[data-image-error="true"] .live-image-fallback { display: grid; }
+.live-image-card strong { display: -webkit-box; margin-top: 7px; color: #3349a4; font-size: 12px; line-height: 1.35; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.live-image-card time { display: block; margin-top: 4px; color: #748098; font-size: 10px; }
 .live-web-results { margin-top: 16px; }
 .live-web-results h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin: 0 0 2px; color: #35435c; font-size: 15px; }
 .live-web-results h3 span { color: #748098; font-size: 10px; font-weight: 500; }
@@ -439,6 +453,12 @@
   .plan-timeline > li > time { grid-column: 1; }
   .plan-timeline > li > div { grid-column: 1 / -1; grid-row: 2; }
   .plan-timeline > li > label { grid-column: 2; grid-row: 1; }
+  .live-image-grid { gap: 7px; }
+  .live-image-card { padding: 5px; }
+}
+
+@media (min-width: 640px) {
+  .live-image-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

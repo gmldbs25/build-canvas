@@ -53,7 +53,23 @@ function persist(state) {
       posts: state.ownPosts.map(({ id, text, date, photo }) => ({ id, text, date, photo: photo?.[0] })),
       comments: Object.fromEntries(state.comments),
     }));
-  } catch { /* Keep current interactions usable. */ }
+    return true;
+  } catch { return false; }
+}
+
+function removeOwnPost(state, id) {
+  state.ownPosts = state.ownPosts.filter((post) => post.id !== id);
+  state.liked.delete(id);
+  state.comments.delete(id);
+}
+
+function setLike(state, id, liked) {
+  if (liked) state.liked.add(id);
+  else state.liked.delete(id);
+}
+
+function storedPostExists(state, id) {
+  return posts.some((post) => post.id === id) || state.ownPosts.some((post) => post.id === id);
 }
 
 function commentsFor(post, state) {
@@ -103,6 +119,7 @@ function postMarkup(post, state, expanded) {
     <header class="pace-post-meta">${avatar(person)}
       <div><h3 id="pace-author-${post.id}">${profileButton(post.author)}</h3>
       <p><time datetime="${html(post.date)}">${post.author === 'you' ? 'Posted on this device' : dateFormat.format(new Date(post.date))}</time>${post.clock ? ` · ${post.clock}` : ''}${post.place ? ` · ${post.place}` : ''}</p></div>
+      ${post.author === 'you' ? '<button class="pace-delete-action" type="button" aria-haspopup="dialog" data-pace-delete>Delete</button>' : ''}
     </header>
     ${post.text ? `<p class="pace-post-text">${html(post.text)}</p>` : ''}
     ${picture}
@@ -179,6 +196,16 @@ export function createPacebook() {
         <header><h2 id="pace-lightbox-title">Shared photo</h2><button type="button" aria-label="Close photo" data-pace-close>×</button></header>
         <img alt=""><div class="pace-lightbox-credit"><p></p>${photoCreditsLink}</div>
       </dialog>
+      <dialog class="pace-delete-dialog" aria-labelledby="pace-delete-title" aria-describedby="pace-delete-description">
+        <form method="dialog">
+          <h2 id="pace-delete-title">Delete this post?</h2>
+          <p id="pace-delete-description">This removes the post and its likes and comments from this browser.</p>
+          <div class="pace-delete-dialog-actions">
+            <button type="submit" value="cancel" autofocus>Cancel</button>
+            <button type="submit" value="delete">Delete post</button>
+          </div>
+        </form>
+      </dialog>
     </div>`;
   }
 
@@ -186,7 +213,9 @@ export function createPacebook() {
     const list = root.querySelector('.pace-story-list');
     const search = root.querySelector('[data-pace-search]');
     const dialog = root.querySelector('.pace-lightbox');
+    const deleteDialog = root.querySelector('.pace-delete-dialog');
     let photoTrigger;
+    let deleteTrigger;
 
     function notify(message) { root.querySelector('.pace-feedback').textContent = message; }
 
@@ -225,14 +254,21 @@ export function createPacebook() {
       const card = button.closest('[data-pace-post]');
       if (!card) return;
       const post = allPosts().find(({ id }) => id === card.dataset.pacePost);
-      if (button.hasAttribute('data-pace-like')) {
+      if (button.hasAttribute('data-pace-delete') && post.author === 'you') {
+        deleteTrigger = button;
+        deleteDialog.returnValue = '';
+        deleteDialog.showModal();
+      } else if (button.hasAttribute('data-pace-like')) {
         const liked = !state.liked.has(post.id);
-        if (liked) state.liked.add(post.id);
-        else state.liked.delete(post.id);
+        setLike(state, post.id, liked);
+        const savedState = loadState();
+        if (storedPostExists(savedState, post.id)) {
+          setLike(savedState, post.id, liked);
+          persist(savedState);
+        }
         button.setAttribute('aria-pressed', String(liked));
         button.querySelector('span').textContent = liked ? '♥' : '♡';
         card.querySelector('.pace-like-count').textContent = `${post.likes + Number(liked)} likes`;
-        persist(state);
         notify(liked ? 'Post liked.' : 'Like removed.');
       } else if (button.hasAttribute('data-pace-comments')) {
         const discussion = card.querySelector('.pace-discussion');
@@ -279,13 +315,15 @@ export function createPacebook() {
           message.textContent = 'Write an update or attach a photo before posting.';
           return;
         }
-        if (state.ownPosts.length >= 24) {
+        const savedState = loadState();
+        if (Math.max(state.ownPosts.length, savedState.ownPosts.length) >= 24) {
           message.textContent = 'This browser has reached the 24-post exhibit limit.';
           return;
         }
-        const id = `local-${crypto.randomUUID()}`;
-        state.ownPosts.unshift({ id, author: 'you', text, photo, date: new Date().toISOString(), likes: 0, comments: [] });
-        persist(state);
+        const post = { id: `local-${crypto.randomUUID()}`, author: 'you', text, photo, date: new Date().toISOString(), likes: 0, comments: [] };
+        state.ownPosts.unshift(post);
+        savedState.ownPosts.unshift(post);
+        persist(savedState);
         form.reset();
         message.textContent = '';
         setFilter('all');
@@ -297,10 +335,17 @@ export function createPacebook() {
       const card = form.closest('[data-pace-post]');
       const post = allPosts().find(({ id }) => id === card.dataset.pacePost);
       const stored = state.comments.get(post.id) || [];
-      if (stored.length >= 36) { notify('This discussion has reached its local comment limit.'); return; }
-      stored.push({ id: `local-${crypto.randomUUID()}`, text, parent: form.dataset.replyTo || '' });
+      const savedState = loadState();
+      const savedComments = savedState.comments.get(post.id) || [];
+      if (Math.max(stored.length, savedComments.length) >= 36) { notify('This discussion has reached its local comment limit.'); return; }
+      const comment = { id: `local-${crypto.randomUUID()}`, text, parent: form.dataset.replyTo || '' };
+      stored.push(comment);
       state.comments.set(post.id, stored);
-      persist(state);
+      if (storedPostExists(savedState, post.id)) {
+        savedComments.push(comment);
+        savedState.comments.set(post.id, savedComments);
+        persist(savedState);
+      }
       card.querySelector('.pace-comment-count').textContent = threadSize(commentsFor(post, state));
       card.querySelector('.pace-discussion').innerHTML = discussionMarkup(post, state);
       card.querySelector('.pace-comment-form input').focus();
@@ -309,6 +354,33 @@ export function createPacebook() {
 
     dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
     dialog.addEventListener('close', () => photoTrigger?.focus());
+    deleteDialog.addEventListener('close', () => {
+      const trigger = deleteTrigger;
+      deleteTrigger = undefined;
+      if (!trigger?.isConnected) return;
+      if (deleteDialog.returnValue !== 'delete') {
+        trigger.focus();
+        return;
+      }
+
+      const card = trigger.closest('[data-pace-post]');
+      const id = card.dataset.pacePost;
+      if (!state.ownPosts.some((post) => post.id === id)) return;
+      const adjacent = card.nextElementSibling || card.previousElementSibling;
+      const focusTarget = adjacent?.querySelector('h3') || root.querySelector('#pace-feed-title');
+
+      removeOwnPost(state, id);
+      expanded.delete(id);
+      // Preserve unrelated posts and reactions saved by another tab since this feed opened.
+      const savedState = loadState();
+      removeOwnPost(savedState, id);
+      const saved = persist(savedState);
+      card.remove();
+      if (!list.firstElementChild) renderList();
+      focusTarget.tabIndex = -1;
+      focusTarget.focus();
+      notify(saved ? 'Post deleted.' : 'Post removed for this visit. Browser storage could not be updated.');
+    });
   }
 
   return { markup, init };

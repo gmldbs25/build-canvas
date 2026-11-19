@@ -129,6 +129,11 @@
 .pace-post-meta { display: flex; align-items: center; gap: 8px; }
 .pace-post-meta h3 { margin: 0; color: #54324d; font-size: 14px; }
 .pace-post-meta p { margin: 1px 0 0; color: var(--pace-muted); font-size: 11px; }
+.pace-delete-action {
+  min-height: 32px; margin-left: auto; padding: 4px 8px; border: 1px solid #ddc8ce; border-radius: 3px;
+  color: #804454; background: #fff; font-size: 11px; font-weight: bold;
+}
+.pace-delete-action:hover { color: #652838; background: #f9eef1; }
 .pace-name, .pace-text-button, .pace-reply, .pace-reply-target button {
   padding: 0; border: 0; color: var(--pace-link); background: transparent; font-weight: bold; text-align: left;
 }
@@ -186,6 +191,22 @@
 }
 .pace-lightbox img { display: block; width: 100%; max-height: calc(100dvh - 110px); background: #18131a; object-fit: contain; }
 .pace-lightbox-credit p, .pace-lightbox-credit a { color: #f2d7ea; font-size: 11px; }
+
+.pace-delete-dialog {
+  width: min(345px, calc(100% - 24px)); padding: 15px; border: 1px solid #bda7b4; border-radius: 4px;
+  color: var(--pace-ink); background: #fff; box-shadow: 0 5px 24px #2c1f3140;
+}
+.pace-delete-dialog::backdrop { background: #2d2233a8; }
+.pace-delete-dialog h2 { margin: 0; color: #56354e; font-size: 16px; }
+.pace-delete-dialog p { margin: 7px 0 15px; }
+.pace-delete-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.pace-delete-dialog-actions button {
+  min-height: 32px; padding: 4px 9px; border: 1px solid #cbbdc8; border-radius: 3px;
+  color: #523546; background: #f7f2f6; font-weight: bold;
+}
+.pace-delete-dialog-actions button[value="delete"] { border-color: #763345; color: #fff; background: #8b4054; }
+.pace-delete-dialog-actions button[value="cancel"]:hover { background: #f0e6ed; }
+.pace-delete-dialog-actions button[value="delete"]:hover { background: #713348; }
 
 @media (max-width: 820px) {
   .pace-layout { grid-template-columns: minmax(105px, 146px) minmax(0, 640px); }

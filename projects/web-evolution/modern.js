@@ -50,6 +50,7 @@ export const modernEras = {
 const combinedQuestion = '노스리지 관측회는 언제 어디서 열려?';
 const timeQuestion = '이번 주 관측회는 몇 시야?';
 const placeQuestion = '관측회는 어디서 열려?';
+const defaultLiveQuestion = '제임스 웹 망원경';
 const agentStorageKey = 'build-canvas:web-evolution:agent-briefing';
 const agentInterests = [
   ['moon', 'Moon & sky'],
@@ -193,12 +194,23 @@ function liveSearchMarkup(state) {
           <time>${item.published ? `${item.provider === 'nasa' ? 'Archive date' : 'Published'} ${escapeHtml(item.published)}` : `Retrieved ${escapeHtml(item.retrieved)}`}</time>
         </article>`).join('')}</div>
       </section>` : '';
+  const nasaImages = state.results.slice(0, state.resultsRevealed).filter((item) => item.provider === 'nasa' && item.thumbnail).slice(0, 4);
+  const imageGallery = nasaImages.length
+    ? `<section class="live-image-results" aria-label="NASA image results">
+        <h3>Images from NASA <span>NASA Image and Video Library</span></h3>
+        <div class="live-image-grid">${nasaImages.map((item) => `<article class="live-image-card" data-nasa-id="${escapeHtml(item.id)}">
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open NASA source: ${escapeHtml(item.title)}">
+            <span class="live-image-frame"><img src="${escapeHtml(item.thumbnail)}" alt="${escapeHtml(item.title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-live-preview><span class="live-image-fallback">Preview unavailable</span></span>
+            <strong>${escapeHtml(item.title)}</strong>
+          </a><time>${item.published ? `Archive date ${escapeHtml(item.published)}` : `Retrieved ${escapeHtml(item.retrieved)}`}</time>
+        </article>`).join('')}</div>
+      </section>` : '';
   const retry = state.status === 'error' || (state.status === 'complete' && !results.length)
     ? '<div class="live-search-error"><button type="button" data-live-retry>Try again</button></div>' : '';
   const progress = `<p class="live-search-status" id="live-search-status" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(state.message || 'Search live NASA and Spaceflight News sources for astronomy records.')}</p>`;
   const waiting = busy && !state.summaryStage ? `<div class="live-search-wait" aria-hidden="true"><span></span><span></span><span></span></div>` : '';
   return `<div class="live-search-results" data-live-stage="${state.status}">
-    ${progress}${waiting}${summary}${rows}${retry}
+    ${progress}${waiting}${summary}${imageGallery}${rows}${retry}
   </div>`;
 }
 
@@ -236,7 +248,7 @@ function searchMarkup(page, question, topic, searchStatus, searchProgress, liveS
       </div>
       <form class="search-form">
         <label class="sr-only" for="search-question">Search the web</label>
-        <input id="search-question" name="question" type="search" value="${escapeHtml(livePage ? liveState.query : question)}" maxlength="160" placeholder="Try ‘James Webb telescope’ or ‘lunar eclipse’" required>
+        <input id="search-question" name="question" type="search" value="${escapeHtml(livePage ? liveState.query || defaultLiveQuestion : landing ? defaultLiveQuestion : question)}" maxlength="160" placeholder="Try ‘James Webb telescope’ or ‘lunar eclipse’" required>
         <button type="submit"><span aria-hidden="true">⌕</span> Search</button>
       </form>
       <p id="search-message" class="search-message" lang="ko" role="status"></p>
@@ -690,16 +702,29 @@ export function createModern(poster) {
     const retrieved = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
     const records = [];
     const nasaItems = nasaPayload?.collection?.items || [];
+    const seenNasaTitles = new Set();
     for (const item of nasaItems) {
       const data = item?.data?.[0];
       const id = data?.nasa_id;
       const url = id ? `https://images.nasa.gov/details/${encodeURIComponent(id)}` : safeHttpUrl(item?.href);
       if (typeof data?.title !== 'string' || !data.title.trim() || !url) continue;
+      const titleKey = data.title.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+      if (seenNasaTitles.has(titleKey)) continue;
+      seenNasaTitles.add(titleKey);
+      const preview = typeof id === 'string' && id.trim() && Array.isArray(item?.links)
+        ? item.links.find((link) => link?.render === 'image' && link?.rel === 'preview')?.href
+        : '';
+      let thumbnail = '';
+      if (preview) {
+        const validPreview = safeHttpUrl(preview);
+        if (validPreview && new URL(validPreview).hostname === 'images-assets.nasa.gov') thumbnail = validPreview;
+      }
       records.push({
         provider: 'nasa', providerLabel: 'NASA Image and Video Library', domain: 'images.nasa.gov',
-        title: data.title, summary: String(data.description || '').replace(/\s+/g, ' ').trim().slice(0, 360),
+        id: String(id || ''), thumbnail, title: data.title, summary: String(data.description || '').replace(/\s+/g, ' ').trim().slice(0, 360),
         published: displayDate(data.date_created), retrieved, url,
       });
+      if (seenNasaTitles.size >= 6) break;
     }
     for (const item of flightPayload?.results || []) {
       const url = safeHttpUrl(item?.url);
@@ -729,7 +754,7 @@ export function createModern(poster) {
     try {
       timeout = setTimeout(() => controller.abort(new Error('The live search timed out.')), 9000);
       const requests = await Promise.allSettled([
-        fetchLiveSource(`https://images-api.nasa.gov/search?q=${q}&media_type=image&page_size=6`, controller.signal, (json) => json?.collection?.items),
+        fetchLiveSource(`https://images-api.nasa.gov/search?q=${q}&media_type=image&page_size=24`, controller.signal, (json) => json?.collection?.items),
         fetchLiveSource(`https://api.spaceflightnewsapi.net/v4/articles/?search=${q}&limit=6&ordering=-published_at`, controller.signal, (json) => json?.results),
       ]);
       if (generation !== liveGeneration) return;
@@ -1037,6 +1062,13 @@ export function createModern(poster) {
       }
       const form = root.querySelector('.search-form');
       if (!form) return;
+      root.addEventListener('error', (event) => {
+        const image = event.target;
+        if (image instanceof HTMLImageElement && image.matches('[data-live-preview]')) {
+          image.hidden = true;
+          image.closest('.live-image-frame')?.setAttribute('data-image-error', 'true');
+        }
+      }, true);
       const search = form.elements.question;
       form.addEventListener('submit', (event) => {
         event.preventDefault();
