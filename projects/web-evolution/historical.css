@@ -65,19 +65,28 @@
 .photo-community-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid #cdd2d4; padding-bottom: 18px; }
 .photo-community-head h2 { margin: 0; color: #2f5367; font-size: clamp(27px, 4vw, 40px); line-height: 1.1; }
 .photo-community-head p { margin: 4px 0 0; color: #69767c; }
-.photo-community-head .photo-kicker { margin: 0 0 4px; color: #9b512b; font-size: 11px; font-weight: bold; letter-spacing: .1em; text-transform: uppercase; }
 .upload-button { flex: none; padding: 7px 12px; color: white; background: #d36a32; border: 1px solid #a9481b; border-radius: 3px; font-weight: bold; }
 .photo-tabs { display: flex; gap: 18px; border-bottom: 1px solid #d7dbdc; padding: 10px 2px 8px; }
 .photo-tabs a { color: #4d6069; }
 .photo-tabs a[aria-current] { color: #b95323; font-weight: bold; }
 .photo-intro { margin: 17px 0; color: #4c575d; }
 .stream-note { margin-top: 13px; color: #788489; font-size: 11px; }
+.photo-kicker { margin: 0 0 4px; color: #9b512b; font-size: 11px; font-weight: bold; letter-spacing: .1em; text-transform: uppercase; }
+.moon-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; }
+.moon-heading h2 { margin-bottom: 0; }
+.moon-result-count { padding: 4px 8px; border: 1px solid #d4d9d8; border-radius: 3px; color: #65757a; background: #fff; font-size: 11px; white-space: nowrap; }
+.photo-tag-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: -4px 0 18px; padding: 10px; border: 1px solid #d7dedd; background: #ebeDEA; }
+.photo-tag-nav .tag-chip { border: 1px solid #c8d1d1; border-radius: 3px; color: #3e5963; text-decoration: none; background: #fafbf9; }
+.photo-tag-nav .tag-chip:hover { border-color: #7396a1; background: #fff; text-decoration: none; }
+.photo-tag-nav .tag-chip[aria-current] { border-color: #a84d25; color: #8e421f; background: #fff4ed; font-weight: bold; }
+.archive-note { margin: 16px 0 0; padding-top: 9px; border-top: 1px solid #d7dbdc; color: #788489; font-size: 11px; }
 .flickr-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 17px; color: #869196; font-size: 12px; }
 .photo-detail-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, .8fr); gap: clamp(18px, 3vw, 32px); align-items: start; }
 .photo-large { margin: 0; padding: 7px; background: white; border: 1px solid #d1d4d3; box-shadow: 0 2px 7px #0002; }
 .photo-large img { display: block; width: 100%; height: auto; max-height: 70vh; aspect-ratio: auto; object-fit: contain; background: #101722; }
+.photo-large:has(img[src*="eclipse-2004-d.webp"]) img { width: 162px; max-width: 100%; margin-inline: auto; image-rendering: pixelated; }
 .photo-large figcaption { padding: 8px 3px 1px; color: #79868a; font-size: 12px; }
-.photo-info h2, .moon-page > h2 { margin: 0 0 7px; color: #2f5367; font-size: clamp(23px, 3vw, 32px); line-height: 1.15; }
+.photo-info h2, .moon-page > h2, .moon-heading h2 { margin: 0 0 7px; color: #2f5367; font-size: clamp(23px, 3vw, 32px); line-height: 1.15; }
 .photo-info p { margin: 8px 0; }
 .photo-info .photo-byline { font-size: 15px; }
 .photo-info .photo-credit { margin-top: 15px; padding-top: 9px; border-top: 1px solid #d5d9d9; color: #69787d; font-size: 11px; }
@@ -97,11 +106,11 @@
 .moon-card { min-width: 0; padding: 5px; border: 1px solid #cbd1d2; background: white; color: #34454c; text-align: left; box-shadow: 0 1px 3px #0002; }
 .moon-card:has(figcaption) { margin: 0; }
 .moon-card:hover { border-color: #6391a5; box-shadow: 0 2px 8px #40627635; }
-.moon-card img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; }
+.moon-card img { display: block; width: 100%; height: auto; aspect-ratio: 4/3; object-fit: contain; background: #101722; }
 .moon-caption { display: grid; gap: 2px; padding: 7px 3px 3px; }
 .moon-caption strong { color: #31546a; font-size: 13px; }
 .moon-caption span { color: #56666d; font-size: 12px; }
-.moon-caption small { color: #8b9699; font-size: 10px; }
+.moon-caption small { color: #7d898d; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
 .upload-dialog { width: min(420px, 90vw); padding: 20px; border: 1px solid #9aabb1; border-radius: 4px; color: #34454c; background: #f8f8f5; box-shadow: 0 10px 40px #0004; }
 .upload-dialog::backdrop { background: #18263288; }
 .upload-close { float: right; }
@@ -113,9 +122,14 @@
 .upload-form > button { justify-self: start; padding: 6px 10px; border: 1px solid #a44d25; border-radius: 3px; color: white; background: #d36a32; }
 .upload-feedback { min-height: 16px; margin: 0; color: #3f734d; font-size: 12px; }
 .empty-favorites { padding: 18px; background: #e8edec; color: #64747a; }
+@media (min-width: 1000px) {
+  .moon-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; }
+  .moon-card img { height: clamp(110px, 13vw, 150px); aspect-ratio: auto; }
+}
 @media (max-width: 650px) {
   .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .moon-heading { align-items: start; }
 }
 @media (max-width: 420px) {
   .photo-page { padding: 15px; }

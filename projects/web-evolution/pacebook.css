@@ -138,7 +138,7 @@
   display: block; width: 100%; padding: 0; border: 1px solid #302834;
   color: #f2e7f0; background: #221c26; cursor: zoom-in;
 }
-.pace-photo img { display: block; width: 100%; aspect-ratio: 1.88; max-height: 325px; object-fit: cover; }
+.pace-photo img { display: block; width: 100%; aspect-ratio: 1.88; max-height: 245px; object-fit: cover; }
 .pace-photo:hover { border-color: #985986; }
 .pace-post-meta + .pace-photo { margin-top: 8px; }
 .pace-post-link { margin: 5px 0; }

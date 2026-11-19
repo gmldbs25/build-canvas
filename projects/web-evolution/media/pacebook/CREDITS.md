@@ -1,6 +1,6 @@
 # Pacebook photo credits
 
-Fictional 2013 Pacebook members share these astronomy photographs and mission images. The credits identify the original creators. Dates describe original capture or publication, as recorded by the source. The local WebPs are adaptations resized to a maximum 1280 px edge.
+Fictional 2013 Pacebook members share everyday photos alongside astronomy photographs and mission images. The credits identify the original creators. Dates describe original capture or publication, as recorded by the source. The local WebPs are adaptations resized to a maximum 1280 px edge.
 
 | Local file | Original credit and date | Source and reuse terms |
 |---|---|---|
@@ -14,5 +14,7 @@ Fictional 2013 Pacebook members share these astronomy photographs and mission im
 | `orion-nebula-hubble-2006.webp` | NASA, ESA, M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Space Telescope Orion Treasury Project Team; released 11 January 2006. | [NASA/ESA Hubble source record](https://science.nasa.gov/asset/hubble/orion-nebula-3/). NASA's [Hubble image FAQ](https://science.nasa.gov/mission/hubble/overview/at-the-museum/frequently-asked-questions/) explains image reuse; retain the full source credit. |
 | `hale-bopp-hubble-1997.webp` | H. Weaver (Johns Hopkins University) and NASA, a sequence of Hubble observations of Comet Hale–Bopp released 27 March 1997. | [NASA/ESA Hubble source record](https://science.nasa.gov/asset/hubble/hubble-images-of-comet-hale-bopp/). Retain the supplied credit. [NASA's media guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/) |
 | `wise-milky-way-2012.webp` | NASA/JPL-Caltech/UCLA, WISE Milky Way mosaic (PIA15256); released 10 January 2012. | [NASA Science source record](https://science.nasa.gov/photojournal/a-royal-celebration/). NASA/JPL image; retain the supplied credit. |
+| `cat-in-box.webp` | normanack, *Box full of cat*; uploaded 15 September 2013. The archived original is 640 × 480 pixels. | [Wikimedia Commons source record](https://commons.wikimedia.org/wiki/File:Box_full_of_cat.jpg); [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/). Resized to 600 px wide; adaptation shared under CC BY 2.0. |
+| `cinnamon-roll.webp` | Steven Depolo, *Cinnamon roll, 2009-11-01*; photograph dated 1 November 2009 and uploaded 11 May 2010. | [Wikimedia Commons source record](https://commons.wikimedia.org/wiki/File:Cinnamon_roll,_2009-11-01.jpg); [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/). Resized to 600 px wide; adaptation shared under CC BY 2.0. |
 
-For the three Wikimedia photographs with Creative Commons licenses, retain the attribution and license links when redistributing the adapted WebP files.
+For the Wikimedia photographs with Creative Commons licenses, retain the attribution and license links when redistributing the adapted WebP files.

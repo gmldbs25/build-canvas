@@ -7,6 +7,8 @@ Moonstream uses archival images of the same total lunar eclipse on 28 October 20
 | `eclipse-2004-a.webp` | 2004.10.28 Pimennys, an eclipse close-up | [Auvo Korpi](https://commons.wikimedia.org/wiki/File:2004.10.28_Pimennys_(28866343308).jpg), based in Huhtamo, Finland. The source title identifies the eclipse. The catalog date is the later Flickr publication date. | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
 | `eclipse-2004-b.webp` | Total lunar eclipse as photographed in A Coruña, Spain | [J.C. Rojas](https://commons.wikimedia.org/wiki/File:J.C._Rojas_-_Lunar_Eclipse_(by-sa).jpg) | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) |
 | `eclipse-2004-c.webp` | A lunar eclipse in Estonia | [Epukas](https://commons.wikimedia.org/wiki/File:Lunar_eclipse_October_28_2004.jpg) | Public domain dedication by the photographer |
+| `eclipse-2004-d.webp` | Lunar eclipse at 6:21 AM in Kiuruvesi, Finland; 162 × 165 px compact-camera photograph | Kari Tikkanen; [Commons record](https://commons.wikimedia.org/wiki/File:Lunar_eclipse_28102004.jpg) identifies the date, place, camera and 10× optical zoom. | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/); converted to WebP without enlargement or cropping |
+| `eclipse-2004-e.webp` | Lunar eclipse photograph, 1,024 × 768 px | Jon Sullivan / [PD Photo.org](https://pdphoto.org/PictureDetail.php?mat=pdef&pg=8338); [Commons record](https://commons.wikimedia.org/wiki/File:Lunar_eclipse01.JPEG) documents the public-domain release. | Public domain; converted to WebP without cropping |
 
 ## Photos retained for existing favorites
 

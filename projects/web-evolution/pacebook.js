@@ -1,10 +1,10 @@
-import { people, posts } from './pacebook-posts.js';
+import { archivedPhotos, people, posts } from './pacebook-posts.js';
 
 const storageKey = 'build-canvas:pacebook';
 const posterLink = '<a href="?era=2013&amp;page=poster" data-page="poster">Fieldwork poster editor ↗</a>';
 const photoCreditsLink = '<a href="./media/pacebook/CREDITS.md" target="_blank" rel="noopener">Photo credits ↗</a>';
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-const photoCatalog = new Map(posts.filter(({ photo }) => photo).map(({ photo }) => [photo[0], photo]));
+const photoCatalog = new Map([...posts.filter(({ photo }) => photo).map(({ photo }) => [photo[0], photo]), ...archivedPhotos.map((photo) => [photo[0], photo])]);
 const filters = { all: 'All updates', photo: 'Photos', mine: 'My posts' };
 
 function html(value) {
