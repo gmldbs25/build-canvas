@@ -38,14 +38,14 @@ export function createAgentReport(root, status, refresh, signal) {
   const wrapper = document.createElement('section');
   wrapper.className = 'agent-report';
   wrapper.setAttribute('aria-labelledby', 'agent-report-title');
-  const glyphs = ['✧', '✦', '✶', '✷', '✧'];
+  const glyphs = ['✧', '✦', '✶', '✷'];
   wrapper.innerHTML = `
     <div class="agent-report-heading">
       <span class="agent-report-mark" aria-hidden="true">✦</span>
       <div><h4 id="agent-report-title">Agent debrief</h4><p>Template-based briefing from public sources</p></div>
     </div>
     <div class="agent-report-progress">
-      <div class="agent-report-stars" aria-hidden="true">${glyphs.map((glyph) => `<span>${glyph}</span>`).join('')}</div>
+      <div class="agent-report-stars" aria-hidden="true">${glyphs.map((glyph, index) => `<span style="--star-index:${index}">${glyph}</span>`).join('')}</div>
       <p class="agent-report-stage" role="status" aria-live="polite" aria-atomic="true"></p>
     </div>
     <div class="agent-report-copy"></div>
@@ -60,7 +60,7 @@ export function createAgentReport(root, status, refresh, signal) {
   const stage = wrapper.querySelector('.agent-report-stage');
   const actions = wrapper.querySelector('.agent-report-actions');
   const recheck = wrapper.querySelector('.agent-report-recheck');
-  const minimumPreparation = 800;
+  const minimumPreparation = 1600;
   let preparationStarted = 0;
   let timer;
 
@@ -74,7 +74,7 @@ export function createAgentReport(root, status, refresh, signal) {
     wrapper.dataset.agentReport = 'checking';
     copy.setAttribute('aria-hidden', 'true');
     copy.textContent = '';
-    stage.textContent = 'Preparing your briefing…';
+    stage.textContent = 'Thinking…';
     stars.hidden = false;
     recheck.setAttribute('aria-disabled', 'true');
   }
@@ -103,9 +103,8 @@ export function createAgentReport(root, status, refresh, signal) {
     const beginWriting = () => {
       timer = undefined;
       if (signal.aborted) return;
-      stars.hidden = true;
       wrapper.dataset.agentReport = 'writing';
-      stage.textContent = 'Writing a short briefing…';
+      stage.textContent = 'Writing…';
       copy.setAttribute('aria-hidden', 'true');
       const words = paragraphs.map((paragraph) => paragraph.match(/\S+\s*/g));
       let paragraph = 0;
