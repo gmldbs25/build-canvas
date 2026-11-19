@@ -221,6 +221,56 @@
 .briefing-eyebrow { margin: 0 0 7px; color: #557066; font: 700 10px/1.4 ui-monospace, monospace; letter-spacing: .09em; }
 .briefing-head h2 { margin: 0; color: #173e31; font: 750 clamp(27px, 4vw, 46px)/1.05 system-ui, sans-serif; letter-spacing: -.055em; }
 .briefing-deck { margin: 10px 0 0; color: #53685e; font-size: 13px; }
+.monitor-head time { color: #264d3e; font-weight: 700; font-variant-numeric: tabular-nums; }
+.monitor-panel {
+  margin-bottom: 16px; padding: clamp(13px, 2vw, 24px); border: 1px solid #c8dacd; border-radius: 12px;
+  background: linear-gradient(135deg, #eef6ef, #f9fbf6 65%); box-shadow: 0 4px 15px #2e503511;
+}
+.monitor-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 9px 16px; }
+.monitor-header .briefing-eyebrow { margin-bottom: 4px; }
+.monitor-header h3 { margin: 0; color: #1b4435; font-size: clamp(18px, 2.4vw, 24px); line-height: 1.16; letter-spacing: -.025em; }
+.monitor-refresh {
+  min-height: 35px; padding: 5px 10px; border: 1px solid #b0cbbc; border-radius: 6px;
+  color: #204e3b; background: #fff; font-size: 11px; font-weight: 750;
+}
+.monitor-refresh:not([aria-disabled]):hover { background: #e2f0e5; }
+.monitor-refresh[aria-disabled], .monitor-refresh:disabled { color: #51685d; background: #f4f8f3; cursor: default; }
+.monitor-description { margin: 8px 0 10px; color: #4f675a; font-size: 12px; }
+.monitor-status { margin: 0 0 10px; color: #275b46; font-size: 12px; font-weight: 700; }
+.monitor-tasks {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 195px), 1fr)); align-items: start; gap: 9px;
+  margin: 0; padding: 0; list-style: none;
+}
+.monitor-task { min-width: 0; padding: 11px; border: 1px solid #d2e0d4; border-radius: 8px; background: #fff; overflow-wrap: anywhere; }
+.monitor-task-heading { display: flex; justify-content: space-between; align-items: start; gap: 6px; }
+.monitor-task h4 { margin: 0; color: #214b3b; font-size: 13px; line-height: 1.3; }
+.monitor-task p { margin: 3px 0 0; color: #50675b; font-size: 11px; }
+.monitor-task-status {
+  display: inline-flex; align-items: center; gap: 5px; flex: none; padding: 2px 5px; border-radius: 4px;
+  color: #245840; background: #e6f1e8; font-size: 9px; font-weight: 750;
+}
+.monitor-task[data-monitor-task="checking"] .monitor-task-status::before {
+  width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: "";
+  animation: reading-pulse .85s ease-in-out infinite alternate;
+}
+.monitor-task[data-monitor-task="unavailable"] .monitor-task-status { color: #7d481f; background: #f9eee0; }
+.monitor-task-output:not(:empty) { margin-top: 9px; padding-top: 8px; border-top: 1px solid #e4ebe2; }
+.monitor-task-output .monitor-weather { margin-top: 0; color: #214b3b; font-size: 13px; font-weight: 750; }
+.monitor-task-output .monitor-attribution, .monitor-task-output .monitor-check-time { margin-top: 6px; font-size: 10px; }
+.monitor-news { display: grid; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.monitor-news-item > a { font-size: 12px; font-weight: 700; }
+.monitor-news-item > p { margin-top: 2px; font-size: 10px; }
+.monitor-news-item > .monitor-excerpt { margin-top: 5px; font-size: 11px; }
+.monitor-more { margin-top: 7px; color: #3c6654; font-size: 11px; }
+.monitor-more summary { width: fit-content; cursor: pointer; }
+.monitor-more[open] > ul { margin-top: 6px; }
+.briefing-scenario { border: 1px solid #dacfbd; border-radius: 10px; background: #fcfaf5; }
+.briefing-scenario > summary { padding: 12px 14px; color: #4a4030; font-weight: 750; cursor: pointer; }
+.scenario-label { display: inline-block; margin-left: 8px; color: #795429; font: 750 9px/1.4 ui-monospace, monospace; letter-spacing: .06em; }
+.scenario-content { padding: 14px; border-top: 1px solid #eadfcd; }
+.scenario-head { margin-bottom: 10px; }
+.scenario-head h3 { margin: 0; color: #314b3d; font-size: 19px; }
+.scenario-head .briefing-deck { margin-top: 4px; }
 .advance-day, .preference-submit, .plan-primary, .plan-secondary {
   min-height: 38px; padding: 8px 12px; border: 1px solid #1c614a; border-radius: 7px;
   color: #fff; background: #1d624b; font: 700 12px/1.25 system-ui, sans-serif; cursor: pointer;
@@ -362,4 +412,8 @@
   .plan-timeline > li > time { grid-column: 1; }
   .plan-timeline > li > div { grid-column: 1 / -1; grid-row: 2; }
   .plan-timeline > li > label { grid-column: 2; grid-row: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monitor-task[data-monitor-task="checking"] .monitor-task-status::before { animation: none; }
 }

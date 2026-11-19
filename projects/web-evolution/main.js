@@ -47,6 +47,7 @@ function showIntro() {
   sceneAnimation?.cancel();
   cancelRedraw();
   classicSearch.cancel();
+  modern.cancelMonitor();
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
@@ -107,6 +108,7 @@ function renderPage(focusPage = false) {
 }
 
 function renderPageBody(focusPage = false, preserveScroll = false) {
+  modern.cancelMonitor();
   const page = trail.pages[trail.index];
   const scrollTop = preserveScroll ? screen.scrollTop : 0;
   const scrollLeft = preserveScroll ? screen.scrollLeft : 0;
@@ -180,6 +182,7 @@ function blankPageCanvas(pageContent, height) {
 
 function reloadPage() {
   cancelRedraw();
+  modern.cancelMonitor();
   if (reducedMotion.matches) {
     renderPageBody(false, true);
     return;
@@ -567,8 +570,6 @@ document.querySelector('#intro-link')?.addEventListener('click', (event) => {
   showIntro();
   intro.querySelector('.cover-start').focus({ preventScroll: true });
 });
-document.querySelector('#scene-help')?.addEventListener('click', showNotes);
-
 const initial = route();
 if (initial.intro) showIntro();
 else selectEra(initial.era, initial.page);

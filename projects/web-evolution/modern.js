@@ -1,3 +1,5 @@
+import { createMonitor } from './monitor.js';
+
 export const modernEras = {
   2023: {
     caption: 'Google Search Labs · Generative AI Search',
@@ -14,12 +16,14 @@ export const modernEras = {
   },
   2025: {
     caption: 'Modern browser · Proactive sky briefing',
-    hint: '오늘의 브리핑은 미리 준비되어 있어요. 관심사를 고르고 다음 날로 넘겨 달라진 예보와 일정을 확인하세요.',
-    notes: '이 장면은 최신 브라우저가 이용자의 관심사에 맞춰 먼저 정보를 모아 주고, 이용자가 계획을 고른 뒤 외부 작업을 승인하는 흐름을 재구성합니다. North Ridge의 지역 예보와 통과 시각은 전시용 시뮬레이션이며, 실제 달·우주·이미지 정보 확인을 위한 NASA와 미국 기상청 자료로 연결됩니다. 캘린더 파일은 기기에서 만들고 2013년 Fieldwork 포스터 변경은 별도 선택을 했을 때만 반영합니다.',
+    hint: '에이전트가 관심사에 맞춰 출처를 확인하는 모습을 보고, 관측 시나리오에서 계획을 만들어 보세요.',
+    notes: '브리핑을 열면 설정된 관심사에 따라 NASA 소식과 Open-Meteo의 실시간 예보 모델 값을 확인합니다. 활동 목록에는 실제로 요청한 출처와 결과가 표시됩니다. North Ridge의 지역 예보, ISS 통과 시각, 관측회 일정은 별도로 표시된 전시용 시나리오입니다. 캘린더 파일은 기기에서 만들고 2013년 포스터는 별도 선택을 했을 때만 변경합니다.',
     sources: [
       ['OpenAI · ChatGPT agent in 2025', 'https://openai.com/index/introducing-chatgpt-agent/'],
       ['Google · Chrome auto browse in 2026', 'https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/'],
       ['Chrome for Developers · WebMCP origin trial', 'https://developer.chrome.com/blog/ai-webmcp-origin-trial'],
+      ['Spaceflight News API · NASA news feed', 'https://www.spaceflightnewsapi.net/'],
+      ['Open-Meteo · Model forecast data', 'https://open-meteo.com/'],
     ],
     base: 'https://observatory.example/',
     pages: {
@@ -411,7 +415,7 @@ function preferencesMarkup(state) {
     <label class="region-field">Viewing region<select name="region">${regionOptions}</select></label>
     <fieldset><legend>Include in my briefing</legend>${interests}</fieldset>
     <button type="submit" class="preference-submit">Update briefing</button>
-    <p class="preferences-note">The three demo regions use curated local scenarios; nothing is sent to an account.</p>
+    <p class="preferences-note">Your region sets the scenario and the forecast reference location. No account is needed.</p>
   </form>`;
 }
 
@@ -424,22 +428,33 @@ function briefingUpdateNote(state) {
   return state.updateNote ? `<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" lang="en">${escapeHtml(state.updateNote)}</p>` : '<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" lang="en"></p>';
 }
 
-function homeBriefingMarkup(state) {
+function homeBriefingMarkup(state, scenarioOpen) {
   const day = agentDay(state);
   const region = regions[state.region];
   const items = briefingItems(state);
   const selected = new Set(state.selectedByDay[agentDayKey(state)] || []);
   const event = officialEvent(state);
-  return `<section class="briefing-head">
-      <div><h2>Your sky briefing</h2>
-        <p class="briefing-deck"><strong>${day.dateLabel}</strong> · ${escapeHtml(region.label)}</p></div>
-      <button type="button" class="advance-day" data-agent-action="advance-day"><span aria-hidden="true">↻</span> Advance to next day</button>
+  return `<section class="briefing-head monitor-head">
+      <div><h2>Your sky briefing</h2><p class="briefing-deck">Your local time · <time data-monitor-clock></time></p></div>
     </section>
+    <section class="monitor-panel" aria-labelledby="monitor-title" data-live-monitor>
+      <header class="monitor-header"><div><p class="briefing-eyebrow">ASSIGNED MONITOR</p><h3 id="monitor-title">Monitor the sky for me</h3></div><button class="monitor-refresh" type="button" data-monitor-refresh>Check again</button></header>
+      <p class="monitor-description">Checks your saved interests when you open the briefing and every five minutes while it stays open and visible.</p>
+      <p class="monitor-status" data-monitor-status role="status" aria-live="polite"></p>
+      <ol class="monitor-tasks" aria-label="Source checks"></ol>
+    </section>
+    <details class="briefing-scenario" ${scenarioOpen ? 'open' : ''}>
+      <summary><span>Explore the observing scenario</span><span class="scenario-label">SIMULATED</span></summary>
+      <div class="scenario-content">
+    <section class="briefing-head scenario-head"><div><h3>North Ridge observing plan</h3><p class="briefing-deck">${day.dateLabel} · ${escapeHtml(region.label)}</p></div>
+      <button type="button" class="advance-day" data-agent-action="advance-day"><span aria-hidden="true">↻</span> Advance to next day</button></section>
     ${briefingUpdateNote(state)}
-    <section class="briefing-event-strip" aria-label="Official observing night notice"><span class="briefing-category">OFFICIAL OBSERVING NIGHT</span><div><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span></div>${sceneLink(2025, 'source-event', 'Open notice →')}</section>
+    <section class="briefing-event-strip" aria-label="Observing night scenario notice"><span class="briefing-category">OBSERVING NIGHT NOTICE</span><div><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span></div>${sceneLink(2025, 'source-event', 'Open notice →')}</section>
     <div class="briefing-summary-row"><div><span class="briefing-summary-label">Tonight’s window</span><strong>${escapeHtml(region.forecasts[state.dayOffset % 3])}</strong></div><div class="briefing-summary-count">${selectedCountMarkup(state)}${sceneLink(2025, 'plan', 'Review plan →')}</div></div>
     ${items.length ? `<div class="briefing-cards" aria-label="Suggested briefing items">${items.map((item) => briefingItemCard(item, selected.has(item.id))).join('')}</div>` : '<p class="no-briefing-items">Choose at least one interest to build your sky briefing.</p>'}
-    <div class="briefing-actions">${sceneLink(2025, 'plan', 'Review selected plan →')}</div>`;
+    <div class="briefing-actions">${sceneLink(2025, 'plan', 'Review selected plan →')}</div>
+      </div>
+    </details>`;
 }
 
 function sourceDetails(page, state) {
@@ -516,34 +531,34 @@ function boardArchiveMarkup(state, poster) {
 }
 
 function toolsMarkup() {
-  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELD NOTES / 2026</p><h2>A web prepared for agents</h2><p>In this scene, useful information appears before a visitor asks. The visitor can change the briefing, review a plan, and choose whether any change reaches another site.</p><p>WebMCP is one experiment in giving browser agents structured ways to interact with a page.</p><a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial" target="_blank" rel="noopener">Chrome for Developers · WebMCP origin trial ↗</a>${sceneLink(2025, 'home', '← Back to proactive briefing')}</article>`;
+  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELD NOTES / 2026</p><h2>A web prepared for agents</h2><p>A browser-side monitor checks public sources for your saved interests while the briefing is visible. The activity shows requests and results. It uses fixed source rules. The observing scenario lets you review a plan, save it here, and approve a local poster update.</p><p>WebMCP is one experiment in giving browser agents structured ways to interact with a page.</p><a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial" target="_blank" rel="noopener">Chrome for Developers · WebMCP origin trial ↗</a>${sceneLink(2025, 'home', '← Back to proactive briefing')}</article>`;
 }
 
-function agentPageContent(page, state, poster) {
-  if (page === 'home') return homeBriefingMarkup(state);
+function agentPageContent(page, state, poster, scenarioOpen) {
+  if (page === 'home') return homeBriefingMarkup(state, scenarioOpen);
   if (page === 'plan') return planMarkup(state, poster);
   if (page === 'bulletin') return bulletinMarkup(state);
   if (page === 'schedule') return scheduleMarkup(state);
   if (page === 'board') return boardArchiveMarkup(state, poster);
   if (page === 'tools') return toolsMarkup();
   if (page.startsWith('source-')) return sourceDetails(page, state);
-  return homeBriefingMarkup(state);
+  return homeBriefingMarkup(state, scenarioOpen);
 }
 
-function agentMarkup(page, state, poster) {
+function agentMarkup(page, state, poster, scenarioOpen) {
   const day = agentDay(state);
   const region = regions[state.region];
   return `<article class="briefing-workspace">
-    <header class="briefing-site-header"><a class="briefing-brand" href="?era=2025" data-page="home"><span aria-hidden="true">✦</span><span>North Ridge</span></a>${agentNav(page)}<span class="briefing-date">${day.shortDate} · ${escapeHtml(region.label)}</span></header>
-    <div class="briefing-layout"><main class="briefing-main">${agentPageContent(page, state, poster)}</main>
+    <header class="briefing-site-header"><a class="briefing-brand" href="?era=2025" data-page="home"><span aria-hidden="true">✦</span><span>North Ridge</span></a>${agentNav(page)}<span class="briefing-date">${page === 'home' ? 'Live briefing' : `Scenario · ${day.shortDate}`} · ${escapeHtml(region.label)}</span></header>
+    <div class="briefing-layout"><main class="briefing-main">${agentPageContent(page, state, poster, scenarioOpen)}</main>
       <aside class="briefing-rail" aria-label="Briefing settings and selected plan">
         ${preferencesMarkup(state)}
-        <section class="rail-plan"><div class="rail-plan-heading"><h3>Selected tonight</h3>${selectedCountMarkup(state)}</div><p>Items stay on this device until you choose to save or download them.</p>${sceneLink(2025, 'plan', 'Review plan →')}</section>
-        <section class="rail-sources"><h3>Sources in this briefing</h3><ul><li>${sceneLink(2025, 'source-moon', 'Moon phase')}</li><li>${sceneLink(2025, 'source-weather', 'Weather')}</li><li>${sceneLink(2025, 'source-iss', 'ISS pass')}</li><li>${sceneLink(2025, 'source-image', 'Space image')}</li></ul></section>
+        <section class="rail-plan"><div class="rail-plan-heading"><h3>Scenario plan</h3>${selectedCountMarkup(state)}</div><p>Items stay on this device until you choose to save or download them.</p>${sceneLink(2025, 'plan', 'Review plan →')}</section>
+        <section class="rail-sources"><h3>Scenario reference notes</h3><ul><li>${sceneLink(2025, 'source-moon', 'Moon phase')}</li><li>${sceneLink(2025, 'source-weather', 'Weather')}</li><li>${sceneLink(2025, 'source-iss', 'ISS pass')}</li><li>${sceneLink(2025, 'source-image', 'Space image')}</li></ul></section>
         <p class="briefing-simulation-note">Region forecasts and pass times are scenarios for this exhibit, not live service data.</p>
       </aside>
     </div>
-    <footer class="briefing-footer"><span>Curated demo briefing · no account connected</span>${sceneLink(2025, 'tools', 'How this web works →')}</footer>
+    <footer class="briefing-footer"><span>Public source checks · No account connected</span>${sceneLink(2025, 'tools', 'How this web works →')}</footer>
   </article>`;
 }
 
@@ -555,6 +570,8 @@ export function createModern(poster) {
   let searchGeneration = 0;
   let searchTimers = [];
   let activeSearchRoot = null;
+  let scenarioOpen = false;
+  const monitor = createMonitor();
   const agentState = loadAgentState();
   ensureAgentSelection(agentState);
   persistAgentState(agentState);
@@ -623,7 +640,7 @@ export function createModern(poster) {
   }
 
   function markup(era, page) {
-    return String(era) === '2023' ? searchMarkup(page, question, topic, searchStatus, searchProgress) : agentMarkup(page, agentState, poster);
+    return String(era) === '2023' ? searchMarkup(page, question, topic, searchStatus, searchProgress) : agentMarkup(page, agentState, poster, scenarioOpen);
   }
 
   function updatePlanCount(root) {
@@ -639,8 +656,16 @@ export function createModern(poster) {
     if (download) download.disabled = count === 0;
   }
 
-  function rerenderAgentRoot(root, page, focusSelector = '') {
-    root.innerHTML = agentMarkup(page, agentState, poster);
+  function rerenderAgentRoot(root, page, focusSelector, retainMonitor = false) {
+    const livePanel = retainMonitor ? root.querySelector('[data-live-monitor]') : null;
+    const clock = retainMonitor ? root.querySelector('[data-monitor-clock]') : null;
+    root.innerHTML = agentMarkup(page, agentState, poster, scenarioOpen);
+    if (livePanel && clock) {
+      root.querySelector('[data-live-monitor]').replaceWith(livePanel);
+      root.querySelector('[data-monitor-clock]').replaceWith(clock);
+    } else {
+      monitor.mount(root, agentState.region, agentState.interests);
+    }
     const focusTarget = focusSelector ? root.querySelector(focusSelector) : null;
     if (focusTarget) {
       focusTarget.tabIndex = -1;
@@ -668,7 +693,7 @@ export function createModern(poster) {
     agentState.interests = agentInterests.map(([id]) => id).filter((id) => data.getAll('interest').includes(id));
     const available = new Set(briefingItems(agentState).map(({ id }) => id));
     agentState.selectedByDay[agentDayKey(agentState)] = [...previousSelection].filter((id) => available.has(id));
-    agentState.updateNote = `Briefing updated for ${agentDay(agentState).dateLabel} in ${regions[agentState.region].label}.`;
+    agentState.updateNote = `Scenario settings updated for ${regions[agentState.region].label}.`;
     persistAgentState(agentState);
     if (page !== 'home') {
       goTo('home');
@@ -687,13 +712,14 @@ export function createModern(poster) {
     const slot = agentState.dayOffset % 3;
     const passTime = region.issTimes[slot];
     const event = officialEvent(agentState);
-    agentState.updateNote = `Updated for ${day.dateLabel}: ${region.forecasts[slot]} The ISS pass is now ${passTime}; it gives you an earlier clear-sky option. The official Observing Night notice now lists ${event.dateLabel} at ${event.time}.`;
+    agentState.updateNote = `Scenario advanced to ${day.dateLabel}. ${region.forecasts[slot]} The simulated ISS pass is now ${passTime}. Observing Night is listed for ${event.dateLabel} at ${event.time}.`;
     persistAgentState(agentState);
     if (page !== 'home') {
       goTo('home');
       return;
     }
-    rerenderAgentRoot(root, 'home', '.briefing-head h2');
+    scenarioOpen = true;
+    rerenderAgentRoot(root, 'home', '.scenario-head h3', true);
     updatePlanCount(root);
   }
 
@@ -789,6 +815,9 @@ export function createModern(poster) {
       event.preventDefault();
       updatePreferences(root, event.target, binding.page, binding.goTo);
     });
+    root.addEventListener('toggle', (event) => {
+      if (event.target.matches('.briefing-scenario')) scenarioOpen = event.target.open;
+    }, true);
     root.addEventListener('click', (event) => {
       const action = event.target.closest('[data-agent-action]')?.dataset.agentAction;
       if (action === 'advance-day') advanceBriefing(root, binding.page, binding.goTo);
@@ -839,7 +868,8 @@ export function createModern(poster) {
     finishInterruptedSearch();
 
     bindAgentPage(root, page, goTo);
+    monitor.mount(root, agentState.region, agentState.interests);
   }
 
-  return { markup, init };
+  return { markup, init, cancelMonitor: monitor.cancel };
 }

@@ -62,7 +62,7 @@ body { display: block; height: auto; background: #10151b; }
 }
 .cover-start > span { transition: transform 240ms cubic-bezier(.2, .82, .25, 1); }
 .cover-start:hover > span, .cover-start:focus-visible > span { transform: translateX(4px); }
-.intro-view :focus-visible, .scene-help:focus-visible { outline: 2px solid #bfdbff; outline-offset: 3px; }
+.intro-view :focus-visible { outline: 2px solid #bfdbff; outline-offset: 3px; }
 
 .cover-stack {
   position: relative; isolation: isolate; width: min(100%, 610px); min-width: 0; aspect-ratio: 1.34;
@@ -138,28 +138,13 @@ body { display: block; height: auto; background: #10151b; }
 .exhibit-bar {
   grid-template: "title timeline actions" auto "hint hint hint" auto / minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 5px 14px;
-  margin: 5px 5px 3px;
   padding-inline: clamp(9px, 1.6vw, 24px);
-  border: 1px solid #d9e8fc36;
-  border-radius: 11px;
-  background-color: #202a35dc;
-  background-color: color-mix(in srgb, var(--era-light) 8%, #202a35dc);
-  background-image: linear-gradient(170deg, #e5f0ff19, transparent 66%, #adc5e20d);
-  box-shadow: inset 0 1px #f4f8ff22, 0 2px 9px #080a103d;
-  backdrop-filter: blur(12px) saturate(1.1);
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  transition: background-color 540ms ease;
+  border: 0;
+  background: transparent;
 }
 .exhibit-title { grid-area: title; color: inherit; text-decoration: none; }
 .exhibit-title:hover { color: #f4d79c; }
-.exhibit-actions { grid-area: actions; justify-self: end; display: flex; align-items: center; gap: clamp(5px, 1vw, 12px); }
-.scene-help {
-  min-height: 28px; padding: 2px 8px; border: 1px solid #d7e8ff35; border-radius: 6px;
-  color: #f6f9fd; background: linear-gradient(180deg, #e3f0ff16, transparent), #17232f80;
-  box-shadow: inset 0 1px #f4f8ff1f;
-  white-space: nowrap; font-size: 12px;
-}
-.scene-help:hover { background-color: #465b71a8; }
+.exhibit-actions { grid-area: actions; justify-self: end; }
 .exhibit-actions .home-link { color: #e3edf8; }
 .timeline {
   --track-inset: 4px;
@@ -254,5 +239,5 @@ body { display: block; height: auto; background: #10151b; }
   to { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .exhibit-bar, .timeline::before, .timeline a, .cover-start, .cover-start > span { transition: none; }
+  .timeline::before, .timeline a, .cover-start, .cover-start > span { transition: none; }
 }
