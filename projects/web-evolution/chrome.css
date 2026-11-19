@@ -1,5 +1,7 @@
 /* Supplemental browser controls for Work 7. These shapes and labels are original exhibit UI. */
 #chrome { position: relative; z-index: 2; }
+/* Keep sticky page headers below the browser menus. */
+#screen { isolation: isolate; }
 .period-menu { position: relative; display: flex; align-items: center; gap: 2px; overflow: visible; white-space: nowrap; padding: 2px 5px; }
 .chrome-menu { position: relative; }
 .menu-trigger { padding: 3px 8px; border: 1px solid transparent; color: inherit; background: transparent; font: inherit; line-height: 1.4; }
