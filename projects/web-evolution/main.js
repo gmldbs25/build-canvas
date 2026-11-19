@@ -30,10 +30,15 @@ let trail;
 let browserState;
 
 function route() {
-  const search = new URLSearchParams(window.location.search);
-  const id = search.get('era');
+  const url = new URL(window.location.href);
+  const requestedEra = url.searchParams.get('era');
+  const id = requestedEra === '2025' ? '2026' : requestedEra;
   if (!id || !Object.hasOwn(eras, id)) return { intro: true };
-  const requested = search.get('page');
+  if (id !== requestedEra) {
+    url.searchParams.set('era', id);
+    window.history.replaceState(window.history.state, '', url);
+  }
+  const requested = url.searchParams.get('page');
   return { intro: false, era: id, page: Object.hasOwn(eras[id].pages, requested) ? requested : 'home', tab: window.history.state?.tab };
 }
 
@@ -84,7 +89,7 @@ function renderChrome() {
 
 function showNotes() {
   const data = eras[era];
-  document.querySelector('#notes-title').textContent = `${era === '2025' ? '2025–26' : era} · ${data.caption}`;
+  document.querySelector('#notes-title').textContent = `${era} · ${data.caption}`;
   document.querySelector('#notes-copy').textContent = data.notes;
   const guide = document.querySelector('#notes-guide');
   if (guide) {
@@ -154,7 +159,7 @@ const reloadTiming = {
   2005: { blank: 90, step: 96, steps: 5 },
   2013: { blank: 60, step: 68, steps: 4 },
   2023: { blank: 32, step: 56, steps: 3 },
-  2025: { blank: 32, step: 56, steps: 3 },
+  2026: { blank: 32, step: 56, steps: 3 },
 };
 
 function cancelRedraw() {

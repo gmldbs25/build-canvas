@@ -13,7 +13,7 @@ body { display: block; height: auto; background: #10151b; }
 #exhibit-view[data-era="2005"] { --era-light: #ffc4db; --era-index: 3; }
 #exhibit-view[data-era="2013"] { --era-light: #c7d9fe; --era-index: 4; overflow: clip; }
 #exhibit-view[data-era="2023"] { --era-light: #cfcbff; --era-index: 5; }
-#exhibit-view[data-era="2025"] { --era-light: #c6ead6; --era-index: 6; }
+#exhibit-view[data-era="2026"] { --era-light: #c6ead6; --era-index: 6; }
 
 .intro-view {
   --cover-gold: #f1d79f;
@@ -216,7 +216,6 @@ body { display: block; height: auto; background: #10151b; }
 }
 @media (max-width: 420px) {
   .timeline { --track-inset: 3px; --track-gap: 3px; }
-  .timeline a:last-child .era-year { font-size: clamp(9.5px, 2.8vw, 11px); letter-spacing: -.06em; }
 }
 @media (max-height: 460px) and (min-width: 600px) {
   .exhibit-bar { grid-template: "title timeline actions" auto "hint hint hint" auto / minmax(0, 1fr) auto minmax(0, 1fr); }

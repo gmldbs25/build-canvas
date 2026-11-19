@@ -236,7 +236,7 @@
   .agent-reading > span, .search-loader { animation: none; }
 }
 
-/* 2025–26 proactive briefing */
+/* 2026 proactive briefing */
 .briefing-workspace {
   --brief-ink: #172e28; --brief-muted: #52665e; --brief-line: #dbe5dc;
   --brief-green: #17644d; --brief-pale: #edf5ed;

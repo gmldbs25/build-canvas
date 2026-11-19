@@ -40,6 +40,62 @@
   font-size: 11px;
 }
 
+.agent-report-progress {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 28px;
+  margin: 0 0 8px;
+}
+
+.agent-report-stars {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  padding: 2px 3px;
+}
+
+.agent-report-stars::before {
+  content: "";
+  position: absolute;
+  inset-inline: 8px;
+  top: 50%;
+  border-top: 1px dotted #8eaf99;
+}
+
+.agent-report-stars span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 18px;
+  color: #39805f;
+  background: #f7fbf7;
+  font-size: 15px;
+  line-height: 1;
+  animation: agent-star-glow 1.45s ease-in-out infinite;
+}
+
+.agent-report-stars span:nth-child(2) { animation-delay: 120ms; }
+.agent-report-stars span:nth-child(3) { animation-delay: 240ms; }
+.agent-report-stars span:nth-child(4) { animation-delay: 360ms; }
+.agent-report-stars span:nth-child(5) { animation-delay: 480ms; }
+
+@keyframes agent-star-glow {
+  0%, 100% { opacity: .45; transform: translateY(1px) rotate(-10deg) scale(.7); }
+  50% { opacity: 1; transform: translateY(-1px) rotate(8deg) scale(1.2); }
+}
+
+.agent-report-stage {
+  margin: 0;
+  color: #456354;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
 .agent-report-copy {
   max-width: 77ch;
   min-height: 1.55em;
@@ -50,7 +106,7 @@
 
 .agent-report-copy > p { margin: 0 0 8px; }
 .agent-report-copy > p:last-child { margin-bottom: 0; }
-.agent-report[data-agent-report="checking"] .agent-report-copy { color: #51685d; }
+.agent-report[data-agent-report="writing"] .agent-report-stage { color: #265f46; }
 .agent-report[data-agent-report="writing"] .agent-report-copy > :last-child::after {
   content: "";
   display: inline-block;
@@ -89,3 +145,7 @@
 .agent-report-actions .agent-report-recheck:not(:disabled, [aria-disabled]):hover { background: #e5f2e8; }
 .agent-report-actions .agent-report-scenario:hover { background: #134d38; }
 .agent-report-actions .agent-report-recheck:is(:disabled, [aria-disabled]) { color: #51685d; background: #f2f7f2; cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-report-stars span { animation: none; }
+}

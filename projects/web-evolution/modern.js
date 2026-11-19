@@ -19,7 +19,7 @@ export const modernEras = {
       archive: ['November Schedule · Observatory Calendar', 'https://calendar.example/2023/november'],
     },
   },
-  2025: {
+  2026: {
     caption: 'Modern browser · Proactive sky briefing',
     hint: '에이전트가 관심사에 맞춰 출처를 확인하는 모습을 보고, 관측 시나리오에서 계획을 만들어 보세요.',
     notes: '브리핑을 열면 설정된 관심사에 따라 NASA 소식과 Open-Meteo의 실시간 예보 모델 값을 확인합니다. 활동 목록에는 실제로 요청한 출처와 결과가 표시됩니다. North Ridge의 지역 예보, ISS 통과 시각, 관측회 일정은 별도로 표시된 전시용 시나리오입니다. 캘린더 파일은 기기에서 만들고 2013년 포스터는 별도 선택을 했을 때만 변경합니다.',
@@ -34,7 +34,7 @@ export const modernEras = {
     pages: {
       home: ['North Ridge Observatory', ''],
       bulletin: ['Observing Night · Event Bulletin', 'events/observing-night'],
-      schedule: ['Public Nights · Community Calendar', 'https://calendar.example/2025/november'],
+      schedule: ['Public Nights · Community Calendar', 'https://calendar.example/2026/november'],
       board: ['Observing Plan · Fieldwork archive', 'https://fieldwork.example/b/observing-night'],
       tools: ['Field Notes · A web for agents', 'journal/2026-tools'],
       plan: ['My Observing Plan · North Ridge', 'plans/current'],
@@ -446,7 +446,7 @@ function agentNav(page) {
   const links = [
     ['home', 'Briefing'], ['plan', 'My plan'], ['bulletin', 'Bulletin'], ['schedule', 'Calendar'],
   ];
-  return `<nav class="briefing-nav" aria-label="Observatory pages">${links.map(([id, label]) => sceneLink(2025, id, label, page === id)).join('')}</nav>`;
+  return `<nav class="briefing-nav" aria-label="Observatory pages">${links.map(([id, label]) => sceneLink(2026, id, label, page === id)).join('')}</nav>`;
 }
 
 function briefingItemCard(item, selected) {
@@ -457,7 +457,7 @@ function briefingItemCard(item, selected) {
     <p>${escapeHtml(item.summary)}</p>
     <p class="briefing-item-note">${escapeHtml(item.note)}</p>
     <div class="briefing-card-foot"><span>${escapeHtml(item.location)}</span><span>${escapeHtml(item.checked)}</span></div>
-    <div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2025, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div>
+    <div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2026, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div>
   </article>`;
 }
 
@@ -503,10 +503,10 @@ function homeBriefingMarkup(state, scenarioOpen) {
     <section class="briefing-head scenario-head"><div><h3>North Ridge observing plan</h3><p class="briefing-deck">${day.dateLabel} · ${escapeHtml(region.label)}</p></div>
       <button type="button" class="advance-day" data-agent-action="advance-day"><span aria-hidden="true">↻</span> Advance to next day</button></section>
     ${briefingUpdateNote(state)}
-    <section class="briefing-event-strip" aria-label="Observing night scenario notice"><span class="briefing-category">OBSERVING NIGHT NOTICE</span><div><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span></div>${sceneLink(2025, 'source-event', 'Open notice →')}</section>
-    <div class="briefing-summary-row"><div><span class="briefing-summary-label">Tonight’s window</span><strong>${escapeHtml(region.forecasts[state.dayOffset % 3])}</strong></div><div class="briefing-summary-count">${selectedCountMarkup(state)}${sceneLink(2025, 'plan', 'Review plan →')}</div></div>
+    <section class="briefing-event-strip" aria-label="Observing night scenario notice"><span class="briefing-category">OBSERVING NIGHT NOTICE</span><div><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span></div>${sceneLink(2026, 'source-event', 'Open notice →')}</section>
+    <div class="briefing-summary-row"><div><span class="briefing-summary-label">Tonight’s window</span><strong>${escapeHtml(region.forecasts[state.dayOffset % 3])}</strong></div><div class="briefing-summary-count">${selectedCountMarkup(state)}${sceneLink(2026, 'plan', 'Review plan →')}</div></div>
     ${items.length ? `<div class="briefing-cards" aria-label="Suggested briefing items">${items.map((item) => briefingItemCard(item, selected.has(item.id))).join('')}</div>` : '<p class="no-briefing-items">Choose at least one interest to build your sky briefing.</p>'}
-    <div class="briefing-actions">${sceneLink(2025, 'plan', 'Review selected plan →')}</div>
+    <div class="briefing-actions">${sceneLink(2026, 'plan', 'Review selected plan →')}</div>
       </div>
     </details>`;
 }
@@ -523,7 +523,7 @@ function sourceDetails(page, state) {
   };
   const source = sourceMap[page];
   const reference = source.url ? `<a href="${source.url}" target="_blank" rel="noopener">Open the real reference ↗</a>` : '<span>Local fictional notice · simulated</span>';
-  return `<article class="source-note-page"><p class="briefing-eyebrow">SOURCE NOTE / ${source.tag}</p><h2>${source.title}</h2><p class="source-note-check">Reference used · ${checked}</p><p>${source.body}</p><div class="source-reference-card"><strong>${source.source}</strong>${reference}</div><p class="source-local-label">Local briefing data: simulated for the North Ridge scene and not fetched from the reference site.</p>${sceneLink(2025, 'home', '← Back to briefing')}</article>`;
+  return `<article class="source-note-page"><p class="briefing-eyebrow">SOURCE NOTE / ${source.tag}</p><h2>${source.title}</h2><p class="source-note-check">Reference used · ${checked}</p><p>${source.body}</p><div class="source-reference-card"><strong>${source.source}</strong>${reference}</div><p class="source-local-label">Local briefing data: simulated for the North Ridge scene and not fetched from the reference site.</p>${sceneLink(2026, 'home', '← Back to briefing')}</article>`;
 }
 
 function bulletinMarkup(state) {
@@ -531,14 +531,14 @@ function bulletinMarkup(state) {
   const region = regions[state.region];
   const event = officialEvent(state);
   const selected = selectedAgentItems(state);
-  return `<article class="briefing-document"><p class="briefing-eyebrow">NORTH RIDGE OBSERVATORY / DAILY BULLETIN</p><h2>Observing Night update</h2><p class="bulletin-issued">Issued ${day.dateLabel} · 2:00 p.m. local · Simulated bulletin</p><p>${escapeHtml(region.forecasts[state.dayOffset % 3])} The local sky note is a curated scenario, not a live forecast.</p><div class="bulletin-facts"><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span><span>${selected.length ? `${selected.length} plan item${selected.length === 1 ? '' : 's'} selected` : 'No plan items selected yet'}</span></div><ul class="bulletin-source-list"><li>${sceneLink(2025, 'source-event', 'Official event notice and date/time update')}</li><li>${sceneLink(2025, 'source-weather', 'Weather reference and simulation note')}</li><li>${sceneLink(2025, 'source-iss', 'ISS pass reference and simulation note')}</li><li>${sceneLink(2025, 'source-moon', 'Moon phase reference and simulation note')}</li></ul>${sceneLink(2025, 'plan', 'Review tonight’s plan →')}</article>`;
+  return `<article class="briefing-document"><p class="briefing-eyebrow">NORTH RIDGE OBSERVATORY / DAILY BULLETIN</p><h2>Observing Night update</h2><p class="bulletin-issued">Issued ${day.dateLabel} · 2:00 p.m. local · Simulated bulletin</p><p>${escapeHtml(region.forecasts[state.dayOffset % 3])} The local sky note is a curated scenario, not a live forecast.</p><div class="bulletin-facts"><strong>${event.dateLabel} · ${event.time}</strong><span>${escapeHtml(event.location)}</span><span>${selected.length ? `${selected.length} plan item${selected.length === 1 ? '' : 's'} selected` : 'No plan items selected yet'}</span></div><ul class="bulletin-source-list"><li>${sceneLink(2026, 'source-event', 'Official event notice and date/time update')}</li><li>${sceneLink(2026, 'source-weather', 'Weather reference and simulation note')}</li><li>${sceneLink(2026, 'source-iss', 'ISS pass reference and simulation note')}</li><li>${sceneLink(2026, 'source-moon', 'Moon phase reference and simulation note')}</li></ul>${sceneLink(2026, 'plan', 'Review tonight’s plan →')}</article>`;
 }
 
 function scheduleMarkup(state) {
   const day = agentDay(state);
   const region = regions[state.region];
   const items = briefingItems(state).sort((a, b) => a.startMinutes - b.startMinutes);
-  return `<article class="briefing-document"><p class="briefing-eyebrow">COMMUNITY CALENDAR / NORTH RIDGE</p><h2>Public observing schedule</h2><p>${day.dateLabel} · local scenario for ${escapeHtml(region.label)}</p><ol class="schedule-list">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.location)}</span></div>${sceneLink(2025, item.sourcePages[0], 'Source note ↗')}</li>`).join('')}</ol><p class="simulation-disclosure">Event timing and local conditions are curated demo data.</p>${sceneLink(2025, 'plan', 'Select items for my plan →')}</article>`;
+  return `<article class="briefing-document"><p class="briefing-eyebrow">COMMUNITY CALENDAR / NORTH RIDGE</p><h2>Public observing schedule</h2><p>${day.dateLabel} · local scenario for ${escapeHtml(region.label)}</p><ol class="schedule-list">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.location)}</span></div>${sceneLink(2026, item.sourcePages[0], 'Source note ↗')}</li>`).join('')}</ol><p class="simulation-disclosure">Event timing and local conditions are curated demo data.</p>${sceneLink(2026, 'plan', 'Select items for my plan →')}</article>`;
 }
 
 function posterSnapshot(poster) {
@@ -566,11 +566,11 @@ function planMarkup(state, poster) {
   const posterHasUpdate = Boolean(state.posterUpdates[key]);
   return `<article class="plan-review-page"><p class="briefing-eyebrow">MY OBSERVING PLAN / ${day.shortDate.toUpperCase()}</p><h2>Review the evening</h2><p class="plan-intro">${escapeHtml(region.label)} · ${escapeHtml(region.location)} · ${items.length} selected item${items.length === 1 ? '' : 's'}</p>
     ${matchesSaved ? '<p class="plan-saved" role="status">This plan is saved on this device.</p>' : approved ? '<p class="plan-changed" role="status">Your selections changed after the last save. Save again to update this plan.</p>' : ''}
-    ${items.length ? `<ol class="plan-timeline">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><span class="plan-kind">${item.category}</span><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.summary)}</p><span>${escapeHtml(item.location)}</span><div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2025, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div></div><label class="plan-pick"><input type="checkbox" data-plan-item="${item.id}" checked><span>Keep</span></label></li>`).join('')}</ol>` : '<p class="no-briefing-items">No items are selected. Return to the briefing and choose at least one idea.</p>'}
-    <section class="poster-proposal" aria-labelledby="poster-proposal-title"><div><p class="briefing-eyebrow">OPTIONAL / 2013 FIELDWORK POSTER</p><h3 id="poster-proposal-title">Proposed schedule change</h3><p>Proposal from the official notice, separate from your selected sky-plan activities. Only date, time, and location fields are proposed. Existing poster edits stay in place. ${sceneLink(2025, 'source-event', 'Open the notice →')}</p></div>
+    ${items.length ? `<ol class="plan-timeline">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><span class="plan-kind">${item.category}</span><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.summary)}</p><span>${escapeHtml(item.location)}</span><div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2026, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div></div><label class="plan-pick"><input type="checkbox" data-plan-item="${item.id}" checked><span>Keep</span></label></li>`).join('')}</ol>` : '<p class="no-briefing-items">No items are selected. Return to the briefing and choose at least one idea.</p>'}
+    <section class="poster-proposal" aria-labelledby="poster-proposal-title"><div><p class="briefing-eyebrow">OPTIONAL / 2013 FIELDWORK POSTER</p><h3 id="poster-proposal-title">Proposed schedule change</h3><p>Proposal from the official notice, separate from your selected sky-plan activities. Only date, time, and location fields are proposed. Existing poster edits stay in place. ${sceneLink(2026, 'source-event', 'Open the notice →')}</p></div>
       <dl class="poster-diff"><div><dt>Date</dt><dd><span>${escapeHtml(currentPoster.date || '—')}</span><b>→</b><strong>${escapeHtml(proposal.date || '—')}</strong></dd></div><div><dt>Time</dt><dd><span>${escapeHtml(currentPoster.time || '—')}</span><b>→</b><strong>${escapeHtml(proposal.time || 'Select an item first')}</strong></dd></div><div><dt>Location</dt><dd><span>${escapeHtml(currentPoster.location || '—')}</span><b>→</b><strong>${escapeHtml(proposal.location || '—')}</strong></dd></div></dl>
       <label class="poster-opt-in"><input type="checkbox" name="sync-poster" data-sync-poster ${state.syncPoster ? 'checked' : ''}><span>Also update the 2013 Fieldwork poster when saving this plan</span></label>
-      ${posterHasUpdate ? `<p class="poster-updated" role="status">Poster schedule updated for ${escapeHtml(day.shortDate)}. ${sceneLink(2025, 'board', 'View the poster archive →')}</p>` : ''}
+      ${posterHasUpdate ? `<p class="poster-updated" role="status">Poster schedule updated for ${escapeHtml(day.shortDate)}. ${sceneLink(2026, 'board', 'View the poster archive →')}</p>` : ''}
     </section>
     <div class="plan-actions"><button type="button" class="plan-primary" data-agent-action="approve-plan" ${items.length ? '' : 'disabled'}>Save this observing plan</button><button type="button" class="plan-secondary" data-agent-action="download-ics" ${items.length ? '' : 'disabled'}>Download .ics calendar</button><a href="?era=2013&amp;page=poster" data-era="2013" data-page="poster">Open the 2013 poster editor →</a></div><p id="plan-feedback" class="plan-feedback" role="status" aria-live="polite"></p>
   </article>`;
@@ -585,7 +585,7 @@ function boardArchiveMarkup(state, poster) {
 }
 
 function toolsMarkup() {
-  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELD NOTES / 2026</p><h2>A web prepared for agents</h2><p>A browser-side monitor checks public sources for your saved interests while the briefing is visible. The activity shows requests and results. It uses fixed source rules. The observing scenario lets you review a plan, save it here, and approve a local poster update.</p><p>WebMCP is one experiment in giving browser agents structured ways to interact with a page.</p><a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial" target="_blank" rel="noopener">Chrome for Developers · WebMCP origin trial ↗</a>${sceneLink(2025, 'home', '← Back to proactive briefing')}</article>`;
+  return `<article class="briefing-document"><p class="briefing-eyebrow">FIELD NOTES / 2026</p><h2>A web prepared for agents</h2><p>A browser-side monitor checks public sources for your saved interests while the briefing is visible. The activity shows requests and results. It uses fixed source rules. The observing scenario lets you review a plan, save it here, and approve a local poster update.</p><p>WebMCP is one experiment in giving browser agents structured ways to interact with a page.</p><a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial" target="_blank" rel="noopener">Chrome for Developers · WebMCP origin trial ↗</a>${sceneLink(2026, 'home', '← Back to proactive briefing')}</article>`;
 }
 
 function agentPageContent(page, state, poster, scenarioOpen) {
@@ -603,16 +603,16 @@ function agentMarkup(page, state, poster, scenarioOpen) {
   const day = agentDay(state);
   const region = regions[state.region];
   return `<article class="briefing-workspace">
-    <header class="briefing-site-header"><a class="briefing-brand" href="?era=2025" data-page="home"><span aria-hidden="true">✦</span><span>North Ridge</span></a>${agentNav(page)}<span class="briefing-date">${page === 'home' ? 'Live briefing' : `Scenario · ${day.shortDate}`} · ${escapeHtml(region.label)}</span></header>
+    <header class="briefing-site-header"><a class="briefing-brand" href="?era=2026" data-page="home"><span aria-hidden="true">✦</span><span>North Ridge</span></a>${agentNav(page)}<span class="briefing-date">${page === 'home' ? 'Live briefing' : `Scenario · ${day.shortDate}`} · ${escapeHtml(region.label)}</span></header>
     <div class="briefing-layout"><main class="briefing-main">${agentPageContent(page, state, poster, scenarioOpen)}</main>
       <aside class="briefing-rail" aria-label="Briefing settings and selected plan">
         ${preferencesMarkup(state)}
-        <section class="rail-plan"><div class="rail-plan-heading"><h3>Scenario plan</h3>${selectedCountMarkup(state)}</div><p>Items stay on this device until you choose to save or download them.</p>${sceneLink(2025, 'plan', 'Review plan →')}</section>
-        <section class="rail-sources"><h3>Scenario reference notes</h3><ul><li>${sceneLink(2025, 'source-moon', 'Moon phase')}</li><li>${sceneLink(2025, 'source-weather', 'Weather')}</li><li>${sceneLink(2025, 'source-iss', 'ISS pass')}</li><li>${sceneLink(2025, 'source-image', 'Space image')}</li></ul></section>
+        <section class="rail-plan"><div class="rail-plan-heading"><h3>Scenario plan</h3>${selectedCountMarkup(state)}</div><p>Items stay on this device until you choose to save or download them.</p>${sceneLink(2026, 'plan', 'Review plan →')}</section>
+        <section class="rail-sources"><h3>Scenario reference notes</h3><ul><li>${sceneLink(2026, 'source-moon', 'Moon phase')}</li><li>${sceneLink(2026, 'source-weather', 'Weather')}</li><li>${sceneLink(2026, 'source-iss', 'ISS pass')}</li><li>${sceneLink(2026, 'source-image', 'Space image')}</li></ul></section>
         <p class="briefing-simulation-note">Region forecasts and pass times are scenarios for this exhibit, not live service data.</p>
       </aside>
     </div>
-    <footer class="briefing-footer"><span>Public source checks · No account connected</span>${sceneLink(2025, 'tools', 'How this web works →')}</footer>
+    <footer class="briefing-footer"><span>Public source checks · No account connected</span>${sceneLink(2026, 'tools', 'How this web works →')}</footer>
   </article>`;
 }
 

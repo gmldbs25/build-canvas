@@ -46,8 +46,8 @@
 .display[data-era="2001"] .screen { background: white; }
 .display[data-era="2001"] .browser-status { padding: 3px 8px; border-top: 1px solid #91a3b1; background: #d5dee8; }
 .display[data-era="2005"] .browser-window { border: 1px solid #7c8c9d; background: #e8edf2; font: 13px/1.35 Arial, sans-serif; }
-.display[data-era="2005"] .period-menu, .display[data-era="2013"] .period-menu, .display[data-era="2023"] .period-menu, .display[data-era="2025"] .period-menu { padding-inline: 9px; background: linear-gradient(#edf2f7, #d8e1eb); color: #34475c; border-bottom: 1px solid #b6c3d1; }
-.display[data-era="2005"] .chrome-location, .display[data-era="2013"] .chrome-location, .display[data-era="2023"] .chrome-location, .display[data-era="2025"] .chrome-location { min-width: 0; }
+.display[data-era="2005"] .period-menu, .display[data-era="2013"] .period-menu, .display[data-era="2023"] .period-menu, .display[data-era="2026"] .period-menu { padding-inline: 9px; background: linear-gradient(#edf2f7, #d8e1eb); color: #34475c; border-bottom: 1px solid #b6c3d1; }
+.display[data-era="2005"] .chrome-location, .display[data-era="2013"] .chrome-location, .display[data-era="2023"] .chrome-location, .display[data-era="2026"] .chrome-location { min-width: 0; }
 .display[data-era="2005"] .address-form, .display[data-era="2013"] .address-form { flex: 1; border: 1px solid #9eafc1; border-radius: 3px; background: #fff; }
 .display[data-era="2005"] .address-form label, .display[data-era="2013"] .address-form label { display: none; }
 .display[data-era="2005"] .address-form input, .display[data-era="2013"] .address-form input { border: 0; background: transparent; }
@@ -57,18 +57,18 @@
 .sim-tab-add { min-width: 30px; justify-content: center; padding-inline: 8px; background: transparent; font-size: 17px; }
 .sim-tab-close { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: auto; border-radius: 50%; font-size: 15px; }
 .sim-tab-close:hover { background: #c7d3df; }
-.display[data-era="2023"] .browser-window, .display[data-era="2025"] .browser-window { border: 1px solid #647180; border-radius: 10px; overflow: hidden; background: #e9edf2; font: 13px/1.4 Arial, sans-serif; }
-.display[data-era="2023"] .sim-tabs, .display[data-era="2025"] .sim-tabs { padding: 7px 10px 0; background: #cbd3dc; }
-.display[data-era="2023"] .chrome-location, .display[data-era="2025"] .chrome-location { display: flex; align-items: center; gap: 6px; padding: 6px 9px; background: #e7ebf0; }
-.display[data-era="2023"] .address-form, .display[data-era="2025"] .address-form { flex: 1; border-radius: 18px; padding-inline: 12px; background: #fff; box-shadow: inset 0 1px 2px #0002; }
-.display[data-era="2023"] .address-form label, .display[data-era="2025"] .address-form label { display: none; }
-.display[data-era="2023"] .address-form input, .display[data-era="2025"] .address-form input { border: 0; background: transparent; }
-.display[data-era="2023"] .address-form button, .display[data-era="2025"] .address-form button { border: 0; border-radius: 50%; background: #e8edf3; }
-.display[data-era="2023"] .period-menu, .display[data-era="2025"] .period-menu { border: 0; background: #e7ebf0; }
-.display[data-era="2023"] .menu-trigger, .display[data-era="2025"] .menu-trigger { border-radius: 12px; }
-.display[data-era="2023"] .browser-tools button, .display[data-era="2025"] .browser-tools button { padding: 4px 7px; border: 0; border-radius: 50%; background: transparent; color: #465363; font-size: 16px; }
-.display[data-era="2023"] .tool-label, .display[data-era="2025"] .tool-label { display: none; }
-.display[data-era="2023"] .browser-status, .display[data-era="2025"] .browser-status { padding: 4px 12px; color: #4b5867; background: #eef1f4; border-top: 1px solid #cbd2da; font-size: 11px; }
+.display[data-era="2023"] .browser-window, .display[data-era="2026"] .browser-window { border: 1px solid #647180; border-radius: 10px; overflow: hidden; background: #e9edf2; font: 13px/1.4 Arial, sans-serif; }
+.display[data-era="2023"] .sim-tabs, .display[data-era="2026"] .sim-tabs { padding: 7px 10px 0; background: #cbd3dc; }
+.display[data-era="2023"] .chrome-location, .display[data-era="2026"] .chrome-location { display: flex; align-items: center; gap: 6px; padding: 6px 9px; background: #e7ebf0; }
+.display[data-era="2023"] .address-form, .display[data-era="2026"] .address-form { flex: 1; border-radius: 18px; padding-inline: 12px; background: #fff; box-shadow: inset 0 1px 2px #0002; }
+.display[data-era="2023"] .address-form label, .display[data-era="2026"] .address-form label { display: none; }
+.display[data-era="2023"] .address-form input, .display[data-era="2026"] .address-form input { border: 0; background: transparent; }
+.display[data-era="2023"] .address-form button, .display[data-era="2026"] .address-form button { border: 0; border-radius: 50%; background: #e8edf3; }
+.display[data-era="2023"] .period-menu, .display[data-era="2026"] .period-menu { border: 0; background: #e7ebf0; }
+.display[data-era="2023"] .menu-trigger, .display[data-era="2026"] .menu-trigger { border-radius: 12px; }
+.display[data-era="2023"] .browser-tools button, .display[data-era="2026"] .browser-tools button { padding: 4px 7px; border: 0; border-radius: 50%; background: transparent; color: #465363; font-size: 16px; }
+.display[data-era="2023"] .tool-label, .display[data-era="2026"] .tool-label { display: none; }
+.display[data-era="2023"] .browser-status, .display[data-era="2026"] .browser-status { padding: 4px 12px; color: #4b5867; background: #eef1f4; border-top: 1px solid #cbd2da; font-size: 11px; }
 .browser-toast { position: fixed; z-index: 30; bottom: 18px; left: 50%; width: max-content; max-width: min(520px, calc(100vw - 24px)); transform: translateX(-50%); padding: 9px 14px; border: 1px solid #48596c; border-radius: 6px; color: #f8fafc; background: #202b38; box-shadow: 0 5px 20px #0005; font: 13px/1.4 Arial, sans-serif; }
 .browser-toast[hidden] { display: none; }
 .bookmark-panel { position: fixed; z-index: 29; top: 22%; right: max(12px, calc((100vw - 650px) / 2)); width: min(320px, calc(100vw - 24px)); max-height: 56vh; overflow: auto; padding: 12px; border: 1px solid #8795a5; border-radius: 5px; color: #222c38; background: #f5f7fa; box-shadow: 0 10px 35px #0006; font: 13px/1.45 Arial, sans-serif; }
@@ -118,7 +118,7 @@
 /* Chrome tab-strip interpretations, based on Chromium's period-specific tab geometry. */
 .display[data-era="2013"] .chrome-tabs-row,
 .display[data-era="2023"] .chrome-tabs-row,
-.display[data-era="2025"] .chrome-tabs-row {
+.display[data-era="2026"] .chrome-tabs-row {
   display: flex;
   align-items: center;
   min-width: 0;
@@ -126,7 +126,7 @@
 }
 .display[data-era="2013"] .sim-tabs,
 .display[data-era="2023"] .sim-tabs,
-.display[data-era="2025"] .sim-tabs {
+.display[data-era="2026"] .sim-tabs {
   display: flex;
   flex: 0 1 auto;
   align-items: center;
@@ -233,13 +233,13 @@
 }
 .display[data-era="2023"] .sim-tab-add:hover { background: #fff; }
 
-.display[data-era="2025"] .chrome-tabs-row {
+.display[data-era="2026"] .chrome-tabs-row {
   min-height: 42px;
   padding: 5px 10px 3px;
   background: #d8dee7;
 }
-.display[data-era="2025"] .sim-tabs { gap: 4px; }
-.display[data-era="2025"] .sim-tab {
+.display[data-era="2026"] .sim-tabs { gap: 4px; }
+.display[data-era="2026"] .sim-tab {
   position: relative;
   flex: 0 1 196px;
   min-width: 72px;
@@ -250,7 +250,7 @@
   background: transparent;
   color: #405064;
 }
-.display[data-era="2025"] .sim-tab:not(.is-active)::after {
+.display[data-era="2026"] .sim-tab:not(.is-active)::after {
   position: absolute;
   top: 8px;
   right: 4px;
@@ -259,11 +259,11 @@
   background: #aeb8c5;
   content: "";
 }
-.display[data-era="2025"] .sim-tab:not(.is-active):hover {
+.display[data-era="2026"] .sim-tab:not(.is-active):hover {
   border-radius: 13px;
   background: #e9edf3;
 }
-.display[data-era="2025"] .sim-tab.is-active {
+.display[data-era="2026"] .sim-tab.is-active {
   flex: 0 1 165px;
   min-width: 128px;
   z-index: 1;
@@ -274,8 +274,8 @@
   color: #293d56;
   box-shadow: 0 2px 0 #f1f4f8;
 }
-.display[data-era="2025"] .sim-tab-close { position: absolute; top: 50%; right: 8px; margin: 0; transform: translateY(-50%); }
-.display[data-era="2025"] .sim-tab-add {
+.display[data-era="2026"] .sim-tab-close { position: absolute; top: 50%; right: 8px; margin: 0; transform: translateY(-50%); }
+.display[data-era="2026"] .sim-tab-add {
   flex: 0 0 28px;
   width: 28px;
   min-width: 28px;
@@ -288,10 +288,10 @@
   color: #3f5268;
   font: 17px/26px Arial, sans-serif;
 }
-.display[data-era="2025"] .sim-tab-add:hover { background: #fff; }
+.display[data-era="2026"] .sim-tab-add:hover { background: #fff; }
 .display[data-era="2013"] .sim-tab-title,
 .display[data-era="2023"] .sim-tab-title,
-.display[data-era="2025"] .sim-tab-title {
+.display[data-era="2026"] .sim-tab-title {
   min-width: 0;
   flex: 1 1 auto;
   overflow: hidden;
@@ -300,10 +300,10 @@
 }
 .display[data-era="2013"] .sim-tab:focus-visible,
 .display[data-era="2023"] .sim-tab:focus-visible,
-.display[data-era="2025"] .sim-tab:focus-visible,
+.display[data-era="2026"] .sim-tab:focus-visible,
 .display[data-era="2013"] .sim-tab-add:focus-visible,
 .display[data-era="2023"] .sim-tab-add:focus-visible,
-.display[data-era="2025"] .sim-tab-add:focus-visible {
+.display[data-era="2026"] .sim-tab-add:focus-visible {
   outline: 2px solid #245b88;
   outline-offset: -3px;
 }
@@ -317,9 +317,9 @@
   .display[data-era="2023"] .sim-tab { flex-basis: 140px; min-width: 90px; height: 27px; }
   .display[data-era="2023"] .sim-tab.is-active { flex-basis: 140px; min-width: 128px; }
   .display[data-era="2023"] .sim-tab-add,
-  .display[data-era="2025"] .sim-tab-add { flex-basis: 26px; width: 26px; min-width: 26px; height: 26px; min-height: 26px; }
-  .display[data-era="2025"] .chrome-tabs-row { min-height: 40px; padding-inline: 5px; }
-  .display[data-era="2025"] .sim-tabs { gap: 2px; }
-  .display[data-era="2025"] .sim-tab { flex-basis: 145px; min-width: 88px; height: 28px; }
-  .display[data-era="2025"] .sim-tab.is-active { flex-basis: 140px; min-width: 128px; }
+  .display[data-era="2026"] .sim-tab-add { flex-basis: 26px; width: 26px; min-width: 26px; height: 26px; min-height: 26px; }
+  .display[data-era="2026"] .chrome-tabs-row { min-height: 40px; padding-inline: 5px; }
+  .display[data-era="2026"] .sim-tabs { gap: 2px; }
+  .display[data-era="2026"] .sim-tab { flex-basis: 145px; min-width: 88px; height: 28px; }
+  .display[data-era="2026"] .sim-tab.is-active { flex-basis: 140px; min-width: 128px; }
 }
