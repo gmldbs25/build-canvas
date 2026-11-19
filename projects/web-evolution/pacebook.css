@@ -1,4 +1,6 @@
 .pacebook {
+  /* Keeps the feed's visually hidden form labels inside its scroll viewport. */
+  position: relative;
   --pace-ink: #312e35;
   --pace-muted: #625961;
   --pace-link: #683754;

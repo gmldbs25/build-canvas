@@ -11,7 +11,7 @@ body { display: block; height: auto; background: #10151b; }
 #exhibit-view[data-era="1998"] { --era-light: #a6eddf; --era-index: 1; }
 #exhibit-view[data-era="2001"] { --era-light: #d7e9a7; --era-index: 2; }
 #exhibit-view[data-era="2005"] { --era-light: #ffc4db; --era-index: 3; }
-#exhibit-view[data-era="2013"] { --era-light: #c7d9fe; --era-index: 4; }
+#exhibit-view[data-era="2013"] { --era-light: #c7d9fe; --era-index: 4; overflow: clip; }
 #exhibit-view[data-era="2023"] { --era-light: #cfcbff; --era-index: 5; }
 #exhibit-view[data-era="2025"] { --era-light: #c6ead6; --era-index: 6; }
 
