@@ -70,12 +70,19 @@
 .photo-tabs a { color: #4d6069; }
 .photo-tabs a[aria-current] { color: #b95323; font-weight: bold; }
 .photo-intro { margin: 17px 0; color: #4c575d; }
-.stream-note { margin-top: 13px; color: #788489; font-size: 11px; }
+.stream-tag-nav strong { margin-right: 4px; color: #4d6069; font-size: 12px; }
+.stream-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 9px; }
+.stream-heading h3 { margin: 0; color: #2f5367; font-size: 15px; }
+.photostream-page .moon-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 152px), 1fr)); gap: 9px; }
+.photostream-page .moon-card img { height: auto; aspect-ratio: 4 / 3; }
+.stream-references { margin-top: 22px; }
+.photostream-page .moon-card img[src*="/observer-negev"] { object-fit: cover; object-position: center 55%; }
 .photo-kicker { margin: 0 0 4px; color: #9b512b; font-size: 11px; font-weight: bold; letter-spacing: .1em; text-transform: uppercase; }
 .moon-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; }
 .moon-heading h2 { margin-bottom: 0; }
 .moon-result-count { padding: 4px 8px; border: 1px solid #d4d9d8; border-radius: 3px; color: #65757a; background: #fff; font-size: 11px; white-space: nowrap; }
 .photo-tag-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: -4px 0 18px; padding: 10px; border: 1px solid #d7dedd; background: #ebeDEA; }
+.stream-tag-nav { margin: 12px 0; }
 .photo-tag-nav .tag-chip { border: 1px solid #c8d1d1; border-radius: 3px; color: #3e5963; text-decoration: none; background: #fafbf9; }
 .photo-tag-nav .tag-chip:hover { border-color: #7396a1; background: #fff; text-decoration: none; }
 .photo-tag-nav .tag-chip[aria-current] { border-color: #a84d25; color: #8e421f; background: #fff4ed; font-weight: bold; }
@@ -135,4 +142,5 @@
   .photo-page { padding: 15px; }
   .moon-grid { grid-template-columns: minmax(0, 1fr); }
   .photo-community-head { align-items: start; }
+  .photostream-page .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

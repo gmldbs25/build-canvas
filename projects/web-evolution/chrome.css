@@ -108,7 +108,28 @@
 .display[data-era="2005"] .chrome-location .browser-tools button { font-size: 17px; line-height: 22px; }
 .display[data-era="2005"] .chrome-location .browser-tools button[data-action="back"] { color: #305d38; }
 .display[data-era="2005"] .sim-tabs { margin: 0; padding-top: 3px; background: #c5cdd4; border-bottom: 1px solid #8b98a6; }
-.display[data-era="2005"] .sim-tab { border-radius: 3px 3px 0 0; }
+.display[data-era="2005"] .sim-tab,
+.display[data-era="2005"] .sim-tab-add {
+  height: 31px;
+  border-radius: 3px 3px 0 0;
+}
+.display[data-era="2005"] .sim-tab { padding-block: 0; }
+.display[data-era="2005"] .sim-tab-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.display[data-era="2005"] .sim-tab-close { flex: none; }
+.display[data-era="2005"] .sim-tab-add {
+  flex: 0 0 25px;
+  width: 25px;
+  min-width: 25px;
+  align-self: end;
+  margin-left: 2px;
+  padding: 0;
+  border: 1px solid #9ba9b6;
+  border-bottom: 0;
+  background: linear-gradient(#e4e9ee, #cbd4dc);
+  color: #405266;
+  font: 16px/24px Arial, sans-serif;
+}
+.display[data-era="2005"] .sim-tab-add:hover { background: #f3f6f8; }
 .display[data-era="2005"] .browser-status { padding: 2px 6px; color: #3b4a55; background: #e4e8e9; font-size: 11px; }
 
 @media (max-width: 560px) {

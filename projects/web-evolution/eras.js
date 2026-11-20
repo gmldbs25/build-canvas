@@ -1,3 +1,5 @@
+import { communityPages } from './moonstream-posts.js';
+
 export const eras = {
   1993: {
     caption: 'NCSA Mosaic · X Window System',
@@ -48,16 +50,18 @@ export const eras = {
     },
   },
   2005: {
-    caption: 'Firefox 1.5 · Finding photos by tag',
-    notes: '2005년 Flickr에서는 여러 사람이 같은 태그로 분류한 사진을 한곳에서 둘러볼 수 있었습니다. Moonstream에서 lunar eclipse 태그를 열어 2004년 10월 개기월식이 촬영자마다 어떻게 기록됐는지 살펴보세요. 사진 상세 화면에 촬영자와 출처가 있습니다.',
-    hint: 'lunar eclipse 태그를 열고 여러 사람이 찍은 같은 날의 월식을 비교해 보세요.',
+    caption: 'Firefox 1.5 · Sharing the night sky',
+    notes: '2005년의 아마추어 천문 관측자들은 웹에 망원경 세팅과 관측 사진을 올리고, 같은 천체를 본 사람들과 촬영 결과를 비교할 수 있었습니다. Moonstream에서는 당시의 관측 사진과 함께 토성, 목성, 혜성 등 관측에 참고할 자료를 찾아볼 수 있습니다.',
+    hint: '망원경 세팅 사진을 보고, lunar eclipse 태그에서 여러 관측자가 찍은 같은 날의 월식을 비교해 보세요.',
     sources: [
       ['Flickr · The New New Things (1 Aug 2005)', 'https://blog.flickr.net/en/2005/08/01/the-new-new-things/'],
+      ['Astronomy Picture of the Day · image archive', 'https://apod.nasa.gov/apod/archivepixFull.html'],
       ['Mozilla · Firefox 1.5 release notes', 'https://www.mozilla.org/en-US/firefox/releases/1.5.html'],
     ],
     base: 'http://moonstream.example/',
     pages: {
-      home: ['Your photostream', '/photos/moonstream/'],
+      home: ['Community photostream', '/photos/moonstream/'],
+      ...communityPages,
       photo: ['Lunar eclipse at Prishtina Observatory', '/photos/moonstream/legacy-harbor/'],
       roof: ['Blood Moon through a Dobsonian', '/photos/moonstream/legacy-roof/'],
       desert: ['Eclipsed Moon over Paranal', '/photos/moonstream/legacy-desert/'],

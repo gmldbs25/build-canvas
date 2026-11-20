@@ -1,4 +1,4 @@
-# 2004 lunar eclipse photo credits
+# Moonstream photo credits
 
 Moonstream uses archival images of the same total lunar eclipse on 28 October 2004. The 2005 photo site and its posts are an exhibit reconstruction. The images are hosted locally, converted to WebP, and resized to a maximum edge of 1600 px without cropping. The editor identifies modifications and credits the chosen image on its exports.
 
@@ -9,6 +9,10 @@ Moonstream uses archival images of the same total lunar eclipse on 28 October 20
 | `eclipse-2004-c.webp` | A lunar eclipse in Estonia | [Epukas](https://commons.wikimedia.org/wiki/File:Lunar_eclipse_October_28_2004.jpg) | Public domain dedication by the photographer |
 | `eclipse-2004-d.webp` | Lunar eclipse at 6:21 AM in Kiuruvesi, Finland; 162 × 165 px compact-camera photograph | Kari Tikkanen; [Commons record](https://commons.wikimedia.org/wiki/File:Lunar_eclipse_28102004.jpg) identifies the date, place, camera and 10× optical zoom. | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/); converted to WebP without enlargement or cropping |
 | `eclipse-2004-e.webp` | Lunar eclipse photograph, 1,024 × 768 px | Jon Sullivan / [PD Photo.org](https://pdphoto.org/PictureDetail.php?mat=pdef&pg=8338); [Commons record](https://commons.wikimedia.org/wiki/File:Lunar_eclipse01.JPEG) documents the public-domain release. | Public domain; converted to WebP without cropping |
+
+## Observing and shared reference photographs
+
+Moonstream also uses Ilan Shimony’s July 2005 Negev observing photo and four earlier NASA images of Saturn, Jupiter, Hale–Bopp and Moltke crater. These use the same local assets and original credits listed in [Pacebook photo credits](pacebook/CREDITS.md).
 
 ## Photos retained for existing favorites
 
