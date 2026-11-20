@@ -49,6 +49,7 @@
 }
 
 .agent-report-stars {
+  --star-frame-duration: calc(400ms / 3);
   display: grid;
   place-items: center;
   flex: none;
@@ -66,8 +67,8 @@
   font-size: 19px;
   line-height: 1;
   opacity: 0;
-  animation: agent-star-slot 1600ms steps(1, end) infinite;
-  animation-delay: calc(var(--star-index) * -400ms);
+  animation: agent-star-slot calc(4 * var(--star-frame-duration)) steps(1, end) infinite;
+  animation-delay: calc(var(--star-index) * -1 * var(--star-frame-duration));
 }
 
 @keyframes agent-star-slot {
