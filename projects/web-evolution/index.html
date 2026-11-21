@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="천문학을 주제로 1993년 하이퍼링크부터 2026년 AI 웹까지 일곱 시대의 웹을 체험하는 Build Canvas Work 7.">
+  <meta name="description" content="문서를 연결하던 웹은 어떻게 사람들이 일하고 AI가 행동하는 공간이 되었을까? 웹의 역사를 읽고 천문 관측을 따라 일곱 시대를 체험하는 Build Canvas Work 7.">
   <meta name="theme-color" content="#10151b">
-  <title>The Evolution of the Web.</title>
+  <title>The Evolution of the Web · 웹은 어떻게 달라졌을까? | Build Canvas</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./historical.css">
   <link rel="stylesheet" href="./chrome.css">
   <link rel="stylesheet" href="./exhibit.css">
+  <link rel="stylesheet" href="./editorial.css">
   <link rel="stylesheet" href="./classic-search.css">
   <link rel="stylesheet" href="./pacebook.css">
   <link rel="stylesheet" href="./poster.css">
@@ -24,44 +25,147 @@
       <span>BUILD CANVAS <b>/</b> WORK 07</span>
       <a href="../">← Build Canvas</a>
     </header>
-    <main class="cover">
-      <div class="cover-hero">
-        <div class="cover-copy">
-          <h1 lang="en">The Evolution<br>of the Web<span>.</span></h1>
-          <p class="cover-subtitle" lang="en">From Hyperlinks to AI web</p>
-          <p class="cover-lede">지금은 너무나도 익숙한 웹의 모습, 어떻게 변해왔을까?<br>천문학이라는 주제로 시간에 따라 달라지는 웹의 모습을 체험해보자</p>
-          <p class="cover-context">관측 기록 찾기부터 월식 사진 비교, AI 관측 계획까지. 전시 상단 연표에서 일곱 시대를 오가며 체험해 보세요.</p>
-          <a class="cover-start" href="?era=1993" data-era="1993" data-page="home">1993년 웹 열기 <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="cover-stack" aria-hidden="true" lang="en">
-          <div class="cover-window cover-modern">
-            <div class="cover-modern-tabs"><span>✦ North Ridge Observatory</span> <b>+</b></div>
-            <div class="cover-modern-address"><span>←　↻</span><span>https://observatory.example/</span></div>
-            <div class="cover-modern-content"><strong>Your sky briefing</strong><span>Moon &amp; sky　·　ISS passes</span></div>
-          </div>
-          <div class="cover-window cover-orbit">
-            <div class="cover-orbit-title"><span>The Orbit Room — Internet Explorer</span><span>_ □ ×</span></div>
-            <div class="cover-orbit-menu">File　Edit　View　Favorites</div>
-            <div class="cover-orbit-content">
-              <strong>The Orbit Room</strong>
-              <span>Moon Diary　·　Guestbook</span>
-              <img src="./media/saturn.webp" width="156" height="102" alt="">
+    <main>
+      <div class="cover">
+        <div class="cover-hero">
+          <div class="cover-copy">
+            <h1 lang="en">The Evolution<br>of the Web<span>.</span></h1>
+            <p class="cover-subtitle" lang="en">From Hyperlinks to AI Agents</p>
+            <p class="cover-lede">문서를 연결하던 웹은 어떻게 사람들이 살아가고 일하며, 이제는 AI가 행동하는 공간이 되었을까?</p>
+            <div class="cover-controls">
+              <a class="cover-read" href="#prologue">아티클 읽기 <span aria-hidden="true">↓</span></a>
+              <a class="cover-start article-experience" href="?era=1993&amp;from=prologue" data-era="1993" data-page="home">1993년 웹 체험 <span aria-hidden="true">→</span></a>
             </div>
           </div>
-          <div class="cover-window cover-mosaic">
-            <div class="cover-mosaic-title"><i></i><span>NCSA Mosaic</span><i></i></div>
-            <div class="cover-mosaic-menu">File　Options　Navigate　Hotlist</div>
-            <div class="cover-mosaic-address"><span>Document URL:</span><span>http://info.cern.ch/hypertext/WWW/</span></div>
-            <div class="cover-mosaic-content">
-              <strong>World Wide Web</strong>
-              <span>Research document index</span>
-              <span>Observing logs and data files</span>
-              <span>Technical notes and instruments</span>
+          <div class="cover-stack" aria-hidden="true" lang="en">
+            <div class="cover-window cover-modern">
+              <div class="cover-modern-tabs"><span>✦ North Ridge Observatory</span> <b>+</b></div>
+              <div class="cover-modern-address"><span>←　↻</span><span>https://observatory.example/</span></div>
+              <div class="cover-modern-content"><strong>Your sky briefing</strong><span>Moon &amp; sky　·　ISS passes</span></div>
             </div>
-            <div class="cover-mosaic-footer"><span>← Back</span><span>Reload</span><small>Document Done</small></div>
+            <div class="cover-window cover-orbit">
+              <div class="cover-orbit-title"><span>The Orbit Room — Internet Explorer</span><span>_ □ ×</span></div>
+              <div class="cover-orbit-menu">File　Edit　View　Favorites</div>
+              <div class="cover-orbit-content">
+                <strong>The Orbit Room</strong>
+                <span>Moon Diary　·　Guestbook</span>
+                <img src="./media/saturn.webp" width="156" height="102" alt="">
+              </div>
+            </div>
+            <div class="cover-window cover-mosaic">
+              <div class="cover-mosaic-title"><i></i><span>NCSA Mosaic</span><i></i></div>
+              <div class="cover-mosaic-menu">File　Options　Navigate　Hotlist</div>
+              <div class="cover-mosaic-address"><span>Document URL:</span><span>http://info.cern.ch/hypertext/WWW/</span></div>
+              <div class="cover-mosaic-content">
+                <strong>World Wide Web</strong>
+                <span>Research document index</span>
+                <span>Observing logs and data files</span>
+                <span>Technical notes and instruments</span>
+              </div>
+              <div class="cover-mosaic-footer"><span>← Back</span><span>Reload</span><small>Document Done</small></div>
+            </div>
           </div>
         </div>
       </div>
+      <article class="editorial" aria-label="웹의 발전">
+        <div class="editorial-layout">
+          <nav class="editorial-index" aria-label="아티클 목차">
+            <p>목차</p>
+            <ol>
+              <li><a href="#prologue">프롤로그</a></li>
+              <li><a href="#connection">연결</a></li>
+              <li><a href="#discovery">발견과 표현</a></li>
+              <li><a href="#participation">참여와 일상</a></li>
+              <li><a href="#accumulation">축적</a></li>
+              <li><a href="#action">지능과 행동</a></li>
+              <li><a href="#epilogue">에필로그</a></li>
+            </ol>
+          </nav>
+          <div class="editorial-body">
+            <section class="editorial-chapter" id="prologue">
+              <p class="chapter-marker">프롤로그 · 읽는 데 약 7분</p>
+              <h2>우리는 언제부터 웹에서 살아가기 시작했을까?</h2>
+              <p>아침에 날씨를 확인하고, 멀리 있는 사람에게 메시지를 보내고, 필요한 물건을 주문한다. 회의 자료를 함께 고치고, 모르는 것을 검색하며, 이제는 질문을 건네 답의 초안을 받기도 한다. 화면은 달라도 우리는 하루의 많은 일을 웹을 통해 이어 간다. 웹은 정보를 보는 창을 넘어 사람과 사람, 일과 도구를 연결하는 일상의 공간이 되었다.</p>
+              <p>하지만 이 넓은 공간은 처음부터 모든 일을 하도록 설계되지 않았다. 그 출발점은 서로 다른 곳에 흩어진 연구 정보를 더 쉽게 찾아 읽고, 관련 자료로 건너갈 방법을 만들려는 필요였다. 문서 사이에 길을 놓는 작은 발상은 어떻게 개인의 홈페이지와 검색, 소셜 피드로 확장되었을까. 그리고 사람들이 공개해 온 지식은 어떻게 인공지능의 재료가 되었으며, AI는 다시 웹에서 무엇을 하게 될까?</p>
+              <p>이 기록은 웹을 바꾼 기술의 이름보다 그 기술을 필요로 했던 사람들의 일을 따라간다. 각 시대의 화면을 열어 당시의 경험을 직접 살펴볼 수 있다.</p>
+            </section>
+
+            <section class="editorial-chapter" id="connection">
+              <p class="chapter-marker">01 · 연결 · 1989—1993</p>
+              <h2>웹은 왜 만들어졌을까?</h2>
+              <p>1989년, CERN에서 일하던 팀 버너스리는 연구자들이 서로 다른 컴퓨터에 둔 정보를 더 쉽게 공유하도록 하는 정보 관리 제안을 썼다. 거대한 연구 조직에서는 자료와 사람, 컴퓨터가 여러 곳에 나뉘어 있었다. 한 문서에서 관련 문서로 이어지는 참조를 따라가며 정보를 발견할 수 있다면, 각 자료를 하나의 중앙 시스템으로 옮기지 않고도 함께 쓸 수 있었다.</p>
+              <p>그가 제안한 웹은 인터넷 그 자체와 같지 않다. 인터넷은 컴퓨터들이 서로 데이터를 주고받게 하는 네트워크 기반이고, 웹은 그 위에서 주소가 붙은 자료를 요청하고 읽는 방식 가운데 하나다. 오늘날에는 웹페이지뿐 아니라 이메일과 메시징, 파일 전송 등 인터넷을 쓰는 여러 서비스가 있다. 웹의 핵심은 문서의 주소(URL), 내용을 표현하는 HTML, 문서를 주고받는 HTTP, 그리고 다른 자료로 건너가는 하이퍼링크의 조합이었다. 기술은 각기 다른 곳의 자료가 제자리에 있으면서도 서로를 가리킬 수 있게 했다.</p>
+              <p>초기 웹페이지는 꾸밈보다 안내에 가까웠다. 링크를 누르면 연구 계획이나 안내 문서, 다른 서버의 자료가 열렸다. 읽는 사람은 관측 일지를 읽다가 기록에 쓰인 기기의 설명을 열고, 다른 연구소의 측정과 비교할 수 있었다. 읽는 순서는 독자가 무엇을 궁금해하느냐에 따라 달라졌다. 자료를 만든 사람은 주소를 공개하고, 읽는 사람은 그 주소를 다른 문서와 엮으며 지식의 경로를 늘려 갔다.</p>
+              <div class="chapter-experiences"><a class="article-experience" href="?era=1993&amp;from=connection"><span>1993</span> 문서와 하이퍼링크 <span aria-hidden="true">→</span></a></div>
+            </section>
+
+            <section class="editorial-chapter" id="discovery">
+              <p class="chapter-marker">02 · 발견과 표현 · 1990년대—2001</p>
+              <h2>누구나 웹에 자신의 공간을 만들다</h2>
+              <p>웹이 연구기관 밖으로 퍼지고 이미지와 글을 한 화면에서 볼 수 있는 그래픽 브라우저가 보급되자, 웹은 읽기 쉬운 공간으로 변했다. Mosaic 같은 브라우저는 텍스트만 나열하던 경험에 이미지와 화면 안의 링크를 결합해 더 많은 사람이 웹을 탐색하도록 도왔다. 접속 가능한 컴퓨터와 호스팅 공간이 늘면서 개인도 자신의 페이지를 만들 수 있었다.</p>
+              <p>1990년대 후반의 개인 홈페이지에는 좋아하는 음악, 취미, 가족과 여행 이야기가 놓였다. 방문자 방명록에 흔적을 남기거나 웹링을 따라 비슷한 관심사의 사이트를 찾아갔다. 웹은 기관이 제공하는 정보의 목록에서 개인이 스스로 꾸미고 발표하는 공간으로 넓어졌다. 달을 관측하는 사람이라면 자기 페이지에 망원경을 소개하고, 어젯밤에 본 달을 기록한 뒤, 비슷한 취미를 가진 사람의 홈페이지를 링크할 수 있었다.</p>
+              <p>다만 페이지가 늘어날수록 원하는 자료를 찾아가는 일이 어려워졌다. 링크를 하나씩 따라가거나 주소를 기억하는 것만으로는 충분하지 않았다. 검색은 사용자가 몇 개의 단어로 넓은 웹에 질문을 던지고, 그 질문과 관련 있어 보이는 페이지를 목록으로 받는 경험을 만들었다. 월식을 찍은 사진을 찾고 싶다면, 즐겨찾기에 관측소 주소가 없어도 검색창에 월식 날짜나 지역을 입력해 볼 수 있었다. 사용자는 결과를 비교하고 각 사이트를 직접 열어 판단했다.</p>
+              <div class="chapter-experiences"><a class="article-experience" href="?era=1998&amp;from=discovery"><span>1998</span> 개인 홈페이지 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2001&amp;from=discovery"><span>2001</span> 키워드 검색 <span aria-hidden="true">→</span></a></div>
+            </section>
+
+            <section class="editorial-chapter" id="participation">
+              <p class="chapter-marker">03 · 참여와 일상 · 2000년대—2010년대</p>
+              <h2>웹은 사람들이 모이는 공간이 되었다</h2>
+              <p>블로그는 개인의 글을 계속 쌓고 독자가 답할 수 있는 출판 도구가 되었고, 위키는 여러 사람이 한 문서를 함께 다듬는 방식을 널리 알렸다. 사진 공유 서비스는 태그를 따라 이미지를 발견하게 했다. 소셜 네트워크는 친구와 지인의 새 소식을 한 피드에 모았다. 웹을 쓰는 사람은 정보를 읽는 동시에 쓰고, 고치고, 분류하고, 다른 사람에게 전하는 참여자가 되었다. 같은 날의 개기월식도 한 사람의 카메라에는 달 표면의 구리빛으로, 다른 사람의 사진에는 몇 시간에 걸친 그림자의 변화로 남았다. 각자 붙인 태그는 그런 기록을 한곳에서 비교할 수 있게 했다.</p>
+              <p>브라우저에서 작동하는 서비스가 풍부해지고 스마트폰이 보급되면서 웹에서 할 수 있는 일도 늘었다. 사진을 올리고 의견을 나누는 일은 컴퓨터 앞에 앉아 있을 때만의 활동이 아니었다. 협업 문서와 온라인 도구는 일과 학습의 일부가 되었고, 웹은 생활의 많은 맥락을 담기 시작했다. 빠른 연결과 편리한 인터페이스는 참여를 넓혔지만, 무엇을 먼저 보게 할지 정하는 추천 시스템과 플랫폼의 편집 권한도 커졌다.</p>
+              <p>피드에서는 추천 순서가 어느 소식이 눈에 먼저 들어올지 좌우한다. 추천은 관심 있는 것을 더 빨리 만나게 할 수 있지만, 정보의 출처나 맥락을 놓치게 할 수도 있다. 누구나 게시할 수 있다는 개방성은 다양한 목소리를 불러왔고, 동시에 사실을 확인하고 신뢰를 쌓는 책임을 독자와 플랫폼에 함께 남겼다. 참여의 확대는 웹을 더 살아 있는 곳으로 만들면서 새로운 질문도 만들었다.</p>
+              <div class="chapter-experiences"><a class="article-experience" href="?era=2005&amp;from=participation"><span>2005</span> 사진 공유와 태그 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2013&amp;from=participation"><span>2013</span> 친구의 뉴스피드 <span aria-hidden="true">→</span></a></div>
+            </section>
+
+            <section class="editorial-chapter" id="accumulation">
+              <p class="chapter-marker">04 · 축적 · 공개 정보와 언어 모델</p>
+              <h2>웹에 쌓인 정보는 AI 발전의 토대가 되었다</h2>
+              <p>수십 년 동안 사람들은 웹에 글과 연구 자료, 뉴스, 설명서, 토론, 코드와 창작물을 공개했다. 서로 다른 목적과 품질을 지닌 이 자료들은 인류가 무엇을 알고 어떻게 표현해 왔는지 보여 주는 방대한 기록의 일부가 되었다. 여러 언어와 주제의 텍스트를 모아 학습에 쓸 수 있었던 배경에는 이런 공개 웹의 규모가 있었다.</p>
+              <p>Common Crawl은 공개 웹페이지를 수집해 연구자가 활용할 수 있는 데이터 아카이브를 제공하는 프로젝트다. OpenAI의 GPT-3 논문은 학습 자료에 Common Crawl의 필터링된 웹 데이터와 책, 위키백과 등을 포함했다고 설명한다. 이는 웹 자료가 대규모 언어 모델 학습에 실제로 쓰인 사례다. 이 규모의 학습에는 모델 구조와 대규모 계산 자원, 학습 기법의 발전도 필요했다. 어떤 웹 자료를 수집하고 선별해 학습에 쓰는지는 모델과 데이터셋마다 다르다.</p>
+              <p>사람이 글을 읽을 수 있도록 공개하는 일과, 그 글을 모아 모델 학습에 쓰는 일에는 서로 다른 판단이 필요하다. 저작권자의 허락과 보상, 개인정보, 자료의 대표성과 편향을 둘러싼 논의가 이어진다. 웹의 축적은 AI의 능력을 키울 수 있는 원천인 동시에, 무엇을 어떤 조건으로 활용해야 하는지 묻는 기록이기도 하다.</p>
+              <ol class="article-flow" aria-label="웹의 정보가 AI 활용으로 이어지는 흐름">
+                <li><strong>사람들이 공개한 기록</strong><span>글 · 연구 · 뉴스 · 코드</span></li>
+                <li><strong>수집과 선별</strong><span>예: Common Crawl 아카이브</span></li>
+                <li><strong>학습의 여러 재료</strong><span>데이터 · 모델 구조 · 계산 자원 · 학습 방법</span></li>
+                <li><strong>다시 웹을 활용하는 AI</strong><span>검색하고 출처를 확인하며 작업을 돕는다</span></li>
+              </ol>
+              <p>사람들이 정보를 나누려고 발전시킨 웹은 이제 인공지능 발전을 뒷받침하는 중요한 지식의 원천이 되었다. 다음 변화는 AI가 그 지식을 요약하는 데서 멈추지 않고, 현재의 웹을 직접 찾아보고 일을 돕는 방향으로 이어지고 있다.</p>
+            </section>
+
+            <section class="editorial-chapter" id="action">
+              <p class="chapter-marker">05 · 지능과 행동 · 2023—2026</p>
+              <h2>AI는 웹을 사용하기 시작했다</h2>
+              <p>전통적인 검색에서는 사용자가 검색어를 만들고, 여러 결과와 문서를 직접 열어 비교했다. 생성형 검색은 질문에 대해 여러 자료를 바탕으로 정리한 답을 먼저 제시해 이 과정을 바꾸려 한다. 2023년 Google이 Search Labs에서 공개한 생성형 검색 실험도 검색 결과에 AI가 만든 개요를 더하는 시도였다. 답을 한곳에서 읽기 쉬워지는 만큼, 요약이 놓친 관점이나 잘못 묶은 내용을 살피고 출처를 확인하는 일이 중요해진다.</p>
+              <p>전시의 2023년 Orbit Search에서 관측회 예시 질문을 고르면 전시용 요약과 출처가 함께 뜬다. 다른 천문 검색어를 입력하면 NASA 이미지 자료와 Spaceflight News의 공개 검색 API를 조회한다. 화면에 표시되는 요약은 조회 결과를 규칙에 따라 구성해 생성형 검색의 읽는 경험을 재현한다.</p>
+              <p>다음으로 소개되는 에이전트는 질문에 답하는 데서 한 걸음 더 나아가 웹 도구를 사용하고 작업을 이어 간다. 관측 준비를 예로 들면 공개된 우주 소식과 날씨 자료를 확인하고, 후보를 모아 계획을 제안한 뒤 사람이 검토하도록 할 수 있다. 이 작품의 2026년 천문 모니터는 관심사에 따라 NASA 소식과 Open-Meteo 예보 모델 값을 가져와 규칙 기반 브리핑을 만든다. 별도의 관측 시나리오에서는 전시용 예보와 행사 일정, ISS 통과 시각을 사용한다. 계획은 방문자가 선택해 저장하고 캘린더 파일로 내려받을 수 있으며, 포스터 일정 변경은 승인했을 때만 반영된다.</p>
+              <p>관측을 준비하는 사람은 예보가 언제 나왔는지 확인하고, 관측회 시각이 바뀌었다면 천문대 공지를 다시 열어 볼 수 있다. 검색 결과와 예보는 바뀌고, 요약은 출처의 맥락을 놓칠 수 있다. 중요한 선택은 원자료를 확인하고 사람이 판단할 수 있어야 한다. 웹의 다음 장은 AI의 능력뿐 아니라 AI가 무엇을 했는지 보이고, 사용자가 검토하고 승인하는 방법에 달려 있다.</p>
+              <div class="chapter-experiences"><a class="article-experience" href="?era=2023&amp;from=action"><span>2023</span> 생성형 검색 체험 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2026&amp;from=action"><span>2026</span> AI 에이전트와 관측 계획 <span aria-hidden="true">→</span></a></div>
+            </section>
+
+            <section class="editorial-chapter" id="epilogue">
+              <p class="chapter-marker">에필로그 · 다음 관측</p>
+              <h2>웹은 앞으로 무엇이 될까?</h2>
+              <p>웹의 역사는 연결에서 시작해 표현과 발견, 참여와 일상으로 넓어졌다. 사람들이 남긴 자료는 인공지능 학습의 중요한 토대가 되었고, 이제 AI는 다시 웹의 정보를 찾아 요약하며 일부 작업을 돕고 있다. 변화의 출발점에는 늘 사람이 하려던 일이 있었다. 정보를 나누려는 필요, 자신을 표현하려는 욕구, 더 빨리 찾고 함께 일하려는 요구가 새로운 도구의 쓰임을 만들었다.</p>
+              <p>앞으로 웹이 어떤 모습이 될지 단정하기는 어렵다. 다만 웹이 열어 둔 정보와 관계를 누가 어떻게 다루는지, 자동화된 행동을 사람이 어떻게 이해하고 조정하는지는 계속 중요할 것이다. 이 전시는 1993년의 링크에서 2026년의 에이전트까지 일곱 시점의 웹을 작은 관측 기록으로 구성했다. 이제 화면을 직접 열어 그 변화의 결을 살펴보자.</p>
+              <div class="chapter-experiences"><a class="article-experience cover-start" href="?era=1993&amp;from=epilogue">전시 시작 · 1993년 문서와 하이퍼링크 <span aria-hidden="true">→</span></a></div>
+            </section>
+
+            <section class="editorial-chapter" id="sources" aria-labelledby="sources-title">
+              <p class="chapter-marker">자료실</p>
+              <h2 id="sources-title">참고 자료</h2>
+              <ul>
+                <li><a href="https://info.cern.ch/hypertext/WWW/TheProject.html">CERN · The World Wide Web project</a>, <a href="https://www.w3.org/History/1989/proposal.html">Tim Berners-Lee · Information Management: A Proposal (1989)</a></li>
+                <li><a href="https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/">NCSA · Mosaic</a>, <a href="https://www.google.com/search/howsearchworks/our-history/">Google · Our history of Search</a></li>
+                <li><a href="https://blog.flickr.net/en/2005/08/01/the-new-new-things/">Flickr · The New New Things (2005)</a>, <a href="https://about.fb.com/news/2013/03/a-new-look-for-news-feed/">Meta · A new look for News Feed (2013)</a></li>
+                <li><a href="https://commoncrawl.org/">Common Crawl</a>, <a href="https://arxiv.org/abs/2005.14165">Brown et al. · Language Models are Few-Shot Learners (GPT-3, 2020)</a></li>
+                <li><a href="https://blog.google/products-and-platforms/products/search/generative-ai-search/">Google · Generative AI in Search (Search Labs, 2023)</a>, <a href="https://images-api.nasa.gov/">NASA Image and Video Library API</a>, <a href="https://www.spaceflightnewsapi.net/">Spaceflight News API</a></li>
+                <li><a href="https://openai.com/index/introducing-chatgpt-agent/">OpenAI · Introducing ChatGPT agent (2025)</a>, <a href="https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/">Google · Chrome auto browse (2026)</a>, <a href="https://open-meteo.com/">Open-Meteo</a></li>
+              </ul>
+              <p>North Ridge Observatory, Moonstream, Pacebook, Orbit Search와 관측회 시나리오는 전시를 위해 구성한 가상 요소다. 2023년 검색과 2026년 브리핑의 실제 데이터 조회 및 전시용 요약 방식은 체험 구현을 설명하며, 해당 연도의 보편적 제품 기능을 뜻하지 않는다.</p>
+            </section>
+          </div>
+        </div>
+      </article>
     </main>
   </div>
   <div id="exhibit-view" hidden>
@@ -77,6 +181,7 @@
         <a href="?era=2026" data-era="2026" aria-label="2026 AI 에이전트"><span class="era-year">2026</span><span class="era-name">AI 에이전트</span></a>
       </nav>
       <div class="exhibit-actions">
+        <a class="article-return" id="article-return" href="./#prologue"><span aria-hidden="true">←</span> 아티클로 돌아가기</a>
         <a class="home-link" href="../" aria-label="Build Canvas 홈으로" aria-keyshortcuts="H"><span aria-hidden="true">←</span> 홈 <kbd aria-hidden="true">H</kbd></a>
       </div>
       <p id="scene-hint" class="scene-hint" aria-live="polite"></p>

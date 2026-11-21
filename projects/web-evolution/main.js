@@ -28,29 +28,38 @@ const chrome = createChrome({ root: chromeRoot, status, onAction: browserAction,
 let era;
 let trail;
 let browserState;
+const articleSections = new Set(['prologue', 'connection', 'discovery', 'participation', 'accumulation', 'action', 'epilogue']);
+let articleContext = null;
+
+function validArticleSection(value) {
+  return articleSections.has(value) ? value : null;
+}
 
 function route() {
   const url = new URL(window.location.href);
+  const stateContext = window.history.state?.articleContext;
+  const from = validArticleSection(url.searchParams.get('from')) || validArticleSection(url.hash.slice(1)) || validArticleSection(stateContext?.from);
+  const context = stateContext?.from === from ? stateContext : from ? { from, scrollY: null, depth: 0 } : null;
   const requestedEra = url.searchParams.get('era');
   const id = requestedEra === '2025' ? '2026' : requestedEra;
-  if (!id || !Object.hasOwn(eras, id)) return { intro: true };
+  if (!id || !Object.hasOwn(eras, id)) return { intro: true, from, articleContext: context };
   if (id !== requestedEra) {
     url.searchParams.set('era', id);
     window.history.replaceState(window.history.state, '', url);
   }
   const requested = url.searchParams.get('page');
-  return { intro: false, era: id, page: Object.hasOwn(eras[id].pages, requested) ? requested : 'home', tab: window.history.state?.tab };
+  return { intro: false, era: id, page: Object.hasOwn(eras[id].pages, requested) ? requested : 'home', tab: window.history.state?.tab, from, articleContext: context };
 }
 
 function pageUrl(page = trail.pages[trail.index]) {
-  return `?era=${era}${page === 'home' ? '' : `&page=${encodeURIComponent(page)}`}`;
+  return `?era=${era}${page === 'home' ? '' : `&page=${encodeURIComponent(page)}`}${articleContext?.from ? `&from=${encodeURIComponent(articleContext.from)}` : ''}`;
 }
 
 function isModernEra(id = era) {
   return Number(id) >= 2005;
 }
 
-function showIntro() {
+function showIntro({ anchor = null, scrollY = null } = {}) {
   sceneAnimation?.cancel();
   cancelRedraw();
   classicSearch.cancel();
@@ -59,12 +68,43 @@ function showIntro() {
   if (intro) intro.hidden = false;
   if (exhibit) exhibit.hidden = true;
   document.body.dataset.view = 'intro';
+  const targetId = validArticleSection(anchor) || articleContext?.from;
+  if (targetId) requestAnimationFrame(() => {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    const restoreScroll = Number.isFinite(scrollY);
+    if (restoreScroll) window.scrollTo(0, scrollY);
+    else target.scrollIntoView({ block: 'start' });
+    const sourceLink = restoreScroll && [...intro.querySelectorAll('.article-experience')]
+      .find((link) => link.getAttribute('href') === articleContext?.sourceHref);
+    const focusTarget = sourceLink || target.querySelector('h2');
+    if (!focusTarget) return;
+    if (!sourceLink) focusTarget.tabIndex = -1;
+    focusTarget.focus({ preventScroll: true });
+  });
+}
+
+function articleHistoryState(state = {}, depth = articleContext?.depth) {
+  if (!articleContext) return state;
+  return { ...state, articleContext: { ...articleContext, depth: Number.isFinite(depth) ? depth : 0 } };
+}
+
+function replaceExhibitState(state, page) {
+  window.history.replaceState(articleHistoryState(state), '', pageUrl(page));
+}
+
+function pushExhibitState(state) {
+  const depth = articleContext ? (articleContext.depth || 0) + 1 : 0;
+  if (articleContext) articleContext = { ...articleContext, depth };
+  window.history.pushState(articleHistoryState(state, depth), '', pageUrl());
 }
 
 function showExhibit() {
   if (intro) intro.hidden = true;
   if (exhibit) exhibit.hidden = false;
   document.body.dataset.view = 'exhibit';
+  const returnLink = document.querySelector('#article-return');
+  if (returnLink) returnLink.href = `./#${encodeURIComponent(articleContext?.from || 'prologue')}`;
 }
 
 function currentTab() {
@@ -308,7 +348,7 @@ function goTo(page, focusPage = true) {
     currentTab().trail = trail;
     currentTab().title = eras[era].pages[page][0];
   }
-  window.history.replaceState({ era, page }, '', pageUrl(page));
+  replaceExhibitState({ era, page }, page);
   renderPage(focusPage);
 }
 
@@ -335,7 +375,7 @@ function switchTab(id) {
   if (!next || next.id === browserState.activeTab) return;
   browserState.activeTab = id;
   trail = next.trail;
-  window.history.replaceState({ era, page: trail.pages[trail.index], tab: id }, '', pageUrl());
+  replaceExhibitState({ era, page: trail.pages[trail.index], tab: id });
   renderPage();
 }
 
@@ -353,7 +393,7 @@ function browserAction(action, detail = {}) {
     trail.index = nextIndex;
     const page = trail.pages[nextIndex];
     if (isModernEra() && currentTab()) currentTab().trail = trail;
-    window.history.replaceState({ era, page }, '', pageUrl(page));
+    replaceExhibitState({ era, page }, page);
     return renderPage(true);
   }
   if (action === 'home') return goTo('home');
@@ -369,7 +409,7 @@ function browserAction(action, detail = {}) {
     browserState.tabs.push({ id, title: 'New tab', trail: newTrail });
     browserState.activeTab = id;
     trail = newTrail;
-    window.history.replaceState({ era, page: 'home', tab: id }, '', pageUrl('home'));
+    replaceExhibitState({ era, page: 'home', tab: id }, 'home');
     return renderPage();
   }
   if (action === 'close-tab') {
@@ -380,7 +420,7 @@ function browserAction(action, detail = {}) {
     browserState.tabs.splice(index, 1);
     if (id === browserState.activeTab) browserState.activeTab = browserState.tabs[Math.max(0, index - 1)].id;
     trail = currentTab().trail;
-    window.history.replaceState({ era, page: trail.pages[trail.index], tab: browserState.activeTab }, '', pageUrl());
+    replaceExhibitState({ era, page: trail.pages[trail.index], tab: browserState.activeTab });
     return renderPage();
   }
   if (action === 'bookmark') {
@@ -532,6 +572,15 @@ function isModifiedClick(event) {
 }
 
 document.addEventListener('click', (event) => {
+  const returnLink = event.target.closest('#article-return');
+  if (returnLink && !isModifiedClick(event)) {
+    event.preventDefault();
+    const from = articleContext?.from || validArticleSection(new URL(window.location.href).searchParams.get('from')) || 'prologue';
+    const depth = articleContext?.depth;
+    if (Number.isFinite(depth) && depth > 0) window.history.go(-depth);
+    else window.location.assign(`./#${encodeURIComponent(from)}`);
+    return;
+  }
   const savedPage = event.target.closest('#bookmark-panel [data-bookmark-page]');
   if (savedPage) {
     const panel = document.querySelector('#bookmark-panel');
@@ -539,17 +588,32 @@ document.addEventListener('click', (event) => {
     goTo(savedPage.dataset.bookmarkPage);
     return;
   }
+  const articleLink = event.target.closest('a.article-experience');
   const link = event.target.closest('a[data-era]');
-  if (link && !isModifiedClick(event)) {
+  const navLink = articleLink || link;
+  if (navLink && !isModifiedClick(event)) {
     event.preventDefault();
-    const targetEra = link.dataset.era;
-    const targetPage = link.dataset.page || 'home';
+    let targetEra = navLink.dataset.era;
+    let targetPage = navLink.dataset.page || 'home';
+    let targetFrom = null;
+    try {
+      const targetUrl = new URL(navLink.href, window.location.href);
+      targetEra ||= targetUrl.searchParams.get('era');
+      targetPage = navLink.dataset.page || targetUrl.searchParams.get('page') || 'home';
+      targetFrom = validArticleSection(targetUrl.searchParams.get('from'));
+    } catch { /* Use the data attributes when a link has no parseable URL. */ }
+    if (!targetEra || !Object.hasOwn(eras, targetEra)) return;
+    if (articleLink) {
+      const from = targetFrom || validArticleSection(articleLink.dataset.from) || 'prologue';
+      articleContext = { from, sourceHref: articleLink.getAttribute('href'), scrollY: window.scrollY, depth: 0 };
+      window.history.replaceState(articleHistoryState(window.history.state, 0), '', `./#${encodeURIComponent(from)}`);
+    }
     if (targetEra === era && exhibit && !exhibit.hidden) {
-      if (link.dataset.page) goTo(targetPage);
+      if (navLink.dataset.page || targetPage !== 'home') goTo(targetPage);
       return;
     }
-    selectEra(targetEra, targetPage, false, Boolean(link.dataset.page));
-    window.history.pushState({ era, page: trail.pages[trail.index], tab: browserState.activeTab }, '', pageUrl());
+    selectEra(targetEra, targetPage, false, Boolean(articleLink || navLink.dataset.page));
+    pushExhibitState({ era, page: trail.pages[trail.index], tab: browserState.activeTab });
     return;
   }
   const pageLink = event.target.closest('#screen [data-page]');
@@ -561,7 +625,8 @@ document.addEventListener('click', (event) => {
 
 window.addEventListener('popstate', () => {
   const next = route();
-  if (next.intro) return showIntro();
+  articleContext = next.articleContext;
+  if (next.intro) return showIntro({ anchor: next.from, scrollY: next.articleContext?.scrollY });
   selectEra(next.era, next.page, true, false, next.tab);
 });
 
@@ -578,10 +643,12 @@ window.addEventListener('keydown', (event) => {
 
 document.querySelector('#intro-link')?.addEventListener('click', (event) => {
   event.preventDefault();
-  window.history.pushState({}, '', './');
-  showIntro();
+  const from = articleContext?.from;
+  window.history.pushState(articleHistoryState({}, 0), '', from ? `./#${encodeURIComponent(from)}` : './');
+  showIntro({ anchor: from, scrollY: articleContext?.scrollY });
   intro.querySelector('.cover-start').focus({ preventScroll: true });
 });
 const initial = route();
-if (initial.intro) showIntro();
+articleContext = initial.articleContext;
+if (initial.intro) showIntro({ anchor: initial.from, scrollY: initial.articleContext?.scrollY });
 else selectEra(initial.era, initial.page);
