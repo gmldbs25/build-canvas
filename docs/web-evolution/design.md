@@ -1,26 +1,43 @@
 # Work 7 — The Evolution of the Web
 
-달을 관측하는 사람들이 웹에서 기록을 남기고, 서로의 관측을 비교하고, 다음 관측을 준비하는 흐름을 따라간다. 서로 다른 시기의 기록과 행사를 연결하는 노스리지 천문대는 이 작품의 가상 장소다.
+Work 7은 서로 다른 세대를 거쳐 온 웹의 역사를 다룬다. 메인 아티클은 실제 사건과 서비스, 사람들이 웹에서 해 온 활동을 중심으로 문서 연결에서 검색·참여·웹 애플리케이션·AI까지의 변화를 설명한다. North Ridge Observatory는 일곱 시대를 체험하기 위한 가상의 전시 장소이며, 메인 아티클의 역사 서사를 이끌지 않는다.
 
-## The Observatory Archive
+## Article — From Hyperlinks to AI Agents
 
-[아티클의 원고 원본](../../projects/web-evolution/index.html)은 브라우저가 직접 읽는 HTML이다. 가상의 노스리지 천문대를 중심으로 관측 일지를 찾고, 같은 월식을 비교하고, 바뀐 관측회 시각을 확인하는 일을 따라간다. 문서의 작성자, 발견 경로, 작업 책임이 시대마다 어떻게 바뀌는지가 글을 이끈다. 실제 역사와 전시용 인물·사례는 본문과 도판에서 구분한다.
+[아티클의 원고 원본](../../projects/web-evolution/index.html)은 브라우저가 직접 읽는 HTML이다. 본문은 실제 웹 역사를 설명하고, 그 시대의 감각을 보여 주는 별도 전시로 연결한다. 짙은 남색 바탕과 금색·청회색 강조, 기록을 탐색하는 에디토리얼 디자인은 유지하되 주요 사례와 도판을 웹의 역사에 맞춘다.
 
 | 장 | 본문이 풀어가는 질문 | 화면과 체험 연결 |
 | --- | --- | --- |
-| 표지와 프롤로그 | 오늘 밤 달을 보러 가려면 어떤 기록이 필요한가 | 겹쳐진 세 브라우저와 연도 눈금, 목차, 좁은 도입 문단. 표지에서 1993년을 열 수 있다. |
-| 01 연결 | 다른 컴퓨터에 있는 자료를 어떻게 읽을까 | 세 문서의 관계를 보여 주는 자료 지도. 1989년 제안, 1990년 구현, 1993년 CERN의 공개와 Mosaic 보급을 다룬다. 1993년 도서관 링크를 연결한다. |
-| 02 발견과 표현 | 찾을 자료의 주소를 모를 때 어디서 시작할까 | 1997년 9월 16일 개기월식을 소재로 한 가상 일지 하나를 이웃의 웹링과 키워드 검색으로 찾는다. 1998년 홈페이지와 2001년 검색 링크를 각각의 서술에 붙인다. |
-| 03 참여와 일상 | 기록을 남기는 사람과 함께 일하는 사람의 역할이 어떻게 달라졌나 | 읽기와 발행·검색은 짧게 되짚고 공유·협업에 도판을 집중한다. 월식 사진 도판은 2004년 사진의 촬영자와 라이선스를 표시한다. 가상의 공동 일정표는 수정한 사람과 시각을 표시한다. 2005년 월식 사진은 대표 항목으로, 2013년 뉴스피드는 본문 링크로 연다. |
-| 04 축적 | 공개 기록 일부가 어떻게 사용되고, 언제 현재 웹을 다시 읽을까 | 본문에서 공개 기록과 모델 학습의 역사적 관계를 먼저 읽는다. 도판은 가상의 일지 한 건을 발행 → 수집 → 선별 → 학습까지 추적한 뒤 별도의 현재 예보 조회를 보여 준다. 수집과 선별은 서로 다른 과정이고, 불러온 예보는 답변 문맥에 들어가며 모델 가중치를 바꾸지 않는다. 도판의 항목 수는 예시이며 실제 규모나 비율을 나타내지 않는다. |
-| 05 지능과 행동 | 예보와 변경 공지를 본 뒤 누가 포스터를 수정할까 | 검색 결과, 출처가 붙은 답, 승인 대기 중인 수정 제안을 비교한다. 같은 예보와 공지를 사용한다. 2023년 검색 링크와 2026년 관측 계획 항목을 이 장에 배치한다. |
-| 에필로그 | 다음 관측자는 어떤 기록을 남길까 | 달을 보러 나가는 장면에서 다시 1993년 문서 체험으로 연결한다. |
+| 표지와 프롤로그 | 문서 연결로 시작한 웹은 어떻게 현재의 일상 공간이 되었나 | 겹친 세 브라우저를 유지한다. 창에는 개인 홈페이지, 초기 문서, 출처를 확인하는 AI 응답을 그린다. |
+| 01 연결 | 서로 다른 컴퓨터의 문서를 어떻게 연결하고 읽을 수 있을까 | 연구 문서의 링크 관계를 보여 주는 가상 도식. 1989년 제안, 1990년 구현, 1991년 CERN 외부 공개, 1993년 저작권 포기와 Mosaic의 보급을 구분한다. |
+| 02 발견과 표현 | 페이지의 주소를 모를 때 어디에서 시작할까 | 개인 홈페이지와 웹링, 디렉터리, AltaVista와 Google 검색의 발견 경로를 비교한다. 1998·2001 체험 링크는 유지한다. |
+| 03 참여와 일상 | 독자는 어떻게 작성자·편집자·플랫폼 이용자가 되었나 | 위키 편집, 소셜 피드, 태그 공유, 브라우저 문서 협업을 보여 준다. 2004년 Web 2.0 콘퍼런스와 2005년 에세이를 구분하며, Google Spreadsheets(2006)와 Facebook News Feed(2006, 2013 재설계)를 다룬다. |
+| 04 축적 | 공개 웹 기록 중 일부가 어떻게 언어 모델 학습에 쓰였나 | PUBLISH → CRAWL → CURATE → TRAIN의 학습 경로를 설명한 뒤 독립된 현재 웹 조회 레인을 보여 준다. GPT-3의 보고 자료는 가상 도식과 분리한 출처 인셋에만 제시한다. 임의 수치나 비율은 쓰지 않는다. |
+| 05 지능과 행동 | 검색·생성형 답변·도구 사용의 차이는 무엇인가 | 날짜와 조건이 같은 여행 예시를 세 단계에 사용한다. 에이전트 초안의 목적지·날짜·금액을 확인하고 승인하거나 거절하는 경계를 보인다. |
+| 에필로그 | 하이퍼링크에서 AI 도구까지 달라진 역할은 무엇인가 | 새 도판 없이 앞의 흐름을 산문으로 돌아본다. 체험은 역사를 보여 주는 별도 가상 전시라고 안내하고 1993년 문서 체험으로 연결한다. |
+
+### Current editorial and visual decisions
+
+- 실제 역사·서비스와 가상 전시를 분리한다. 천문대 인물, 관측 일지와 천문 관측 예시는 본문에서 제외하고 체험 연결 문구에만 쓴다.
+- 주요 시각 자료는 독자적인 HTML/CSS/SVG로 직접 만든다. 실제 서비스 로고, 제품 스크린샷, 사용 권리가 불분명한 아카이브 이미지를 재게시하지 않는다. 설명용 UI는 캡션에서 재구성임을 밝힌다.
+- 기존 장 앵커, 시대 URL, 두 장면의 step ID, scroll restoration과 전시 복귀 흐름을 유지한다. 스크롤 컨트롤러는 현재 마크업과 접근성 동작을 보존하고 필요한 장면 미세 조정만 허용한다.
+- 학습과 현재 웹 검색은 별도 과정이다. GPT-3 보고서의 자료명을 실제 설명용 도식과 분리하고, 학습 비율은 임의로 시각화하지 않는다. 코드가 GPT-3 학습 코퍼스였다고 서술하지 않는다.
+
+### Current article sources
+
+- **초기 웹:** [Tim Berners-Lee 1989 proposal](https://www.w3.org/History/1989/proposal.html), [W3C history](https://www.w3.org/about/history/), [MDN World Wide Web (GitHub source)](https://github.com/mdn/content/blob/main/files/en-us/glossary/world_wide_web/index.md), [NCSA Mosaic](https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/). 1990년 CERN 구현, 1991년 CERN 밖 인터넷 사용자에게 공개, 1993년 저작권 포기와 공개를 구분한다.
+- **검색:** [Brin & Page, The Anatomy of a Large-Scale Hypertextual Web Search Engine (1998)](https://research.google/pubs/the-anatomy-of-a-large-scale-hypertextual-web-search-engine/), [Yahoo selects Google (2000)](https://googlepress.blogspot.com/2000/06/yahoo-selects-google-as-its-default.html).
+- **참여와 웹 앱:** [O’Reilly, What Is Web 2.0? (2005)](https://www.oreilly.com/pub/a/web2/archive/what-is-web-20.html), [Flickr tag navigation (2005)](https://blog.flickr.net/en/2005/08/01/the-new-new-things/), [Google Spreadsheets (2006)](https://googleblog.blogspot.com/2006/06/introducing-google-spreadsheets.html), [Facebook News Feed (2006)](https://about.fb.com/news/2006/09/news-feed-and-mini-feed/), [2013 News Feed redesign](https://about.fb.com/news/2013/03/a-new-look-for-news-feed/), [MDN Ajax (GitHub source)](https://github.com/mdn/content/blob/main/files/en-us/glossary/ajax/index.md), [HTML5 Recommendation (2014)](https://www.w3.org/TR/2014/REC-html5-20141028/).
+- **학습과 검색:** [Common Crawl overview](https://commoncrawl.org/overview), [CC Index Table README](https://github.com/commoncrawl/cc-index-table/blob/master/README.md), [GPT-3 paper (2020)](https://arxiv.org/abs/2005.14165), [GPT-3 model card (GitHub source)](https://github.com/openai/gpt-3/blob/master/model-card.md), [U.S. Copyright Office AI reports](https://www.copyright.gov/ai/).
+- **생성형 검색과 에이전트:** [Google SGE experiment (2023)](https://blog.google/products-and-platforms/products/search/generative-ai-search/), [ChatGPT agent (2025)](https://openai.com/index/introducing-chatgpt-agent/), [Gemini auto browse in Chrome (2026)](https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/), [WebMCP proposal](https://github.com/webmachinelearning/webmcp). Each is a specific product or experiment, not a universal browser capability.
+- **Image rights:** this article does not require original product images. Diagrams are original, generic representations. Any future archival image proposal must be checked for creator, item-specific license, embedded works, date, and attribution.
+- **Source access:** the official MDN source pages, Common Crawl index README, GPT-3 model card, and WebMCP repository are GitHub-hosted and were directly reviewed for this pass. Direct CERN and some external product-source domains were proxy-limited, so their cited reference pages remain source references rather than a claim of live access during this pass.
 
 짙은 남색, 금색 강조, 청회색 구분선을 사용한다. 한국어 본문은 17~19px와 약 700px 읽기 폭을 기준으로 삼으며, 개념 관계를 한눈에 비교해야 하는 도판은 더 넓게 펼친다. 두 스크롤 장면은 넓고 높은 화면에서만 같은 도판을 일정 영역에 고정한다. 스크롤 위치에서 현재 본문 단계를 계산하고, 링크로 단계를 바로 열 수도 있다. 좁거나 낮은 화면에서는 각 도판이 설명 바로 뒤에 놓인다. 스크립트 초기화 없이도 본문과 도판을 모두 읽을 수 있으며, 모션 설정에 따라 정보가 달라지지 않는다.
 
 표지와 에필로그의 시작 링크는 1993년을 연다. `?era=2005&from=participation`의 `from`은 체험 안에서 시대·페이지·탭을 바꾸어도 유지된다. “아티클로 돌아가기”와 브라우저 뒤로 가기는 읽던 스크롤 위치와 진입 링크의 포커스를 복원한다. 읽기 이력이 없는 주소는 장 앵커로, 장 정보가 없으면 프롤로그로 돌아간다. `?era=1998&page=guestbook` 같은 시점별 주소와 Build Canvas 홈으로 이동하는 H 단축키를 지원한다.
 
-### 최종 편집
+### 이전 판본 검수 기록과 기존 체험 참고 자료
 
 1998년 웹링과 2001년 검색 결과는 1997년 9월 16일 월식을 기록한 같은 가상의 노스리지 일지로 연결된다. Chapter 03의 개인 홈페이지 발행 예시도 같은 날짜를 쓰며, 협업 일정표의 가상 편집 이력은 2013년에 놓았다. [NASA 월식 목록](https://eclipse.gsfc.nasa.gov/LEcat5/LE1901-2000.html)의 [보존본](https://github.com/cosinekitty/astronomy/blob/master/generate/eclipse/le1901.html#L616)에서 해당 날짜와 개기월식 표기 `T`를 확인했다. NASA 원본 호스트는 환경에서 직접 열리지 않았다.
 

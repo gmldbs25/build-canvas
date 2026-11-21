@@ -1,4 +1,4 @@
-/* Work 7 editorial shell: observatory notes, archive plates, and the existing exhibit return link. */
+/* Work 7 editorial shell: Web history article, original diagrams, and the separate era exhibit. */
 .intro-view {
   --archive-ground: #101820;
   --archive-panel: #16212c;
@@ -28,6 +28,7 @@
 .cover-subtitle { color: var(--archive-gold); }
 .cover-lede { max-width: 31em; color: #d0d8df; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.8; }
 .cover-context { max-width: 42em; color: var(--archive-muted); }
+.cover-art-caption { max-width: 520px; margin: 10px 0 0; color: #aebdc8; font-size: .75rem; letter-spacing: .025em; }
 
 .cover-controls {
   display: flex;
@@ -306,9 +307,13 @@
 .editorial-chapter .article-experience.archive-entry strong { color: var(--archive-blue); }
 .editorial-chapter .article-experience:hover { border-color: var(--archive-gold); background: #26333e; }
 .editorial-chapter .cover-start {
+  max-width: 100%;
+  flex-wrap: wrap;
   border-color: #e6ce9f;
   color: #18202a;
   background: #e6ce9f;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .editorial-chapter .cover-start:hover { color: #18202a; background: #f4dfb6; }
 
