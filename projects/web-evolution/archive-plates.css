@@ -79,24 +79,22 @@
 .role-plate-head { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-bottom: 18px; }
 .role-plate-head h3 { margin: 0; }
 .role-index { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid #a88d59; color: #ead6a8; font: 700 1rem/1 system-ui, sans-serif; }
+.editorial-body .role-recap {
+  padding: 12px 0;
+  border: 0;
+  border-block: 1px solid #596575;
+  background: transparent;
+  box-shadow: none;
+}
+
+.role-recap .role-plate-head { margin-bottom: 8px; }
+
+.role-recap figcaption {
+  margin: 0;
+  color: #d7e1e9;
+}
+
 .role-stamp { max-width: 180px; padding: 4px 8px; border: 1px solid #657487; color: #c4d0dc; font-size: .8125rem; text-align: center; }
-.role-reading-route { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin: 0; padding: 0; list-style: none; }
-.role-reading-route li { position: relative; display: grid; align-content: start; gap: 5px; min-height: 105px; padding: 15px 12px 12px; background: #e9e2d3; color: #28333e; }
-.role-reading-route li:not(:last-child)::after { content: "→"; position: absolute; top: 36px; right: -19px; color: #e1ca96; font-size: 1.125rem; }
-.role-route-no { color: #7b6539; font: 700 .8125rem/1 system-ui, sans-serif; }
-.role-reading-route strong { color: #24303b; }
-.role-reading-route small { color: #53616e; }
-
-.publish-workbench { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); align-items: center; gap: 14px; }
-.publish-page, .publish-result { display: grid; align-content: start; gap: 8px; min-height: 148px; padding: 16px; border: 1px solid #9b998e; background: #eee8db; color: #26323d; }
-.publish-page .plate-kicker, .publish-result .plate-kicker { color: #695b3b; }
-.publish-page > strong, .publish-result > strong { color: #26323d; font-size: 1.125rem; }
-.publish-page p { color: #46535e; }
-.publish-address { align-self: end; color: #566574; font: .8125rem/1.4 ui-monospace, monospace; }
-.publish-arrow { color: #e0c78e; font-size: 1.75rem; text-align: center; }
-.publish-result .query-line { margin: 0; }
-.publish-result small { color: #52606e; }
-
 .role-share { background: #17232f; }
 .share-surface { display: grid; grid-template-columns: minmax(0, 2fr) minmax(210px, .85fr); border: 1px solid #536272; }
 .tag-stream { min-width: 0; padding: 14px; background: #e8e2d4; color: #1e2933; }
@@ -265,13 +263,6 @@
   .role-plate-head { grid-template-columns: 34px minmax(0, 1fr); gap: 8px; margin-bottom: 12px; }
   .role-index { width: 32px; height: 32px; }
   .role-stamp { grid-column: 2; justify-self: start; }
-  .role-reading-route { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .role-reading-route li { min-height: 0; padding: 10px; }
-  .role-reading-route li:not(:last-child)::after { top: auto; right: 50%; bottom: -9px; content: "↓"; }
-  .publish-workbench { grid-template-columns: minmax(0, 1fr); gap: 7px; }
-  .publish-page, .publish-result { min-height: 0; padding: 11px; }
-  .publish-arrow { transform: rotate(90deg); font-size: 1.125rem; line-height: 1; }
-
   .share-surface { grid-template-columns: minmax(0, 1fr); }
   .tag-stream { padding: 8px 10px; }
   .tag-stream-label { margin-bottom: 5px !important; }
@@ -335,7 +326,9 @@
 .story-stage .tag-stream > .eclipse-record { grid-template-columns: 88px minmax(0, 1fr); padding-block: 5px; }
 .story-stage .feed-separation { display: block; padding: 9px 12px; }
 .story-stage .feed-separation strong { margin-inline-end: 8px; }
+.story-stage .work-schedule-heading,
 .story-stage .work-field { padding: 8px 11px; }
+.story-stage .work-change { padding: 6px 11px; }
 .story-stage .curate-filter { padding: 6px 12px; }
 .story-stage .curate-filter .filter-mark { line-height: .7; }
 .story-stage .data-source { min-height: 72px; padding: 8px; }

@@ -177,6 +177,21 @@
 .editorial-chapter p { margin: 0 0 1.1em; }
 .editorial-chapter p:last-child { margin-bottom: 0; }
 
+#accumulation .chapter-lede {
+  padding-inline-start: clamp(12px, 2vw, 22px);
+  border-inline-start: 2px solid var(--archive-gold);
+  color: #f0e7d5;
+  font-size: clamp(1.16rem, 1.8vw, 1.42rem);
+  line-height: 1.65;
+}
+
+#accumulation .archive-wide {
+  margin-block-start: clamp(24px, 4vw, 44px);
+  padding-block-start: clamp(18px, 3vw, 30px);
+  border-top: 1px solid #6b8795;
+}
+
+
 .chapter-marker {
   margin: 0 0 12px !important;
   color: var(--archive-gold);
@@ -345,7 +360,8 @@
 .story-step-nav a[aria-current="step"] { border-color: var(--archive-gold); color: #17212a; background: var(--archive-gold); }
 .story-stage > .step-figure { margin: 0; }
 .story-steps { min-width: 0; }
-.story-step { padding: 10px 0 28px; border-bottom: 1px solid #536575; scroll-margin-top: 34vh; }
+.story-step { padding: 10px 0 28px; border-bottom: 1px solid #536575; scroll-margin-top: 24px; }
+.story-scene[data-scene-enhanced="true"] .story-step { scroll-margin-top: 34vh; }
 .story-step + .story-step { margin-top: clamp(24px, 4vw, 48px); }
 .story-step:last-child { border-bottom: 0; }
 .step-copy h3 { margin-top: 0; color: #f1e7d3; font-size: clamp(22px, 2.2vw, 28px); }
@@ -405,7 +421,10 @@
   .archive-chronology { grid-template-columns: 1fr; }
   .archive-entry { grid-template-columns: auto minmax(0, 1fr); }
   .archive-entry a { grid-column: 2; justify-self: start; }
-  .story-step { padding-bottom: 22px; }
+  .story-step { padding-bottom: 18px; }
+  .story-step + .story-step { margin-top: 18px; }
+  .story-step > .step-figure { margin-block: 14px 4px; }
+  .editorial-chapter .article-experience.archive-entry { margin-block: 14px; }
   .editorial-chapter .article-experience { margin-right: 8px; }
   .exhibit-actions { gap: 9px; }
   .exhibit-title { min-width: 0; }
