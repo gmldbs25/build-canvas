@@ -12,12 +12,14 @@
   <link rel="stylesheet" href="./chrome.css">
   <link rel="stylesheet" href="./exhibit.css">
   <link rel="stylesheet" href="./editorial.css">
+  <link rel="stylesheet" href="./archive-plates.css">
   <link rel="stylesheet" href="./classic-search.css">
   <link rel="stylesheet" href="./pacebook.css">
   <link rel="stylesheet" href="./poster.css">
   <link rel="stylesheet" href="./modern.css">
   <link rel="stylesheet" href="./agent-stream.css">
   <script type="module" src="./main.js"></script>
+  <script type="module" src="./editorial-scenes.js"></script>
 </head>
 <body>
   <div id="intro-view" class="intro-view">
@@ -30,140 +32,387 @@
         <div class="cover-hero">
           <div class="cover-copy">
             <h1 lang="en">The Evolution<br>of the Web<span>.</span></h1>
-            <p class="cover-subtitle" lang="en">From Hyperlinks to AI Agents</p>
-            <p class="cover-lede">문서를 연결하던 웹은 어떻게 사람들이 살아가고 일하며, 이제는 AI가 행동하는 공간이 되었을까?</p>
+            <p class="cover-subtitle" lang="en">The Observatory Archive</p>
+            <p class="cover-lede">흩어진 관측 기록을 읽던 웹에서, 오늘 밤의 계획을 함께 짜는 웹까지. 같은 하늘을 보려는 사람들이 도구를 어떻게 바꿔 왔는지 따라간다.</p>
             <div class="cover-controls">
               <a class="cover-read" href="#prologue">아티클 읽기 <span aria-hidden="true">↓</span></a>
               <a class="cover-start article-experience" href="?era=1993&amp;from=prologue" data-era="1993" data-page="home">1993년 웹 체험 <span aria-hidden="true">→</span></a>
             </div>
           </div>
-          <div class="cover-stack" aria-hidden="true" lang="en">
-            <div class="cover-window cover-modern">
-              <div class="cover-modern-tabs"><span>✦ North Ridge Observatory</span> <b>+</b></div>
-              <div class="cover-modern-address"><span>←　↻</span><span>https://observatory.example/</span></div>
-              <div class="cover-modern-content"><strong>Your sky briefing</strong><span>Moon &amp; sky　·　ISS passes</span></div>
-            </div>
-            <div class="cover-window cover-orbit">
-              <div class="cover-orbit-title"><span>The Orbit Room — Internet Explorer</span><span>_ □ ×</span></div>
-              <div class="cover-orbit-menu">File　Edit　View　Favorites</div>
-              <div class="cover-orbit-content">
-                <strong>The Orbit Room</strong>
-                <span>Moon Diary　·　Guestbook</span>
-                <img src="./media/saturn.webp" width="156" height="102" alt="">
+          <div class="cover-artwork">
+            <div class="cover-stack" aria-hidden="true" lang="en">
+              <div class="cover-window cover-modern">
+                <div class="cover-modern-tabs"><span>✦ North Ridge Observatory</span> <b>+</b></div>
+                <div class="cover-modern-address"><span>←　↻</span><span>https://observatory.example/</span></div>
+                <div class="cover-modern-content"><strong>Your sky briefing</strong><span>Moon &amp; sky　·　ISS passes</span></div>
+              </div>
+              <div class="cover-window cover-orbit">
+                <div class="cover-orbit-title"><span>The Orbit Room — Internet Explorer</span><span>_ □ ×</span></div>
+                <div class="cover-orbit-menu">File　Edit　View　Favorites</div>
+                <div class="cover-orbit-content">
+                  <strong>The Orbit Room</strong>
+                  <span>Moon Diary　·　Guestbook</span>
+                  <img src="./media/saturn.webp" width="156" height="102" alt="">
+                </div>
+              </div>
+              <div class="cover-window cover-mosaic">
+                <div class="cover-mosaic-title"><i></i><span>NCSA Mosaic</span><i></i></div>
+                <div class="cover-mosaic-menu">File　Options　Navigate　Hotlist</div>
+                <div class="cover-mosaic-address"><span>Document URL:</span><span>http://info.cern.ch/hypertext/WWW/</span></div>
+                <div class="cover-mosaic-content">
+                  <strong>World Wide Web</strong>
+                  <span>Research document index</span>
+                  <span>Observing logs and data files</span>
+                  <span>Technical notes and instruments</span>
+                </div>
+                <div class="cover-mosaic-footer"><span>← Back</span><span>Reload</span><small>Document Done</small></div>
               </div>
             </div>
-            <div class="cover-window cover-mosaic">
-              <div class="cover-mosaic-title"><i></i><span>NCSA Mosaic</span><i></i></div>
-              <div class="cover-mosaic-menu">File　Options　Navigate　Hotlist</div>
-              <div class="cover-mosaic-address"><span>Document URL:</span><span>http://info.cern.ch/hypertext/WWW/</span></div>
-              <div class="cover-mosaic-content">
-                <strong>World Wide Web</strong>
-                <span>Research document index</span>
-                <span>Observing logs and data files</span>
-                <span>Technical notes and instruments</span>
-              </div>
-              <div class="cover-mosaic-footer"><span>← Back</span><span>Reload</span><small>Document Done</small></div>
-            </div>
+            <p class="cover-register" aria-hidden="true"><span>1993</span><span>1998</span><span>2026</span></p>
           </div>
         </div>
       </div>
       <article class="editorial" aria-label="웹의 발전">
-        <div class="editorial-layout">
-          <nav class="editorial-index" aria-label="아티클 목차">
-            <p>목차</p>
-            <ol>
-              <li><a href="#prologue">프롤로그</a></li>
-              <li><a href="#connection">연결</a></li>
-              <li><a href="#discovery">발견과 표현</a></li>
-              <li><a href="#participation">참여와 일상</a></li>
-              <li><a href="#accumulation">축적</a></li>
-              <li><a href="#action">지능과 행동</a></li>
-              <li><a href="#epilogue">에필로그</a></li>
-            </ol>
-          </nav>
-          <div class="editorial-body">
-            <section class="editorial-chapter" id="prologue">
-              <p class="chapter-marker">프롤로그 · 읽는 데 약 7분</p>
-              <h2>우리는 언제부터 웹에서 살아가기 시작했을까?</h2>
-              <p>아침에 날씨를 확인하고, 멀리 있는 사람에게 메시지를 보내고, 필요한 물건을 주문한다. 회의 자료를 함께 고치고, 모르는 것을 검색하며, 이제는 질문을 건네 답의 초안을 받기도 한다. 화면은 달라도 우리는 하루의 많은 일을 웹을 통해 이어 간다. 웹은 정보를 보는 창을 넘어 사람과 사람, 일과 도구를 연결하는 일상의 공간이 되었다.</p>
-              <p>하지만 이 넓은 공간은 처음부터 모든 일을 하도록 설계되지 않았다. 그 출발점은 서로 다른 곳에 흩어진 연구 정보를 더 쉽게 찾아 읽고, 관련 자료로 건너갈 방법을 만들려는 필요였다. 문서 사이에 길을 놓는 작은 발상은 어떻게 개인의 홈페이지와 검색, 소셜 피드로 확장되었을까. 그리고 사람들이 공개해 온 지식은 어떻게 인공지능의 재료가 되었으며, AI는 다시 웹에서 무엇을 하게 될까?</p>
-              <p>이 기록은 웹을 바꾼 기술의 이름보다 그 기술을 필요로 했던 사람들의 일을 따라간다. 각 시대의 화면을 열어 당시의 경험을 직접 살펴볼 수 있다.</p>
-            </section>
+        <nav class="editorial-index" aria-label="아티클 목차">
+          <p>목차</p>
+          <ol>
+            <li><a href="#prologue">프롤로그</a></li>
+            <li><a href="#connection">연결</a></li>
+            <li><a href="#discovery">발견과 표현</a></li>
+            <li><a href="#participation">참여와 일상</a></li>
+            <li><a href="#accumulation">축적</a></li>
+            <li><a href="#action">지능과 행동</a></li>
+            <li><a href="#epilogue">에필로그</a></li>
+          </ol>
+        </nav>
+        <div class="editorial-body">
+          <section class="editorial-chapter chapter-prologue" id="prologue">
+            <div class="reading-column">
+              <p class="chapter-marker">관측 기록 · 읽는 데 약 10분</p>
+              <h2>오늘 밤, 달을 보러 갈 수 있을까?</h2>
+              <p>달을 관측하려는 사람에게 필요한 정보는 한데 모여 있지 않다. 언제 구름이 걷힐지, 어느 방향으로 달이 뜰지, 지난번에는 어떤 접안렌즈를 썼는지, 다른 관측자는 같은 분화구를 어떻게 기록했는지. 오늘이라면 날씨 앱과 천문 달력, 검색 결과, 사진 커뮤니티를 오가며 답을 찾을 수 있다. 기록을 저장하고 동료에게 보내고, 날짜가 바뀌면 계획을 다시 고친다. 웹은 이 일들을 연결하는 배경이 되었다.</p>
+              <p>지금이라면 늦은 오후에 천문대 공지를 열고, 구름 예보를 본 뒤, 동료에게 장소를 보낼 수 있다. 하지만 1993년의 관측자가 가장 먼저 풀어야 했던 문제는 다른 곳에 있는 관측 일지를 어떻게 찾느냐였다. 같은 하늘을 보려는 일이 시대마다 어떤 웹을 필요로 했는지, 노스리지 천문대라는 가상의 장소를 따라가 보자.</p>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="connection">
+          <section class="editorial-chapter" id="connection">
+            <div class="reading-column">
               <p class="chapter-marker">01 · 연결 · 1989—1993</p>
-              <h2>웹은 왜 만들어졌을까?</h2>
-              <p>1989년, CERN에서 일하던 팀 버너스리는 연구자들이 서로 다른 컴퓨터에 둔 정보를 더 쉽게 공유하도록 하는 정보 관리 제안을 썼다. 거대한 연구 조직에서는 자료와 사람, 컴퓨터가 여러 곳에 나뉘어 있었다. 한 문서에서 관련 문서로 이어지는 참조를 따라가며 정보를 발견할 수 있다면, 각 자료를 하나의 중앙 시스템으로 옮기지 않고도 함께 쓸 수 있었다.</p>
-              <p>그가 제안한 웹은 인터넷 그 자체와 같지 않다. 인터넷은 컴퓨터들이 서로 데이터를 주고받게 하는 네트워크 기반이고, 웹은 그 위에서 주소가 붙은 자료를 요청하고 읽는 방식 가운데 하나다. 오늘날에는 웹페이지뿐 아니라 이메일과 메시징, 파일 전송 등 인터넷을 쓰는 여러 서비스가 있다. 웹의 핵심은 문서의 주소(URL), 내용을 표현하는 HTML, 문서를 주고받는 HTTP, 그리고 다른 자료로 건너가는 하이퍼링크의 조합이었다. 기술은 각기 다른 곳의 자료가 제자리에 있으면서도 서로를 가리킬 수 있게 했다.</p>
-              <p>초기 웹페이지는 꾸밈보다 안내에 가까웠다. 링크를 누르면 연구 계획이나 안내 문서, 다른 서버의 자료가 열렸다. 읽는 사람은 관측 일지를 읽다가 기록에 쓰인 기기의 설명을 열고, 다른 연구소의 측정과 비교할 수 있었다. 읽는 순서는 독자가 무엇을 궁금해하느냐에 따라 달라졌다. 자료를 만든 사람은 주소를 공개하고, 읽는 사람은 그 주소를 다른 문서와 엮으며 지식의 경로를 늘려 갔다.</p>
-              <div class="chapter-experiences"><a class="article-experience" href="?era=1993&amp;from=connection"><span>1993</span> 문서와 하이퍼링크 <span aria-hidden="true">→</span></a></div>
-            </section>
+              <h2>흩어진 기록 사이에 길을 놓다</h2>
+              <p>1989년 3월, CERN의 소프트웨어 엔지니어 팀 버너스리는 연구소 안의 정보 관리 문제를 제안서로 정리했다. 여러 컴퓨터와 운영체제, 서로 다른 연구팀 사이의 문서를 한곳에 복사해 통일하기는 어려웠다. 그는 기존 문서에 다른 문서의 주소를 연결하고 링크를 따라 정보를 찾는 분산형 시스템을 제안했다. 1990년 11월, 버너스리와 로버트 카이오가 공동 제안서를 제출했다. 그해 말에는 CERN에서 첫 웹 서버와 브라우저 편집기가 작동했다.</p>
+              <p>인터넷은 서로 다른 컴퓨터가 데이터를 주고받게 하는 통신 기반이다. 그 위에서 웹은 주소가 붙은 문서를 요청하고, 문서 안의 링크를 따라 다른 자료로 이동하는 방법을 제공한다. 이렇게 문장이나 그림에 다른 자료로 이어지는 참조를 붙인 글을 하이퍼텍스트라고 한다. 자료가 있는 컴퓨터의 종류를 먼저 알 필요가 없었다.</p>
+              <p>달 관측을 예로 들어 보자. 한 서버에는 10월 23일의 관측 일지가, 다른 곳에는 망원경 사양과 보정 표가 있을 수 있다. 또 다른 연구소가 측정법에 답한 기술 교신을 보관한다. 관측자는 일지를 읽다가 측정값이 어디서 왔는지 따라가고, 다시 원래 자료로 돌아온다. 자료는 각 기관에 남아 있지만 읽는 사람은 필요한 순서로 엮을 수 있었다. 신뢰는 문서의 출처와 작성자, 기록된 방법을 확인하는 데 놓였다.</p>
+            </div>
+            <div class="archive-wide">
+              <figure class="step-figure connection-map" data-plate="connection-map" aria-labelledby="connection-map-caption">
+                <div class="connection-map-track" role="group" aria-label="링크를 따라가는 세 자료">
+                  <div class="connection-record"><span class="plate-kicker">NORTH RIDGE · 1993</span><strong>관측 일지</strong><span>10월 23일 · 달 가장자리 측정</span><span class="connection-hop">기록을 참조 ↗</span></div>
+                  <div class="connection-record"><span class="plate-kicker">같은 서버</span><strong>기기 보정표</strong><span>마이크로미터 환산값</span><span class="connection-hop">교신에 연결 ↗</span></div>
+                  <div class="connection-record connection-record-external"><span class="plate-kicker">LYRA OBSERVATORY</span><strong>기술 교신</strong><span>측정 시각 표기 답신</span><span class="plate-origin">다른 기관의 주소</span></div>
+                </div>
+                <figcaption id="connection-map-caption"><strong>링크는 원문을 옮기지 않고 문서 사이의 길을 만든다.</strong> 두 자료는 노스리지 서버에, 답신은 다른 기관 서버에 남는다. 여기 적힌 관측 기록과 기관은 전시용 가상 자료다.</figcaption>
+              </figure>
+            </div>
+            <div class="reading-column">
+              <h3>열린 소프트웨어, 넓어진 독자</h3>
+              <p>1993년 4월 30일 CERN은 웹 소프트웨어를 퍼블릭 도메인에 두어 누구나 사용할 수 있게 했다. 같은 해 미국 NCSA의 Mosaic은 텍스트와 이미지를 한 페이지에 보여 주며 웹 탐색에 익숙하지 않은 사람도 링크를 쉽게 따라가게 했다. CERN의 공개 정책과 Mosaic의 보급은 웹이 연구기관 밖으로 퍼지는 데 각각 다른 역할을 했다. 자료를 연결할 도구가 열린 덕분에 연결할 이야기도 훨씬 다양해졌다.</p>
+              <a class="article-experience archive-inline" href="?era=1993&amp;from=connection"><time>1993</time> 관측 일지에서 다른 기관의 기록으로 <span aria-hidden="true">↗</span></a>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="discovery">
+          <section class="editorial-chapter" id="discovery">
+            <div class="reading-column">
               <p class="chapter-marker">02 · 발견과 표현 · 1990년대—2001</p>
-              <h2>누구나 웹에 자신의 공간을 만들다</h2>
-              <p>웹이 연구기관 밖으로 퍼지고 이미지와 글을 한 화면에서 볼 수 있는 그래픽 브라우저가 보급되자, 웹은 읽기 쉬운 공간으로 변했다. Mosaic 같은 브라우저는 텍스트만 나열하던 경험에 이미지와 화면 안의 링크를 결합해 더 많은 사람이 웹을 탐색하도록 도왔다. 접속 가능한 컴퓨터와 호스팅 공간이 늘면서 개인도 자신의 페이지를 만들 수 있었다.</p>
-              <p>1990년대 후반의 개인 홈페이지에는 좋아하는 음악, 취미, 가족과 여행 이야기가 놓였다. 방문자 방명록에 흔적을 남기거나 웹링을 따라 비슷한 관심사의 사이트를 찾아갔다. 웹은 기관이 제공하는 정보의 목록에서 개인이 스스로 꾸미고 발표하는 공간으로 넓어졌다. 달을 관측하는 사람이라면 자기 페이지에 망원경을 소개하고, 어젯밤에 본 달을 기록한 뒤, 비슷한 취미를 가진 사람의 홈페이지를 링크할 수 있었다.</p>
-              <p>다만 페이지가 늘어날수록 원하는 자료를 찾아가는 일이 어려워졌다. 링크를 하나씩 따라가거나 주소를 기억하는 것만으로는 충분하지 않았다. 검색은 사용자가 몇 개의 단어로 넓은 웹에 질문을 던지고, 그 질문과 관련 있어 보이는 페이지를 목록으로 받는 경험을 만들었다. 월식을 찍은 사진을 찾고 싶다면, 즐겨찾기에 관측소 주소가 없어도 검색창에 월식 날짜나 지역을 입력해 볼 수 있었다. 사용자는 결과를 비교하고 각 사이트를 직접 열어 판단했다.</p>
-              <div class="chapter-experiences"><a class="article-experience" href="?era=1998&amp;from=discovery"><span>1998</span> 개인 홈페이지 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2001&amp;from=discovery"><span>2001</span> 키워드 검색 <span aria-hidden="true">→</span></a></div>
-            </section>
+              <h2>홈페이지의 이웃과 검색의 순위</h2>
+              <p>그래픽 브라우저가 보급되고 인터넷 접속과 웹 공간을 얻기 쉬워지자, 웹의 작성자는 연구기관의 전산 담당자에 한정되지 않았다. 1990년대 후반에는 개인이 자기 페이지를 만들고 취미와 일상을 기록했다. 달을 보는 아마추어 관측자는 망원경을 직접 조립하는 법, 지난밤의 스케치와 사진, 실패한 관측담을 HTML로 올릴 수 있었다. 홈페이지의 색과 배치는 만든 사람의 성격을 드러냈다. 카운터와 방명록은 방문의 흔적을 남겼고, 웹링은 비슷한 주제의 사이트를 연결했다.</p>
+              <p>이 연결은 오늘날의 검색 결과나 피드와 달랐다. 웹링의 운영자나 다른 홈페이지 주인이 링크를 걸어 주면 방문자는 이웃 사이트를 알게 되었다. 각 페이지는 독립된 주소를 가진 작은 집 같았다. 하지만 관측법을 찾는 사람은 어느 사이트가 최신인지 알기 어려웠다. 링크가 늘수록 발견의 부담도 커졌다.</p>
+              <p><a class="article-experience archive-inline" href="?era=1998&amp;from=discovery"><time>1998</time> 개인 홈페이지의 방명록과 웹링 <span aria-hidden="true">↗</span></a></p>
+              <h3>주소를 몰라도, 궁금한 것은 알 수 있다</h3>
+              <p>1990년대 중반의 검색 서비스는 이 문제를 여러 방식으로 풀었다. Yahoo는 1994년 제리 양과 데이비드 필로가 만든 웹 디렉터리에서 출발해 사람이 주제별로 사이트를 분류했다. 편집자가 만든 천문학 목록을 훑는 방식은 주제의 지도를 보여 주지만, 모든 페이지를 사람이 분류하기는 어렵다. 자동 수집과 키워드 검색은 더 큰 범위를 다룰 수 있었으나, 검색어가 본문에 많이 등장한다는 이유만으로 좋은 자료가 위에 오를 수 있었다.</p>
+              <p>1998년 설립된 Google은 PageRank를 검색 순위의 한 요소로 사용했다. 다른 페이지가 얼마나, 또 어떤 페이지에서 해당 문서를 가리키는지 살펴 링크 수와 링크를 건 페이지의 중요도를 함께 고려했다. 링크는 이용자가 건너가는 통로인 동시에 웹페이지 사이의 관계를 보여 주는 신호가 되었다. 이것이 순위의 전부는 아니었고 검색 엔진은 여러 신호를 함께 사용했다. 2000년 Yahoo가 Google의 검색 기술을 채택한 일은 검색이 웹 이용의 중심 관문으로 커지고 있음을 보여 준다.</p>
+            </div>
+            <div class="archive-wide">
+              <figure class="step-figure discovery-compare" data-plate="discovery-compare" aria-labelledby="discovery-compare-caption">
+                <div class="discovery-lanes" role="group" aria-label="같은 월식 관측 기록을 찾는 두 경로">
+                  <section class="discovery-lane discovery-neighbor" aria-labelledby="neighbor-title">
+                    <p class="plate-kicker">사람이 잇는 경로 · 1998</p><h3 id="neighbor-title">WebRing: Lunar Observers</h3>
+                    <p>North Ridge Moon Diary <span aria-hidden="true">→</span> East Window Notes <span aria-hidden="true">→</span> Lyra Eclipse Log</p>
+                    <div class="discovery-hit"><strong>28 Oct 2004 · Total lunar eclipse</strong><span>이웃 사이트가 연결한 관측 기록</span></div>
+                    <small>관심사의 이웃을 따라 도착</small>
+                  </section>
+                  <section class="discovery-lane discovery-index" aria-labelledby="index-title">
+                    <p class="plate-kicker">색인과 순위 · 2001</p><h3 id="index-title">Search results</h3>
+                    <p class="query-line"><span>lunar eclipse observing log</span><b aria-label="검색">⌕</b></p>
+                    <ol><li><strong>28 Oct 2004 · Total lunar eclipse</strong><span>North Ridge Moon Diary · lunar log</span></li><li>NASA eclipse predictions · decade table</li><li>Amateur telescope notes · archive</li></ol>
+                    <small>질문어와 색인된 페이지를 따라 도착</small>
+                  </section>
+                </div>
+                <figcaption id="discovery-compare-caption"><strong>같은 가상 관측 기록, 다른 발견 경로.</strong> 왼쪽은 사이트 운영자가 건 링크를 따라가고, 오른쪽은 검색어와 색인 순위에서 출발한다. 결과 순위는 원문의 신뢰성을 대신하지 않는다.</figcaption>
+              </figure>
+            </div>
+            <div class="reading-column">
+              <p>관측자는 이제 <code lang="en">lunar eclipse</code>라고 입력해 월식 날짜나 촬영 기록을 찾는다. 디렉터리를 뒤지거나 출발 사이트의 주소를 기억할 필요가 줄었다. 이제 첫 선택은 어느 사이트에 갈지가 아니라, 무엇을 찾고 싶은지였다. 어디에서 온 자료인지 판단하려면 결과를 열어 날짜와 작성자를 확인해야 했다.</p>
+              <a class="article-experience archive-inline" href="?era=2001&amp;from=discovery"><time>2001</time> 월식 기록을 키워드로 찾아보기 <span aria-hidden="true">↗</span></a>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="participation">
-              <p class="chapter-marker">03 · 참여와 일상 · 2000년대—2010년대</p>
-              <h2>웹은 사람들이 모이는 공간이 되었다</h2>
-              <p>블로그는 개인의 글을 계속 쌓고 독자가 답할 수 있는 출판 도구가 되었고, 위키는 여러 사람이 한 문서를 함께 다듬는 방식을 널리 알렸다. 사진 공유 서비스는 태그를 따라 이미지를 발견하게 했다. 소셜 네트워크는 친구와 지인의 새 소식을 한 피드에 모았다. 웹을 쓰는 사람은 정보를 읽는 동시에 쓰고, 고치고, 분류하고, 다른 사람에게 전하는 참여자가 되었다. 같은 날의 개기월식도 한 사람의 카메라에는 달 표면의 구리빛으로, 다른 사람의 사진에는 몇 시간에 걸친 그림자의 변화로 남았다. 각자 붙인 태그는 그런 기록을 한곳에서 비교할 수 있게 했다.</p>
-              <p>브라우저에서 작동하는 서비스가 풍부해지고 스마트폰이 보급되면서 웹에서 할 수 있는 일도 늘었다. 사진을 올리고 의견을 나누는 일은 컴퓨터 앞에 앉아 있을 때만의 활동이 아니었다. 협업 문서와 온라인 도구는 일과 학습의 일부가 되었고, 웹은 생활의 많은 맥락을 담기 시작했다. 빠른 연결과 편리한 인터페이스는 참여를 넓혔지만, 무엇을 먼저 보게 할지 정하는 추천 시스템과 플랫폼의 편집 권한도 커졌다.</p>
-              <p>피드에서는 추천 순서가 어느 소식이 눈에 먼저 들어올지 좌우한다. 추천은 관심 있는 것을 더 빨리 만나게 할 수 있지만, 정보의 출처나 맥락을 놓치게 할 수도 있다. 누구나 게시할 수 있다는 개방성은 다양한 목소리를 불러왔고, 동시에 사실을 확인하고 신뢰를 쌓는 책임을 독자와 플랫폼에 함께 남겼다. 참여의 확대는 웹을 더 살아 있는 곳으로 만들면서 새로운 질문도 만들었다.</p>
-              <div class="chapter-experiences"><a class="article-experience" href="?era=2005&amp;from=participation"><span>2005</span> 사진 공유와 태그 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2013&amp;from=participation"><span>2013</span> 친구의 뉴스피드 <span aria-hidden="true">→</span></a></div>
-            </section>
+          <section class="editorial-chapter" id="participation">
+            <div class="reading-column">
+              <p class="chapter-marker">03 · 참여와 일상 · 2001—2013</p>
+              <h2>기록을 올리고, 함께 고치고, 피드에서 만나다</h2>
+              <p>2001년 시작한 Wikipedia는 자원봉사자가 항목을 만들고 고치는 백과사전이 되었다. 누구나 편집할 수 있다는 원칙은 작성자와 독자의 경계를 흐렸다. 블로그도 일기처럼 글을 발행하고 독자의 댓글에 답하는 일을 쉽게 만들었다. 웹은 완성된 문서를 읽는 곳에 머물지 않고, 방문자가 내용을 보태는 출판 환경으로 넓어졌다. 관측자는 자기 관측 결과를 게시할 뿐 아니라, 다른 사람이 남긴 측정 오류를 지적하고 자료를 보완할 수도 있었다.</p>
+              <p>이런 변화를 묶어 부르는 말이 <em>Web 2.0</em>이었다. 2004년 콘퍼런스에서 이름이 널리 알려졌고, 팀 오라일리는 2005년 에세이에서 참여할수록 자료가 쌓이는 서비스와 웹을 플랫폼으로 쓰는 흐름을 설명했다. 다른 표준으로 교체된 날짜를 가리키는 말이기보다, 누가 쓰고 무엇을 함께 할 수 있는지 달라진 모습을 설명하는 말에 가깝다.</p>
+            </div>
+            <div class="archive-wide">
+              <section class="story-scene" data-story-scene id="role-scene" aria-label="웹에서 할 수 있는 일의 변화">
+                <div class="story-steps">
+                  <section class="story-step" data-story-step data-story-label="읽기" id="role-read">
+                    <div class="step-copy">
+                      <h3>어떤 기록이 이 문서를 뒷받침할까?</h3>
+                      <p>관측 일지에 달린 링크를 열어 측정값에 쓰인 기기의 보정 기록을 찾는다. 문서 작성자가 마련한 길을 따라 출처까지 갈 수 있다.</p>
+                    </div>
+                    <figure class="step-figure role-plate role-read" data-plate="role-read" aria-labelledby="role-read-caption">
+                      <div class="role-plate-head"><span class="role-index">01</span><div><p class="plate-kicker">READ · 따라 읽기</p><h3>측정값의 출처를 연다</h3></div><span class="role-stamp">문서 읽기</span></div>
+                      <ol class="role-reading-route"><li><span class="role-route-no">A</span><strong>23 October · Moon log</strong><small>21:17 · Copernicus rim</small></li><li><span class="role-route-no">B</span><strong>Micrometer calibration</strong><small>20 divisions · mean correction</small></li><li><span class="role-route-no">C</span><strong>Lyra Observatory reply</strong><small>time notation · source correspondence</small></li></ol>
+                      <figcaption id="role-read-caption"><strong>읽기는 관계를 따라가는 일.</strong> 일지의 측정값에서 기기 보정표를 거쳐 다른 기관의 답신까지 링크로 이동한다. 이 기관과 기록은 설명을 위한 가상 예시다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="발행과 검색" id="role-publish">
+                    <div class="step-copy">
+                      <h3>내 기록을 올리면 누가 찾을까?</h3>
+                      <p>발행한 관측 일지는 자기 주소를 갖는다. 어떤 사람은 이웃 홈페이지의 소개를 따라 오고, 어떤 사람은 키워드 검색 결과에 나타난 같은 기록을 연다.</p>
+                    </div>
+                    <figure class="step-figure role-plate role-publish" data-plate="role-publish" aria-labelledby="role-publish-caption">
+                      <div class="role-plate-head"><span class="role-index">02</span><div><p class="plate-kicker">PUBLISH · 쓰고 찾기</p><h3>개인 기록이 색인에 들어간다</h3></div><span class="role-stamp">게시 → 검색</span></div>
+                      <div class="publish-workbench" role="group" aria-label="개인 관측 페이지 작성과 검색">
+                        <div class="publish-page"><span class="plate-kicker">MY HOME PAGE · 1998</span><strong>Moon Diary</strong><p>28 Oct 2004: total eclipse.<br>10× eyepiece · copper-red shadow.</p><span class="publish-address">/~observer/moon.html</span></div>
+                        <span class="publish-arrow" aria-hidden="true">→</span>
+                        <div class="publish-result"><span class="plate-kicker">WEB INDEX · 2001</span><span class="query-line">lunar eclipse <b>⌕</b></span><strong>Moon Diary · observing log</strong><small>Matched words and indexed page; open source to inspect.</small></div>
+                      </div>
+                      <figcaption id="role-publish-caption"><strong>한 사람이 쓴 페이지가 검색 가능한 기록이 된다.</strong> 게시자는 내용을 만들고, 색인은 크롤링해 찾을 수 있는 페이지를 결과로 연결한다. 검색 순위는 링크 관계 등 여러 신호를 반영한다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="공유" id="role-share">
+                    <div class="step-copy">
+                      <h3>서로 다른 사진에서 같은 월식을 보다</h3>
+                      <p>2005년의 Flickr에서는 여러 사용자가 붙인 태그를 열어 주제가 비슷한 사진을 나란히 볼 수 있었다. 2004년 10월 28일의 월식도 어떤 카메라에는 한 장의 붉은 달로, 다른 카메라에는 그림자가 서서히 이동하는 여러 프레임으로 남았다. 사진은 서로의 관측 조건과 촬영법을 묻는 대화의 출발점이 됐다.</p>
+                      <a class="article-experience archive-entry" href="?era=2005&amp;from=participation">
+                        <time>2005</time>
+                        <span><strong>Moonstream의 월식 사진 열기</strong><span>촬영자마다 같은 밤을 어떻게 기록했는지 비교해 보세요.</span></span>
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    </div>
+                    <figure class="step-figure role-plate role-share" data-plate="role-share" aria-labelledby="role-share-caption">
+                      <div class="role-plate-head"><span class="role-index">03</span><div><p class="plate-kicker">SHARE · 분류하고 비교하기</p><h3>같은 월식, 서로 다른 사진</h3></div><span class="role-stamp">#lunar-eclipse</span></div>
+                      <div class="share-surface">
+                        <div class="tag-stream"><p class="tag-stream-label">공개 태그 스트림 · 28 Oct 2004</p>
+                          <div class="eclipse-record"><a href="./media/eclipse-2004-a.webp"><img src="./media/eclipse-2004-a.webp" width="1600" height="1584" alt="Auvo Korpi가 촬영한 2004년 10월 개기월식의 구리빛 달. 비교용 미리보기로 잘라 표시." loading="lazy" decoding="async"></a><div class="eclipse-record-caption"><strong>Auvo Korpi</strong><span>촬영 위치는 출처에 기재 없음</span><a href="https://commons.wikimedia.org/wiki/File:2004.10.28_Pimennys_(28866343308).jpg">출처 · CC BY 2.0</a></div></div>
+                          <div class="eclipse-record"><a href="./media/eclipse-2004-b.webp"><img src="./media/eclipse-2004-b.webp" width="1094" height="944" alt="J.C. Rojas가 스페인 아 코루냐에서 촬영한 2004년 10월 월식의 여러 단계. 비교용 미리보기로 잘라 표시." loading="lazy" decoding="async"></a><div class="eclipse-record-caption"><strong>J.C. Rojas</strong><span>A Coruña, Spain</span><a href="https://commons.wikimedia.org/wiki/File:J.C._Rojas_-_Lunar_Eclipse_(by-sa).jpg">출처 · CC BY-SA 2.0</a></div></div>
+                          <div class="eclipse-record"><a href="./media/eclipse-2004-c.webp"><img src="./media/eclipse-2004-c.webp" width="1600" height="1081" alt="Epukas가 에스토니아에서 촬영한 2004년 10월 월식이 지구 그림자에 들어가는 연속 이미지. 비교용 미리보기로 잘라 표시." loading="lazy" decoding="async"></a><div class="eclipse-record-caption"><strong>Epukas</strong><span>Estonia</span><a href="https://commons.wikimedia.org/wiki/File:Lunar_eclipse_October_28_2004.jpg">출처 · 사진가의 퍼블릭 도메인 기증</a></div></div>
+                        </div>
+                        <aside class="feed-separation" aria-label="태그 탐색과 뉴스피드의 차이"><strong>친구의 뉴스피드</strong><span>추천 순서에 따라 친구의 다른 소식 사이에서 관측 사진을 만난다.</span></aside>
+                      </div>
+                      <figcaption id="role-share-caption"><strong>2004년 10월 28일 개기월식.</strong> 촬영자와 이용 조건은 사진마다 다르다. 전시용 썸네일은 비교를 위해 잘랐으며, 각 촬영자의 원본은 출처에서 확인할 수 있다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="협업" id="role-work">
+                    <div class="step-copy">
+                      <h3>동료와 같은 문서를 고치다</h3>
+                      <p>브라우저 안에서 앱처럼 작동하는 서비스도 늘었다. Gmail은 2004년 메일 대화를 한데 묶는 웹메일을 내놓았고, Google Maps는 2005년 지도를 끌어 움직일 때 전체 페이지를 다시 불러오지 않고 필요한 지도 타일을 갱신했다. 이런 부분 갱신에는 비동기 요청, 즉 AJAX가 쓰였다. 이후 HTML5는 브라우저에서 영상·음성 재생과 그래픽 그리기를 위한 표준 기능을 넓혔다. 문서와 스프레드시트를 함께 편집하는 웹 앱도 파일을 주고받는 대신 같은 문서에서 협업하는 일을 익숙하게 했다.</p>
+                      <p>이를 관측 준비에 대입하면 역할의 차이가 분명하다. 한 사람이 올린 일정표를 읽고 따로 수정본을 보내던 일을, 공유 문서의 장소와 장비 칸에 각자 수정 내용을 남기는 일로 바꿀 수 있다.</p>
+                    </div>
+                    <figure class="step-figure role-plate role-work" data-plate="role-work" aria-labelledby="role-work-caption">
+                      <div class="role-plate-head"><span class="role-index">04</span><div><p class="plate-kicker">WORK · 같은 일정표를 편집하기</p><h3>각자 맡은 항목을 고친다</h3></div><span class="role-stamp">공유 앱의 예시</span></div>
+                      <div class="work-schedule"><div class="work-schedule-heading"><strong>North Ridge · Observing night</strong><span>shared schedule · example</span></div>
+                        <div class="work-field"><span>Equipment · M. Han</span><strong>90 mm refractor → 90 mm refractor + 10 mm eyepiece</strong><small>기여자 M. Han · 가상 변경</small></div>
+                        <div class="work-change"><span class="change-avatar">MH</span><span><strong>M. Han</strong> · equipment changed</span><time datetime="2026-11-21T16:42">2026-11-21 · 16:42</time></div>
+                        <div class="work-field work-field-edit"><span>Weather note · E. Park</span><strong>확인 전 → 예보 출처 링크 추가</strong><small>기여자 E. Park · 가상 변경</small></div>
+                        <div class="work-change"><span class="change-avatar change-avatar-alt">EP</span><span><strong>E. Park</strong> · weather source added</span><time datetime="2026-11-21T16:47">2026-11-21 · 16:47</time></div>
+                      </div>
+                      <figcaption id="role-work-caption"><strong>협업 문서는 서로 다른 사람의 변경과 시각을 함께 남긴다.</strong> M. Han과 E. Park은 가상 기여자이며 값과 시각도 설명용 예시다. Work 7의 2013년 Fieldwork는 기기 안에서 저장되는 로컬 편집기다.</figcaption>
+                    </figure>
+                  </section>
+                </div>
+              </section>
+            </div>
+            <div class="reading-column">
+              <h3>사진을 찾아가는 웹에서 피드를 받아보는 웹으로</h3>
+              <p>사진뿐 아니라 영상도 널리 오갔다. 2005년 등장한 YouTube에서는 촬영한 영상을 올리고 링크로 퍼뜨릴 수 있었다. 이후 스마트폰으로 관측지에서 사진을 찍고 이동 중 댓글을 읽거나 약속 장소를 확인하는 일이 익숙해졌다. 브라우저로 여는 모바일 웹과 설치형 앱은 함께 성장했다. 수익을 내야 하는 소셜 서비스는 광고와 콘텐츠 추천을 피드 안에 결합하며 사용자가 자주 돌아올 이유를 만들었다.</p>
+              <p>2005년 태그 페이지에서 독자는 주제를 골라 사진을 찾아간다. 2013년 페이스북의 새 뉴스피드는 친구들의 소식을 받아보는 화면에서 사진을 더 크게 보여 주고, 사진처럼 특정 유형의 콘텐츠만 볼 수 있게 하는 방향을 발표했다. 같은 관측 사진도 누구와 연결돼 있고 서비스가 무엇을 먼저 보여 주느냐에 따라 전혀 다른 때에 눈에 띈다. 추천은 발견을 돕는 한편, 덜 노출된 관점과 원래 글의 문맥을 놓치게 할 수 있다.</p>
+              <a class="article-experience archive-inline" href="?era=2013&amp;from=participation"><time>2013</time> 친구의 관측 소식이 섞인 뉴스피드 열기 <span aria-hidden="true">↗</span></a>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="accumulation">
-              <p class="chapter-marker">04 · 축적 · 공개 정보와 언어 모델</p>
-              <h2>웹에 쌓인 정보는 AI 발전의 토대가 되었다</h2>
-              <p>수십 년 동안 사람들은 웹에 글과 연구 자료, 뉴스, 설명서, 토론, 코드와 창작물을 공개했다. 서로 다른 목적과 품질을 지닌 이 자료들은 인류가 무엇을 알고 어떻게 표현해 왔는지 보여 주는 방대한 기록의 일부가 되었다. 여러 언어와 주제의 텍스트를 모아 학습에 쓸 수 있었던 배경에는 이런 공개 웹의 규모가 있었다.</p>
-              <p>Common Crawl은 공개 웹페이지를 수집해 연구자가 활용할 수 있는 데이터 아카이브를 제공하는 프로젝트다. OpenAI의 GPT-3 논문은 학습 자료에 Common Crawl의 필터링된 웹 데이터와 책, 위키백과 등을 포함했다고 설명한다. 이는 웹 자료가 대규모 언어 모델 학습에 실제로 쓰인 사례다. 이 규모의 학습에는 모델 구조와 대규모 계산 자원, 학습 기법의 발전도 필요했다. 어떤 웹 자료를 수집하고 선별해 학습에 쓰는지는 모델과 데이터셋마다 다르다.</p>
-              <p>사람이 글을 읽을 수 있도록 공개하는 일과, 그 글을 모아 모델 학습에 쓰는 일에는 서로 다른 판단이 필요하다. 저작권자의 허락과 보상, 개인정보, 자료의 대표성과 편향을 둘러싼 논의가 이어진다. 웹의 축적은 AI의 능력을 키울 수 있는 원천인 동시에, 무엇을 어떤 조건으로 활용해야 하는지 묻는 기록이기도 하다.</p>
-              <ol class="article-flow" aria-label="웹의 정보가 AI 활용으로 이어지는 흐름">
-                <li><strong>사람들이 공개한 기록</strong><span>글 · 연구 · 뉴스 · 코드</span></li>
-                <li><strong>수집과 선별</strong><span>예: Common Crawl 아카이브</span></li>
-                <li><strong>학습의 여러 재료</strong><span>데이터 · 모델 구조 · 계산 자원 · 학습 방법</span></li>
-                <li><strong>다시 웹을 활용하는 AI</strong><span>검색하고 출처를 확인하며 작업을 돕는다</span></li>
-              </ol>
-              <p>사람들이 정보를 나누려고 발전시킨 웹은 이제 인공지능 발전을 뒷받침하는 중요한 지식의 원천이 되었다. 다음 변화는 AI가 그 지식을 요약하는 데서 멈추지 않고, 현재의 웹을 직접 찾아보고 일을 돕는 방향으로 이어지고 있다.</p>
-            </section>
+          <section class="editorial-chapter" id="accumulation">
+            <div class="reading-column">
+              <p class="chapter-marker">04 · 축적 · 공개된 기록과 언어 모델</p>
+              <h2>공개된 기록은 어떻게 학습 자료가 되었을까?</h2>
+              <p>검색으로 발견한 일지, 주말에 고친 위키, 논쟁이 이어진 뉴스와 포럼, 공개된 코드. 저마다 다른 목적으로 쓰인 문서가 수십 년간 웹에 쌓였다. 그중에는 같은 질문에 전혀 다르게 답하는 글도, 주소만 바뀐 중복 사본도 있다. 규모와 다양성이 학습에 도움이 될 수 있는 만큼, 어떤 기록이 어떻게 모이고 빠지는지를 이해할 필요가 있다.</p>
+            </div>
+            <div class="archive-wide">
+              <section class="story-scene" data-story-scene id="learning-scene" aria-label="공개 웹 기록과 언어 모델">
+                <div class="story-steps">
+                  <section class="story-step" data-story-step data-story-label="발행" id="data-publish">
+                    <div class="step-copy">
+                      <h3>어떤 기록이 남는가?</h3>
+                      <p>가상의 관측자가 공개 글에 “밤 9시에 달 가장자리가 구름에 가렸다”라고 적었다고 해 보자. 이 일지는 다른 자료와 나란히 웹에 놓인다. 여러 표현과 문맥을 담은 이 기록들은 처음부터 학습용으로 만들어진 것이 아니었다.</p>
+                    </div>
+                    <figure class="step-figure data-plate data-publish" data-plate="data-publish" aria-labelledby="data-publish-caption">
+                      <div class="data-plate-head"><span class="data-step">01</span><div><p class="plate-kicker">PUBLISH · 공개된 기록</p><h3>같은 웹에는 서로 다른 목소리가 있다</h3></div></div>
+                      <div class="data-sources" role="group" aria-label="학습에 쓰일 수 있는 서로 다른 자료 유형">
+                        <div class="data-source"><span class="source-glyph">LOG</span><strong>관측 일지</strong><small>NR-93-1023 · 달 가장자리 관측</small></div><div class="data-source"><span class="source-glyph">PAPER</span><strong>연구 논문</strong><small>방법과 결과</small></div><div class="data-source"><span class="source-glyph">NEWS</span><strong>뉴스 기사</strong><small>사건과 시각</small></div><div class="data-source"><span class="source-glyph">CODE</span><strong>코드와 설명</strong><small>명령과 주석</small></div>
+                      </div>
+                      <figcaption id="data-publish-caption"><strong>사람들이 쓰고 공개한 자료는 형식과 목적이 제각각이다.</strong> 반복해서 등장하는 작은 표식은 전시용 가상 관측 일지의 일부를 뜻한다. 표식 개수와 배치는 규모나 실제 자료 비율을 나타내지 않는다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="수집" id="data-crawl">
+                    <div class="step-copy">
+                      <h3>열 수 있는 주소 일부를 일정 시점에 수집한다</h3>
+                      <p>Common Crawl은 웹페이지를 자동으로 방문해 수집한 응답을 보존하고, 주소와 수집 시점을 찾아볼 수 있는 색인을 제공하는 비영리 프로젝트다. 이때 남는 것은 방문에 성공한 시점의 사본이다. 방문하지 못한 주소나 로그인 뒤에 있는 일지는 같은 수집본에 담기지 않을 수 있다.</p>
+                    </div>
+                    <figure class="step-figure data-plate data-crawl" data-plate="data-crawl" aria-labelledby="data-crawl-caption">
+                      <div class="data-plate-head"><span class="data-step">02</span><div><p class="plate-kicker">CRAWL · 시점이 있는 수집</p><h3>크롤러가 접근 가능한 페이지를 방문한다</h3></div></div>
+                      <div class="data-crawl-stage" role="group" aria-label="관측 일지 하나가 crawl snapshot에 포함되고, 다른 페이지는 수집 바깥에 남음">
+                        <div class="data-origin"><span class="sample-log">NR-93-1023 · 관측 일지</span><small>주소가 공개된 가상 페이지</small></div><span class="data-arrow" aria-hidden="true">→</span><div class="crawl-snapshot"><span class="plate-kicker">가상 스냅샷 · 2019-11-22</span><span class="sample-log">NR-93-1023 · 관측 일지</span><small>이 샘플은 수집 범위에 포함</small></div>
+                        <div class="crawl-outside"><span class="outside-mark" aria-hidden="true">×</span><strong>수집 범위 바깥</strong><small>접근 제한 · 로그인 뒤 · 방문하지 못한 주소</small></div>
+                      </div>
+                      <figcaption id="data-crawl-caption"><strong>크롤링은 웹 전체를 빠짐없이 복사하는 일이 아니다.</strong> 2019-11-22는 가상 예시 날짜다. 이 예시에서는 공개 주소의 관측 일지 NR-93-1023 하나가 스냅샷에 포함되고 다른 문서는 수집되지 않는다. 도식은 설명용이며 수집 비율이나 실제 데이터 양을 나타내지 않는다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="선별" id="data-curate">
+                    <div class="step-copy">
+                      <h3>중복·품질을 살펴 학습 후보를 고른다</h3>
+                      <p>학습 자료를 만드는 팀은 수집된 웹 자료 중 필요한 부분을 다시 고른다. 일지가 다른 주소에 복사돼 있다면 중복을 줄일 수 있고, 다른 문서는 품질 기준에서 빠질 수 있다. 한 번 수집된 문서가 곧바로 학습에 포함된다는 의미는 아니다. 기준과 데이터 원천은 모델마다 다르다.</p>
+                    </div>
+                    <figure class="step-figure data-plate data-curate" data-plate="data-curate" aria-labelledby="data-curate-caption">
+                      <div class="data-plate-head"><span class="data-step">03</span><div><p class="plate-kicker">CURATE · 선별과 중복 제거</p><h3>모든 수집 자료가 학습 묶음에 들어가지는 않는다</h3></div></div>
+                      <div class="curate-stage" role="group" aria-label="여러 문서 사례가 선별 단계에서 나뉨">
+                        <div class="curate-in"><span class="sample-log">NR-93-1023 · 관측 일지</span><span class="sample-log sample-muted">NR-93-1023 · 복제본</span><span class="sample-log sample-muted">NR-93-1023 · 불명확 발췌</span></div>
+                        <div class="curate-filter"><span class="filter-mark" aria-hidden="true">›</span><strong>품질·중복·정책 검사</strong><small>예시 처리 경로</small></div>
+                        <div class="curate-out"><span class="sample-log">NR-93-1023 · 선별 예시</span><small>키를 이어 같은 샘플을 추적</small><span class="sample-log sample-dropped">복제본 · 보류/제외</span></div>
+                      </div>
+                      <p class="curate-outside-note"><span class="outside-mark" aria-hidden="true">×</span> 미수집 페이지는 이 선별 단계의 입력이 아니다. crawl 바깥에 계속 남는다.</p>
+                      <figcaption id="data-curate-caption"><strong>선별은 어떤 자료를 남길지 결정한다.</strong> 원본 키 NR-93-1023이 남을 수 있고, 그 복제본이나 조건에 맞지 않는 같은 키의 발췌는 제외 또는 보류될 수 있다. 실제 데이터셋별 기준은 다르며, 이 분기는 관측된 비율을 뜻하지 않는다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="학습" id="data-train">
+                    <div class="step-copy">
+                      <h3>문장 예측이 달라지도록 모델을 조정한다</h3>
+                      <p>GPT-3 논문의 표 2.2에는 필터링한 Common Crawl, WebText2, 두 책 말뭉치, 영어 위키백과가 함께 나온다. 학습에서 뽑는 비율은 자료별로 달랐고, 이 사례에서는 Common Crawl이 가장 큰 비중을 차지했다.</p>
+                      <p>언어 모델은 앞의 글을 보고 다음 토큰(글의 작은 단위)을 예측한다. 예상과 실제 문장의 차이를 줄이는 방향으로 가중치를 반복 조정한다. 많은 예시와 계산 자원, 모델 구조와 학습 방법이 함께 필요하다. 가중치는 원문을 열어 보는 색인이 아니며, 모델이 간혹 학습 문구를 되풀이한다고 해서 언제나 정확하게 인용한다는 보장도 없다.</p>
+                    </div>
+                    <figure class="step-figure data-plate data-train" data-plate="data-train" aria-labelledby="data-train-caption">
+                      <div class="data-plate-head"><span class="data-step">04</span><div><p class="plate-kicker">TRAIN · 다음 토큰 예측</p><h3>여러 자료와 학습 방법이 모델의 가중치를 조정한다</h3></div></div>
+                      <div class="train-stage" role="group" aria-label="선별된 예시와 여러 학습 자료 및 계산·방법이 함께 모델 가중치 조정에 기여">
+                        <div class="train-inputs"><span class="sample-log">NR-93-1023</span><span class="train-other">책 · 위키</span><span class="train-other">뉴스 · 코드</span></div>
+                        <div class="train-mechanism"><span class="plate-kicker">예측 → 비교 → 조정</span><p>“달 가장자리가…” <b>다음 토큰?</b></p><small>예측과 목표의 차이에 따라 가중치를 반복 조정</small></div>
+                        <div class="train-model"><span class="parameter-glyph" aria-hidden="true">◈<br>⋮<br>◈</span><strong>학습된 가중치</strong><small>패턴을 담은 모델</small><small class="no-pages">원문 페이지 보관함이 아님</small></div>
+                      </div>
+                      <div class="train-support">모델 구조 <span>+</span> 계산 자원 <span>+</span> 학습 방법</div>
+                      <figcaption id="data-train-caption"><strong>언어 모델은 다음에 올 토큰을 예측하며 학습한다.</strong> 이 그림은 웹 기록 외에 책·위키·뉴스·코드, 모델 구조, 계산과 방법이 함께 필요함을 보여 준다. 표식은 예시일 뿐 학습량·비중·실제 데이터셋을 나타내지 않는다.</figcaption>
+                    </figure>
+                  </section>
+                  <section class="story-step" data-story-step data-story-label="현재 조회" id="data-retrieve">
+                    <div class="step-copy">
+                      <h3>내일의 예보는 다시 찾아 읽는다</h3>
+                      <p>관측을 앞둔 오후, 바뀐 구름 예보를 묻는 사람이 있다. 검색 도구를 연결한 서비스라면 시각이 적힌 기상 자료를 가져와 질문과 함께 모델에 건넬 수 있다. 그 자료는 이번 답변에 쓰이는 문맥이다. 예보를 읽는 동안 저장된 모델 가중치는 그대로다.</p>
+                    </div>
+                    <figure class="step-figure data-plate data-retrieve" data-plate="data-retrieve" aria-labelledby="data-retrieve-caption">
+                      <div class="data-plate-head"><span class="data-step">05</span><div><p class="plate-kicker">RETRIEVE · 현재 출처 확인</p><h3>새 예보는 저장된 모델 바깥에서 들어온다</h3></div></div>
+                      <div class="retrieve-stage" role="group" aria-label="현재 질문은 검색으로 날짜가 표시된 출처를 가져오고 모델 가중치는 바뀌지 않음">
+                        <div class="retrieve-query"><span class="plate-kicker">새 질문</span><strong>오늘 밤 달 관측의 예보는?</strong><small>가상 시나리오 · 위치와 유효 시각 지정</small></div>
+                        <div class="retrieve-source"><span class="plate-kicker">가상 예보 출처 · 유효 시각 2026-11-21 20:00 UTC</span><strong>구름 예측 62% → 38%</strong><small>발행 시각: 2026-11-21 15:00 → 16:00 UTC</small><span class="forecast-stamp">가상 예시 · 실제 날씨 아님</span><span class="retrieve-flow">응답 출처 <b aria-hidden="true">→</b> 답변 문맥</span></div>
+                        <div class="weights-stay"><span class="parameter-glyph" aria-hidden="true">◈<br>⋮<br>◈</span><strong>저장된 가중치</strong><span class="stay-line">조회 중 가중치 고정</span><small>검색 자료를 답변에 전달; 가중치는 그대로</small></div>
+                      </div>
+                      <figcaption id="data-retrieve-caption"><strong>검색 자료는 답변 문맥에 이어지지만 저장된 가중치는 바뀌지 않는다.</strong> 구름 비율과 15:00→16:00 UTC 시각은 발행 시각의 차이를 보여 주는 가상 예시이며, 실제 기상 관측이나 예보가 아니다.</figcaption>
+                    </figure>
+                  </section>
+                </div>
+              </section>
+            </div>
+            <div class="reading-column">
+              <h3>공개된 기록을 어디까지 이용할 수 있을까?</h3>
+              <p>공개 웹을 학습에 이용할 권리와 조건은 여전히 논쟁 중이다. 페이지가 공개되어 있어도 창작자는 허락 없는 복제나 상업적 학습에 동의하지 않았을 수 있다. 개인정보와 민감한 정보, 충분히 대표되지 않은 언어와 공동체의 문제도 남는다. 현재 웹을 검색해 문장을 가져오는 일도 그 자료의 저작권을 없애지 않는다. 검색과 도구 사용에도 접근 제한, 이용 조건, 개인정보 보호 문제가 따른다. 인터넷에 기록을 남길 기회가 적었던 언어나 공동체는 수집이 커져도 덜 대표될 수 있다. 무엇을 얼마나 남기고 누구의 허락을 받는지는 결국 데이터셋의 성격을 정하는 선택이다.</p>
+              <p>사람들이 서로의 지식을 찾으려고 키운 웹은 모델 학습의 중요한 자료원이 되었다. 다음 장면에서는 학습으로 얻은 능력이 지금의 웹과 만난다. 새로운 자료를 읽은 다음, 그 자료를 근거로 어디까지 행동할 것인지 결정할 차례다.</p>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="action">
+          <section class="editorial-chapter" id="action">
+            <div class="reading-column">
               <p class="chapter-marker">05 · 지능과 행동 · 2023—2026</p>
-              <h2>AI는 웹을 사용하기 시작했다</h2>
-              <p>전통적인 검색에서는 사용자가 검색어를 만들고, 여러 결과와 문서를 직접 열어 비교했다. 생성형 검색은 질문에 대해 여러 자료를 바탕으로 정리한 답을 먼저 제시해 이 과정을 바꾸려 한다. 2023년 Google이 Search Labs에서 공개한 생성형 검색 실험도 검색 결과에 AI가 만든 개요를 더하는 시도였다. 답을 한곳에서 읽기 쉬워지는 만큼, 요약이 놓친 관점이나 잘못 묶은 내용을 살피고 출처를 확인하는 일이 중요해진다.</p>
-              <p>전시의 2023년 Orbit Search에서 관측회 예시 질문을 고르면 전시용 요약과 출처가 함께 뜬다. 다른 천문 검색어를 입력하면 NASA 이미지 자료와 Spaceflight News의 공개 검색 API를 조회한다. 화면에 표시되는 요약은 조회 결과를 규칙에 따라 구성해 생성형 검색의 읽는 경험을 재현한다.</p>
-              <p>다음으로 소개되는 에이전트는 질문에 답하는 데서 한 걸음 더 나아가 웹 도구를 사용하고 작업을 이어 간다. 관측 준비를 예로 들면 공개된 우주 소식과 날씨 자료를 확인하고, 후보를 모아 계획을 제안한 뒤 사람이 검토하도록 할 수 있다. 이 작품의 2026년 천문 모니터는 관심사에 따라 NASA 소식과 Open-Meteo 예보 모델 값을 가져와 규칙 기반 브리핑을 만든다. 별도의 관측 시나리오에서는 전시용 예보와 행사 일정, ISS 통과 시각을 사용한다. 계획은 방문자가 선택해 저장하고 캘린더 파일로 내려받을 수 있으며, 포스터 일정 변경은 승인했을 때만 반영된다.</p>
-              <p>관측을 준비하는 사람은 예보가 언제 나왔는지 확인하고, 관측회 시각이 바뀌었다면 천문대 공지를 다시 열어 볼 수 있다. 검색 결과와 예보는 바뀌고, 요약은 출처의 맥락을 놓칠 수 있다. 중요한 선택은 원자료를 확인하고 사람이 판단할 수 있어야 한다. 웹의 다음 장은 AI의 능력뿐 아니라 AI가 무엇을 했는지 보이고, 사용자가 검토하고 승인하는 방법에 달려 있다.</p>
-              <div class="chapter-experiences"><a class="article-experience" href="?era=2023&amp;from=action"><span>2023</span> 생성형 검색 체험 <span aria-hidden="true">→</span></a><a class="article-experience" href="?era=2026&amp;from=action"><span>2026</span> AI 에이전트와 관측 계획 <span aria-hidden="true">→</span></a></div>
-            </section>
+              <h2>답을 얻는 일에서, 행동을 맡기는 일로</h2>
+              <p>전통적인 검색에서 관측자는 검색어를 만들고, 결과 목록을 훑어 여러 사이트를 직접 연다. 생성형 검색은 질문을 받아 자료를 요약한 답을 먼저 보여 주며 이 순서를 바꾸려 한다. 2023년 Google Search Labs의 Search Generative Experience(SGE)는 검색 결과 페이지 안에 생성형 AI 개요를 더하는 실험이었다. 질문을 문장으로 던지고 이어서 묻는 흐름은 검색을 대화에 가깝게 만들었다. 하지만 한 문단의 요약은 원자료 사이의 차이를 감추거나 잘못된 내용을 그럴듯하게 섞을 수 있다. 답에 딸린 출처를 열어 날짜와 맥락을 살피는 습관은 여전히 필요하다.</p>
+              <a class="article-experience archive-inline" href="?era=2023&amp;from=action"><time>2023</time> 생성형 검색에서 답변의 출처 열기 <span aria-hidden="true">↗</span></a>
+              <h3>날씨가 바뀌었다. 관측회 시간도 바뀌었을까?</h3>
+              <p>관측회에 가려던 사람에게 두 가지 소식이 도착한다. 오후 예보는 구름이 줄었다고 하고, 천문대 공지는 모이는 시각을 오후 8시에서 8시 30분으로 고쳤다. 구름 예보는 갈지를 판단할 자료이고, 공지는 행사 시각을 확인할 출처다. 같은 질문으로 검색 결과를 여는 일, 자료를 종합한 답을 읽는 일, 그 답을 근거로 일정을 바꾸는 일은 필요한 확인이 서로 다르다.</p>
+            </div>
+            <div class="archive-wide">
+              <figure class="step-figure action-compare" data-plate="action-compare" aria-labelledby="action-compare-caption">
+                <div class="action-request"><span class="plate-kicker">같은 요청 · 가상 시나리오</span><strong>이번 관측회를 준비해 줘</strong><small>노스리지 천문대 · 공지와 개인 일정표</small></div>
+                <div class="action-rows" role="group" aria-label="검색, 답변, 승인 필요한 행동의 비교">
+                  <section class="action-row"><div class="action-kind"><span class="action-number">01</span><h3>SEARCH · 찾기</h3></div><div class="action-system"><strong>공개 공지와 예보를 나열</strong><span>천문대 공지 · 날씨 출처 · 일정 페이지</span></div><div class="action-human"><span class="plate-kicker">사람이 확인</span><strong>누가 올렸나? 언제 갱신됐나?</strong><span>공식 공지의 원문을 연다.</span></div></section>
+                  <section class="action-row"><div class="action-kind"><span class="action-number">02</span><h3>ANSWER · 정리</h3></div><div class="action-system"><strong>출처와 시각을 붙여 요약</strong><span>행사 공지 · 16:00 발행 · 시작 20:00 → 20:30</span><span>별도 예보 · 16:00 조회 · 저녁 구름 38%</span></div><div class="action-human"><span class="plate-kicker">사람이 확인</span><strong>시간 변경과 예보는 서로 다른 자료</strong><span>행사 시각은 공지, 하늘 상태는 예보에서 확인한다.</span></div></section>
+                  <section class="action-row action-row-approval"><div class="action-kind"><span class="action-number">03</span><h3>ACTION · 제안</h3></div><div class="action-system"><strong>개인 포스터 수정안을 준비</strong><span>기존 20:00 → 제안 20:30</span><small>천문대 원본 공지는 이미 20:30</small></div><div class="action-human"><span class="plate-kicker">승인 경계 · 내 포스터</span><strong>사용자가 공지를 확인하고 선택</strong><div class="action-branches"><span><b>승인</b> 개인 포스터 복사본에 20:30 저장</span><span><b>취소</b> 개인 초안은 유지되고 공식 공지는 20:30으로 표시</span></div></div></section>
+                </div>
+                <figcaption id="action-compare-caption"><strong>검색은 찾고, 답변은 정리하고, 행동은 승인 전까지 제안으로 남는다.</strong> 발행 시각이 표시된 공지와 예보는 서로 다른 출처다. 행사 시각과 장소의 공식 결정은 천문대 담당자가 내린다. 모든 일정과 인물은 가상 시나리오다.</figcaption>
+              </figure>
+            </div>
+            <div class="reading-column">
+              <p>언어 모델에 검색과 브라우저 조작, 문서 편집 같은 도구를 연결하면 여러 단계를 위임할 수 있다. 2025년 공개된 ChatGPT agent는 브라우저 등을 사용해 작업하는 이 방향의 사례다. 그래도 일정표를 열 수 있다는 사실과 이를 고칠 권한은 별개다. 관측자는 공지 원문을 확인하고, 어느 파일의 어떤 항목이 바뀌는지 본 뒤 승인하거나 거절할 수 있어야 한다. 키워드 검색과 원문 확인은 이 작업 속에서도 쓰인다.</p>
+              <a class="article-experience archive-entry" href="?era=2026&amp;from=action">
+                <time>2026</time>
+                <span><strong>노스리지 관측 계획 열기</strong><span>자료를 확인하고, 계획을 고른 뒤, 포스터 변경안을 검토해 보세요.</span></span>
+                <span aria-hidden="true">↗</span>
+              </a>
+              <aside class="editorial-note"><p><strong>전시의 자료와 승인.</strong> Orbit Search의 관측회 예시 질문은 전시 자료를 보여 준다. 다른 천문 검색과 관측 모니터는 공개 API 응답을 규칙으로 요약한다. 관측 시나리오의 지역 예보·ISS 통과·행사 내용은 전시용이다. 저장·포스터 변경은 선택한 뒤 이 브라우저에 반영된다.</p></aside>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="epilogue">
-              <p class="chapter-marker">에필로그 · 다음 관측</p>
-              <h2>웹은 앞으로 무엇이 될까?</h2>
-              <p>웹의 역사는 연결에서 시작해 표현과 발견, 참여와 일상으로 넓어졌다. 사람들이 남긴 자료는 인공지능 학습의 중요한 토대가 되었고, 이제 AI는 다시 웹의 정보를 찾아 요약하며 일부 작업을 돕고 있다. 변화의 출발점에는 늘 사람이 하려던 일이 있었다. 정보를 나누려는 필요, 자신을 표현하려는 욕구, 더 빨리 찾고 함께 일하려는 요구가 새로운 도구의 쓰임을 만들었다.</p>
-              <p>앞으로 웹이 어떤 모습이 될지 단정하기는 어렵다. 다만 웹이 열어 둔 정보와 관계를 누가 어떻게 다루는지, 자동화된 행동을 사람이 어떻게 이해하고 조정하는지는 계속 중요할 것이다. 이 전시는 1993년의 링크에서 2026년의 에이전트까지 일곱 시점의 웹을 작은 관측 기록으로 구성했다. 이제 화면을 직접 열어 그 변화의 결을 살펴보자.</p>
-              <div class="chapter-experiences"><a class="article-experience cover-start" href="?era=1993&amp;from=epilogue">전시 시작 · 1993년 문서와 하이퍼링크 <span aria-hidden="true">→</span></a></div>
-            </section>
+          <section class="editorial-chapter" id="epilogue">
+            <div class="reading-column">
+              <p class="chapter-marker">에필로그 · 다시 하늘을 보다</p>
+              <h2>다시, 관측 일지를 펼치다</h2>
+              <p>시간이 바뀐 것을 확인한 관측자는 새 시각에 맞춰 망원경을 준비한다. 달이 뜨면 한 줄을 쓴다. 구름은 언제 걷혔는지, 어떤 접안렌즈를 썼는지, 다음 사람에게 무엇을 알려 주고 싶은지. 누군가에겐 그 문장이 링크를 따라 겨우 찾아낸 기록일 수 있고, 또 다른 누군가에겐 다음 관측을 계획할 출처일 수 있다.</p>
+              <p>웹이 앞으로 어떤 모습이 될지는 아직 열려 있다. 다음 도구가 무엇이든 어떤 기록을 남기고, 무엇을 근거로 삼고, 어떤 결정을 사람에게 돌려줄지는 우리가 함께 정할 일이다. 그 질문을 품고 첫 장면의 연구 도서관으로 돌아가 보자.</p>
+              <a class="article-experience cover-start" href="?era=1993&amp;from=epilogue">1993년, 첫 관측 기록 열기 <span aria-hidden="true">→</span></a>
+            </div>
+          </section>
 
-            <section class="editorial-chapter" id="sources" aria-labelledby="sources-title">
-              <p class="chapter-marker">자료실</p>
-              <h2 id="sources-title">참고 자료</h2>
-              <ul>
-                <li><a href="https://info.cern.ch/hypertext/WWW/TheProject.html">CERN · The World Wide Web project</a>, <a href="https://www.w3.org/History/1989/proposal.html">Tim Berners-Lee · Information Management: A Proposal (1989)</a></li>
-                <li><a href="https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/">NCSA · Mosaic</a>, <a href="https://www.google.com/search/howsearchworks/our-history/">Google · Our history of Search</a></li>
-                <li><a href="https://blog.flickr.net/en/2005/08/01/the-new-new-things/">Flickr · The New New Things (2005)</a>, <a href="https://about.fb.com/news/2013/03/a-new-look-for-news-feed/">Meta · A new look for News Feed (2013)</a></li>
-                <li><a href="https://commoncrawl.org/">Common Crawl</a>, <a href="https://arxiv.org/abs/2005.14165">Brown et al. · Language Models are Few-Shot Learners (GPT-3, 2020)</a></li>
-                <li><a href="https://blog.google/products-and-platforms/products/search/generative-ai-search/">Google · Generative AI in Search (Search Labs, 2023)</a>, <a href="https://images-api.nasa.gov/">NASA Image and Video Library API</a>, <a href="https://www.spaceflightnewsapi.net/">Spaceflight News API</a></li>
-                <li><a href="https://openai.com/index/introducing-chatgpt-agent/">OpenAI · Introducing ChatGPT agent (2025)</a>, <a href="https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/">Google · Chrome auto browse (2026)</a>, <a href="https://open-meteo.com/">Open-Meteo</a></li>
-              </ul>
-              <p>North Ridge Observatory, Moonstream, Pacebook, Orbit Search와 관측회 시나리오는 전시를 위해 구성한 가상 요소다. 2023년 검색과 2026년 브리핑의 실제 데이터 조회 및 전시용 요약 방식은 체험 구현을 설명하며, 해당 연도의 보편적 제품 기능을 뜻하지 않는다.</p>
-            </section>
-          </div>
+          <section class="editorial-chapter archive-sources" id="sources" aria-labelledby="sources-title">
+            <div class="reading-column">
+              <p class="chapter-marker">자료실 · 장별 참고 자료</p>
+                <h2 id="sources-title">장별 참고 자료</h2>
+                <h3>연결 · CERN과 초기 웹</h3>
+                <ul>
+                  <li><a href="https://www.w3.org/History/1989/proposal.html">Tim Berners-Lee, Information Management: A Proposal (1989)</a> 및 <a href="https://www.w3.org/about/history/">W3C, History</a> · 제안, 첫 서버와 브라우저의 연혁.</li>
+                  <li><a href="https://home.cern/science/computing/the-birth-of-the-web/">CERN, The birth of the Web</a> 및 <a href="https://www.ncsa.illinois.edu/research/project-highlights/ncsa-mosaic/">NCSA, Mosaic</a> · <a href="https://github.com/mdn/content/blob/main/files/en-us/glossary/world_wide_web/index.md">MDN, World Wide Web</a> · 1993년 CERN의 공개 정책과 Mosaic 개발·보급은 별도의 기록으로 확인.</li>
+                </ul>
+                <h3>발견 · 디렉터리와 검색</h3>
+                <ul>
+                  <li><a href="https://www.britannica.com/money/Yahoo-Inc">Yahoo의 초기 역사 자료</a>, <a href="https://googlepress.blogspot.com/2000/06/yahoo-selects-google-as-its-default.html">Yahoo Selects Google as Its Default Search Engine (2000)</a> · Yahoo 디렉터리의 출발과 Google 검색 채택.</li>
+                  <li><a href="https://research.google/pubs/the-anatomy-of-a-large-scale-hypertextual-web-search-engine/">Brin &amp; Page, The Anatomy of a Large-Scale Hypertextual Web Search Engine (1998)</a> · PageRank를 포함한 초기 Google 검색 설명.</li>
+                </ul>
+                <h3>참여 · 공동 편집, 사진과 웹 앱</h3>
+                <ul>
+                  <li><a href="https://en.wikipedia.org/wiki/Wikipedia">Wikipedia · Wikipedia history and launch (2001)</a>, <a href="https://www.oreilly.com/pub/a/web2/archive/what-is-web-20.html">Tim O'Reilly, What Is Web 2.0? (2005)</a>.</li>
+                  <li><a href="https://blog.flickr.net/en/2005/08/01/the-new-new-things/">Flickr, The New New Things (2005)</a> · <a href="https://gmail.googleblog.com/2004/04/introducing-gmail-google-approach-to.html">Google, Introducing Gmail (2004)</a> · <a href="https://googleblog.blogspot.com/2005/02/mapping-your-way.html">Google, Google Maps (2005)</a>.</li>
+                  <li><a href="https://www.youtube.com/watch?v=jNQXAC9IVRw">YouTube · Me at the zoo (2005)</a> · <a href="https://about.fb.com/news/2013/03/a-new-look-for-news-feed/">Meta, A New Look for News Feed (2013)</a> · <a href="https://about.fb.com/news/2014/01/facebook-reports-fourth-quarter-and-full-year-2013-results/">Facebook, Fourth Quarter and Full Year 2013 Results</a>.</li>
+                </ul>
+                <h3>축적 · 데이터와 언어 모델</h3>
+                <ul>
+                  <li><a href="https://commoncrawl.org/overview">Common Crawl</a> 및 <a href="https://github.com/commoncrawl/cc-index-table">데이터 이용 안내</a> · 공개 웹 아카이브와 검색 가능한 인덱스의 구조.</li>
+                  <li><a href="https://arxiv.org/abs/2005.14165">Brown et al., Language Models are Few-Shot Learners (2020)</a> 및 <a href="https://github.com/openai/gpt-3/blob/master/model-card.md">OpenAI, GPT-3 Model Card</a> · 훈련 자료 예시와 모델의 한계·위험.</li>
+                  <li><a href="https://www.copyright.gov/ai/">U.S. Copyright Office · Copyright and Artificial Intelligence</a> · 학습 자료와 저작권에 관한 정책 검토.</li>
+                </ul>
+                <h3>행동 · 생성형 검색과 에이전트</h3>
+                <ul>
+                  <li><a href="https://blog.google/products-and-platforms/products/search/generative-ai-search/">Google, Generative AI in Search Labs (2023)</a> · SGE 공개 실험.</li>
+                  <li><a href="https://images-api.nasa.gov/">NASA Image and Video Library API</a>, <a href="https://www.spaceflightnewsapi.net/">Spaceflight News API</a>, <a href="https://open-meteo.com/">Open-Meteo</a> · 체험의 실제 공개 데이터 조회에 관한 참고.</li>
+                  <li><a href="https://openai.com/index/introducing-chatgpt-agent/">OpenAI, Introducing ChatGPT agent (2025)</a> · <a href="https://blog.google/products-and-platforms/products/chrome/gemini-3-auto-browse/">Google, Chrome auto browse (2026)</a> · <a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial">Chrome for Developers, WebMCP origin trial</a>.</li>
+                </ul>
+                <p>노스리지 천문대, The Orbit Room, Moonstream, Pacebook과 Orbit Search는 전시용 재구성이다. 도식 속 관측 기록과 일정은 설명을 위한 예시이며, 아카이브 사진의 촬영자와 원본 출처는 해당 도판에 표시했다.</p>
+            </div>
+          </section>
         </div>
       </article>
     </main>
