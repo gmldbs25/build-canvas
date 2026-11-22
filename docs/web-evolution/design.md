@@ -33,7 +33,7 @@ Work 7은 서로 다른 세대를 거쳐 온 웹의 역사를 다룬다. 메인 
 - **Image rights:** this article does not require original product images. Diagrams are original, generic representations. Any future archival image proposal must be checked for creator, item-specific license, embedded works, date, and attribution.
 - **Source access:** the official MDN source pages, Common Crawl index README, GPT-3 model card, and WebMCP repository are GitHub-hosted and were directly reviewed for this pass. Direct CERN and some external product-source domains were proxy-limited, so their cited reference pages remain source references rather than a claim of live access during this pass.
 
-짙은 남색, 금색 강조, 청회색 구분선을 사용한다. 한국어 본문은 17~19px와 약 700px 읽기 폭을 기준으로 삼으며, 개념 관계를 한눈에 비교해야 하는 도판은 더 넓게 펼친다. 두 스크롤 장면은 넓고 높은 화면에서만 같은 도판을 일정 영역에 고정한다. 스크롤 위치에서 현재 본문 단계를 계산하고, 링크로 단계를 바로 열 수도 있다. 좁거나 낮은 화면에서는 각 도판이 설명 바로 뒤에 놓인다. 스크립트 초기화 없이도 본문과 도판을 모두 읽을 수 있으며, 모션 설정에 따라 정보가 달라지지 않는다.
+짙은 남색, 금색 강조, 청회색 구분선을 사용한다. 한국어 본문은 17~19px와 최대 800px 읽기 폭을 기준으로 삼으며, 개념 관계를 한눈에 비교해야 하는 도판은 더 넓게 펼친다. 두 스크롤 장면은 넓고 높은 화면에서만 같은 도판을 일정 영역에 고정한다. 스크롤 위치에서 현재 본문 단계를 계산하고, 링크로 단계를 바로 열 수도 있다. 좁거나 낮은 화면에서는 각 도판이 설명 바로 뒤에 놓인다. 스크립트 초기화 없이도 본문과 도판을 모두 읽을 수 있으며, 모션 설정에 따라 정보가 달라지지 않는다.
 
 표지와 에필로그의 시작 링크는 1993년을 연다. `?era=2005&from=participation`의 `from`은 체험 안에서 시대·페이지·탭을 바꾸어도 유지된다. “아티클로 돌아가기”와 브라우저 뒤로 가기는 읽던 스크롤 위치와 진입 링크의 포커스를 복원한다. 읽기 이력이 없는 주소는 장 앵커로, 장 정보가 없으면 프롤로그로 돌아간다. `?era=1998&page=guestbook` 같은 시점별 주소와 Build Canvas 홈으로 이동하는 H 단축키를 지원한다.
 

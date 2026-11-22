@@ -312,3 +312,49 @@
 .story-stage .curate-filter .filter-mark { line-height: .7; }
 .story-stage .data-source { min-height: 72px; padding: 8px; }
 .story-stage .retrieve-query, .story-stage .retrieve-source { min-height: 0; }
+
+/* Keep the current-web lookup lane in view even when the final step is selected. */
+.story-stage .data-retrieve .data-plate-head { margin-bottom: 8px; }
+.story-stage .data-retrieve .data-plate-head h3 { font-size: 1rem; line-height: 1.25; }
+.story-stage .data-retrieve .retrieve-stage { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) {
+  grid-template-columns: minmax(86px, .32fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1px 8px;
+  min-height: 0;
+  padding: 5px 8px;
+}
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) .plate-kicker {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin: 0;
+  font-size: .72rem;
+  line-height: 1.25;
+  letter-spacing: .055em;
+}
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) strong,
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) small { grid-column: 2; }
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) strong { grid-row: 1; line-height: 1.25; }
+.story-stage .data-retrieve :is(.retrieve-query, .retrieve-tool, .retrieve-source, .retrieve-answer) small { grid-row: 2; line-height: 1.25; }
+.story-stage .data-retrieve .retrieve-arrow { font-size: 1rem; line-height: .8; }
+.story-stage .data-retrieve figcaption { margin-top: 5px; font-size: .8rem; line-height: 1.32; }
+
+/* Use two compact columns in the sticky plate; inline and mobile views keep their natural stack. */
+.story-stage .data-train .data-plate-head { margin-bottom: 8px; }
+.story-stage .data-train .train-stage { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 8px; }
+.story-stage .data-train .train-inputs { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.story-stage .data-train .train-mechanism { min-height: 0; gap: 6px; padding: 9px; }
+.story-stage .data-train .train-model {
+  grid-column: 1 / -1;
+  grid-template-columns: 34px max-content minmax(0, 1fr);
+  align-items: center;
+  justify-items: start;
+  gap: 4px 8px;
+  padding: 8px;
+  text-align: left;
+}
+.story-stage .data-train .train-model .parameter-glyph { grid-row: 1 / span 2; }
+.story-stage .data-train .train-model .no-pages { grid-column: 3; }
+.story-stage .data-train .gpt3-inset { gap: 4px; margin-top: 8px; padding: 8px; }
+.story-stage .data-train .train-support { gap: 7px; margin-top: 8px; }
+.story-stage .data-train figcaption { margin-top: 6px; font-size: .8rem; line-height: 1.32; }
