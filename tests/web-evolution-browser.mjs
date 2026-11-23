@@ -106,6 +106,38 @@ try {
   assert.equal(requests,before,'language toggle refetched sources');
   assert.equal(await page.evaluate(()=>localStorage.getItem('build-canvas:web-evolution:agent-briefing')),agentSaved);
   await context.close();
+  // Audit every registered exhibit route in the selected Korean locale.
+  const routeContext=await browser.newContext({viewport:{width:1440,height:900}});
+  const routePage=await routeContext.newPage();
+  await routePage.goto(baseUrl+'?era=1993',{waitUntil:'domcontentloaded'});
+  await routePage.locator('#screen .page-content').waitFor();
+  await choose(routePage,'ko');
+  const routes=await routePage.evaluate(async()=>{
+    const [history,classic,modern]=await Promise.all([import('./eras.js'),import('./classic-search.js'),import('./modern.js')]);
+    const all={...history.eras,'2001':classic.classicSearchEra,...modern.modernEras};
+    return Object.entries(all).flatMap(([era,data])=>Object.keys(data.pages).map(page=>({era,page})));
+  });
+  assert.equal(routes.length,75,'expected all 75 curated pages');
+  const untranslated=new Map();
+  for(const {era,page:pageId} of routes){
+    await routePage.goto(baseUrl+'?era='+era+'&page='+encodeURIComponent(pageId),{waitUntil:'domcontentloaded'});
+    await routePage.locator('#screen .page-content').waitFor();
+    assert.equal(await routePage.locator('#screen').getAttribute('lang'),'ko');
+    const result=await routePage.evaluate(()=>{
+      const root=document.querySelector('#screen .page-content');
+      const nodes=[...root.querySelectorAll('h1,h2,h3,p,li,td,th')].filter(n=>!n.closest('[data-no-translate],pre,code,.monitor-news,.live-result-list'));
+      const english=nodes.map(n=>n.textContent.trim().replace(/\s+/g,' '))
+        .filter(s=>!/[가-힣]/.test(s)&&(/[a-z]+(?:\s+[a-z]+){5,}/i).test(s)).slice(0,3);
+      return {length:root.innerText?.length||root.textContent?.length||0,english};
+    });
+    assert.ok(result.length>15,'missing page content at '+era+'/'+pageId);
+    if(result.english.length)untranslated.set(era+'/'+pageId,result.english);
+  }
+  console.log('All 75 Work 7 exhibit routes loaded in Korean mode.');
+  const samples=[...untranslated].slice(0,70).map(([route,texts])=>({route,examples:texts.map(t=>t.slice(0,170))}));
+  console.log('KOREAN_COPY_REVIEW '+JSON.stringify({routesWithLongEnglishText:untranslated.size,samples}));
+  await routeContext.close();
+
   console.log('Work 7 bilingual browser smoke passed: 9 viewports, guestbook, local search, Pacebook, Orbit Search, poster and agent.');
 } finally {
   await browser.close();
