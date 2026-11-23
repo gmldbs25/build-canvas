@@ -463,24 +463,40 @@
       </article>
     </main>
   </div>
-  <div id="exhibit-view" hidden>
-    <header class="exhibit-bar">
-      <a class="exhibit-title" id="intro-link" href="./"><span class="exhibit-mark" aria-hidden="true"></span><span lang="en">The Evolution of the Web</span></a>
-      <nav class="timeline" aria-label="시대 선택">
-        <a href="?era=1993" data-era="1993"><span class="era-year">1993</span><span class="era-name">문서</span></a>
-        <a href="?era=1998" data-era="1998"><span class="era-year">1998</span><span class="era-name">개인 홈페이지</span></a>
-        <a href="?era=2001" data-era="2001"><span class="era-year">2001</span><span class="era-name">키워드 검색</span></a>
-        <a href="?era=2005" data-era="2005" aria-label="2005 사진 공유"><span class="era-year">2005</span><span class="era-name">사진 공유</span></a>
-        <a href="?era=2013" data-era="2013" aria-label="2013 친구의 뉴스피드"><span class="era-year">2013</span><span class="era-name">친구의 뉴스피드</span></a>
-        <a href="?era=2023" data-era="2023"><span class="era-year">2023</span><span class="era-name">AI 검색</span></a>
-        <a href="?era=2026" data-era="2026" aria-label="2026 AI 에이전트"><span class="era-year">2026</span><span class="era-name">AI 에이전트</span></a>
-      </nav>
-      <div class="exhibit-actions">
-        <a class="article-return" id="article-return" href="./#prologue"><span aria-hidden="true">←</span> 아티클로 돌아가기</a>
-        <a class="home-link" href="../" aria-label="Build Canvas 홈으로" aria-keyshortcuts="H"><span aria-hidden="true">←</span> 홈 <kbd aria-hidden="true">H</kbd></a>
+  <div id="exhibit-view" data-sidebar="expanded" hidden>
+    <aside id="exhibit-sidebar" class="exhibit-sidebar" aria-label="전시 탐색">
+      <div class="sidebar-header">
+        <a class="exhibit-title" id="intro-link" href="./" aria-label="The Evolution of the Web 아티클로 이동">
+          <span class="exhibit-mark" aria-hidden="true"></span>
+          <span class="sidebar-brand"><span class="sidebar-eyebrow">WORK 07</span><span lang="en">The Evolution of the Web</span></span>
+          <span class="sidebar-brand-compact" aria-hidden="true">07</span>
+        </a>
+        <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-controls="exhibit-sidebar" aria-expanded="true" aria-label="시대 사이드바 접기" title="시대 사이드바 접기">
+          <span class="sidebar-toggle-glyph" aria-hidden="true">‹</span>
+        </button>
       </div>
-      <p id="scene-hint" class="scene-hint" aria-live="polite"></p>
-    </header>
+      <nav id="era-timeline" class="timeline" aria-label="시대 선택">
+        <div class="timeline-track">
+          <a href="?era=1993" data-era="1993" aria-label="1993 문서"><span class="era-year">1993</span><span class="era-name">문서</span></a>
+          <a href="?era=1998" data-era="1998" aria-label="1998 개인 홈페이지"><span class="era-year">1998</span><span class="era-name">개인 홈페이지</span></a>
+          <a href="?era=2001" data-era="2001" aria-label="2001 키워드 검색"><span class="era-year">2001</span><span class="era-name">키워드 검색</span></a>
+          <a href="?era=2005" data-era="2005" aria-label="2005 사진 공유"><span class="era-year">2005</span><span class="era-name">사진 공유</span></a>
+          <a href="?era=2013" data-era="2013" aria-label="2013 친구의 뉴스피드"><span class="era-year">2013</span><span class="era-name">친구의 뉴스피드</span></a>
+          <a href="?era=2023" data-era="2023" aria-label="2023 AI 검색"><span class="era-year">2023</span><span class="era-name">AI 검색</span></a>
+          <a href="?era=2026" data-era="2026" aria-label="2026 AI 에이전트"><span class="era-year">2026</span><span class="era-name">AI 에이전트</span></a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-hint-area">
+          <p id="scene-hint" class="scene-hint" aria-live="polite"></p>
+          <button id="sidebar-hint-open" class="sidebar-info-button" type="button" aria-label="시대 안내 펼치기" aria-controls="scene-hint" title="시대 안내 펼치기">i</button>
+        </div>
+        <div class="exhibit-actions">
+          <a class="article-return" id="article-return" href="./#prologue" aria-label="아티클로 돌아가기"><span class="sidebar-action-icon" aria-hidden="true">←</span><span class="sidebar-action-text">아티클로 돌아가기</span></a>
+          <a class="home-link" href="../" aria-label="Build Canvas 홈으로" aria-keyshortcuts="H"><span class="sidebar-action-icon" aria-hidden="true">⌂</span><span class="sidebar-action-text">Build Canvas 홈</span><kbd aria-hidden="true">H</kbd></a>
+        </div>
+      </div>
+    </aside>
     <main id="display" class="display" data-era="1993">
       <section id="window" class="browser-window" aria-label="시대별 브라우저">
         <div id="chrome"></div>
