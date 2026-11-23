@@ -510,11 +510,14 @@ function briefingItemCard(item, selected) {
 function preferencesMarkup(state) {
   const regionOptions = Object.entries(regions).map(([id, region]) => `<option value="${id}" ${state.region === id ? 'selected' : ''}>${escapeHtml(region.label)}</option>`).join('');
   const interests = agentInterests.map(([id, label]) => `<label class="interest-option"><input type="checkbox" name="interest" value="${id}" ${state.interests.includes(id) ? 'checked' : ''}><span>${label}</span></label>`).join('');
+  const notice=agentNotice(state);
+  const feedback=notice?.key==='agent.note.settings' ? `<p class="preferences-feedback" role="status" aria-live="polite" data-i18n-message="${notice.key}" data-i18n-params="${escapeHtml(JSON.stringify(notice.params))}">${escapeHtml(formatMessage(notice.key,notice.params))}</p>` : '';
   return `<form class="briefing-preferences" id="briefing-preferences">
     <h3>Your interests</h3>
     <label class="region-field">Viewing region<select name="region">${regionOptions}</select></label>
     <fieldset><legend>Include in my briefing</legend>${interests}</fieldset>
     <button type="submit" class="preference-submit">Update briefing</button>
+    ${feedback}
     <p class="preferences-note">Your region sets the scenario and the forecast reference location. No account is needed.</p>
   </form>`;
 }

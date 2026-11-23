@@ -110,8 +110,8 @@ function changeAttr(node,name,lang){
 }
 export function applyLocale(root,lang=locale){
   if(!root)return;
-  for(const node of root.querySelectorAll('[data-i18n-rich]'))applyRich(node,lang);
-  for(const node of root.querySelectorAll('[data-i18n-message]'))applyBoundMessage(node,lang);
+  for(const node of [...(root.matches?.('[data-i18n-rich]')?[root]:[]),...root.querySelectorAll('[data-i18n-rich]')])applyRich(node,lang);
+  for(const node of [...(root.matches?.('[data-i18n-message]')?[root]:[]),...root.querySelectorAll('[data-i18n-message]')])applyBoundMessage(node,lang);
   const tree=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   let node;while((node=tree.nextNode()))changeText(node,lang);
   const elements=[root,...root.querySelectorAll('*')];

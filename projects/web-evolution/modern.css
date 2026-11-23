@@ -359,6 +359,7 @@
 .interest-option { display: flex; align-items: center; gap: 7px; color: #354e42; font-size: 11px; cursor: pointer; }
 .preference-submit { min-height: 34px; padding: 6px 10px; font-size: 11px; }
 .preferences-note { margin: 9px 0 0; color: #738078; font-size: 10px; }
+.preferences-feedback { margin: 10px 0 0; padding: 8px 9px; border: 1px solid #bad6c2; border-radius: 6px; color: #204f3c; background: #e4f2e9; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
 .rail-plan-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .rail-plan-heading h3 { margin-bottom: 0; }
 .rail-plan-heading [data-plan-count] { color: #496258; font-size: 10px; text-align: right; }
