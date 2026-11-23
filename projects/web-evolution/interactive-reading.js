@@ -119,7 +119,9 @@
     }
   }
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&pinned){event.preventDefault();hideBubble(true);}
+    if(event.key!=='Escape')return;
+    if(active){event.preventDefault();hideBubble(pinned);return;}
+    if(detail?.open){event.preventDefault();closeDetail();}
   });
   window.addEventListener('scroll',()=>{
     if(!pinned)hideBubble();
