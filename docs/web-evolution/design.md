@@ -106,3 +106,34 @@ Moonstream의 포토스트림은 2005년 네게브의 망원경 세팅과 여러
 - [Anthropic의 Claude Design 데모에 나온 한 자리 상태 표시](https://www.youtube.com/watch?v=t_LBECIQQqs&t=42s)
 
 월식과 Pacebook 사진의 촬영자 및 라이선스는 작품 화면과 출처 목록에 기록한다. 토성 픽셀 아트와 노스리지 천문대 표지는 전시용 이미지다. [월식 사진 출처](../../projects/web-evolution/media/PHOTO-CREDITS.md) · [Pacebook 사진 출처](../../projects/web-evolution/media/pacebook/CREDITS.md)
+
+
+## Interactive Reading Experience · 2026-11-23
+
+The article remains the primary explanation. Reading aids are deliberately limited and must not replace original prose, the existing 12 explanatory plates/steps, or any of the seven era exhibits. This implementation follows the final editorial review rather than applying the full 36-entry research glossary.
+
+### Content scope
+
+- Corrected Flickr's tag introduction to 2004, distinguishing its later 2005-era exhibit; GeoCities's 1994 precursor from its 1995 name; and CERN's 1993 public-domain release of core web software. The ACTION approval example is explicitly a static illustration rather than an interactive reservation.
+- Inline descriptions: 16 first-use terms, at most two per paragraph (CERN, hypertext, Mosaic; GeoCities, WebRing, PageRank; Web 2.0, AJAX; Common Crawl, dataset, language model, token, model weights, pretraining; SGE, AI agent).
+- Added 12 deliberate short bold emphases and 12 primary-source inline links; the existing chapter-indexed sources remain available.
+- The new PageRank graphic is an original, explicitly conceptual SVG. It explains inbound links and link relationships; it is not an actual search-engine result or mathematical ranking. No third-party screenshots or unverified image rights were introduced.
+- Prologue, epilogue, existing 1993–2026 experiences, and existing stories/scrolling plates keep their structure.
+
+### Interaction behavior
+
+- A glossary word is an accessible inline button: transient preview on mouse hover or keyboard focus; click/touch to pin; click the trigger again, click outside, close button, or Escape to dismiss. Descriptions stay in a single reusable surface, avoiding overlays on every word. On narrow screens, this surface appears as a small bottom popover.
+- The PageRank diagram is present in the article without JavaScript. With JavaScript it also offers a larger detailed panel. At >=1800px wide and >=740px high it is non-modal; elsewhere it is a native modal dialog; on phone widths it becomes a bottom sheet. The initiating control receives focus again after closing. It cannot alter the chapter hash or scroll Y.
+- The existing header H shortcut and `editorial-scenes.js` remain untouched. Popovers and details close on history navigation and when leaving the article for an exhibit. The native dialog handles Escape; reduced-motion settings and focus-visible indications are supported.
+- If JavaScript is disabled, all explanatory prose and the PageRank diagram remain visible. Tooltip words revert to normal text appearance; the disabled enhancement button stays hidden.
+- Do not promote these styles to repository-wide conventions; the assets are local to `projects/web-evolution/`.
+
+### Verification contract
+
+1. Run `node --check projects/web-evolution/interactive-reading.js` and `node --test tests/web-evolution-reading.test.mjs`.
+2. Run `npm run lint`, `npm test`, `npm run build:pages` as CI supports.
+3. In a browser, test 360, 390, 768, 1159, 1160, 1280, 1440, and 1920px widths, varying height 719↔720px. Check body overflow, popover positioning, drawer/side-panel behavior, focus/scroll recovery, Escape, outside click, and no-JS.
+4. Re-test the existing `role-scene` and `learning-scene` step navigation across the sticky breakpoint, article hash navigation, `?era=1993&from=connection`, all seven era exhibits, back/forward, and H.
+5. After integration, verify GitHub Pages deploy is for the intended `main` SHA and that `/build-canvas/web-evolution/` serves the new JS/CSS assets.
+
+The original main-article width and history routing must remain unchanged. Do not claim visual browser tests pass unless they were actually executed.
