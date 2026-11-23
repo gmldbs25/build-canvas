@@ -572,6 +572,21 @@ function isModifiedClick(event) {
 }
 
 document.addEventListener('click', (event) => {
+  const chapterLink = event.target.closest('.cover-read[href^="#"], .editorial-index a[href^="#"]');
+  if (chapterLink && !event.defaultPrevented && !isModifiedClick(event) && !reducedMotion.matches) {
+    const chapter = document.getElementById(chapterLink.hash.slice(1));
+    if (chapter) {
+      event.preventDefault();
+      if (window.location.hash !== chapterLink.hash) window.history.pushState(null, '', chapterLink.hash);
+      const heading = chapter.querySelector('h2');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
+      chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+  }
   const returnLink = event.target.closest('#article-return');
   if (returnLink && !isModifiedClick(event)) {
     event.preventDefault();
