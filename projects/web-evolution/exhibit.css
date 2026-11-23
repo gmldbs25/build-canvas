@@ -279,6 +279,7 @@ body { display: block; height: auto; background: #10151b; }
   #exhibit-view[data-sidebar="collapsed"] .timeline-track::before { left: 3px; right: 3px; }
   #exhibit-view[data-sidebar="collapsed"] .sidebar-footer { padding: 8px 4px 12px; gap: 7px; }
   #exhibit-view[data-sidebar="collapsed"] .sidebar-language { justify-items: center; }
+  #exhibit-view[data-sidebar="collapsed"] .language-popover { left: calc(100% + 7px); right: auto; }
   #exhibit-view[data-sidebar="collapsed"] .sidebar-language-label,
   #exhibit-view[data-sidebar="collapsed"] .sidebar-language-options { display: none; }
   #exhibit-view[data-sidebar="collapsed"] .language-compact { display: flex; }
