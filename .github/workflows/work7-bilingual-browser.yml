@@ -1,0 +1,33 @@
+name: Work 7 bilingual browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/web-evolution/**'
+      - 'tests/web-evolution-browser.mjs'
+      - '.github/workflows/work7-bilingual-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bilingual-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: chmod +x scripts/*.sh projects/orca/scripts/*.sh projects/transformer-to-agent/scripts/*.sh
+      - run: npm run build:pages
+      - name: Install browser runner
+        run: |
+          npm install --no-save --package-lock=false playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Test EN/KR interactions across nine viewports
+        run: node tests/web-evolution-browser.mjs
