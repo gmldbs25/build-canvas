@@ -50,6 +50,18 @@ jobs:
           node --check projects/web-evolution/main.js
           node --test tests/web-evolution-workspace.test.mjs
 
+      - name: Verify Work 7 bilingual system
+        run: |
+          node --check projects/web-evolution/i18n.js
+          node --check projects/web-evolution/modern.js
+          node --check projects/web-evolution/classic-search.js
+          node --check projects/web-evolution/pacebook.js
+          node --check projects/web-evolution/photo.js
+          node --check projects/web-evolution/poster.js
+          node --check projects/web-evolution/agent-report.js
+          node --check projects/web-evolution/monitor.js
+          node --test tests/web-evolution-i18n.test.mjs
+
       - name: Build portfolio
         run: npm run build:pages
 

@@ -856,5 +856,5 @@ syncSidebarLayout();
 const initial = route();
 articleContext = initial.articleContext;
 if (initial.intro) showIntro({ anchor: initial.from, scrollY: initial.articleContext?.scrollY });
-syncLanguageUI();
 else selectEra(initial.era, initial.page);
+syncLanguageUI();
