@@ -291,5 +291,25 @@ export const refinedMorePairs = [
   [
     "Open the real reference",
     "실제 참고 자료 열기"
+  ],
+  [
+    " — mission news and pictures from space",
+    " — 우주 임무 소식과 사진"
+  ],
+  [
+    "← Return to Pacebook",
+    "← Pacebook으로 돌아가기"
+  ],
+  [
+    "Find the next Observing Night →",
+    "다음 관측회 찾아보기 →"
+  ],
+  [
+    "NASA Astronomy Picture of the Day archive",
+    "NASA 오늘의 천문 사진 자료실"
+  ],
+  [
+    "All changes saved",
+    "모든 변경 사항 저장됨"
   ]
 ];

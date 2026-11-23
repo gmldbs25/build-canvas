@@ -15,6 +15,7 @@ test('seven eras have bilingual route labels and stable nontranslatable names',(
   assert.equal(message('era.1998.pages.home.title','en'),'The Orbit Room');
   assert.equal(translateText('Search results','ko'),'검색 결과');
   assert.equal(translateText('Return to the ', 'ko'),'다음 페이지로 돌아갑니다: ');
+  assert.equal(translateText('관측회 예시 질문은 전시 자료를 사용하고, 다른 천문 검색어는 NASA와 Spaceflight News의 공개 검색 API를 조회합니다.','ko'),'관측회 예시 질문은 전시 자료를 사용하고, 다른 천문 검색어는 NASA와 Spaceflight News의 공개 검색 API를 조회합니다.');
 });
 test('locale selection cannot call a page renderer or change the browser route',()=>{
   const source=readFileSync(new URL('../projects/web-evolution/main.js',import.meta.url),'utf8');
