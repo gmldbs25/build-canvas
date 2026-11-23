@@ -238,7 +238,7 @@ export function createMonitor() {
       running = false;
       refreshButton.removeAttribute('aria-disabled');
       panel.dataset.monitorState = completed === jobs.length ? 'complete' : completed ? 'partial' : 'unavailable';
-      if(completed===jobs.length){delete status.dataset.i18nMessage;delete status.dataset.i18nParams;status.textContent=getLocale()==='ko'?'출처 확인이 완료됐습니다.':'Source check complete.';}
+      if(completed===jobs.length)bindMessage(status,'monitor.complete');
       else bindMessage(status,'monitor.partial',{done:completed,count:jobs.length});
       report.write(checked, jobs.length, reducedMotion);
     }

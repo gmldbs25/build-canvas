@@ -420,6 +420,233 @@ export const richMessages={
         "연구 자료실"
       ]
     ]
+  },
+  "98.home.discovery": {
+    "en": [
+      "My pages: ",
+      " · ",
+      " · ",
+      ""
+    ],
+    "ko": [
+      "내 페이지: ",
+      " · ",
+      " · ",
+      ""
+    ],
+    "labels": [
+      [
+        "how I made this",
+        "홈페이지 제작기"
+      ],
+      [
+        "North Star WebRing",
+        "North Star WebRing"
+      ],
+      [
+        "Sign my Guestbook",
+        "방명록에 글 남기기"
+      ]
+    ]
+  },
+  "98.home.footer": {
+    "en": [
+      "You are visiting my GeoCities-style Area51 home ",
+      " Thanks for stopping by!"
+    ],
+    "ko": [
+      "GeoCities 스타일의 Area51 홈페이지를 방문했군요. ",
+      " 들러줘서 고마워요!"
+    ],
+    "labels": [
+      null
+    ]
+  },
+  "98.links.nasa": {
+    "en": [
+      "",
+      " — mission news and pictures from space"
+    ],
+    "ko": [
+      "",
+      " — 우주 임무 소식과 사진"
+    ],
+    "labels": [
+      null
+    ]
+  },
+  "98.links.apod": {
+    "en": [
+      "",
+      " — one picture every day"
+    ],
+    "ko": [
+      "",
+      " — 매일 한 장의 천문 사진"
+    ],
+    "labels": [
+      null
+    ]
+  },
+  "98.links.cafe": {
+    "en": [
+      "",
+      " — friendly answers to astronomy questions"
+    ],
+    "ko": [
+      "",
+      " — 천문학 질문에 대한 친절한 답변"
+    ],
+    "labels": [
+      null
+    ]
+  },
+  "98.links.footer": {
+    "en": [
+      "I check these links from my bookmarks. ",
+      " Found another good one? ",
+      "."
+    ],
+    "ko": [
+      "나는 이 링크들을 즐겨찾기로 모아두고 자주 방문해. ",
+      " 좋은 사이트를 더 발견했다면 ",
+      "!"
+    ],
+    "labels": [
+      null,
+      [
+        "sign my guestbook",
+        "방명록에 남겨줘"
+      ]
+    ]
+  },
+  "98.html.guestbook": {
+    "en": [
+      "This is the link I use to open the ",
+      "."
+    ],
+    "ko": [
+      "이 링크를 누르면 ",
+      "이 열려."
+    ],
+    "labels": [
+      [
+        "guestbook page",
+        "방명록"
+      ]
+    ]
+  },
+  "98.html.saturn": {
+    "en": [
+      "Still learning: my tiny Saturn picture took me two tries to center. The ",
+      " has more homemade pages. ",
+      "."
+    ],
+    "ko": [
+      "아직 배우는 중이라 작은 토성 사진을 가운데에 놓는 데 두 번이나 시도했어. ",
+      "에는 직접 만든 홈페이지가 더 많아. ",
+      "!"
+    ],
+    "labels": [
+      [
+        "North Star WebRing",
+        "North Star WebRing"
+      ],
+      [
+        "Back to my homepage",
+        "홈페이지로 돌아가기"
+      ]
+    ]
+  },
+  "98.webring.footer": {
+    "en": [
+      "The ring members are fictional neighbors made for this exhibit. ",
+      "."
+    ],
+    "ko": [
+      "웹링 회원들은 이 전시를 위해 만든 가상의 이웃들이야. ",
+      "!"
+    ],
+    "labels": [
+      [
+        "Return to The Orbit Room",
+        "The Orbit Room으로 돌아가기"
+      ]
+    ]
+  },
+  "98.mina.nav": {
+    "en": [
+      "Previous member: ",
+      " · ",
+      " · Next member: ",
+      "."
+    ],
+    "ko": [
+      "이전 회원: ",
+      " · ",
+      " · 다음 회원: ",
+      "."
+    ],
+    "labels": [
+      [
+        "The Orbit Room",
+        "The Orbit Room"
+      ],
+      [
+        "Back to North Star WebRing",
+        "North Star WebRing으로 돌아가기"
+      ],
+      [
+        "Orion’s Backyard Observatory",
+        "Orion의 뒷마당 관측소"
+      ]
+    ]
+  },
+  "98.orion.nav": {
+    "en": [
+      "Previous member: ",
+      " · ",
+      " · ",
+      "."
+    ],
+    "ko": [
+      "이전 회원: ",
+      " · ",
+      " · ",
+      "."
+    ],
+    "labels": [
+      [
+        "North Star WebRing",
+        "North Star WebRing"
+      ],
+      [
+        "The Orbit Room",
+        "The Orbit Room"
+      ],
+      [
+        "Mina’s Moon Pages",
+        "Mina의 달 이야기"
+      ]
+    ]
+  },
+  "98.mina.footer": {
+    "en": [
+      "This is a fictional neighborhood homepage in the exhibit. Last updated 10/31/98."
+    ],
+    "ko": [
+      "전시를 위해 만든 가상의 이웃 홈페이지야. 마지막 업데이트: 1998년 10월 31일."
+    ],
+    "labels": []
+  },
+  "98.orion.footer": {
+    "en": [
+      "This is a fictional neighborhood homepage in the exhibit. Web page updated 11/18/98."
+    ],
+    "ko": [
+      "전시를 위해 만든 가상의 이웃 홈페이지야. 업데이트: 1998년 11월 18일."
+    ],
+    "labels": []
   }
 };
 export const runtimeMessages={
@@ -446,6 +673,7 @@ export const runtimeMessages={
  'monitor.estimate':['Model estimate for','모델 예측 기준'],
  'monitor.forecastBy':['Forecast data by','예보 데이터 제공:'],
  'monitor.checked':['Checked','확인됨'],
+ 'monitor.complete':['Source check complete.','출처 확인이 완료됐습니다.'],
  'monitor.checkingLabel':['Checking','확인 중'],
  'monitor.timedOut':['Timed out','시간 초과'],
  'monitor.unavailableLabel':['Unavailable','이용 불가']

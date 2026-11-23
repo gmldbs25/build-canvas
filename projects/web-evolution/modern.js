@@ -377,10 +377,19 @@ function agentNotice(state){
   if(!agentNoteCodes.has(code))return null;
   const region=regions[state.region];
   const day=agentDay(state),event=officialEvent(state);
-  const locale=getLocale();
-  const dateFmt=new Intl.DateTimeFormat(locale==='ko'?'ko-KR':'en-US',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
-  const eventTime=event.time;
-  const params={region:region.label,date:dateFmt.format(day.date),forecast:translateText(region.forecasts[state.dayOffset%3],locale),iss:region.issTimes[state.dayOffset%3],eventDate:dateFmt.format(new Date(event.dateIso+'T20:00:00Z')),eventTime};
+  const dateFmtEn=new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
+  const dateFmtKo=new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
+  const eventInstant=new Date(event.dateIso+'T20:00:00Z');
+  const slot=state.dayOffset%3;
+  const koreanTime=value=>String(value).replace(/(\d{1,2}):(\d{2})\s*p\.m\./g,(_m,h,minutes)=>'오후 '+h+'시 '+Number(minutes)+'분');
+  const params={
+    region:region.label,
+    dateEn:dateFmtEn.format(day.date),dateKo:dateFmtKo.format(day.date),
+    forecastEn:region.forecasts[slot],forecastKo:translateText(region.forecasts[slot],'ko'),
+    issEn:region.issTimes[slot],issKo:koreanTime(region.issTimes[slot]),
+    eventDateEn:dateFmtEn.format(eventInstant),eventDateKo:dateFmtKo.format(eventInstant),
+    eventTimeEn:event.time,eventTimeKo:koreanTime(event.time)
+  };
   return {key:'agent.note.'+code,params};
 }
 function setAgentNotice(state,code){state.updateCode=code;state.updateNote='';}

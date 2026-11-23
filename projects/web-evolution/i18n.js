@@ -27,7 +27,10 @@ export function message(key,lang=locale){const pair=messages[key];return pair?pa
 export function getSceneText(era,kind,original,lang=locale){return lang==='en'?(sceneEnglish[String(era)]?.[kind]||original):original}
 export function formatMessage(key,params={},lang=locale){
  const pair=runtimeMessages[key]||messages[key];if(!pair)return key;
- return pair[lang==='ko'?1:0].replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(full,name)=>Object.hasOwn(params,name)?String(params[name]):full);
+ return pair[lang==='ko'?1:0].replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(full,name)=>{
+ const specific=name+(lang==='ko'?'Ko':'En');
+ return Object.hasOwn(params,specific)?String(params[specific]):Object.hasOwn(params,name)?String(params[name]):full;
+});
 }
 export function bindMessage(node,key,params={}){node.dataset.i18nMessage=key;node.dataset.i18nParams=JSON.stringify(params);node.textContent=(node.dataset.i18nPrefix||'')+formatMessage(key,params);return node;}
 export function translateText(value,lang=locale){

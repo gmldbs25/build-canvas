@@ -213,9 +213,9 @@ export function orbitPage(page) {
       ${nav}
       <p class="orbit-badges"><a class="orbit-badge" href="?era=1998&amp;page=html" data-page="html">BEST VIEWED<br>800 × 600</a> <a class="orbit-badge orbit-badge-green" href="?era=1998&amp;page=webring" data-page="webring">AREA51<br>MEMBER</a> <a class="orbit-badge orbit-badge-gold" href="?era=1998&amp;page=links" data-page="links">MOON<br>WATCHER</a></p>
       <div class="visitor"><span>Visitor number</span> <strong>001287</strong></div>
-      <p class="orbit-discovery">My pages: ${link(1998, 'html', 'how I made this')} · ${link(1998, 'webring', 'North Star WebRing')} · ${link(1998, 'guestbook', 'Sign my Guestbook')}</p>
+      <p class="orbit-discovery" data-i18n-rich="98.home.discovery">My pages: ${link(1998, 'html', 'how I made this')} · ${link(1998, 'webring', 'North Star WebRing')} · ${link(1998, 'guestbook', 'Sign my Guestbook')}</p>
       <p class="orbit-update"><strong>Updated 11/21/98:</strong> I added tonight’s moon notes and fixed two links.</p>
-      <p class="orbit-footer">You are visiting my GeoCities-style Area51 home <span aria-hidden="true">★</span> Thanks for stopping by!</p>`,
+      <p class="orbit-footer" data-i18n-rich="98.home.footer">You are visiting my GeoCities-style Area51 home <span aria-hidden="true">★</span> Thanks for stopping by!</p>`,
     guestbook: `
       <h2><small>THE ORBIT ROOM</small>Guestbook</h2>
       ${nav}
@@ -230,44 +230,44 @@ export function orbitPage(page) {
       <h2><small>THE ORBIT ROOM</small>Space Links</h2>
       ${nav}
       <ul class="orbit-links">
-        <li><a href="https://www.nasa.gov/" target="_blank" rel="noopener">NASA</a> — mission news and pictures from space</li>
-        <li><a href="https://apod.nasa.gov/apod/archivepix.html" target="_blank" rel="noopener">Astronomy Picture of the Day</a> — one picture every day</li>
-        <li><a href="https://www.theastronomycafe.net/" target="_blank" rel="noopener">The Astronomy Cafe</a> — friendly answers to astronomy questions</li>
+        <li data-i18n-rich="98.links.nasa"><a href="https://www.nasa.gov/" target="_blank" rel="noopener">NASA</a> — mission news and pictures from space</li>
+        <li data-i18n-rich="98.links.apod"><a href="https://apod.nasa.gov/apod/archivepix.html" target="_blank" rel="noopener">Astronomy Picture of the Day</a> — one picture every day</li>
+        <li data-i18n-rich="98.links.cafe"><a href="https://www.theastronomycafe.net/" target="_blank" rel="noopener">The Astronomy Cafe</a> — friendly answers to astronomy questions</li>
         <li>${link(1998, 'guestbook', 'Know a good site? Tell me in the guestbook!')}</li>
       </ul>
-      <p class="orbit-footer">I check these links from my bookmarks. <span>✦</span> Found another good one? ${link(1998, 'guestbook', 'sign my guestbook')}.</p>`,
+      <p class="orbit-footer" data-i18n-rich="98.links.footer">I check these links from my bookmarks. <span>✦</span> Found another good one? ${link(1998, 'guestbook', 'sign my guestbook')}.</p>`,
     html: `
       <h2><small>THE ORBIT ROOM</small>How I made this page</h2>
       ${nav}
       <p>I write plain HTML in a text editor and upload the file to my GeoCities directory. Here are a few bits I use. When I change a color or picture, I save the file and reload the page to see how it looks.</p>
-      <h3>Make a link</h3><pre>&lt;a href="guestbook.html"&gt;Sign my guestbook&lt;/a&gt;</pre><p>This is the link I use to open the ${link(1998, 'guestbook', 'guestbook page')}.</p>
+      <h3>Make a link</h3><pre>&lt;a href="guestbook.html"&gt;Sign my guestbook&lt;/a&gt;</pre><p data-i18n-rich="98.html.guestbook">This is the link I use to open the ${link(1998, 'guestbook', 'guestbook page')}.</p>
       <h3>Put words in a simple table</h3><pre>&lt;table border="1"&gt;
   &lt;tr&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th&gt;Object&lt;/th&gt;&lt;/tr&gt;
   &lt;tr&gt;&lt;td&gt;11/21/98&lt;/td&gt;&lt;td&gt;The Moon&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;</pre>
       <h3>Keep a page list</h3><ul><li>Home — who I am and tonight’s note</li><li>Space links — pages I like</li><li>Guestbook — leave a message</li></ul>
-      <p>Still learning: my tiny Saturn picture took me two tries to center. The ${link(1998, 'webring', 'North Star WebRing')} has more homemade pages. ${link(1998, 'home', 'Back to my homepage')}.</p>`,
+      <p data-i18n-rich="98.html.saturn">Still learning: my tiny Saturn picture took me two tries to center. The ${link(1998, 'webring', 'North Star WebRing')} has more homemade pages. ${link(1998, 'home', 'Back to my homepage')}.</p>`,
     webring: `
       <h2><small>HOMEPAGES THAT LOOK UP</small>North Star WebRing</h2>
       ${nav}
       <p>A webring is a hand-kept loop of hobby pages. Click around and meet other people who watch the sky from home.</p>
       <div class="orbit-ring"><a href="?era=1998&amp;page=mina" data-page="mina">◀ Previous page: Mina’s Moon Pages</a><span>North Star WebRing · member page 7</span><a href="?era=1998&amp;page=orion" data-page="orion">Next page: Orion’s Backyard Observatory ▶</a></div>
       <h3>More pages from this neighborhood</h3><ul class="orbit-links"><li>${link(1998, 'links', 'Alex’s favorite space links')}</li><li>${link(1998, 'html', 'Alex’s HTML notebook')}</li><li>${link(1998, 'guestbook', 'Leave Alex a note')}</li></ul>
-      <p class="orbit-footer">The ring members are fictional neighbors made for this exhibit. ${link(1998, 'home', 'Return to The Orbit Room')}.</p>`,
+      <p class="orbit-footer" data-i18n-rich="98.webring.footer">The ring members are fictional neighbors made for this exhibit. ${link(1998, 'home', 'Return to The Orbit Room')}.</p>`,
     mina: `
       <h2><small>NORTH STAR WEBRING · MEMBER 6</small>Mina’s Moon Pages</h2>
       ${nav}
       <p>Hello from Mina in Cedar Falls! I started this page after a school astronomy night. My little 76 mm reflector is wobbly, but it shows the Moon’s bright craters beautifully when the air settles.</p>
       <div class="orbit-diary"><strong>Notebook · 10/31/98</strong><p>Found the Moon between clouds just before supper. Copernicus looked like a bright ring. I drew it in my spiral notebook and added a pencil sketch to the page last weekend.</p></div>
-      <p>Previous member: ${link(1998, 'home', 'The Orbit Room')} · ${link(1998, 'webring', 'Back to North Star WebRing')} · Next member: ${link(1998, 'orion', 'Orion’s Backyard Observatory')}.</p>
-      <p class="orbit-footer">This is a fictional neighborhood homepage in the exhibit. Last updated 10/31/98.</p>`,
+      <p data-i18n-rich="98.mina.nav">Previous member: ${link(1998, 'home', 'The Orbit Room')} · ${link(1998, 'webring', 'Back to North Star WebRing')} · Next member: ${link(1998, 'orion', 'Orion’s Backyard Observatory')}.</p>
+      <p class="orbit-footer" data-i18n-rich="98.mina.footer">This is a fictional neighborhood homepage in the exhibit. Last updated 10/31/98.</p>`,
     orion: `
       <h2><small>NORTH STAR WEBRING · MEMBER 8</small>Orion’s Backyard Observatory</h2>
       ${nav}
       <p>Welcome! I’m Chris. My dad and I set up the telescope on the garage roof when the weather cooperates. This page is my list of things I can find without a computer.</p>
       <h3>My fall list</h3><ol><li>Find the Moon’s terminator.</li><li>Sketch Saturn’s rings.</li><li>Compare notes with other backyard observers.</li></ol>
-      <p>Previous member: ${link(1998, 'webring', 'North Star WebRing')} · ${link(1998, 'home', 'The Orbit Room')} · ${link(1998, 'mina', 'Mina’s Moon Pages')}.</p>
-      <p class="orbit-footer">This is a fictional neighborhood homepage in the exhibit. Web page updated 11/18/98.</p>`,
+      <p data-i18n-rich="98.orion.nav">Previous member: ${link(1998, 'webring', 'North Star WebRing')} · ${link(1998, 'home', 'The Orbit Room')} · ${link(1998, 'mina', 'Mina’s Moon Pages')}.</p>
+      <p class="orbit-footer" data-i18n-rich="98.orion.footer">This is a fictional neighborhood homepage in the exhibit. Web page updated 11/18/98.</p>`,
   };
   return `<article class="orbit-page">${pages[page] || pages.home}</article>`;
 }
