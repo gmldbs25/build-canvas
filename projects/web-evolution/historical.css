@@ -48,7 +48,7 @@
   width: fit-content; max-width: 100%; margin: 8px auto; padding: 8px;
   overflow: auto; border: 1px inset #8b74b5; background: #100d34; color: #f4e8ff; text-align: left;
 }
-@media (max-width: 600px) {
+@container exhibit-page (max-width: 600px) {
   .orbit-ring { grid-template-columns: minmax(0, 1fr); text-align: left; }
   .orbit-ring a:first-child, .orbit-ring a:last-child { text-align: left; }
 }
@@ -129,16 +129,16 @@
 .upload-form > button { justify-self: start; padding: 6px 10px; border: 1px solid #a44d25; border-radius: 3px; color: white; background: #d36a32; }
 .upload-feedback { min-height: 16px; margin: 0; color: #3f734d; font-size: 12px; }
 .empty-favorites { padding: 18px; background: #e8edec; color: #64747a; }
-@media (min-width: 1000px) {
+@container exhibit-page (min-width: 1000px) {
   .moon-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; }
   .moon-card img { height: clamp(110px, 13vw, 150px); aspect-ratio: auto; }
 }
-@media (max-width: 650px) {
+@container exhibit-page (max-width: 650px) {
   .moon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-detail-grid { grid-template-columns: minmax(0, 1fr); }
   .moon-heading { align-items: start; }
 }
-@media (max-width: 420px) {
+@container exhibit-page (max-width: 420px) {
   .photo-page { padding: 15px; }
   .moon-grid { grid-template-columns: minmax(0, 1fr); }
   .photo-community-head { align-items: start; }
