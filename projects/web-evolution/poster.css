@@ -52,14 +52,14 @@
 .poster-next-scene { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin: 0 clamp(12px, 2vw, 22px); padding: 11px 13px; border: 1px solid #b6c4ce; border-radius: 4px; color: #586c7b; background: #eef2f5; font-size: 11px; }
 .poster-next-scene a { color: #1e5e8a; font-weight: bold; text-decoration: none; }
 .poster-next-scene a:hover { text-decoration: underline; }
-@media (max-width: 700px) {
+@container exhibit-page (max-width: 700px) {
   .poster-editor-layout { grid-template-columns: minmax(0, 1fr); }
   .poster-preview-column { width: 100%; }
   .poster-artboard { width: min(100%, 590px); }
   .poster-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   .poster-control-set { padding: 10px; }
 }
-@media (max-width: 480px) {
+@container exhibit-page (max-width: 480px) {
   .poster-editor-header { gap: 8px; }
   .poster-editor-header h2 { font-size: 13px; }
   .poster-save-state { font-size: 9px; }
