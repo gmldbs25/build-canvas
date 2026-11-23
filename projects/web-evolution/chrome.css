@@ -69,9 +69,9 @@
 .display[data-era="2023"] .browser-tools button, .display[data-era="2026"] .browser-tools button { padding: 4px 7px; border: 0; border-radius: 50%; background: transparent; color: #465363; font-size: 16px; }
 .display[data-era="2023"] .tool-label, .display[data-era="2026"] .tool-label { display: none; }
 .display[data-era="2023"] .browser-status, .display[data-era="2026"] .browser-status { padding: 4px 12px; color: #4b5867; background: #eef1f4; border-top: 1px solid #cbd2da; font-size: 11px; }
-.browser-toast { position: fixed; z-index: 30; bottom: 18px; left: 50%; width: max-content; max-width: min(520px, calc(100vw - 24px)); transform: translateX(-50%); padding: 9px 14px; border: 1px solid #48596c; border-radius: 6px; color: #f8fafc; background: #202b38; box-shadow: 0 5px 20px #0005; font: 13px/1.4 Arial, sans-serif; }
+.browser-toast { position: fixed; z-index: 30; bottom: 18px; left: var(--viewer-center-x, 50%); width: max-content; max-width: min(520px, calc(100vw - 24px)); transform: translateX(-50%); padding: 9px 14px; border: 1px solid #48596c; border-radius: 6px; color: #f8fafc; background: #202b38; box-shadow: 0 5px 20px #0005; font: 13px/1.4 Arial, sans-serif; }
 .browser-toast[hidden] { display: none; }
-.bookmark-panel { position: fixed; z-index: 29; top: 22%; right: max(12px, calc((100vw - 650px) / 2)); width: min(320px, calc(100vw - 24px)); max-height: 56vh; overflow: auto; padding: 12px; border: 1px solid #8795a5; border-radius: 5px; color: #222c38; background: #f5f7fa; box-shadow: 0 10px 35px #0006; font: 13px/1.45 Arial, sans-serif; }
+.bookmark-panel { position: fixed; z-index: 29; top: clamp(12px, 22vh, 180px); left: var(--viewer-bookmark-x, 50%); right: auto; transform: translateX(-50%); width: min(320px, calc(100vw - 24px)); max-height: 56vh; overflow: auto; padding: 12px; border: 1px solid #8795a5; border-radius: 5px; color: #222c38; background: #f5f7fa; box-shadow: 0 10px 35px #0006; font: 13px/1.45 Arial, sans-serif; }
 .bookmark-panel[hidden] { display: none; }
 .bookmark-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 7px; border-bottom: 1px solid #cbd2da; }
 .bookmark-heading h2 { margin: 0; font-size: 15px; }
