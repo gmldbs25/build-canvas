@@ -6,6 +6,8 @@ on:
     paths:
       - 'projects/web-evolution/**'
       - 'tests/web-evolution-browser.mjs'
+      - 'tests/web-evolution-quality-browser.mjs'
+      - 'tests/web-evolution-live-qa.mjs'
       - '.github/workflows/work7-bilingual-browser.yml'
   workflow_dispatch:
 
