@@ -25,6 +25,87 @@ const notesDialog = document.querySelector('#field-notes');
 const browserStates = new Map();
 const bookmarks = new Map();
 const chrome = createChrome({ root: chromeRoot, status, onAction: browserAction, onAddress: navigateAddress, onTab: switchTab });
+
+const sidebarToggle = document.querySelector('#sidebar-toggle');
+const sidebarInfoButton = document.querySelector('#sidebar-hint-open');
+const eraTimeline = document.querySelector('#era-timeline');
+const timelineTrack = eraTimeline?.querySelector('.timeline-track');
+const sidebarCompactQuery = window.matchMedia('(max-width: 999px), (max-height: 559px)');
+const sidebarDefaultExpandedQuery = window.matchMedia('(min-width: 1400px) and (min-height: 800px)');
+const sidebarStorageKey = 'build-canvas:web-evolution:sidebar';
+let sidebarPreference = null;
+let indicatorFrame = 0;
+try {
+  const savedSidebar = sessionStorage.getItem(sidebarStorageKey);
+  if (savedSidebar === 'expanded' || savedSidebar === 'collapsed') sidebarPreference = savedSidebar;
+} catch { /* Private browsing may block session storage. */ }
+
+function alignViewerOverlays() {
+  if (exhibit.hidden) return;
+  const bounds = display.getBoundingClientRect();
+  const toast = document.querySelector('#browser-toast');
+  const bookmarksPanel = document.querySelector('#bookmark-panel');
+  const center = Math.max(12, Math.min(window.innerWidth - 12, bounds.left + bounds.width / 2));
+  if (toast) toast.style.setProperty('--viewer-center-x', center + 'px');
+  if (bookmarksPanel) {
+    const panelWidth = Math.min(320, Math.max(200, bounds.width - 24), window.innerWidth - 24);
+    const left = Math.max(panelWidth / 2 + 12, Math.min(window.innerWidth - panelWidth / 2 - 12, bounds.right - panelWidth / 2 - 16));
+    bookmarksPanel.style.setProperty('--viewer-bookmark-x', left + 'px');
+  }
+}
+
+function syncActiveIndicator() {
+  indicatorFrame = 0;
+  if (!timelineTrack || exhibit.hidden) return;
+  const activeLink = timelineTrack.querySelector('a[aria-current]');
+  if (!activeLink) return;
+  timelineTrack.style.setProperty('--active-y', activeLink.offsetTop + 'px');
+  timelineTrack.style.setProperty('--active-height', activeLink.offsetHeight + 'px');
+  timelineTrack.style.setProperty('--active-x', activeLink.offsetLeft + 'px');
+  timelineTrack.style.setProperty('--active-width', activeLink.offsetWidth + 'px');
+  timelineTrack.dataset.indicatorReady = 'true';
+}
+
+function scheduleActiveIndicator() {
+  if (indicatorFrame) return;
+  indicatorFrame = requestAnimationFrame(syncActiveIndicator);
+}
+
+function syncSidebarLayout() {
+  const mode = sidebarPreference || (sidebarDefaultExpandedQuery.matches ? 'expanded' : 'collapsed');
+  exhibit.dataset.sidebar = mode;
+  if (sidebarToggle) {
+    const expanded = mode === 'expanded';
+    sidebarToggle.setAttribute('aria-expanded', String(expanded));
+    sidebarToggle.setAttribute('aria-label', expanded ? '시대 사이드바 접기' : '시대 사이드바 펼치기');
+    sidebarToggle.title = expanded ? '시대 사이드바 접기' : '시대 사이드바 펼치기';
+  }
+  scheduleActiveIndicator();
+  requestAnimationFrame(alignViewerOverlays);
+}
+
+function chooseSidebarMode(mode) {
+  sidebarPreference = mode;
+  try { sessionStorage.setItem(sidebarStorageKey, mode); } catch { /* UI state remains usable in memory. */ }
+  syncSidebarLayout();
+}
+
+sidebarToggle?.addEventListener('click', () => {
+  chooseSidebarMode(exhibit.dataset.sidebar === 'expanded' ? 'collapsed' : 'expanded');
+});
+sidebarInfoButton?.addEventListener('click', () => chooseSidebarMode('expanded'));
+window.addEventListener('resize', () => {
+  if (sidebarCompactQuery.matches && document.activeElement === sidebarToggle) {
+    timelineTrack?.querySelector('a[aria-current]')?.focus({ preventScroll: true });
+  }
+  syncSidebarLayout();
+});
+if (typeof ResizeObserver === 'function' && timelineTrack) {
+  const observer = new ResizeObserver(scheduleActiveIndicator);
+  observer.observe(timelineTrack);
+}
+window.addEventListener('load', scheduleActiveIndicator);
+
 let era;
 let trail;
 let browserState;
@@ -105,6 +186,8 @@ function showExhibit() {
   document.body.dataset.view = 'exhibit';
   const returnLink = document.querySelector('#article-return');
   if (returnLink) returnLink.href = `./#${encodeURIComponent(articleContext?.from || 'prologue')}`;
+  scheduleActiveIndicator();
+  requestAnimationFrame(alignViewerOverlays);
 }
 
 function currentTab() {
@@ -329,6 +412,7 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
   const hint = document.querySelector('#scene-hint');
   if (hint) hint.textContent = eras[era].hint || 'Explore the page links and browser menus in this scene.';
   showExhibit();
+  scheduleActiveIndicator();
   renderPage();
   if (fromIntroControl) exhibit.querySelector('.timeline a[aria-current]').focus({ preventScroll: true });
   if ((entering || changingEra) && !reducedMotion.matches && typeof stage.animate === 'function') {
@@ -458,6 +542,7 @@ function showToast(message) {
   }
   toast.textContent = message;
   toast.hidden = false;
+  alignViewerOverlays();
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(() => { toast.hidden = true; }, 2600);
 }
@@ -492,6 +577,7 @@ function showBookmarks() {
     }
   }
   panel.hidden = false;
+  alignViewerOverlays();
   panel.querySelector('.bookmark-list button')?.focus();
 }
 
@@ -663,6 +749,7 @@ document.querySelector('#intro-link')?.addEventListener('click', (event) => {
   showIntro({ anchor: from, scrollY: articleContext?.scrollY });
   intro.querySelector('.cover-start').focus({ preventScroll: true });
 });
+syncSidebarLayout();
 const initial = route();
 articleContext = initial.articleContext;
 if (initial.intro) showIntro({ anchor: initial.from, scrollY: initial.articleContext?.scrollY });
