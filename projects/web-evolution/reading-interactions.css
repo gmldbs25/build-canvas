@@ -58,6 +58,9 @@
 .reading-pagerank h3 { margin: 0 0 8px; font: 650 clamp(19px, 2vw, 23px)/1.4 system-ui, sans-serif; }
 .reading-pagerank > p { margin: 0 0 8px; color: #c9d5dd; font: 400 15px/1.7 system-ui, sans-serif; }
 .reading-pagerank svg, .reading-detail svg { display: block; width: 100%; height: auto; }
+.reading-pagerank .pagerank-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.reading-pagerank .pagerank-scroll:focus-visible { outline: 2px solid #e9ce99; outline-offset: 3px; }
+.reading-detail [data-reading-diagram] { overflow-x: auto; overscroll-behavior-x: contain; }
 .pagerank-surface { fill: #17232c; }
 .pagerank-edge { fill: none; stroke: #d5be8c; stroke-width: 3; }
 .pagerank-node { fill: #304555; stroke: #9db3c4; stroke-width: 2; }
@@ -85,6 +88,7 @@
 .reading-detail a { color: #c3e4fc; text-underline-offset: .2em; }
 @media (max-width: 600px) {
   .reading-tooltip { width: auto !important; max-height: min(43dvh, 290px); box-shadow: 0 6px 32px #000b; }
+  .reading-pagerank .pagerank-scroll svg, .reading-detail [data-reading-diagram] svg { min-width: 560px; }
   .reading-detail { inset: auto 0 0 0; width: 100%; max-height: 85dvh; padding: 18px; border-radius: 14px 14px 0 0; }
 }
 @media (prefers-reduced-motion: reduce) {
