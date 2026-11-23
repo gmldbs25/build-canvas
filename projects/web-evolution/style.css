@@ -131,7 +131,7 @@ button:disabled { cursor: default; }
 .display[data-era="1998"] .browser-tools button:nth-last-child(-n + 2) span:first-child { color: #123878; }
 .display[data-era="1998"] .tool-label { font-size: 11px; }
 .display[data-era="1998"] .browser-tools button:last-child .tool-label { font-size: 0; }
-.display[data-era="1998"] .browser-tools button:last-child .tool-label::after { content: "Info"; font-size: 11px; }
+.display[data-era="1998"] .browser-tools button:last-child .tool-label::after { content: "ⓘ"; font-size: 11px; }
 .display[data-era="1998"] .address-row { padding: 2px 4px; }
 .display[data-era="1998"] .screen { border: 2px inset #d5d5d5; color: #fff6b0; background: #05051b; scrollbar-color: #c0c0c0 #5c65a3; }
 .display[data-era="1998"] .browser-status { padding: 2px; }

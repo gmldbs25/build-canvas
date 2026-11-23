@@ -1,4 +1,5 @@
 import { archivedPhotos, people, posts } from './pacebook-posts.js';
+import { translateText } from './i18n.js';
 
 const storageKey = 'build-canvas:pacebook';
 const posterLink = '<a href="?era=2013&amp;page=poster" data-page="poster">Fieldwork poster editor ↗</a>';
@@ -90,7 +91,7 @@ function threadSize(comments) {
 }
 
 function commentContent(comment) {
-  return `${avatar(people[comment.author], 'small')}<div class="pace-comment-copy">${profileButton(comment.author)}<p>${html(comment.text)}</p></div>`;
+  return `${avatar(people[comment.author], 'small')}<div class="pace-comment-copy">${profileButton(comment.author)}<p${comment.id?.startsWith('local-') ? ' data-no-translate' : ''}>${html(comment.text)}</p></div>`;
 }
 
 function discussionMarkup(post, state) {
@@ -121,7 +122,7 @@ function postMarkup(post, state, expanded) {
       <p><time datetime="${html(post.date)}">${post.author === 'you' ? 'Posted on this device' : dateFormat.format(new Date(post.date))}</time>${post.clock ? ` · ${post.clock}` : ''}${post.place ? ` · ${post.place}` : ''}</p></div>
       ${post.author === 'you' ? '<button class="pace-delete-action" type="button" aria-haspopup="dialog" data-pace-delete>Delete</button>' : ''}
     </header>
-    ${post.text ? `<p class="pace-post-text">${html(post.text)}</p>` : ''}
+    ${post.text ? `<p class="pace-post-text" ${post.author === 'you' ? 'data-no-translate' : ''}>${html(post.text)}</p>` : ''}
     ${picture}
     ${post.poster ? `<p class="pace-post-link">${posterLink}</p>` : ''}
     <div class="pace-post-actions">
@@ -145,7 +146,7 @@ export function createPacebook() {
     const match = query.trim().toLowerCase();
     const visible = allPosts().filter((post) =>
       (filter !== 'photo' || post.photo) && (filter !== 'mine' || post.author === 'you') &&
-      (!match || `${people[post.author].name} ${post.text} ${post.photo?.[1] || ''}`.toLowerCase().includes(match)));
+      (!match || `${people[post.author].name} ${post.text} ${translateText(post.text, 'ko')} ${post.photo?.[1] || ''}`.toLowerCase().includes(match)));
     return visible.length ? visible.map((post) => postMarkup(post, state, expanded.has(post.id))).join('')
       : '<p class="pace-empty">No posts match. Try another search or share an update.</p>';
   }

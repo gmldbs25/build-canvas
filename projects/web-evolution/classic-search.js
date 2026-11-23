@@ -1,3 +1,4 @@
+import { getLocale } from './i18n.js';
 const DEFAULT_QUERY = 'lunar eclipse';
 const LEGACY_QUERY = 'North Ridge public observing night';
 const eventDate = 'Saturday, October 13, 2001';
@@ -110,15 +111,26 @@ function internalLink(page, label, className = '') {
 }
 
 function searchForm(query, searchId = 'classic-search-query') {
+  const isDefault = searchId === 'classic-search-query' && query === DEFAULT_QUERY;
+  const shown = isDefault && getLocale() === 'ko' ? '월식' : query;
   return `<form class="classic-search-form" role="search">
     <label class="sr-only" for="${searchId}">Search the exhibit’s local Web index</label>
-    <input id="${searchId}" name="query" type="search" value="${escapeHtml(query)}" maxlength="120" autocomplete="off" required>
+    <input id="${searchId}" name="query" type="search" value="${escapeHtml(shown)}" ${isDefault ? 'data-locale-default="classic"' : ''} maxlength="120" autocomplete="off" required>
     <button type="submit">Search</button>
   </form>`;
 }
 
 function tokensFor(value) {
-  return [...new Set(value.toLowerCase().match(/[a-z0-9]+/g) || [])].filter((word) => !stopWords.has(word));
+  // Korean aliases affect matching only: stored query and stable result page IDs stay unchanged.
+  const canonical = String(value).toLowerCase()
+    .replace(/(?:부분\s*월식|개기\s*월식|월식)/g, ' lunar eclipse ')
+    .replace(/(?:노스\s*리지|노스리지)/g, ' north ridge ')
+    .replace(/(?:공개\s*관측회|관측회|관측\s*행사)/g, ' public observing night ')
+    .replace(/(?:달|달의)/g, ' moon ')
+    .replace(/(?:천문대|천문\s*동호회)/g, ' observatory astronomy club ')
+    .replace(/(?:1월|일월)/g, ' january ')
+    .replace(/(?:7월|칠월)/g, ' july ');
+  return [...new Set(canonical.match(/[a-z0-9]+/g) || [])].filter((word) => !stopWords.has(word));
 }
 
 function findResults(query) {

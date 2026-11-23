@@ -87,7 +87,7 @@ function photoTile(photo) {
   const details = [photo.place, photo.date].filter(Boolean).map(escapeHtml).join(' · ');
   const dimensions = photo.width && photo.height ? ` width="${photo.width}" height="${photo.height}"` : '';
   const image = `<img src="${photo.image}" alt="${escapeHtml(photo.alt)}"${dimensions}>`;
-  const caption = `<strong>${escapeHtml(photo.title)}</strong><span>by ${escapeHtml(photo.author)}</span><small>${details}</small>`;
+  const caption = `<span ${String(photo.id).startsWith('upload-') ? 'data-no-translate' : ''}><strong>${escapeHtml(photo.title)}</strong><span>by ${escapeHtml(photo.author)}</span><small>${details}</small></span>`;
   return photo.page
     ? photoLink(photo.page, `${image}<span class="moon-caption">${caption}</span>`, 'class="moon-card"')
     : `<figure class="moon-card">${image}<figcaption class="moon-caption">${caption}</figcaption></figure>`;

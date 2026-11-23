@@ -1,4 +1,5 @@
 import { createMonitor } from './monitor.js';
+import { getLocale } from './i18n.js';
 
 export const modernEras = {
   2023: {
@@ -47,10 +48,20 @@ export const modernEras = {
   },
 };
 
-const combinedQuestion = '노스리지 관측회는 언제 어디서 열려?';
-const timeQuestion = '이번 주 관측회는 몇 시야?';
-const placeQuestion = '관측회는 어디서 열려?';
-const defaultLiveQuestion = '제임스 웹 망원경';
+const combinedQuestion = 'When and where is the North Ridge observing night?';
+const timeQuestion = "What time is this week's observing night?";
+const placeQuestion = 'Where is the observing night held?';
+const defaultLiveQuestion = 'James Webb Space Telescope';
+const koreanQuestions = {
+  both: '노스리지 관측회는 언제 어디서 열려?',
+  time: '이번 주 관측회는 몇 시야?',
+  place: '관측회는 어디서 열려?',
+  live: '제임스 웹 우주망원경',
+};
+function exampleQuestion(kind) {
+  if (getLocale() === 'ko') return koreanQuestions[kind];
+  return kind === 'both' ? combinedQuestion : kind === 'time' ? timeQuestion : kind === 'place' ? placeQuestion : defaultLiveQuestion;
+}
 const agentStorageKey = 'build-canvas:web-evolution:agent-briefing';
 const agentInterests = [
   ['moon', 'Moon & sky'],
@@ -210,6 +221,7 @@ function liveSearchMarkup(state) {
   const progress = `<p class="live-search-status" id="live-search-status" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(state.message || 'Search live NASA and Spaceflight News sources for astronomy records.')}</p>`;
   const waiting = busy && !state.summaryStage ? `<div class="live-search-wait" aria-hidden="true"><span></span><span></span><span></span></div>` : '';
   return `<div class="live-search-results" data-live-stage="${state.status}">
+    <p class="live-source-language">External source text is shown in its original language.</p>
     ${progress}${waiting}${summary}${imageGallery}${rows}${retry}
   </div>`;
 }
@@ -248,15 +260,15 @@ function searchMarkup(page, question, topic, searchStatus, searchProgress, liveS
       </div>
       <form class="search-form">
         <label class="sr-only" for="search-question">Search the web</label>
-        <input id="search-question" name="question" type="search" value="${escapeHtml(livePage ? liveState.query || defaultLiveQuestion : landing ? defaultLiveQuestion : question)}" maxlength="160" placeholder="Try ‘James Webb telescope’ or ‘lunar eclipse’" required>
+        <input id="search-question" name="question" type="search" value="${escapeHtml(livePage ? liveState.query || exampleQuestion('live') : landing ? exampleQuestion('live') : question)}" ${landing || (livePage && !liveState.query) ? 'data-locale-default="live"' : ''} maxlength="160" placeholder="Try ‘James Webb telescope’ or ‘lunar eclipse’" required>
         <button type="submit"><span aria-hidden="true">⌕</span> Search</button>
       </form>
       <p id="search-message" class="search-message" lang="ko" role="status"></p>
       ${landing ? `<div class="search-suggestions" lang="ko"><span>예시 질문</span>
-        <button type="button" data-search="both">${combinedQuestion}</button>
-        <button type="button" data-search="time">${timeQuestion}</button>
-        <button type="button" data-search="place">${placeQuestion}</button>
-        <button type="button" data-search-query="월식">월식</button>
+        <button type="button" data-search="both">${exampleQuestion('both')}</button>
+        <button type="button" data-search="time">${exampleQuestion('time')}</button>
+        <button type="button" data-search="place">${exampleQuestion('place')}</button>
+        <button type="button" data-search-query="lunar-eclipse">${getLocale()==='ko' ? '월식' : 'lunar eclipse'}</button>
       </div><p class="search-hint" lang="ko">관측회 예시 질문은 전시 자료를 사용하고, 다른 천문 검색어는 NASA와 Spaceflight News의 공개 검색 API를 조회합니다.</p>` : `<div class="search-result-shell">
         ${livePage ? liveSearchMarkup(liveState) : `<p id="search-status" class="search-status" lang="ko" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(searchStatusMessage(searchStatus, searchProgress))}</p>
         <div class="search-output">${searchOutputMarkup(searchStatus, searchProgress, topic)}</div>`}
@@ -1095,13 +1107,13 @@ export function createModern(poster) {
       });
       for (const button of root.querySelectorAll('[data-search]')) {
         button.addEventListener('click', () => {
-          search.value = button.dataset.search === 'place' ? placeQuestion : button.dataset.search === 'both' ? combinedQuestion : timeQuestion;
+          search.value = exampleQuestion(button.dataset.search);
           form.requestSubmit();
         });
       }
       for (const button of root.querySelectorAll('[data-search-query]')) {
         button.addEventListener('click', () => {
-          search.value = button.dataset.searchQuery;
+          search.value = getLocale() === 'ko' ? '월식' : 'lunar eclipse';
           form.requestSubmit();
         });
       }

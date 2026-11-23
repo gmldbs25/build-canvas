@@ -108,9 +108,9 @@ export function createPoster() {
             </div>
             <figcaption class="poster-art-copy">
               <p class="poster-small-label">PUBLIC PROGRAM</p>
-              <h3 data-poster-title>${escapeHtml(state.title)}</h3>
-              <p class="poster-date-line"><span data-poster-date>${escapeHtml(state.date)}</span><span aria-hidden="true"> · </span><span data-poster-time>${escapeHtml(state.time)}</span></p>
-              <p class="poster-location-line" data-poster-location>${escapeHtml(state.location)}</p>
+              <h3 data-poster-title data-no-translate>${escapeHtml(state.title)}</h3>
+              <p class="poster-date-line"><span data-poster-date data-no-translate>${escapeHtml(state.date)}</span><span aria-hidden="true"> · </span><span data-poster-time data-no-translate>${escapeHtml(state.time)}</span></p>
+              <p class="poster-location-line" data-poster-location data-no-translate>${escapeHtml(state.location)}</p>
               <p class="poster-credit-line" data-poster-credit>${escapeHtml(attribution(photo || { credit: 'Photo credit unavailable', license: '' }))}</p>
             </figcaption>
           </figure>

@@ -487,6 +487,18 @@
         </div>
       </nav>
       <div class="sidebar-footer">
+        <div class="sidebar-language" role="group" aria-label="Language selection">
+          <span class="sidebar-language-label">LANGUAGE</span>
+          <div class="sidebar-language-options" role="group" aria-label="Choose exhibit language">
+            <button type="button" data-language="en" aria-pressed="true">EN</button>
+            <button type="button" data-language="ko" aria-pressed="false">한국어</button>
+          </div>
+          <button type="button" id="language-compact" class="language-compact" aria-expanded="false" aria-controls="language-popover" aria-label="Choose exhibit language" title="Language">文</button>
+          <div id="language-popover" class="language-popover" hidden>
+            <button type="button" data-language="en" aria-pressed="true">EN</button>
+            <button type="button" data-language="ko" aria-pressed="false">한국어</button>
+          </div>
+        </div>
         <div class="sidebar-hint-area">
           <p id="scene-hint" class="scene-hint" aria-live="polite"></p>
           <button id="sidebar-hint-open" class="sidebar-info-button" type="button" aria-label="시대 안내 펼치기" aria-controls="scene-hint" title="시대 안내 펼치기">i</button>

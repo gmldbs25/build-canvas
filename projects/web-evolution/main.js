@@ -5,6 +5,7 @@ import { modernEras, createModern } from './modern.js';
 import { createPacebook } from './pacebook.js';
 import { createPoster } from './poster.js';
 import { createChrome, pageAddress } from './chrome.js';
+import { getLocale, setLocale, message, getSceneText, translateText, applyLocale, subscribeLocale } from './i18n.js';
 
 const eras = { ...historicalEras, 2001: classicSearchEra, ...modernEras };
 const intro = document.querySelector('#intro-view');
@@ -28,6 +29,103 @@ const chrome = createChrome({ root: chromeRoot, status, onAction: browserAction,
 
 const sidebarToggle = document.querySelector('#sidebar-toggle');
 const sidebarInfoButton = document.querySelector('#sidebar-hint-open');
+const languagePanel = document.querySelector('.sidebar-language');
+const languageCompact = document.querySelector('#language-compact');
+const languagePopover = document.querySelector('#language-popover');
+let compositionInProgress = false;
+exhibit.addEventListener('compositionstart', () => { compositionInProgress = true; }, true);
+exhibit.addEventListener('compositionend', () => { compositionInProgress = false; }, true);
+exhibit.addEventListener('input', (event) => {
+  if (event.target.matches?.('[data-locale-default]')) event.target.dataset.userEdited = 'true';
+}, true);
+function closeLanguagePopover(restoreFocus = false) {
+  if (!languagePopover || languagePopover.hidden) return;
+  languagePopover.hidden = true;
+  languageCompact.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) languageCompact.focus({ preventScroll: true });
+}
+languagePanel?.addEventListener('click', (event) => {
+  const chosen = event.target.closest('[data-language]')?.dataset.language;
+  if (chosen) {
+    setLocale(chosen);
+    if (event.target.closest('.language-popover')) closeLanguagePopover(true);
+    return;
+  }
+  if (event.target.closest('#language-compact')) {
+    const open = languagePopover.hidden;
+    languagePopover.hidden = !open;
+    languageCompact.setAttribute('aria-expanded', String(open));
+    if (open) languagePopover.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true });
+  }
+});
+document.addEventListener('click', (event) => { if (!languagePanel?.contains(event.target)) closeLanguagePopover(); });
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !languagePopover.hidden) closeLanguagePopover(true); });
+function syncLanguageUI() {
+  const lang = getLocale(), english = lang === 'en';
+  exhibit.lang = lang;
+  for (const button of languagePanel?.querySelectorAll('[data-language]') || []) {
+    button.setAttribute('aria-pressed', String(button.dataset.language === lang));
+  }
+  const languageLabel = english ? 'Choose exhibit language' : '체험 언어 선택';
+  languagePanel?.setAttribute('aria-label', languageLabel);
+  languageCompact?.setAttribute('aria-label', languageLabel);
+  languageCompact?.setAttribute('title', languageLabel);
+  languagePanel?.querySelector('.sidebar-language-options')?.setAttribute('aria-label', languageLabel);
+  for (const link of eraTimeline?.querySelectorAll('a[data-era]') || []) {
+    const year = link.dataset.era;
+    const name = message('sidebar.era.' + year);
+    const title = link.querySelector('.era-name');
+    if (title) title.textContent = name;
+    link.setAttribute('aria-label', year + ' ' + name);
+  }
+  const expanded = exhibit.dataset.sidebar === 'expanded';
+  if (sidebarToggle) {
+    const label = message(expanded ? 'sidebar.collapse' : 'sidebar.expand');
+    sidebarToggle.setAttribute('aria-label', label);
+    sidebarToggle.title = label;
+  }
+  const info = document.querySelector('#sidebar-hint-open');
+  if (info) { info.setAttribute('aria-label', message('sidebar.info')); info.title = message('sidebar.info'); }
+  const back = document.querySelector('#article-return');
+  const home = document.querySelector('.exhibit-actions .home-link');
+  if (back) { back.querySelector('.sidebar-action-text').textContent = message('sidebar.return'); back.setAttribute('aria-label', message('sidebar.return')); }
+  if (home) { home.querySelector('.sidebar-action-text').textContent = message('sidebar.home'); home.setAttribute('aria-label', message('sidebar.home')); }
+  if (era && eras[era]) {
+    const hint = document.querySelector('#scene-hint');
+    if (hint) hint.textContent = getSceneText(era, 'hint', eras[era].hint || 'Explore the browser links and menus.', lang);
+    if (notesDialog?.open) syncNotesLanguage();
+  }
+  // Only untouched default examples change. Submitted and user-typed queries remain byte-for-byte intact.
+  if (!compositionInProgress) for (const input of exhibit.querySelectorAll('[data-locale-default]')) {
+    if (input.dataset.userEdited === 'true') continue;
+    if (input.dataset.localeDefault === 'classic') input.value = english ? 'lunar eclipse' : '월식';
+    if (input.dataset.localeDefault === 'live') input.value = english ? 'James Webb Space Telescope' : '제임스 웹 우주망원경';
+  }
+  document.querySelector('#screen').lang = lang;
+  document.querySelector('#chrome').lang = lang;
+  applyLocale(exhibit, lang);
+  if (notesDialog?.open) applyLocale(notesDialog, lang);
+  const toast = document.querySelector('#browser-toast');
+  const panel = document.querySelector('#bookmark-panel');
+  if (toast) applyLocale(toast, lang);
+  if (panel) applyLocale(panel, lang);
+}
+function syncNotesLanguage() {
+  if (!era || !eras[era]) return;
+  document.querySelector('#notes-title').textContent = era + ' · ' + eras[era].caption;
+  document.querySelector('#notes-copy').textContent = getSceneText(era, 'notes', eras[era].notes);
+  const guide = document.querySelector('#notes-guide');
+  if (guide) guide.textContent = getSceneText(era, 'hint', eras[era].hint || '');
+  document.querySelector('#notes-sources')?.setAttribute('aria-label', message('notes.sources'));
+  notesDialog.querySelector('[aria-label="자료 닫기"],[aria-label="Close exhibit notes"]')?.setAttribute('aria-label',message('notes.close'));
+  applyLocale(notesDialog);
+}
+subscribeLocale(syncLanguageUI);
+let localizationFrame = 0;
+new MutationObserver(() => {
+  if (localizationFrame) return;
+  localizationFrame = requestAnimationFrame(() => { localizationFrame = 0; applyLocale(exhibit); });
+}).observe(exhibit, { subtree: true, childList: true, characterData: true });
 const eraTimeline = document.querySelector('#era-timeline');
 const timelineTrack = eraTimeline?.querySelector('.timeline-track');
 const sidebarCompactQuery = window.matchMedia('(max-width: 999px), (max-height: 559px)');
@@ -82,6 +180,7 @@ function syncSidebarLayout() {
   }
   scheduleActiveIndicator();
   requestAnimationFrame(alignViewerOverlays);
+  syncLanguageUI();
 }
 
 function chooseSidebarMode(mode) {
@@ -230,12 +329,14 @@ function showNotes() {
     return item;
   }));
   notesDialog.showModal();
+  syncNotesLanguage();
 }
 
 function renderPage(focusPage = false) {
   cancelRedraw();
   renderChrome();
   renderPageBody(focusPage);
+  syncLanguageUI();
 }
 
 function renderPageBody(focusPage = false, preserveScroll = false) {
@@ -410,7 +511,7 @@ function selectEra(id, page = 'home', restore = false, navigate = false, tabId =
     else link.removeAttribute('aria-current');
   }
   const hint = document.querySelector('#scene-hint');
-  if (hint) hint.textContent = eras[era].hint || 'Explore the page links and browser menus in this scene.';
+  if (hint) hint.textContent = getSceneText(era, 'hint', eras[era].hint || 'Explore the page links and browser menus in this scene.');
   showExhibit();
   scheduleActiveIndicator();
   renderPage();
@@ -540,7 +641,7 @@ function showToast(message) {
     toast.setAttribute('role', 'status');
     document.body.append(toast);
   }
-  toast.textContent = message;
+  toast.textContent = translateText(message);
   toast.hidden = false;
   alignViewerOverlays();
   clearTimeout(showToast.timer);
@@ -577,6 +678,7 @@ function showBookmarks() {
     }
   }
   panel.hidden = false;
+  applyLocale(panel);
   alignViewerOverlays();
   panel.querySelector('.bookmark-list button')?.focus();
 }
@@ -630,12 +732,13 @@ function initGuestbook() {
   const form = screen.querySelector('#guestbook-form');
   const list = screen.querySelector('#guestbook-entries');
   const showEntries = () => {
-    const entries = [...guestbook, { name: 'Stargazer42', message: 'The same bright edge showed up in my binoculars. Clear skies!' }];
-    list.replaceChildren(...entries.map(({ name, message }) => {
+    const entries = [...guestbook.map((entry) => ({ ...entry, userWritten: true })), { name: 'Stargazer42', message: 'The same bright edge showed up in my binoculars. Clear skies!' }];
+    list.replaceChildren(...entries.map(({ name, message, userWritten }) => {
       const item = document.createElement('li');
+      if (userWritten) item.dataset.noTranslate = '';
       const author = document.createElement('b');
       author.textContent = name;
-      item.append(author, document.createTextNode(` wrote: ${message}`));
+      item.append(author, document.createTextNode(' wrote: '), document.createTextNode(message));
       return item;
     }));
   };
@@ -753,4 +856,5 @@ syncSidebarLayout();
 const initial = route();
 articleContext = initial.articleContext;
 if (initial.intro) showIntro({ anchor: initial.from, scrollY: initial.articleContext?.scrollY });
+syncLanguageUI();
 else selectEra(initial.era, initial.page);

@@ -1,3 +1,4 @@
+import { getLocale, subscribeLocale } from './i18n.js';
 const reportTime = new Intl.DateTimeFormat('en-US', {
   month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
 });
@@ -6,6 +7,7 @@ const publicationDate = new Intl.DateTimeFormat('en-US', {
 });
 
 function reportParagraphs(results, assigned) {
+  const korean = getLocale() === 'ko';
   const checked = results.length;
   const weather = results.find(({ id }) => id === 'weather');
   const article = results.filter(({ id }) => id !== 'weather').flatMap(({ data }) => data)
@@ -27,6 +29,15 @@ function reportParagraphs(results, assigned) {
   if (article) next += ' Open the NASA update in the source list for the full story.';
   if (findings.length === 0) next = 'I’d try the sources again before making a plan for today. You can still explore the simulated plan.';
 
+  if (korean) {
+    const weatherSummary = weather ? `Open-Meteo 모델에 따르면 ${weather.source}의 구름량은 ${weather.data.clouds}%, 기온은 ${weather.data.temperature.toFixed(1)}°C입니다.` : '';
+    const latest = article ? `최근에 확인한 NASA 자료는 “${article.title}”입니다(발행: ${publicationDate.format(article.published)}). 원문 제목은 그대로 표시합니다.` : '';
+    return [
+      `지정된 출처 ${assigned}개 중 ${checked}개를 확인했습니다. ${[weatherSummary,latest].filter(Boolean).join(' ') || '이번 확인에서는 사용할 수 있는 최신 정보를 찾지 못했습니다.'}`,
+      '현지 관측을 계획하기 전에는 실제 지역의 최신 예보를 다시 확인하세요. 이 브리핑이 열려 있고 표시되는 동안 5분마다 출처를 확인합니다.',
+      '출처를 다시 확인하거나 전시용 관측 시나리오를 살펴볼까요?',
+    ];
+  }
   return [
     `I checked ${count}.${findings.length ? ` ${findings.join(' ')}` : ' I didn’t find usable current information in this run.'}`,
     `${next} I’ll keep checking these sources every five minutes while this briefing is open and visible.`,
@@ -63,6 +74,19 @@ export function createAgentReport(root, status, refresh, signal) {
   const minimumPreparation = 1600;
   let preparationStarted = 0;
   let timer;
+  let latestResults = null;
+  let latestAssigned = 0;
+  const stopLocale = subscribeLocale(() => {
+    if (latestResults === null || signal.aborted) return;
+    // Finish the current visual typewriter in the chosen language; never restart a source check.
+    clearTimeout(timer);
+    const paragraphs = reportParagraphs(latestResults,latestAssigned);
+    copy.replaceChildren(...paragraphs.map((entry) => {
+      const p=document.createElement('p');p.textContent=entry;return p;
+    }));
+    finish();
+  });
+  signal.addEventListener('abort', stopLocale, { once: true });
 
   function cancel() {
     clearTimeout(timer);
@@ -91,6 +115,8 @@ export function createAgentReport(root, status, refresh, signal) {
 
   function write(results, assigned, reducedMotion) {
     clearTimeout(timer);
+    latestResults = results;
+    latestAssigned = assigned;
     const paragraphs = reportParagraphs(results, assigned);
     const lines = paragraphs.map(() => document.createElement('p'));
     if (reducedMotion) {

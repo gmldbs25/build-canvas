@@ -1,5 +1,6 @@
 import { createAgentReport } from './agent-report.js';
 
+import { getLocale } from './i18n.js';
 const newsEndpoint = 'https://api.spaceflightnewsapi.net/v4/articles/';
 const weatherEndpoint = 'https://api.open-meteo.com/v1/forecast';
 const referencePlaces = {
@@ -108,7 +109,7 @@ function weatherMarkup(data, place) {
   const attribution = element('p', 'Forecast data by ', 'monitor-attribution');
   attribution.append(sourceLink('Open-Meteo', 'https://open-meteo.com/'), ` · Reference location: ${place.name}`);
   output.append(
-    element('p', `${data.clouds}% cloud cover · ${data.temperature.toFixed(1)} °C`, 'monitor-weather'),
+    element('p', getLocale()==='ko' ? `구름량 ${data.clouds}% · 기온 ${data.temperature.toFixed(1)} °C` : `${data.clouds}% cloud cover · ${data.temperature.toFixed(1)} °C`, 'monitor-weather'),
     valid,
     attribution,
   );
