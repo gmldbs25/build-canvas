@@ -107,11 +107,11 @@ export function mosaicPage(page) {
   const pages = {
       home: `
       <h2>World Wide Web</h2>
-      <p>The World Wide Web is a way to publish and read documents across a network.
+      <p data-i18n-rich="93.home.lead">The World Wide Web is a way to publish and read documents across a network.
         A document can point to another by means of a ${link(1993, 'guide', 'hypertext link')}.</p>
       <p>This maintained project entry points to research material shared between laboratories. A group can keep a note at its own institution, link it from a directory, and revise the source without mailing another copy to every colleague.</p>
       <h3>Research material on the Web</h3>
-      <ul><li>${link(1993, 'directory', 'North Ridge Observatory research library')} — observing records, equipment notes, tables and revision notices.</li><li>${link(1993, 'memo', 'Lunar observing log, 23 October 1993')} — a dated record on another server.</li><li>${link(1993, 'correspondence', 'Notes from Lyra Observatory')} — a working exchange between institutions.</li></ul>
+      <ul><li data-i18n-rich="93.home.directory">${link(1993, 'directory', 'North Ridge Observatory research library')} — observing records, equipment notes, tables and revision notices.</li><li data-i18n-rich="93.home.memo">${link(1993, 'memo', 'Lunar observing log, 23 October 1993')} — a dated record on another server.</li><li data-i18n-rich="93.home.lyra">${link(1993, 'correspondence', 'Notes from Lyra Observatory')} — a working exchange between institutions.</li></ul>
       <dl>
         <dt>${link(1993, 'directory')}</dt><dd>Find a subject, field record or related source document.</dd>
         <dt>${link(1993, 'guide', 'Hypertext and HTML')}</dt><dd>How documents are linked, with an example of HTML markup.</dd>
@@ -133,15 +133,15 @@ export function mosaicPage(page) {
         <dt>${link(1993, 'correspondence', 'Correspondence with Lyra Observatory')}</dt><dd>Questions on time notation and a reply linked from their server.</dd>
       </dl>
       <h3>Other project directories</h3>
-      <ul><li>High-energy physics — CERN documents and software.</li><li>Computing — NCSA browser notes and computing services.</li><li>Astronomy — ${link(1993, 'correspondence', 'cross-institute observing notes')}.</li></ul>
-      <p>Follow the blue words to open a record, then use the browser’s Back button to return to this library. To see how a pointer is written, read ${link(1993, 'guide')}.</p>
-      <p>Return to the ${home}.</p>`,
+      <ul><li>High-energy physics — CERN documents and software.</li><li>Computing — NCSA browser notes and computing services.</li><li data-i18n-rich="93.dir.astronomy">Astronomy — ${link(1993, 'correspondence', 'cross-institute observing notes')}.</li></ul>
+      <p data-i18n-rich="93.dir.guide">Follow the blue words to open a record, then use the browser’s Back button to return to this library. To see how a pointer is written, read ${link(1993, 'guide')}.</p>
+      <p data-i18n-rich="93.returnHome">Return to the ${home}.</p>`,
     guide: `
       <h2>How does a link work?</h2>
       <p>A link is an address attached to a word or phrase. Select the text and the browser asks for the document at that address.</p>
       <pre>&lt;a href="TheProject.html"&gt;World Wide Web project&lt;/a&gt;</pre>
-      <p>In a browser, that line becomes a clickable link to the ${home}.</p>
-      <p>Next, ${link(1993, 'directory', 'look through the directory')}.</p>`,
+      <p data-i18n-rich="93.guide.example">In a browser, that line becomes a clickable link to the ${home}.</p>
+      <p data-i18n-rich="93.guide.next">Next, ${link(1993, 'directory', 'look through the directory')}.</p>`,
     people: `
       <h2>People behind the Web</h2>
       <dl>
@@ -149,7 +149,7 @@ export function mosaicPage(page) {
         <dt>Robert Cailliau</dt><dd>Worked with Berners-Lee at CERN and helped promote the project.</dd>
         <dt>Marc Andreessen and Eric Bina</dt><dd>Developed the first X Window System version of Mosaic at NCSA.</dd>
       </dl>
-      <p>Continue to ${link(1993, 'history', 'the timeline')} or return to the ${home}.</p>`,
+      <p data-i18n-rich="93.people.nav">Continue to ${link(1993, 'history', 'the timeline')} or return to the ${home}.</p>`,
     history: `
       <h2>A short history</h2>
       <dl>
@@ -157,47 +157,47 @@ export function mosaicPage(page) {
         <dt>1990</dt><dd>The first browser and Web server are running at CERN.</dd>
         <dt>1993</dt><dd>CERN makes Web software freely available. NCSA Mosaic helps bring graphical browsing to a wider audience.</dd>
       </dl>
-      <p>Return to the ${home}.</p>`,
+      <p data-i18n-rich="93.returnHome">Return to the ${home}.</p>`,
     memo: `
       <h2>Lunar observing log · NR-93-1023</h2>
       <p><em>North Ridge Observatory · 23 October 1993 · West Terrace</em></p>
       <p><strong>Observer:</strong> A. Mercer · <strong>Time:</strong> 21:10–21:42 local · <strong>Conditions:</strong> thin cloud; eastern roofline clear after 21:08.</p>
       <p>The bright Moon cleared the roofline. Thin cloud softened its northern limb for several minutes; Mare Imbrium and the bright rim of Copernicus remained easy to pick out at low power. Two micrometer readings were made before cloud returned.</p>
       <table><caption>Field measurements, 21:17 local</caption><thead><tr><th>Feature</th><th>Time</th><th>Comment</th></tr></thead><tbody><tr><td>Copernicus, bright rim</td><td>21:17</td><td>sharp in steady interval</td></tr><tr><td>Mare Imbrium, east edge</td><td>21:24</td><td>cloud crossing; repeat uncertain</td></tr></tbody></table>
-      <p>Instrument details are in the ${link(1993, 'instruments', '90 mm refractor note')}; comparison readings are in the ${link(1993, 'calibration', 'calibration sheet')}. Read the ${link(1993, 'reductions', 'reduction notes')} before comparing values with the ${link(1993, 'catalog', 'feature catalogue')}.</p>
-      <p>This fictional North Ridge record is served from <code>observatory.northridge.example</code>, a different simulated host. Return to the ${link(1993, 'directory', 'research library')} or ${link(1993, 'home', 'World Wide Web project entry')}.</p>`,
+      <p data-i18n-rich="93.memo.links">Instrument details are in the ${link(1993, 'instruments', '90 mm refractor note')}; comparison readings are in the ${link(1993, 'calibration', 'calibration sheet')}. Read the ${link(1993, 'reductions', 'reduction notes')} before comparing values with the ${link(1993, 'catalog', 'feature catalogue')}.</p>
+      <p data-i18n-rich="93.memo.host">This fictional North Ridge record is served from <code>observatory.northridge.example</code>, a different simulated host. Return to the ${link(1993, 'directory', 'research library')} or ${link(1993, 'home', 'World Wide Web project entry')}.</p>`,
     instruments: `
       <h2>Instrument note · NR-I-07</h2>
       <p><em>North Ridge Observatory · amended 12 October 1993 · A. Mercer</em></p>
       <p>The west-room portable refractor was used for visual lunar observations while the larger equatorial was reserved for photographic work.</p>
       <table><caption>Configuration used 23 October</caption><tbody><tr><th>Objective</th><td>90 mm achromat; focal length 1000 mm</td></tr><tr><th>Mount</th><td>wooden tripod, alt-azimuth head</td></tr><tr><th>Eyepiece</th><td>25 mm for finding; 10 mm for edge detail</td></tr><tr><th>Micrometer</th><td>eyepiece reticle, checked against ruled scale</td></tr></tbody></table>
-      <p>The reticle correction is listed in the ${link(1993, 'calibration', 'calibration sheet')}. The observing session is ${link(1993, 'memo', 'NR-93-1023')}; its features are indexed in the ${link(1993, 'catalog', 'lunar catalogue')}.</p><p>Return to the ${link(1993, 'directory', 'research library')}.</p>`,
+      <p data-i18n-rich="93.instruments.links">The reticle correction is listed in the ${link(1993, 'calibration', 'calibration sheet')}. The observing session is ${link(1993, 'memo', 'NR-93-1023')}; its features are indexed in the ${link(1993, 'catalog', 'lunar catalogue')}.</p><p data-i18n-rich="93.returnLibrary">Return to the ${link(1993, 'directory', 'research library')}.</p>`,
     calibration: `
       <h2>Micrometer calibration · NR-CAL-93-10</h2>
       <p><em>North Ridge Observatory · 22 October 1993 · M. Ibarra</em></p>
       <p>The eyepiece reticle was compared with the west-room ruled scale at three tube positions. Variation was not significant at the precision used in the visual log; retain the mean correction below.</p>
       <table><caption>Comparison readings</caption><thead><tr><th>Trial</th><th>Reticle divisions</th><th>Scale interval (mm)</th></tr></thead><tbody><tr><td>1</td><td>20</td><td>4.02</td></tr><tr><td>2</td><td>20</td><td>4.00</td></tr><tr><td>3</td><td>20</td><td>4.01</td></tr></tbody></table>
-      <p>Mean: 0.2005 mm per division. Do not quote more precision than the visual edge permits. See the ${link(1993, 'instruments', 'instrument note')} and the ${link(1993, 'reductions', 'reduction README')}.</p><p>Filed by the North Ridge instrument group. Return to the ${link(1993, 'directory', 'research library')}.</p>`,
+      <p data-i18n-rich="93.calibration.notes">Mean: 0.2005 mm per division. Do not quote more precision than the visual edge permits. See the ${link(1993, 'instruments', 'instrument note')} and the ${link(1993, 'reductions', 'reduction README')}.</p><p data-i18n-rich="93.calibration.return">Filed by the North Ridge instrument group. Return to the ${link(1993, 'directory', 'research library')}.</p>`,
     reductions: `
       <h2>Moon reductions · README and sample</h2>
       <p><em>North Ridge Observatory Data Desk · revision 1 · 28 October 1993</em></p>
-      <p>These are working reductions from visual notes, not a precision ephemeris. Local time is recorded as entered in the log; comparison sketches were aligned by the printed east-limb mark. Reticle divisions use the mean from the ${link(1993, 'calibration', 'October calibration sheet')}.</p>
+      <p data-i18n-rich="93.reductions.note">These are working reductions from visual notes, not a precision ephemeris. Local time is recorded as entered in the log; comparison sketches were aligned by the printed east-limb mark. Reticle divisions use the mean from the ${link(1993, 'calibration', 'October calibration sheet')}.</p>
       <h3>Files in this directory</h3><pre>README · this description and units · 1023.txt · field entries · limb.tab · reduced readings · rev1.note · corrections</pre>
       <table><caption>Sample from limb.tab · 23 October</caption><thead><tr><th>Log time</th><th>Feature</th><th>Reticle div.</th><th>Status</th></tr></thead><tbody><tr><td>21:17</td><td>Copernicus rim</td><td>8.4</td><td>clear interval</td></tr><tr><td>21:24</td><td>Mare Imbrium edge</td><td>11.2</td><td>cloud; provisional</td></tr></tbody></table>
-      <p>For the field description see ${link(1993, 'memo', 'log NR-93-1023')}; names follow the ${link(1993, 'catalog', 'feature catalogue')}. A question on time notation is in the ${link(1993, 'correspondence', 'Lyra exchange')}.</p><p>Return to the ${link(1993, 'directory', 'research library')}.</p>`,
+      <p data-i18n-rich="93.reductions.links">For the field description see ${link(1993, 'memo', 'log NR-93-1023')}; names follow the ${link(1993, 'catalog', 'feature catalogue')}. A question on time notation is in the ${link(1993, 'correspondence', 'Lyra exchange')}.</p><p data-i18n-rich="93.returnLibrary">Return to the ${link(1993, 'directory', 'research library')}.</p>`,
     catalog: `
       <h2>Working catalogue · Moon · revision 2</h2>
       <p><em>North Ridge Observatory · catalogue keeper: M. Ibarra · 4 November 1993</em></p>
       <p>This short list records names used in local observing notes. It is an index to the field material, not a map. Roman names follow the printed atlas in the west room.</p>
       <table><caption>Entries cited in October logs</caption><thead><tr><th>Entry</th><th>Reference</th><th>Revision note</th></tr></thead><tbody><tr><td>Mare Imbrium</td><td>west atlas, plate 7</td><td>east edge wording clarified</td></tr><tr><td>Copernicus</td><td>west atlas, plate 8</td><td>rim observation linked to 1023</td></tr><tr><td>Terminator</td><td>west atlas, plate 4</td><td>use “edge” in quick logs</td></tr></tbody></table>
-      <h3>Revision record</h3><ul><li>r0 · 2 October: names copied from observing card.</li><li>r1 · 19 October: atlas plate numbers added.</li><li>r2 · 4 November: corrected after checking the ${link(1993, 'memo', '23 October observing log')}.</li></ul>
-      <p>Questions about the October session are shared with ${link(1993, 'correspondence', 'Lyra Observatory')}. Return to the ${link(1993, 'directory', 'research library')}.</p>`,
+      <h3>Revision record</h3><ul><li>r0 · 2 October: names copied from observing card.</li><li>r1 · 19 October: atlas plate numbers added.</li><li data-i18n-rich="93.catalog.revision">r2 · 4 November: corrected after checking the ${link(1993, 'memo', '23 October observing log')}.</li></ul>
+      <p data-i18n-rich="93.catalog.links">Questions about the October session are shared with ${link(1993, 'correspondence', 'Lyra Observatory')}. Return to the ${link(1993, 'directory', 'research library')}.</p>`,
     correspondence: `
       <h2>Observing correspondence · October 1993</h2>
       <p><em>Lyra Observatory computing group · received 29 October · copy filed at North Ridge</em></p>
       <blockquote><p>Dear North Ridge colleagues,</p><p>We have added your 23 October lunar note to our comparison list. Could you state whether times in the reduction table are local civil time or measured from the start of the session? Our calibration sheet uses a different heading.</p><p>— S. Rao, Lyra Observatory</p></blockquote>
       <h3>North Ridge reply · 2 November 1993</h3><p>The times are local civil time, as written in the field book. The provisional 21:24 reading was made during cloud and should not be used as a precise edge position. We revised the README to mark that entry provisional.</p>
-      <p>This fictional copy is served from <code>lyra-observatory.example</code>. Compare the ${link(1993, 'reductions', 'reduction notes')} with the ${link(1993, 'memo', 'source observing log')}, or return to the ${link(1993, 'directory', 'research library')}.</p>`,
+      <p data-i18n-rich="93.correspondence.links">This fictional copy is served from <code>lyra-observatory.example</code>. Compare the ${link(1993, 'reductions', 'reduction notes')} with the ${link(1993, 'memo', 'source observing log')}, or return to the ${link(1993, 'directory', 'research library')}.</p>`,
   };
   return `<article class="mosaic-page">${pages[page] || pages.home}</article>`;
 }
