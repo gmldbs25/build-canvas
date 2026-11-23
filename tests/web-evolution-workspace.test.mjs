@@ -13,7 +13,8 @@ test('exhibit uses one seven-era navigation and a separate browser stage', () =>
   assert.ok(exhibit.includes('id="exhibit-sidebar"'));
   assert.ok(exhibit.includes('id="sidebar-toggle"'));
   assert.ok(exhibit.includes('id="era-timeline"'));
-  assert.deepEqual([...exhibit.matchAll(/data-era="(1993|1998|2001|2005|2013|2023|2026)"/g)].map((match) => match[1]),
+  const eraLinks = exhibit.split('id="era-timeline"')[1].split('</nav>')[0];
+  assert.deepEqual([...eraLinks.matchAll(/data-era="(1993|1998|2001|2005|2013|2023|2026)"/g)].map((match) => match[1]),
     ['1993', '1998', '2001', '2005', '2013', '2023', '2026']);
   assert.equal((exhibit.match(/id="screen"/g) || []).length, 1);
   assert.equal((exhibit.match(/id="article-return"/g) || []).length, 1);
