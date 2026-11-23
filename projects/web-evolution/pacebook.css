@@ -210,11 +210,11 @@
 .pace-delete-dialog-actions button[value="cancel"]:hover { background: #f0e6ed; }
 .pace-delete-dialog-actions button[value="delete"]:hover { background: #713348; }
 
-@media (max-width: 820px) {
+@container exhibit-page (max-width: 820px) {
   .pace-layout { grid-template-columns: minmax(105px, 146px) minmax(0, 640px); }
   .pace-right { display: none; }
 }
-@media (max-width: 580px) {
+@container exhibit-page (max-width: 580px) {
   .pace-bar-inner { gap: 8px; padding-inline: 8px; }
   .pacebook .pace-wordmark { font-size: 18px; }
   .pace-wordmark > span { width: 18px; height: 18px; font-size: 13px; }
