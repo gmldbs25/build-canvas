@@ -5,7 +5,7 @@ import { modernEras, createModern } from './modern.js';
 import { createPacebook } from './pacebook.js';
 import { createPoster } from './poster.js';
 import { createChrome, pageAddress } from './chrome.js';
-import { getLocale, setLocale, message, getSceneText, translateText, applyLocale, subscribeLocale } from './i18n.js';
+import { getLocale, setLocale, message, getSceneText, translateText, applyLocale, subscribeLocale, formatMessage, bindMessage } from './i18n.js';
 
 const eras = { ...historicalEras, 2001: classicSearchEra, ...modernEras };
 const intro = document.querySelector('#intro-view');
@@ -632,7 +632,7 @@ function browserAction(action, detail = {}) {
   if (action === 'select-all') return selectPageText();
 }
 
-function showToast(message) {
+function showToast(message, localized = null) {
   let toast = document.querySelector('#browser-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -641,7 +641,8 @@ function showToast(message) {
     toast.setAttribute('role', 'status');
     document.body.append(toast);
   }
-  toast.textContent = translateText(message);
+  if(localized)bindMessage(toast,localized.key,localized.params||{});
+  else{delete toast.dataset.i18nMessage;delete toast.dataset.i18nParams;toast.textContent=translateText(message);}
   toast.hidden = false;
   alignViewerOverlays();
   clearTimeout(showToast.timer);
@@ -694,7 +695,7 @@ function saveCurrentPage() {
   link.download = `${era}-${page}.txt`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  showToast(`Saved “${title}” as a text file.`);
+  showToast('',{key:'browser.saved',params:{title}});
 }
 
 function selectPageText() {
@@ -735,10 +736,13 @@ function initGuestbook() {
     const entries = [...guestbook.map((entry) => ({ ...entry, userWritten: true })), { name: 'Stargazer42', message: 'The same bright edge showed up in my binoculars. Clear skies!' }];
     list.replaceChildren(...entries.map(({ name, message, userWritten }) => {
       const item = document.createElement('li');
-      if (userWritten) item.dataset.noTranslate = '';
       const author = document.createElement('b');
       author.textContent = name;
-      item.append(author, document.createTextNode(' wrote: '), document.createTextNode(message));
+      if(userWritten)author.dataset.noTranslate='';
+      const body=document.createElement('span');
+      body.textContent=message;
+      if(userWritten)body.dataset.noTranslate='';
+      item.append(author, document.createTextNode(' wrote: '), body);
       return item;
     }));
   };

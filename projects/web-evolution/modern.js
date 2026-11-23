@@ -1,5 +1,5 @@
 import { createMonitor } from './monitor.js';
-import { getLocale } from './i18n.js';
+import { getLocale, formatMessage, translateText, bindMessage } from './i18n.js';
 
 export const modernEras = {
   2023: {
@@ -359,9 +359,31 @@ function calendarZoneLines(timeZone, dateIso) {
 }
 
 function makeInitialAgentState() {
-  return { region: 'north', interests: ['moon', 'iss', 'research'], dayOffset: 0, selectedByDay: {}, approvedPlans: {}, posterUpdates: {}, syncPoster: false, updateNote: '' };
+  return { region: 'north', interests: ['moon', 'iss', 'research'], dayOffset: 0, selectedByDay: {}, approvedPlans: {}, posterUpdates: {}, syncPoster: false, updateNote: '', updateCode: '' };
 }
 
+const agentNoteCodes = new Set(['settings','advance','posterSaved','posterFailed','planSaved']);
+function legacyAgentNoteCode(value){
+  if(typeof value!=='string')return '';
+  if(value.startsWith('Scenario settings updated for '))return 'settings';
+  if(value.startsWith('Scenario advanced to '))return 'advance';
+  if(value.includes('three approved schedule fields'))return 'posterSaved';
+  if(value.includes('poster schedule could not be updated'))return 'posterFailed';
+  if(value.includes('2013 poster was left unchanged'))return 'planSaved';
+  return '';
+}
+function agentNotice(state){
+  const code=state.updateCode||legacyAgentNoteCode(state.updateNote);
+  if(!agentNoteCodes.has(code))return null;
+  const region=regions[state.region];
+  const day=agentDay(state),event=officialEvent(state);
+  const locale=getLocale();
+  const dateFmt=new Intl.DateTimeFormat(locale==='ko'?'ko-KR':'en-US',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
+  const eventTime=event.time;
+  const params={region:region.label,date:dateFmt.format(day.date),forecast:translateText(region.forecasts[state.dayOffset%3],locale),iss:region.issTimes[state.dayOffset%3],eventDate:dateFmt.format(new Date(event.dateIso+'T20:00:00Z')),eventTime};
+  return {key:'agent.note.'+code,params};
+}
+function setAgentNotice(state,code){state.updateCode=code;state.updateNote='';}
 function loadAgentState() {
   try {
     const saved = JSON.parse(localStorage.getItem(agentStorageKey));
@@ -375,6 +397,7 @@ function loadAgentState() {
     if (saved.posterUpdates && typeof saved.posterUpdates === 'object') state.posterUpdates = saved.posterUpdates;
     state.syncPoster = saved.syncPoster === true;
     state.updateNote = typeof saved.updateNote === 'string' ? saved.updateNote.slice(0, 240) : '';
+    state.updateCode = agentNoteCodes.has(saved.updateCode) ? saved.updateCode : legacyAgentNoteCode(state.updateNote);
     return state;
   } catch {
     return makeInitialAgentState();
@@ -487,11 +510,13 @@ function preferencesMarkup(state) {
 
 function selectedCountMarkup(state) {
   const count = selectedAgentItems(state).length;
-  return `<strong data-plan-count aria-live="polite">${count} ${count === 1 ? 'item' : 'items'} selected</strong>`;
+  return `<strong data-plan-count data-i18n-message="agent.planCount" data-i18n-params='{"count":${count},"noun":"${count===1?'item':'items'}"}' aria-live="polite">${formatMessage('agent.planCount',{count,noun:count===1?'item':'items'})}</strong>`;
 }
 
 function briefingUpdateNote(state) {
-  return state.updateNote ? `<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" lang="en">${escapeHtml(state.updateNote)}</p>` : '<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" lang="en"></p>';
+  const note=agentNotice(state);
+  if(note)return `<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" data-i18n-message="${note.key}" data-i18n-params="${escapeHtml(JSON.stringify(note.params))}">${escapeHtml(formatMessage(note.key,note.params))}</p>`;
+  return state.updateNote ? `<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite" lang="en" data-no-translate>${escapeHtml(state.updateNote)}</p>` : '<p class="briefing-update-note" id="briefing-update-note" role="status" aria-live="polite"></p>';
 }
 
 function homeBriefingMarkup(state, scenarioOpen) {
@@ -881,7 +906,7 @@ export function createModern(poster) {
     const valid = new Set(briefingItems(agentState).map(({ id }) => id));
     const count = [...selected].filter((id) => valid.has(id)).length;
     root.querySelectorAll('[data-plan-count]').forEach((node) => {
-      node.textContent = `${count} ${count === 1 ? 'item' : 'items'} selected`;
+      bindMessage(node,'agent.planCount',{count,noun:count===1?'item':'items'});
     });
     const save = root.querySelector('[data-agent-action="approve-plan"]');
     const download = root.querySelector('[data-agent-action="download-ics"]');
@@ -926,7 +951,7 @@ export function createModern(poster) {
     agentState.interests = agentInterests.map(([id]) => id).filter((id) => data.getAll('interest').includes(id));
     const available = new Set(briefingItems(agentState).map(({ id }) => id));
     agentState.selectedByDay[agentDayKey(agentState)] = [...previousSelection].filter((id) => available.has(id));
-    agentState.updateNote = `Scenario settings updated for ${regions[agentState.region].label}.`;
+    setAgentNotice(agentState,'settings');
     persistAgentState(agentState);
     if (page !== 'home') {
       goTo('home');
@@ -945,7 +970,7 @@ export function createModern(poster) {
     const slot = agentState.dayOffset % 3;
     const passTime = region.issTimes[slot];
     const event = officialEvent(agentState);
-    agentState.updateNote = `Scenario advanced to ${day.dateLabel}. ${region.forecasts[slot]} The simulated ISS pass is now ${passTime}. Observing Night is listed for ${event.dateLabel} at ${event.time}.`;
+    setAgentNotice(agentState,'advance');
     persistAgentState(agentState);
     if (page !== 'home') {
       goTo('home');
@@ -969,12 +994,12 @@ export function createModern(poster) {
         if (typeof poster.updateSchedule !== 'function') throw new Error('The Fieldwork poster editor is not available.');
         poster.updateSchedule(proposal);
         agentState.posterUpdates[key] = { ...proposal, savedAt: Date.now() };
-        agentState.updateNote = 'Plan saved and the three approved schedule fields were sent to the 2013 poster.';
+        setAgentNotice(agentState,'posterSaved');
       } catch {
-        agentState.updateNote = 'Plan saved on this device. The poster schedule could not be updated in this preview.';
+        setAgentNotice(agentState,'posterFailed');
       }
     } else {
-      agentState.updateNote = 'Plan saved on this device. The 2013 poster was left unchanged.';
+      setAgentNotice(agentState,'planSaved');
     }
     agentState.syncPoster = false;
     persistAgentState(agentState);
@@ -1020,7 +1045,7 @@ export function createModern(poster) {
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     const feedback = root.querySelector('#plan-feedback');
-    if (feedback) feedback.textContent = `Calendar file created for ${items.length} event${items.length === 1 ? '' : 's'}.`;
+    if (feedback) bindMessage(feedback,'agent.calendar',{count:items.length,noun:items.length===1?'event':'events'});
   }
 
   const agentPageBindings = new WeakMap();

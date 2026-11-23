@@ -1,5 +1,6 @@
 import { communityTags, observingPhoto, referencePhotos } from './moonstream-posts.js';
 
+import { formatMessage, bindMessage } from './i18n.js';
 const gallery = [
   { id: 'eclipse-a', page: 'eclipse-a', author: 'Auvo Korpi', place: 'Location not listed', date: 'Oct 28, 2004', title: 'A copper-red lunar eclipse', image: './media/eclipse-2004-a.webp', width: 1600, height: 1584, alt: 'A close view of the Moon in deep copper-red shadow during the 28 October 2004 lunar eclipse.', notes: 'The source title is “2004.10.28 Pimennys.” The image record does not identify the capture location; Huhtamo, Finland is the photographer’s base, not a confirmed photo location.', tags: ['lunar-eclipse', 'red-moon', 'close-up'], comments: [['stargazer', 'The copper colour came through even on a small screen.'], ['bluehour', 'I was watching the same eclipse from a cloudy patch of sky.']], credit: 'Photo by Auvo Korpi · Wikimedia Commons', sourceUrl: 'https://commons.wikimedia.org/wiki/File:2004.10.28_Pimennys_(28866343308).jpg', originalUrl: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/2004.10.28_Pimennys_(28866343308).jpg', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/' },
   { id: 'eclipse-b', page: 'eclipse-b', author: 'J.C. Rojas', place: 'A Coruña, Spain', date: 'Oct 28, 2004', title: 'Stages of a lunar eclipse', image: './media/eclipse-2004-b.webp', width: 1094, height: 944, alt: 'A composite showing successive phases of the 28 October 2004 lunar eclipse.', notes: 'A composite of successive lunar eclipse phases photographed in A Coruña, Spain.', tags: ['lunar-eclipse', 'sequence', 'red-moon'], comments: [['moonwatcher', 'The sequence makes the change in colour easier to follow.'], ['celeste', 'A Coruña had a clear view that night.']], credit: 'Photo by J.C. Rojas · Wikimedia Commons', sourceUrl: 'https://commons.wikimedia.org/wiki/File:J.C._Rojas_-_Lunar_Eclipse_(by-sa).jpg', originalUrl: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/J.C._Rojas_-_Lunar_Eclipse_(by-sa).jpg', license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/', shareAlike: true },
@@ -43,7 +44,7 @@ function renderPhotoDetail(photo) {
         ${photo.notes ? `<p>${escapeHtml(photo.notes)}</p>` : ''}
         <p class="photo-credit"><strong>${escapeHtml(photo.credit)}</strong>. <a href="${photo.sourceUrl}" target="_blank" rel="noopener noreferrer">Source record</a>${photo.originalUrl ? ` · <a href="${photo.originalUrl}" target="_blank" rel="noopener noreferrer">Download original</a>` : ''}${photo.licenseUrl ? ` · <a href="${photo.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(photo.license)}</a>` : ''}</p>
         <div class="photo-tags"><strong>Tags</strong> ${tags.map((tag) => photoLink(photoTagPages[tag] || 'moon', tagLabels[tag] || tag, 'class="tag-chip"')).join('')}</div>
-        <button class="photo-fave" type="button" data-favorite="${photo.id}" aria-pressed="${isFavorite}">${isFavorite ? '♥ In favorites' : '♡ Add to favorites'}</button>
+        <button class="photo-fave" type="button" data-favorite="${photo.id}" aria-pressed="${isFavorite}">${isFavorite ? '♥ ' + formatMessage('photo.favorite.saved') : '♡ ' + formatMessage('photo.favorite.add')}</button>
         ${comments.length ? `<div class="photo-comments"><h3>${comments.length} comments</h3>${comments.map(([name, comment]) => `<p><strong>${escapeHtml(name)}:</strong> ${escapeHtml(comment)}</p>`).join('')}</div>` : ''}
       </aside>
     </div>
@@ -154,7 +155,8 @@ export function initPhoto(content) {
       if (saved) favoriteIds.add(id); else favoriteIds.delete(id);
       saveFavorites();
       favorite.setAttribute('aria-pressed', String(saved));
-      favorite.textContent = saved ? '♥ In favorites' : '♡ Add to favorites';
+      favorite.dataset.i18nPrefix=saved?'♥ ':'♡ ';
+      bindMessage(favorite,saved?'photo.favorite.saved':'photo.favorite.add');
       return;
     }
     if (event.target.closest('[data-upload-open]')) content.querySelector('.upload-dialog')?.showModal();
@@ -171,6 +173,6 @@ export function initPhoto(content) {
     content.querySelector('.upload-dialog')?.close();
     content.querySelector('.moon-grid')?.insertAdjacentHTML('afterbegin', photoTile(uploadedPhotos[0]));
     const count = content.querySelector('.moon-result-count');
-    if (count) count.textContent = `${memberPhotos.length + uploadedPhotos.length} photos`;
+    if (count) bindMessage(count,'photo.count',{count:memberPhotos.length+uploadedPhotos.length});
   });
 }

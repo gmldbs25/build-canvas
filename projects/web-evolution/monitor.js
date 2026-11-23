@@ -1,6 +1,6 @@
 import { createAgentReport } from './agent-report.js';
 
-import { getLocale } from './i18n.js';
+import { getLocale, bindMessage, formatMessage, subscribeLocale } from './i18n.js';
 const newsEndpoint = 'https://api.spaceflightnewsapi.net/v4/articles/';
 const weatherEndpoint = 'https://api.open-meteo.com/v1/forecast';
 const referencePlaces = {
@@ -77,8 +77,8 @@ async function fetchWeather(place, signal) {
 
 function newsItem(article, includeExcerpt = false) {
   const item = element('li', undefined, 'monitor-news-item');
-  const metadata = element('p', 'NASA · Published ');
-  metadata.append(timeNode(article.published));
+  const metadata = element('p');
+  metadata.append(bindMessage(element('span'), 'monitor.published'),document.createTextNode(' '),timeNode(article.published));
   item.append(sourceLink(article.title, article.url), metadata);
   if (includeExcerpt && article.excerpt) item.append(element('p', article.excerpt, 'monitor-excerpt'));
   return item;
@@ -93,7 +93,7 @@ function newsMarkup(articles) {
     const details = element('details', undefined, 'monitor-more');
     const more = element('ul', undefined, 'monitor-news');
     more.append(...articles.slice(1).map((article) => newsItem(article)));
-    details.append(element('summary', `${articles.length - 1} more NASA updates`), more);
+    details.append(bindMessage(element('summary'),'monitor.more',{count:articles.length-1}), more);
     output.append(details);
   }
   const attribution = element('p', 'Delivered by ', 'monitor-attribution');
@@ -104,9 +104,11 @@ function newsMarkup(articles) {
 
 function weatherMarkup(data, place) {
   const output = document.createDocumentFragment();
-  const valid = element('p', 'Model estimate for ');
+  const valid = element('p');
+  valid.append(bindMessage(element('span'),'monitor.estimate'),document.createTextNode(' '));
   valid.append(timeNode(data.validAt));
-  const attribution = element('p', 'Forecast data by ', 'monitor-attribution');
+  const attribution = element('p', undefined, 'monitor-attribution');
+  attribution.append(bindMessage(element('span'),'monitor.forecastBy'),document.createTextNode(' '));
   attribution.append(sourceLink('Open-Meteo', 'https://open-meteo.com/'), ` · Reference location: ${place.name}`);
   output.append(
     element('p', getLocale()==='ko' ? `구름량 ${data.clouds}% · 기온 ${data.temperature.toFixed(1)} °C` : `${data.clouds}% cloud cover · ${data.temperature.toFixed(1)} °C`, 'monitor-weather'),
@@ -139,7 +141,7 @@ function showTask(job) {
   const item = element('li', undefined, 'monitor-task');
   const header = element('div', undefined, 'monitor-task-heading');
   const identity = element('div');
-  const badge = element('span', 'Checking', 'monitor-task-status');
+  const badge = bindMessage(element('span', undefined, 'monitor-task-status'),'monitor.checkingLabel');
   const output = element('div', undefined, 'monitor-task-output');
   item.dataset.monitorTask = 'checking';
   identity.append(element('h4', job.label), element('p', job.source));
@@ -186,7 +188,7 @@ export function createMonitor() {
       running = true;
       panel.dataset.monitorState = 'checking';
       refreshButton.setAttribute('aria-disabled', 'true');
-      status.textContent = `Checking ${jobs.length} public ${jobs.length === 1 ? 'source' : 'sources'}…`;
+      bindMessage(status,'monitor.checking',{count:jobs.length,noun:jobs.length===1?'source':'sources'});
       report.pending();
       const timeout = AbortSignal.timeout(8500);
       const signal = AbortSignal.any([timeout, lifetime.signal]);
@@ -213,8 +215,8 @@ export function createMonitor() {
           await reveal;
           if (lifetime.signal.aborted) return;
           item.dataset.monitorTask = 'checked';
-          badge.textContent = 'Checked';
-          output.append(Array.isArray(data) && !data.length ? element('p', 'This feed returned no usable articles.') : job.render(data));
+          bindMessage(badge,'monitor.checked');
+          output.append(Array.isArray(data) && !data.length ? bindMessage(element('p'),'monitor.noArticles') : job.render(data));
           const checked = element('p', 'Checked ', 'monitor-check-time');
           checked.append(timeNode(receivedAt));
           output.append(checked);
@@ -225,8 +227,8 @@ export function createMonitor() {
           await reveal;
           if (lifetime.signal.aborted) return;
           item.dataset.monitorTask = 'unavailable';
-          badge.textContent = timedOut ? 'Timed out' : 'Unavailable';
-          output.append(element('p', timedOut ? 'The source did not respond in time.' : 'The source could not be reached or returned unreadable data.'));
+          bindMessage(badge,timedOut?'monitor.timedOut':'monitor.unavailableLabel');
+          output.append(bindMessage(element('p'),timedOut?'monitor.timeout':'monitor.unavailable'));
         }
       }));
 
@@ -236,7 +238,8 @@ export function createMonitor() {
       running = false;
       refreshButton.removeAttribute('aria-disabled');
       panel.dataset.monitorState = completed === jobs.length ? 'complete' : completed ? 'partial' : 'unavailable';
-      status.textContent = completed === jobs.length ? 'Source check complete.' : `${completed} of ${jobs.length} sources checked. Try again for unavailable sources.`;
+      if(completed===jobs.length){delete status.dataset.i18nMessage;delete status.dataset.i18nParams;status.textContent=getLocale()==='ko'?'출처 확인이 완료됐습니다.':'Source check complete.';}
+      else bindMessage(status,'monitor.partial',{done:completed,count:jobs.length});
       report.write(checked, jobs.length, reducedMotion);
     }
 

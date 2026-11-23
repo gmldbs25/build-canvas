@@ -3,7 +3,7 @@ import { communityPages } from './moonstream-posts.js';
 export const eras = {
   1993: {
     caption: 'NCSA Mosaic · X Window System',
-    hint: 'Research library 링크를 열어 관측 일지와 기기 보정 기록을 찾아보세요.',
+    hint: '연구 자료실 링크를 열어 관측 일지와 장비 보정 기록을 찾아보세요.',
     notes: '초기 웹에서 연구자는 소속 기관의 서버에 논문, 장비 설명서, 데이터 목록을 올려 다른 기관과 공유했습니다. 이 장면의 천문대와 관측 기록은 전시용 가상 자료입니다.',
     sources: [
       ['CERN · World Wide Web', 'https://info.cern.ch/hypertext/WWW/TheProject.html'],
@@ -27,7 +27,7 @@ export const eras = {
   },
   1998: {
     caption: 'Internet Explorer 4 · Windows 98',
-    hint: 'HTML notes에서 제작 노트를 읽거나 WebRing으로 이웃의 홈페이지를 방문해 보세요.',
+    hint: 'HTML 제작 노트를 읽거나 웹링을 따라 이웃 홈페이지를 방문해 보세요.',
     notes: 'GeoCities의 Area51은 SF와 판타지 팬들이 모이는 동네였습니다. 당시 개인 홈페이지에서 볼 수 있던 방문자 카운터, 방명록, 갱신 기록, 작은 배너와 웹링을 반영했습니다.',
     sources: [
       ['Web Design Museum · GeoCities', 'https://www.webdesignmuseum.org/all-websites/geocities-1998'],
@@ -52,7 +52,7 @@ export const eras = {
   2005: {
     caption: 'Firefox 1.5 · Sharing the night sky',
     notes: '2005년의 아마추어 천문 관측자들은 웹에 망원경 세팅과 관측 사진을 올리고, 같은 천체를 본 사람들과 촬영 결과를 비교할 수 있었습니다. Moonstream에서는 당시의 관측 사진과 함께 토성, 목성, 혜성 등 관측에 참고할 자료를 찾아볼 수 있습니다.',
-    hint: '망원경 세팅 사진을 보고, lunar eclipse 태그에서 여러 관측자가 찍은 같은 날의 월식을 비교해 보세요.',
+    hint: '망원경 설치 사진을 보고, ‘월식’ 태그에서 여러 사람이 찍은 같은 날의 달을 비교해 보세요.',
     sources: [
       ['Flickr · The New New Things (1 Aug 2005)', 'https://blog.flickr.net/en/2005/08/01/the-new-new-things/'],
       ['Astronomy Picture of the Day · image archive', 'https://apod.nasa.gov/apod/archivepixFull.html'],

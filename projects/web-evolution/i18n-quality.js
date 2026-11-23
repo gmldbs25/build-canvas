@@ -440,5 +440,13 @@ export const runtimeMessages={
  'agent.note.posterSaved':['Plan saved and the three approved schedule fields were sent to the 2013 poster.','계획을 저장하고 승인된 일정 세 항목을 2013년 포스터에 반영했습니다.'],
  'agent.note.posterFailed':['Plan saved on this device. The poster schedule could not be updated in this preview.','계획은 이 기기에 저장했지만 포스터 일정을 갱신하지 못했습니다.'],
  'agent.note.planSaved':['Plan saved on this device. The 2013 poster was left unchanged.','계획을 이 기기에 저장했습니다. 2013년 포스터는 변경하지 않았습니다.'],
- 'agent.planCount':['{count} {noun} selected','선택한 계획 항목 {count}개']
+ 'agent.planCount':['{count} {noun} selected','선택한 계획 항목 {count}개'],
+ 'agent.calendar':['Calendar file created for {count} {noun}.','일정 {count}개가 담긴 캘린더 파일을 만들었습니다.'],
+ 'monitor.published':['NASA · Published','NASA · 게시'],
+ 'monitor.estimate':['Model estimate for','모델 예측 기준'],
+ 'monitor.forecastBy':['Forecast data by','예보 데이터 제공:'],
+ 'monitor.checked':['Checked','확인됨'],
+ 'monitor.checkingLabel':['Checking','확인 중'],
+ 'monitor.timedOut':['Timed out','시간 초과'],
+ 'monitor.unavailableLabel':['Unavailable','이용 불가']
 };

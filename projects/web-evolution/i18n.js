@@ -29,7 +29,7 @@ export function formatMessage(key,params={},lang=locale){
  const pair=runtimeMessages[key]||messages[key];if(!pair)return key;
  return pair[lang==='ko'?1:0].replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(full,name)=>Object.hasOwn(params,name)?String(params[name]):full);
 }
-export function bindMessage(node,key,params={}){node.dataset.i18nMessage=key;node.dataset.i18nParams=JSON.stringify(params);node.textContent=formatMessage(key,params);return node;}
+export function bindMessage(node,key,params={}){node.dataset.i18nMessage=key;node.dataset.i18nParams=JSON.stringify(params);node.textContent=(node.dataset.i18nPrefix||'')+formatMessage(key,params);return node;}
 export function translateText(value,lang=locale){
   const s=String(value), trimmed=s.trim();
   if(!trimmed)return s;

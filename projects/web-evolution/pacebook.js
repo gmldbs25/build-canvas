@@ -1,4 +1,5 @@
 import { archivedPhotos, people, posts } from './pacebook-posts.js';
+import { formatMessage, bindMessage } from './i18n.js';
 import { translateText } from './i18n.js';
 
 const storageKey = 'build-canvas:pacebook';
@@ -128,7 +129,7 @@ function postMarkup(post, state, expanded) {
     <div class="pace-post-actions">
       <button class="pace-text-button pace-like" type="button" aria-pressed="${liked}" data-pace-like><span aria-hidden="true">${liked ? '♥' : '♡'}</span> Like</button>
       <button class="pace-text-button" type="button" data-pace-comments aria-controls="pace-thread-${post.id}" aria-expanded="${expanded}">Comments <span class="pace-comment-count">${commentCount}</span></button>
-      <span class="pace-like-count">${post.likes + Number(liked)} likes</span>
+      <span class="pace-like-count" data-i18n-message="pace.likes" data-i18n-params='{"count":${post.likes + Number(liked)}}'>${formatMessage('pace.likes',{count:post.likes+Number(liked)})}</span>
     </div>
     <section class="pace-discussion" id="pace-thread-${post.id}" aria-label="Discussion" ${expanded ? '' : 'hidden'}>${expanded ? discussionMarkup(post, state) : ''}</section>
   </article>`;
@@ -269,7 +270,7 @@ export function createPacebook() {
         }
         button.setAttribute('aria-pressed', String(liked));
         button.querySelector('span').textContent = liked ? '♥' : '♡';
-        card.querySelector('.pace-like-count').textContent = `${post.likes + Number(liked)} likes`;
+        bindMessage(card.querySelector('.pace-like-count'),'pace.likes',{count:post.likes+Number(liked)});
         notify(liked ? 'Post liked.' : 'Like removed.');
       } else if (button.hasAttribute('data-pace-comments')) {
         const discussion = card.querySelector('.pace-discussion');
