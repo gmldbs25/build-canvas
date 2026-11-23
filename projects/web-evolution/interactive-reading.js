@@ -97,8 +97,7 @@
       const graphic=source.cloneNode(true);
       graphic.removeAttribute('aria-labelledby');
       graphic.setAttribute('aria-label','페이지 A와 B가 C를, C와 B가 D를 가리키는 링크 관계 예시');
-      const marker=graphic.querySelector('#pagerank-arrow');
-      if(marker)marker.id='pagerank-arrow-detail';
+      graphic.querySelectorAll('[id]').forEach(item=>{item.id += '-detail';});
       graphic.querySelectorAll('[marker-end]').forEach(item=>item.setAttribute('marker-end','url(#pagerank-arrow-detail)'));
       slot.append(graphic);
       opener.hidden=false;
