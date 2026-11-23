@@ -1,4 +1,7 @@
 /* Work 7: restrained in-place reading aids. Never alter the original reading rail. */
+/* Without JavaScript, unfamiliar terms remain ordinary readable prose, not inert controls. */
+.intro-view:not(.reading-enhanced) .glossary-trigger { color: inherit; border-bottom: 0; cursor: inherit; }
+
 .editorial-body .glossary-trigger {
   display: inline;
   appearance: none;
