@@ -695,7 +695,7 @@ function saveCurrentPage() {
   link.download = `${era}-${page}.txt`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  showToast('',{key:'browser.saved',params:{title}});
+  showToast('',{key:'browser.saved',params:{titleEn:title,titleKo:translateText(title,'ko')}});
 }
 
 function selectPageText() {

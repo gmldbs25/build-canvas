@@ -121,7 +121,7 @@ export function applyLocale(root,lang=locale){
   }
   // Only exhibit-owned wrappers are switched. Live-source subtrees retain their source language.
   for(const element of elements){
-    if(element.matches?.('#screen,#chrome,.pacebook,.search-suggestions,.search-hint,#search-status,.briefing-update-note'))element.lang=lang;
+    if(element.matches?.('#screen,#chrome,.pacebook,.search-suggestions,.search-hint,#search-status,#search-message,.briefing-update-note'))element.lang=lang;
   }
   const external=root.querySelectorAll?.('.live-result-list,.live-image-grid,.monitor-news,.monitor-excerpt')||[];
   for(const element of external)element.lang='en';

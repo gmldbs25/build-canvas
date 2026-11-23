@@ -62,6 +62,9 @@ try{
  await page.locator('[data-i18n-rich="98.links.nasa"]').waitFor();
  await choose(page,'ko');
  assert.match(await page.locator('[data-i18n-rich="98.links.nasa"]').innerText(),/우주 임무 소식/);
+ assert.match(await page.locator('.orbit-page nav').first().innerText(),/HTML 제작 노트/);
+ assert.match(await page.locator('.orbit-page .orbit-links').innerText(),/방명록에 알려 줘/);
+ assert.match(await page.locator('#status').innerText(),/인터넷 영역/);
  assert.equal(await page.locator('[data-i18n-rich="98.links.nasa"] a').getAttribute('href'),'https://www.nasa.gov/');
  assert.match(await page.getByRole('link',{name:/좋은 사이트를 알고 있니/}).innerText(),/방명록/);
  await page.screenshot({path:'work7-quality-captures/1998-links-korean.png'});
@@ -131,6 +134,9 @@ try{
  assert.match(await apiPage.locator('#briefing-update-note').innerText(),/Scenario advanced to/);
  await choose(apiPage,'ko');
  assert.match(await apiPage.locator('#briefing-update-note').innerText(),/오후/);
+ assert.match(await apiPage.locator('.rail-plan h3').innerText(),/시나리오 계획/);
+ assert.match(await apiPage.locator('.briefing-scenario summary').innerText(),/관측 시나리오 살펴보기/);
+ assert.match(await apiPage.locator('.interest-option').first().innerText(),/달과 하늘/);
  await apiPage.screenshot({path:'work7-quality-captures/2026-agent-korean.png'});
  assert.deepEqual(errors,[],'No page errors are allowed during quality QA');
  await apiContext.close();

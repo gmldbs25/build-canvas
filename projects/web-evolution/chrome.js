@@ -134,7 +134,7 @@ export function createChrome({ root, status, onAction, onAddress, onTab }) {
       status.innerHTML = `<span class="status-text">Document Done</span><span> ${index + 1} of ${length}</span>`;
     } else if (era === '1998') {
       root.innerHTML = `<div class="ie-title"><span class="ie-mark" aria-hidden="true">e</span><span>${title} – Explorer</span><span class="window-buttons" aria-hidden="true"><b>_</b><b>□</b><b>×</b></span></div>${menus}<div class="browser-tools">${back}${forward}${home}${reload}${info}</div>${address}`;
-      status.innerHTML = '<span class="status-text">Done</span><span aria-hidden="true">◉ Internet zone</span>';
+      status.innerHTML = '<span class="status-text">Done</span><span aria-hidden="true" data-i18n-message="chrome.internetZone" data-i18n-prefix="◉ ">◉ Internet zone</span>';
     } else if (era === '2001') {
       root.innerHTML = `<div class="navigator-title"><span class="navigator-mark" aria-hidden="true">N</span><span>${title} — Netscape</span></div>${menus}<div class="navigator-location"><div class="browser-tools">${back}${forward}${reload}${home}</div>${address}<div class="browser-tools">${info}</div></div>`;
       status.innerHTML = '<span class="status-text">Document: Done</span><span aria-hidden="true">Navigator</span>';
