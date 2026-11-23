@@ -237,7 +237,7 @@ function searchSourcePage(page) {
       <p class="site-kicker">${official ? 'PUBLIC PROGRAMS / NOVEMBER 2023' : 'COMMUNITY EVENTS / NOVEMBER 2023'}</p>
       <h2>${official ? 'Observing Night' : 'November Schedule'}</h2>
       <p class="source-datetime"><time datetime="2023-11-18T20:30">Saturday, 18 November 2023 · 8:30 p.m.</time></p>
-      <p>Bring a warm layer and join local volunteers at the <strong>West Terrace, North Ridge Observatory</strong>. Use the north entrance on Ridge Road.</p>
+      <p data-i18n-rich="23.source.direction">Bring a warm layer and join local volunteers at the <strong>West Terrace, North Ridge Observatory</strong>. Use the north entrance on Ridge Road.</p>
       <p>${official ? 'The terrace opens at 8:15 p.m. Telescopes will be available, and visitors are welcome to bring a red flashlight.' : 'Calendar entry supplied by North Ridge Observatory. Please check the observatory notice for weather changes.'}</p>
       ${sceneLink(2023, official ? 'archive' : 'notice', official ? 'View the calendar listing →' : 'Read the official event notice →')}
     </div>

@@ -647,6 +647,19 @@ export const richMessages={
       "전시를 위해 만든 가상의 이웃 홈페이지야. 업데이트: 1998년 11월 18일."
     ],
     "labels": []
+  },
+  "23.source.direction": {
+    "en": [
+      "Bring a warm layer and join local volunteers at the ",
+      ". Use the north entrance on Ridge Road."
+    ],
+    "ko": [
+      "따뜻한 겉옷을 입고 지역 자원봉사자들과 ",
+      "에서 만나세요. Ridge Road 북쪽 입구를 이용하세요."
+    ],
+    "labels": [
+      null
+    ]
   }
 };
 export const runtimeMessages={
@@ -766,4 +779,97 @@ export const staticLinkPairs = [
   ["My fall list","가을 관측 목록"],
   ["Make a link","링크 만들기"],
   ["Keep a page list","페이지 목록 만들기"]
+];
+
+// Locally authored exhibit sentences detected by text-node QA.
+// Original external image titles, article metadata and personal names remain in English.
+export const authoredTextPairs = [
+  [
+    "West Terrace record with local time, weather and field notes.",
+    "서쪽 테라스에서 기록한 현지 시각, 날씨, 현장 메모."
+  ],
+  [
+    "Optical arrangement and configuration used during the lunar session.",
+    "달 관측에 사용한 광학 구성과 장비 설정."
+  ],
+  [
+    "October comparison readings and scale correction.",
+    "10월의 비교 측정값과 눈금 보정 자료."
+  ],
+  [
+    "README, units and reduced notes for the lunar limb.",
+    "README, 측정 단위와 달 가장자리 관측값 정리."
+  ],
+  [
+    "Working names, atlas references and corrections to the first list.",
+    "임시 지형명, 월면도 참조 항목과 최초 목록 수정 내역."
+  ],
+  [
+    "Questions on time notation and a reply linked from their server.",
+    "시각 표기에 관한 질문과 상대 기관 서버에 연결된 답변."
+  ],
+  [
+    "Proposed the Web at CERN and built its first browser and server.",
+    "CERN에서 웹을 제안하고 최초의 브라우저와 서버를 만들었습니다."
+  ],
+  [
+    "Worked with Berners-Lee at CERN and helped promote the project.",
+    "CERN에서 버너스리와 협력하며 웹 프로젝트의 확산을 도왔습니다."
+  ],
+  [
+    "Developed the first X Window System version of Mosaic at NCSA.",
+    "NCSA에서 최초의 X 윈도 시스템용 Mosaic 브라우저를 개발했습니다."
+  ],
+  [
+    "North Ridge Observatory Data Desk · revision 1 · 28 October 1993",
+    "North Ridge 관측소 데이터팀 · 개정 1판 · 1993년 10월 28일"
+  ],
+  [
+    "Entries cited in October logs",
+    "10월 관측 일지에서 참조한 항목"
+  ],
+  [
+    "r0 · 2 October: names copied from observing card.",
+    "r0 · 10월 2일: 관측 카드에서 지형명을 옮겨 적었습니다."
+  ],
+  [
+    "Lyra Observatory computing group · received 29 October · copy filed at North Ridge",
+    "Lyra 천문대 전산팀 · 10월 29일 수신 · North Ridge에 사본 보관"
+  ],
+  [
+    "More pages from this neighborhood",
+    "이웃 홈페이지 더 보기"
+  ],
+  [
+    "Eclipse science and observing activities",
+    "월식의 과학과 관측 활동"
+  ],
+  [
+    "North Ridge Astronomy Club calendar",
+    "North Ridge 천문 동호회 일정표"
+  ],
+  [
+    "Thanks for sharing this moment.",
+    "이 순간을 공유해 주셔서 고마워요."
+  ],
+  [
+    "Search the web, then explore a generated overview.",
+    "웹을 검색한 뒤 생성된 요약을 살펴보세요."
+  ],
+  [
+    "Read the official event notice →",
+    "공식 행사 공지 읽기 →"
+  ],
+  [
+    "Select items for my plan →",
+    "관측 계획에 항목 추가하기 →"
+  ],
+  [
+    "A web prepared for agents",
+    "에이전트를 위해 준비된 웹"
+  ],
+  [
+    "NASA image release · 22 August 2022. Selected again for the 7:40 p.m. sky-talk slot; local agenda timing is simulated.",
+    "NASA 사진 공개 · 2022년 8월 22일. 오후 7시 40분 천문학 이야기 시간의 자료로 다시 선정했습니다. 현지 프로그램 시간은 전시용 가상 일정입니다."
+  ]
 ];

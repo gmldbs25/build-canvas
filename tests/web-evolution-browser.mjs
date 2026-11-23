@@ -149,6 +149,11 @@ try {
   const samples=[...untranslated].slice(0,70).map(([route,texts])=>({route,examples:texts.map(t=>t.slice(0,170))}));
   console.log('KOREAN_COPY_REVIEW '+JSON.stringify({routesWithLongEnglishText:untranslated.size,samples}));
   console.log('KOREAN_NODE_REVIEW '+JSON.stringify({routesWithEnglishFragments:englishFragments.size,samples:[...englishFragments].slice(0,40).map(([route,fragments])=>({route,fragments}))}));
+  // Regression guard for invented exhibit copy. Original-source titles and attribution
+  // are intentionally exempt from translated copy requirements.
+  const knownAuthoredEnglish=["West Terrace record with local time, weather and field notes.","Optical arrangement and configuration used during the lunar session.","October comparison readings and scale correction.","README, units and reduced notes for the lunar limb.","Working names, atlas references and corrections to the first list.","Questions on time notation and a reply linked from their server.","Proposed the Web at CERN and built its first browser and server.","Worked with Berners-Lee at CERN and helped promote the project.","Developed the first X Window System version of Mosaic at NCSA.","North Ridge Observatory Data Desk · revision 1 · 28 October 1993","Entries cited in October logs","r0 · 2 October: names copied from observing card.","Lyra Observatory computing group · received 29 October · copy filed at North Ridge","More pages from this neighborhood","Eclipse science and observing activities","North Ridge Astronomy Club calendar","Thanks for sharing this moment.","Search the web, then explore a generated overview.","Read the official event notice →","Select items for my plan →","A web prepared for agents","NASA image release · 22 August 2022. Selected again for the 7:40 p.m. sky-talk slot; local agenda timing is simulated."];
+  const leaked=[...englishFragments].flatMap(([route,fragments])=>fragments.filter(s=>knownAuthoredEnglish.some(en=>s.includes(en))).map(s=>({route,text:s})));
+  assert.deepEqual(leaked,[],'Authored English fragments must be translated; see KOREAN_NODE_REVIEW');
   await routeContext.close();
 
   console.log('Work 7 bilingual browser smoke passed: 9 viewports, guestbook, local search, Pacebook, Orbit Search, poster and agent.');
