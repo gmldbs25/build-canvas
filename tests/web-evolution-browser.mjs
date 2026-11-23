@@ -119,6 +119,7 @@ try {
   });
   assert.equal(routes.length,75,'expected all 75 curated pages');
   const untranslated=new Map();
+  const englishFragments=new Map();
   for(const {era,page:pageId} of routes){
     await routePage.goto(baseUrl+'?era='+era+'&page='+encodeURIComponent(pageId),{waitUntil:'domcontentloaded'});
     await routePage.locator('#screen .page-content').waitFor();
@@ -128,14 +129,26 @@ try {
       const nodes=[...root.querySelectorAll('h1,h2,h3,p,li,td,th')].filter(n=>!n.closest('[data-no-translate],pre,code,.monitor-news,.live-result-list'));
       const english=nodes.map(n=>n.textContent.trim().replace(/\s+/g,' '))
         .filter(s=>!/[가-힣]/.test(s)&&(/[a-z]+(?:\s+[a-z]+){5,}/i).test(s)).slice(0,3);
-      return {length:root.innerText?.length||root.textContent?.length||0,english};
+      // Detect English fragments within mixed EN/KR paragraphs. A paragraph-level
+      // regex misses these because a single Hangul character hides untranslated nodes.
+      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+      const fragments=[];let node;
+      while((node=walker.nextNode())){
+        const el=node.parentElement;
+        if(!el||el.closest('pre,code,[data-no-translate],.monitor-news,.monitor-excerpt,.live-result-list,.live-image-grid,.source-reference-card,.photo-credit,.source-note-check'))continue;
+        const s=node.nodeValue.trim().replace(/\\s+/g,' ');
+        if(!/[가-힣]/.test(s)&&/(?:\\b[A-Za-z][A-Za-z'’–-]*\\s+){4,}[A-Za-z]/.test(s))fragments.push(s.slice(0,150));
+      }
+      return {length:root.innerText?.length||root.textContent?.length||0,english,fragments:fragments.slice(0,8)};
     });
     assert.ok(result.length>15,'missing page content at '+era+'/'+pageId);
     if(result.english.length)untranslated.set(era+'/'+pageId,result.english);
+    if(result.fragments.length)englishFragments.set(era+'/'+pageId,result.fragments);
   }
   console.log('All 75 Work 7 exhibit routes loaded in Korean mode.');
   const samples=[...untranslated].slice(0,70).map(([route,texts])=>({route,examples:texts.map(t=>t.slice(0,170))}));
   console.log('KOREAN_COPY_REVIEW '+JSON.stringify({routesWithLongEnglishText:untranslated.size,samples}));
+  console.log('KOREAN_NODE_REVIEW '+JSON.stringify({routesWithEnglishFragments:englishFragments.size,samples:[...englishFragments].slice(0,40).map(([route,fragments])=>({route,fragments}))}));
   await routeContext.close();
 
   console.log('Work 7 bilingual browser smoke passed: 9 viewports, guestbook, local search, Pacebook, Orbit Search, poster and agent.');

@@ -692,3 +692,18 @@ export const runtimeMessages={
  'live.paused':['Search paused. Try again when you are back in Orbit Search.','검색이 중단됐습니다. Orbit Search로 돌아와 다시 시도하세요.'],
  'live.existing':['Showing the sources already found.','이미 찾은 출처를 표시합니다.']
 };
+
+
+// Authored link labels identified in a 75-route translation review.
+// Historical brand names, URLs, user entries and original source titles are unchanged.
+export const staticLinkPairs = [
+  ['Hypertext and HTML','하이퍼텍스트와 HTML'],
+  ['Night log: 23 October 1993','관측 일지: 1993년 10월 23일'],
+  ['Instrument description: 90 mm refractor','장비 설명: 90mm 굴절망원경'],
+  ['Reduction procedure and sample table','관측값 정리 절차와 예제 표'],
+  ['Lunar feature catalogue, revision 2','달 지형 목록, 개정 2판'],
+  ['Correspondence with Lyra Observatory','Lyra 천문대와의 교신 기록'],
+  ['Know a good site? Tell me in the guestbook!','좋은 사이트를 알고 있니? 방명록에 알려 줘!'],
+  ['Alex’s favorite space links','Alex가 좋아하는 우주 관련 링크'],
+  ['Leave Alex a note','Alex에게 글 남기기']
+];

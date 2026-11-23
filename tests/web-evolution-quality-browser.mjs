@@ -63,6 +63,7 @@ try{
  await choose(page,'ko');
  assert.match(await page.locator('[data-i18n-rich="98.links.nasa"]').innerText(),/우주 임무 소식/);
  assert.equal(await page.locator('[data-i18n-rich="98.links.nasa"] a').getAttribute('href'),'https://www.nasa.gov/');
+ assert.match(await page.getByRole('link',{name:/좋은 사이트를 알고 있니/}).innerText(),/방명록/);
  await page.screenshot({path:'work7-quality-captures/1998-links-korean.png'});
  await page.goto(baseUrl+'?era=2005&page=eclipse-a');
  await page.locator('[data-favorite]').waitFor();
