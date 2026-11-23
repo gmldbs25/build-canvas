@@ -156,6 +156,31 @@
               </figure>
             </div>
             <div class="reading-column">
+              <figure id="pagerank-explainer" class="reading-pagerank" aria-labelledby="pagerank-explainer-title">
+                <p class="reading-figure-kicker">LINK ANALYSIS · CONCEPT</p>
+                <h3 id="pagerank-explainer-title">링크는 검색 순위의 신호가 되었다</h3>
+                <p>어떤 페이지를 다른 페이지들이 가리키는지 살펴보면, 검색어가 포함됐는지 외의 관계도 알 수 있다.</p>
+                <svg viewBox="0 0 740 280" role="img" aria-labelledby="pagerank-diagram-title pagerank-diagram-desc">
+                  <title id="pagerank-diagram-title">서로 다른 페이지 사이의 링크 구조</title>
+                  <desc id="pagerank-diagram-desc">페이지 A와 B가 C로 연결되고, 페이지 B와 C가 D로 연결되는 예시. PageRank는 이런 연결 구조를 중요도 평가에 활용한다.</desc>
+                  <defs><marker id="pagerank-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#d5be8c"/></marker></defs>
+                  <rect class="pagerank-surface" x="2" y="2" width="736" height="276" rx="8"/>
+                  <path class="pagerank-edge" d="M170 85 Q260 85 343 136" marker-end="url(#pagerank-arrow)"/>
+                  <path class="pagerank-edge" d="M170 209 Q250 190 343 152" marker-end="url(#pagerank-arrow)"/>
+                  <path class="pagerank-edge" d="M435 145 L594 145" marker-end="url(#pagerank-arrow)"/>
+                  <path class="pagerank-edge" d="M165 229 Q385 275 609 181" marker-end="url(#pagerank-arrow)"/>
+                  <circle class="pagerank-node" cx="135" cy="80" r="38"/>
+                  <circle class="pagerank-node" cx="135" cy="215" r="38"/>
+                  <circle class="pagerank-node-feature" cx="397" cy="145" r="38"/>
+                  <circle class="pagerank-node-feature" cx="637" cy="145" r="38"/>
+                  <text class="pagerank-label" x="135" y="80">A</text><text class="pagerank-label" x="135" y="215">B</text>
+                  <text class="pagerank-label" x="397" y="145">C</text><text class="pagerank-label" x="637" y="145">D</text>
+                  <text class="pagerank-small" x="135" y="133">페이지 A</text><text class="pagerank-small" x="135" y="267">페이지 B</text>
+                  <text class="pagerank-small" x="397" y="202">페이지 C</text><text class="pagerank-small" x="637" y="202">페이지 D</text>
+                </svg>
+                <figcaption>설명을 위해 만든 가상 링크 지도다. 화살표는 링크가 향하는 방향을 나타낸다. 실제 PageRank는 연결 수뿐 아니라 연결의 구조를 고려하며, Google 검색 순위가 이 지표 하나로 정해지지는 않는다.</figcaption>
+                <div class="reading-figure-actions"><button type="button" class="reading-detail-trigger" data-reading-detail="pagerank" hidden>개념 크게 보기</button></div>
+              </figure>
               <p>이제 방문자는 <code lang="en">easy bread recipe</code> 같은 말을 입력해 처음 보는 페이지까지 갈 수 있다. 모든 결과가 믿을 만하거나 원하는 답을 주는 것은 아니다. 검색은 발견의 출발점을 바꿨고, 작성자와 날짜, 페이지 안의 근거를 살피는 판단은 여전히 독자에게 남았다.</p>
               <a class="article-experience archive-inline" href="?era=2001&amp;from=discovery"><time>2001</time> 검색어로 자료 찾기 <span aria-hidden="true">↗</span></a>
             </div>
@@ -468,6 +493,14 @@
     <p id="notes-guide" class="notes-guide"></p>
     <p id="notes-copy"></p>
     <ul id="notes-sources" aria-label="역사 자료"></ul>
+  </dialog>
+
+  <dialog id="reading-detail" class="reading-detail" aria-labelledby="reading-detail-title">
+    <header><p>VISUAL NOTES · 02</p><button type="button" data-reading-close aria-label="개념 상세 닫기">닫기 ×</button></header>
+    <h2 id="reading-detail-title">PageRank · 링크 관계 이해하기</h2>
+    <div data-reading-diagram></div>
+    <p>페이지 A와 B가 C를, B와 C가 D를 가리키는 예시다. PageRank는 이렇게 이어진 링크의 관계를 중요도 판단의 한 신호로 활용한다. 화살표는 실제 검색 순위를 계산한 결과가 아니다.</p>
+    <p><a href="https://research.google/pubs/the-anatomy-of-a-large-scale-hypertextual-web-search-engine/">Brin과 Page의 1998년 연구 원문</a></p>
   </dialog>
   <noscript><p class="no-js">시대별 웹을 탐험하려면 JavaScript를 켜 주세요.</p></noscript>
 </body>
