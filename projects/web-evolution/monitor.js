@@ -16,6 +16,12 @@ const timeFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
   timeZoneName: 'short',
 });
+const clockFormatKo = new Intl.DateTimeFormat('ko-KR',{
+  weekday:'long',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'
+});
+const timeFormatKo = new Intl.DateTimeFormat('ko-KR',{
+  month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'
+});
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -25,8 +31,9 @@ function element(tag, text, className) {
 }
 
 function timeNode(date, formatter = timeFormat) {
-  const time = element('time', formatter.format(date));
+  const time = element('time', (getLocale()==='ko'?timeFormatKo:formatter).format(date));
   time.dateTime = date.toISOString();
+  time.dataset.monitorTime='true';
   return time;
 }
 
@@ -173,7 +180,7 @@ export function createMonitor() {
 
     function showClock() {
       const now = new Date();
-      localClock.textContent = clockFormat.format(now);
+      localClock.textContent = (getLocale()==='ko'?clockFormatKo:clockFormat).format(now);
       localClock.dateTime = now.toISOString();
     }
 
@@ -243,6 +250,16 @@ export function createMonitor() {
       report.write(checked, jobs.length, reducedMotion);
     }
 
+    // Update displayed dates without remounting the monitor or repeating an API request.
+    const unsubscribeLocale=subscribeLocale(()=>{
+      if(lifetime.signal.aborted)return;
+      showClock();
+      for(const time of panel.querySelectorAll('time[data-monitor-time]')){
+        const date=new Date(time.dateTime);
+        if(Number.isFinite(date.getTime()))time.textContent=(getLocale()==='ko'?timeFormatKo:timeFormat).format(date);
+      }
+    });
+    lifetime.signal.addEventListener('abort',unsubscribeLocale,{once:true});
     const clockInterval = setInterval(showClock, 15000);
     const feedInterval = setInterval(() => {
       if (!document.hidden) refresh();

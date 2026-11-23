@@ -676,5 +676,19 @@ export const runtimeMessages={
  'monitor.complete':['Source check complete.','출처 확인이 완료됐습니다.'],
  'monitor.checkingLabel':['Checking','확인 중'],
  'monitor.timedOut':['Timed out','시간 초과'],
- 'monitor.unavailableLabel':['Unavailable','이용 불가']
+ 'monitor.unavailableLabel':['Unavailable','이용 불가'],
+ 'live.searching':['Searching live NASA and Spaceflight News sources…','NASA와 Spaceflight News의 실시간 자료를 검색하는 중…'],
+ 'live.found':['{count} live records found. Preparing a source-based overview…','실시간 자료 {count}건을 찾았습니다. 출처 기반 개요를 준비 중…'],
+ 'live.foundPartial':['{count} live records found. Preparing a source-based overview… {source} could not be loaded.','실시간 자료 {count}건을 찾았습니다. 출처 기반 개요를 준비 중입니다. {source} 자료는 불러오지 못했습니다.'],
+ 'live.none':['No live results found for “{query}”.','“{query}”에 대한 실시간 검색 결과가 없습니다.'],
+ 'live.nonePartial':['No live results found for “{query}”. {source} could not be loaded.','“{query}”에 대한 결과가 없습니다. {source} 자료는 불러오지 못했습니다.'],
+ 'live.identifying':['Identifying useful sources…','유용한 출처를 확인하는 중…'],
+ 'live.reading':['Reading the first source summary…','첫 번째 자료의 요약을 읽는 중…'],
+ 'live.links':['Showing the first source links…','첫 번째 출처 링크를 표시하는 중…'],
+ 'live.ready':['Showing {count} live source records for “{query}”.','“{query}”에 대한 실시간 출처 {count}건을 표시합니다.'],
+ 'live.readyPartial':['Showing {count} live source records for “{query}”. {source} could not be loaded.','“{query}”에 대한 실시간 출처 {count}건을 표시합니다. {source} 자료는 불러오지 못했습니다.'],
+ 'live.failed':['The live sources could not be reached. Try again.','실시간 자료에 접근하지 못했습니다. 다시 시도하세요.'],
+ 'live.timedOut':['The live search timed out. Try again.','실시간 검색이 시간 초과되었습니다. 다시 시도하세요.'],
+ 'live.paused':['Search paused. Try again when you are back in Orbit Search.','검색이 중단됐습니다. Orbit Search로 돌아와 다시 시도하세요.'],
+ 'live.existing':['Showing the sources already found.','이미 찾은 출처를 표시합니다.']
 };

@@ -44,7 +44,7 @@ function renderPhotoDetail(photo) {
         ${photo.notes ? `<p>${escapeHtml(photo.notes)}</p>` : ''}
         <p class="photo-credit"><strong>${escapeHtml(photo.credit)}</strong>. <a href="${photo.sourceUrl}" target="_blank" rel="noopener noreferrer">Source record</a>${photo.originalUrl ? ` · <a href="${photo.originalUrl}" target="_blank" rel="noopener noreferrer">Download original</a>` : ''}${photo.licenseUrl ? ` · <a href="${photo.licenseUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(photo.license)}</a>` : ''}</p>
         <div class="photo-tags"><strong>Tags</strong> ${tags.map((tag) => photoLink(photoTagPages[tag] || 'moon', tagLabels[tag] || tag, 'class="tag-chip"')).join('')}</div>
-        <button class="photo-fave" type="button" data-favorite="${photo.id}" aria-pressed="${isFavorite}">${isFavorite ? '♥ ' + formatMessage('photo.favorite.saved') : '♡ ' + formatMessage('photo.favorite.add')}</button>
+        <button class="photo-fave" type="button" data-favorite="${photo.id}" aria-pressed="${isFavorite}" data-i18n-message="${isFavorite?'photo.favorite.saved':'photo.favorite.add'}" data-i18n-prefix="${isFavorite?'♥ ':'♡ '}">${isFavorite ? '♥ ' + formatMessage('photo.favorite.saved') : '♡ ' + formatMessage('photo.favorite.add')}</button>
         ${comments.length ? `<div class="photo-comments"><h3>${comments.length} comments</h3>${comments.map(([name, comment]) => `<p><strong>${escapeHtml(name)}:</strong> ${escapeHtml(comment)}</p>`).join('')}</div>` : ''}
       </aside>
     </div>
@@ -110,7 +110,7 @@ export function photoPage(page) {
     const counts = tagGroup.map((tag) => [tag, communityStream.filter(({ tags }) => tags.includes(tag)).length]);
     return `<article class="photo-page moon-page">
       <div class="flickr-breadcrumb">${photoLink('home', 'Community photostream')} <span>›</span> Explore tags</div>
-      <header class="moon-heading"><div><p class="photo-kicker">moonstream · explore</p><h2>Photos tagged <span class="tag-chip">${escapeHtml(activeTag ? tagLabels[activeTag] || activeTag : 'lunar eclipse')}</span></h2></div><span class="moon-result-count">${photos.length} photos</span></header>
+      <header class="moon-heading"><div><p class="photo-kicker">moonstream · explore</p><h2>Photos tagged <span class="tag-chip">${escapeHtml(activeTag ? tagLabels[activeTag] || activeTag : 'lunar eclipse')}</span></h2></div><span class="moon-result-count" data-i18n-message="photo.count" data-i18n-params='{"count":${photos.length}}'>${formatMessage('photo.count',{count:photos.length})}</span></header>
       <p class="photo-intro">${activeTag in communityTags ? 'Browse observation photos and reference images by topic.' : 'Compare photographs of the October 2004 eclipse. Open a photo for its capture details and source record.'}</p>
       <nav class="photo-tag-nav" aria-label="Browse by tag">
         ${photoLink('home', 'All community photos', 'class="tag-chip"')}
@@ -135,10 +135,10 @@ export function photoPage(page) {
     <nav class="photo-tag-nav stream-tag-nav" aria-label="Explore community tags"><strong>Explore tags</strong>
       ${['lunar-eclipse', 'observing', 'telescopes', 'planets', 'comets', 'moon'].map((tag) => tagLink(tag, tagLabels[tag], page)).join('')}
     </nav>
-    <div class="stream-heading"><h3>Member observations</h3><span class="moon-result-count" aria-live="polite">${photos.length} photos</span></div>
+    <div class="stream-heading"><h3>Member observations</h3><span class="moon-result-count" aria-live="polite" data-i18n-message="photo.count" data-i18n-params='{"count":${photos.length}}'>${formatMessage('photo.count',{count:photos.length})}</span></div>
     ${photoTiles(photos)}
     <section class="stream-references" aria-labelledby="reference-heading">
-      <div class="stream-heading"><h3 id="reference-heading">Shared reference images</h3><span class="moon-result-count">${referencePhotos.length} photos</span></div>
+      <div class="stream-heading"><h3 id="reference-heading">Shared reference images</h3><span class="moon-result-count" data-i18n-message="photo.count" data-i18n-params='{"count":${referencePhotos.length}}'>${formatMessage('photo.count',{count:referencePhotos.length})}</span></div>
       ${photoTiles(referencePhotos)}
     </section>
     <dialog class="upload-dialog"><form method="dialog" class="upload-close"><button type="submit" aria-label="Close upload">×</button></form><form class="upload-form"><h3>Share a photograph</h3><p>Your photo appears in this exhibit for this visit.</p><label>Photo <input type="file" name="photo" accept="image/*" required></label><label>Caption <input name="caption" maxlength="70" placeholder="A note about this moment"></label><p class="upload-feedback" aria-live="polite"></p><button type="submit">Add to photostream</button></form></dialog>

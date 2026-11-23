@@ -218,7 +218,9 @@ function liveSearchMarkup(state) {
       </section>` : '';
   const retry = state.status === 'error' || (state.status === 'complete' && !results.length)
     ? '<div class="live-search-error"><button type="button" data-live-retry>Try again</button></div>' : '';
-  const progress = `<p class="live-search-status" id="live-search-status" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(state.message || 'Search live NASA and Spaceflight News sources for astronomy records.')}</p>`;
+  const statusText = state.messageKey ? formatMessage(state.messageKey,state.messageParams||{}) : state.message || 'Search live NASA and Spaceflight News sources for astronomy records.';
+  const attrs=state.messageKey ? ` data-i18n-message="${escapeHtml(state.messageKey)}" data-i18n-params="${escapeHtml(JSON.stringify(state.messageParams||{}))}"` : '';
+  const progress = `<p class="live-search-status" id="live-search-status" role="status" aria-live="polite" aria-atomic="true"${attrs}>${escapeHtml(statusText)}</p>`;
   const waiting = busy && !state.summaryStage ? `<div class="live-search-wait" aria-hidden="true"><span></span><span></span><span></span></div>` : '';
   return `<div class="live-search-results" data-live-stage="${state.status}">
     <p class="live-source-language">External source text is shown in its original language.</p>
@@ -697,6 +699,8 @@ export function createModern(poster) {
     if (liveState.status === 'loading') {
       liveState.status = liveState.results.length ? 'complete' : 'error';
       liveState.message = liveState.results.length ? 'Showing the sources already found.' : 'Search paused. Try again when you are back in Orbit Search.';
+      liveState.messageKey=liveState.results.length?'live.existing':'live.paused';
+      liveState.messageParams={};
       liveState.summaryStage = liveState.results.length ? 3 : 0;
       liveState.resultsRevealed = liveState.results.length;
     }
@@ -790,7 +794,7 @@ export function createModern(poster) {
     const generation = liveGeneration;
     const query = value.trim();
     if (!query) return;
-    liveState = { query, status: 'loading', message: 'Searching live NASA and Spaceflight News sources…', results: [], summaryStage: 0, resultsRevealed: 0 };
+    liveState = { query, status: 'loading', message: 'Searching live NASA and Spaceflight News sources…', messageKey:'live.searching', messageParams:{}, results: [], summaryStage: 0, resultsRevealed: 0 };
     activeLiveRoot = root;
     renderLiveState();
     const controller = new AbortController();
@@ -815,6 +819,8 @@ export function createModern(poster) {
       liveState.message = results.length
         ? `${results.length} live records found. Preparing a source-based overview…${sourceNote}`
         : `No live results found for “${query}”.${sourceNote}`;
+      liveState.messageKey=results.length?(failed.length?'live.foundPartial':'live.found'):(failed.length?'live.nonePartial':'live.none');
+      liveState.messageParams={count:results.length,query,source:failed.join(' and ')};
       liveController = null;
       if (!results.length) {
         liveState.status = 'complete';
@@ -822,15 +828,18 @@ export function createModern(poster) {
         return;
       }
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const finalKey=failed.length?'live.readyPartial':'live.ready';
       const steps = reduced
-        ? [[0, 3, results.length, readyMessage]]
-        : [[240, 0, 0, liveState.message], [600, 1, 0, 'Identifying useful sources…'], [1030, 2, 0, 'Reading the first source summary…'], [1460, 3, Math.min(2, results.length), 'Showing the first source links…'], [1900, 3, results.length, readyMessage]];
-      for (const [delay, summaryStage, revealed, message] of steps) {
+        ? [[0, 3, results.length, readyMessage,finalKey]]
+        : [[240, 0, 0, liveState.message,liveState.messageKey], [600, 1, 0, 'Identifying useful sources…','live.identifying'], [1030, 2, 0, 'Reading the first source summary…','live.reading'], [1460, 3, Math.min(2, results.length), 'Showing the first source links…','live.links'], [1900, 3, results.length, readyMessage,finalKey]];
+      for (const [delay, summaryStage, revealed, message,messageKey] of steps) {
         liveTimers.push(setTimeout(() => {
           if (generation !== liveGeneration) return;
           liveState.summaryStage = summaryStage;
           liveState.resultsRevealed = Math.max(liveState.resultsRevealed, revealed);
           liveState.message = message;
+          liveState.messageKey=messageKey;
+          liveState.messageParams={count:results.length,query,source:failed.join(' and ')};
           if (delay === steps.at(-1)[0]) {
             liveState.status = 'complete';
             liveTimers = [];
@@ -843,6 +852,8 @@ export function createModern(poster) {
       liveController = null;
       liveState.status = 'error';
       liveState.message = controller.signal.reason?.message || error.message || 'The live sources could not be reached.';
+      liveState.messageKey=controller.signal.aborted?'live.timedOut':'live.failed';
+      liveState.messageParams={};
       renderLiveState();
     } finally {
       clearTimeout(timeout);
