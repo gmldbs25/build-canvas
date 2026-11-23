@@ -14,6 +14,7 @@ test('seven eras have bilingual route labels and stable nontranslatable names',(
   }
   assert.equal(message('era.1998.pages.home.title','en'),'The Orbit Room');
   assert.equal(translateText('Search results','ko'),'검색 결과');
+  assert.equal(translateText('Return to the ', 'ko'),'다음 페이지로 돌아갑니다: ');
 });
 test('locale selection cannot call a page renderer or change the browser route',()=>{
   const source=readFileSync(new URL('../projects/web-evolution/main.js',import.meta.url),'utf8');
