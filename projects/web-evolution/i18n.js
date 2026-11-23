@@ -36,6 +36,7 @@ export function translateText(value,lang=locale){
   }
   // Simulated dates remain data, but their display format follows the selected language.
   if (lang === 'ko') {
+    result = result.replace(' · local scenario for ', ' · 지역 시나리오: ');
     result = result.replace(/\b(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday), (?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}\b/g, (dateText) => {
       const date = new Date(dateText);
       return Number.isNaN(date.getTime()) ? dateText : new Intl.DateTimeFormat('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long', timeZone:'UTC' }).format(date);
@@ -54,7 +55,7 @@ export function setLocale(next){
 }
 const originalText=new WeakMap();
 const originalAttrs=new WeakMap();
-const protectedSelector='script,style,pre,code,[data-no-translate],.live-result-list,.live-image-grid,.monitor-news,.monitor-excerpt,.live-summary-copy';
+const protectedSelector='script,style,pre,code,[data-no-translate],.live-result-list,.live-image-grid,.monitor-news,.monitor-excerpt';
 function protectedNode(element){return Boolean(element?.closest(protectedSelector))}
 function changeText(node,lang){
   if(protectedNode(node.parentElement))return;
@@ -88,7 +89,7 @@ export function applyLocale(root,lang=locale){
   for(const element of elements){
     if(element.matches?.('#screen,#chrome,.pacebook,.search-suggestions,.search-hint,#search-status,.briefing-update-note'))element.lang=lang;
   }
-  const external=root.querySelectorAll?.('.live-result-list,.live-image-grid,.monitor-news,.monitor-excerpt,.live-summary-copy')||[];
+  const external=root.querySelectorAll?.('.live-result-list,.live-image-grid,.monitor-news,.monitor-excerpt')||[];
   for(const element of external)element.lang='en';
 }
 export function localeAudit(){return {locale,catalogKeys:Object.keys(messages).length,englishPairs:enToKo.size}}

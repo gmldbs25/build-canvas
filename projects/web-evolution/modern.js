@@ -187,11 +187,11 @@ function liveSearchMarkup(state) {
   const summary = state.summaryStage > 0 && top
     ? `<article class="live-ai-summary" aria-labelledby="live-summary-title">
         <div class="live-ai-label"><span aria-hidden="true">✦</span> Orbit Search synthesis <span>from live sources</span></div>
-        <h3 id="live-summary-title">${escapeHtml(state.query)}</h3>
+        <h3 id="live-summary-title" data-no-translate>${escapeHtml(state.query)}</h3>
         <div class="live-summary-copy">
-          <p>I found <strong>${results.length}</strong> ${results.length === 1 ? 'record' : 'records'} from ${escapeHtml(providers)}.</p>
-          ${state.summaryStage >= 2 ? `<p>One source to start with: <strong>${escapeHtml(top.title)}</strong>${top.published ? ` · ${top.provider === 'nasa' ? 'archived' : 'published'} ${escapeHtml(top.published)}` : ''}.</p>` : ''}
-          ${state.summaryStage >= 3 ? `<p>${escapeHtml(top.summary || top.title)} <a href="${escapeHtml(top.url)}" target="_blank" rel="noopener noreferrer">Open this source ↗</a></p>` : ''}
+          <p>I found <strong>${results.length}</strong> ${results.length === 1 ? 'record' : 'records'} from <span data-no-translate lang="en">${escapeHtml(providers)}</span>.</p>
+          ${state.summaryStage >= 2 ? `<p>One source to start with: <strong data-no-translate lang="en">${escapeHtml(top.title)}</strong>${top.published ? ` · <span>${top.provider === 'nasa' ? 'archived' : 'published'}</span> <span data-no-translate lang="en">${escapeHtml(top.published)}</span>` : ''}.</p>` : ''}
+          ${state.summaryStage >= 3 ? `<p><span data-no-translate lang="en">${escapeHtml(top.summary || top.title)}</span> <a href="${escapeHtml(top.url)}" target="_blank" rel="noopener noreferrer">Open this source ↗</a></p>` : ''}
         </div>
         <p class="live-summary-note">A short generated orientation based on the linked records below; verify details on the source pages.</p>
       </article>` : '';

@@ -311,5 +311,13 @@ export const refinedPairs = [
   [
     "Return to the search results",
     "검색 결과로 돌아가기"
+  ],
+  [
+    "Filed by the North Ridge instrument group. Return to the",
+    "North Ridge 관측 장비팀에서 작성했습니다. 다음 자료실로 돌아갑니다:"
+  ],
+  [
+    "research library",
+    "연구 자료실"
   ]
 ];

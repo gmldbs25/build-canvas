@@ -311,5 +311,33 @@ export const refinedMorePairs = [
   [
     "All changes saved",
     "모든 변경 사항 저장됨"
+  ],
+  [
+    "I found",
+    "찾은 자료:"
+  ],
+  [
+    "record from",
+    "개 · 출처:"
+  ],
+  [
+    "records from",
+    "개 · 출처:"
+  ],
+  [
+    "One source to start with:",
+    "먼저 살펴볼 출처:"
+  ],
+  [
+    "Open this source ↗",
+    "원문 출처 열기 ↗"
+  ],
+  [
+    "archived",
+    "보관됨"
+  ],
+  [
+    "published",
+    "게시됨"
   ]
 ];
