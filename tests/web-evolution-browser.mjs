@@ -136,8 +136,8 @@ try {
       while((node=walker.nextNode())){
         const el=node.parentElement;
         if(!el||el.closest('pre,code,[data-no-translate],.monitor-news,.monitor-excerpt,.live-result-list,.live-image-grid,.source-reference-card,.photo-credit,.source-note-check'))continue;
-        const s=node.nodeValue.trim().replace(/\\s+/g,' ');
-        if(!/[가-힣]/.test(s)&&/(?:\\b[A-Za-z][A-Za-z'’–-]*\\s+){4,}[A-Za-z]/.test(s))fragments.push(s.slice(0,150));
+        const s=node.nodeValue.trim().replace(/\s+/g,' ');
+        if(!/[가-힣]/.test(s)&&/(?:\b[A-Za-z][A-Za-z'’–-]*\s+){4,}[A-Za-z]/.test(s))fragments.push(s.slice(0,150));
       }
       return {length:root.innerText?.length||root.textContent?.length||0,english,fragments:fragments.slice(0,8)};
     });
