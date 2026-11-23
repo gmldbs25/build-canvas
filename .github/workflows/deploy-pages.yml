@@ -45,6 +45,11 @@ jobs:
       - name: Verify Work 7 reading interactions
         run: node --test tests/web-evolution-reading.test.mjs
 
+      - name: Verify Work 7 exhibit workspace
+        run: |
+          node --check projects/web-evolution/main.js
+          node --test tests/web-evolution-workspace.test.mjs
+
       - name: Build portfolio
         run: npm run build:pages
 
