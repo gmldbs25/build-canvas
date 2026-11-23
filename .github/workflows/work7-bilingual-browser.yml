@@ -31,3 +31,12 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test EN/KR interactions across nine viewports
         run: node tests/web-evolution-browser.mjs
+      - name: Validate authored rich text and dynamic locale state
+        run: node tests/web-evolution-quality-browser.mjs
+      - name: Upload Work 7 bilingual quality screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: work7-quality-screenshots
+          path: work7-quality-captures
+          if-no-files-found: ignore
