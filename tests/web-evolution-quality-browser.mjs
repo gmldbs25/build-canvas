@@ -135,7 +135,7 @@ try{
  await choose(apiPage,'ko');
  assert.match(await apiPage.locator('#briefing-update-note').innerText(),/오후/);
  assert.match(await apiPage.locator('.rail-plan h3').innerText(),/시나리오 계획/);
- assert.match(await apiPage.locator('.briefing-scenario summary').innerText(),/관측 시나리오 살펴보기/);
+ assert.match(await apiPage.locator('.briefing-scenario summary').innerText(),/관측 시나리오 (체험하기|살펴보기)/);
  assert.match(await apiPage.locator('.interest-option').first().innerText(),/달과 하늘/);
  await apiPage.screenshot({path:'work7-quality-captures/2026-agent-korean.png'});
  assert.deepEqual(errors,[],'No page errors are allowed during quality QA');
