@@ -139,7 +139,7 @@ function assignedTasks(region, interests) {
     tasks.push({ id: 'iss', label: 'Station updates', source: 'NASA · International Space Station', load: (signal) => fetchNews('international space station', signal), render: newsMarkup });
   }
   if (interests.includes('research')) {
-    tasks.push({ id: 'research', label: 'Moon research', source: 'NASA · Moon', load: (signal) => fetchNews('moon', signal), render: newsMarkup });
+    tasks.push({ id: 'research', label: 'Space research & images', source: 'NASA · Space science', load: (signal) => fetchNews('space telescope', signal), render: newsMarkup });
   }
   return tasks;
 }
