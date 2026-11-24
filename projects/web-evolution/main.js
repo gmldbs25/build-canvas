@@ -541,18 +541,23 @@ function navigateAddress(value) {
   const address = String(value || '').trim();
   if (!address) return;
   const info = eras[era];
+  const rejectAddress = () => {
+    const field = document.querySelector('#browser-address');
+    if (field) field.value = pageAddress(info.base, info.pages[trail.pages[trail.index]][1]);
+    showToast('This exhibit only opens its featured pages.');
+  };
   let absolute;
   try {
     absolute = new URL(address, info.base).href;
   } catch {
-    showToast('This exhibit only opens its featured pages.');
+    rejectAddress();
     return;
   }
   const found = Object.entries(info.pages).find(([, [, path]]) => (
     absolute === new URL(pageAddress(info.base, path)).href
   ));
   if (found) goTo(found[0]);
-  else showToast('This exhibit only opens its featured pages.');
+  else rejectAddress();
 }
 
 function switchTab(id) {
@@ -747,12 +752,35 @@ function initGuestbook() {
     }));
   };
   showEntries();
+  // Provide visible, accessible feedback even for whitespace-only entries.
+  form.noValidate = true;
+  const feedback = document.createElement('p');
+  feedback.id = 'guestbook-validation';
+  feedback.setAttribute('role', 'alert');
+  feedback.style.color = '#b00020';
+  form.append(feedback);
+  const fields = [form.elements.namedItem('name'), form.elements.namedItem('message')];
+  fields.forEach(field => {
+    field.setAttribute('aria-describedby', feedback.id);
+    field.addEventListener('input', () => {
+      if (field.value.trim()) field.removeAttribute('aria-invalid');
+      if (fields.every(item => item.value.trim())) feedback.textContent = '';
+    });
+  });
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const data = new FormData(form);
     const name = data.get('name').trim();
     const message = data.get('message').trim();
-    if (!name || !message) return;
+    if (!name || !message) {
+      fields.forEach(field => field.setAttribute('aria-invalid', String(!field.value.trim())));
+      feedback.textContent = 'Please enter both your name and a message.';
+      applyLocale(form);
+      fields.find(field => !field.value.trim())?.focus();
+      return;
+    }
+    fields.forEach(field => field.removeAttribute('aria-invalid'));
+    feedback.textContent = '';
     guestbook = [{ name, message }, ...guestbook].slice(0, 20);
     try { localStorage.setItem(guestbookKey, JSON.stringify(guestbook)); } catch { /* Keep this visit's entry in memory. */ }
     form.reset();
