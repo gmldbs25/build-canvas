@@ -1,5 +1,5 @@
 import { createMonitor } from './monitor.js';
-import { getLocale, formatMessage, translateText, bindMessage } from './i18n.js';
+import { getLocale, formatMessage, translateText, bindMessage, formatKoreanTime } from './i18n.js';
 
 export const modernEras = {
   2023: {
@@ -300,12 +300,13 @@ function classifyQuestion(value, fallback) {
   return fallback;
 }
 
-function agentDay(state) {
-  const date = new Date(Date.UTC(2026, 10, 18 + state.dayOffset, 20));
-  const region = regions[state.region];
+function agentDay(state, daysAfterSelectedNight = 0) {
+  // The public event is three calendar days after the selected scenario night.
+  // Both are derived from the same dayOffset and civil date in UTC.
+  const date = new Date(Date.UTC(2026, 10, 18 + state.dayOffset + daysAfterSelectedNight));
   const dateIso = date.toISOString().slice(0, 10);
-  const dateLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: region.timeZone }).format(date);
-  const shortDate = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: region.timeZone }).format(date);
+  const dateLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(date);
+  const shortDate = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(date);
   return { date, dateIso, dateLabel, shortDate };
 }
 
@@ -379,18 +380,17 @@ function agentNotice(state){
   if(!agentNoteCodes.has(code))return null;
   const region=regions[state.region];
   const day=agentDay(state),event=officialEvent(state);
-  const dateFmtEn=new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
-  const dateFmtKo=new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:region.timeZone});
-  const eventInstant=new Date(event.dateIso+'T20:00:00Z');
+  const dateFmtEn=new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:'UTC'});
+  const dateFmtKo=new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long',timeZone:'UTC'});
+  const eventInstant=event.date;
   const slot=state.dayOffset%3;
-  const koreanTime=value=>String(value).replace(/(\d{1,2}):(\d{2})\s*p\.m\./g,(_m,h,minutes)=>'오후 '+h+'시 '+Number(minutes)+'분');
   const params={
     region:region.label,
     dateEn:dateFmtEn.format(day.date),dateKo:dateFmtKo.format(day.date),
     forecastEn:region.forecasts[slot],forecastKo:translateText(region.forecasts[slot],'ko'),
-    issEn:region.issTimes[slot],issKo:koreanTime(region.issTimes[slot]),
+    issEn:region.issTimes[slot],issKo:formatKoreanTime(region.issTimes[slot]),
     eventDateEn:dateFmtEn.format(eventInstant),eventDateKo:dateFmtKo.format(eventInstant),
-    eventTimeEn:event.time,eventTimeKo:koreanTime(event.time)
+    eventTimeEn:event.time,eventTimeKo:formatKoreanTime(event.time)
   };
   return {key:'agent.note.'+code,params};
 }
@@ -475,11 +475,8 @@ function ensureAgentSelection(state, carrySelection) {
 
 function officialEvent(state) {
   const region = regions[state.region];
-  const date = new Date(Date.UTC(2026, 10, 21 + state.dayOffset, 20));
-  const dateIso = date.toISOString().slice(0, 10);
-  const dateLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: region.timeZone }).format(date);
-  const shortDate = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: region.timeZone }).format(date);
-  return { dateIso, dateLabel, shortDate, time: ['7:30 p.m.', '8:00 p.m.', '8:30 p.m.'][state.dayOffset % 3], location: `${region.location} · North Ridge Observatory` };
+  const day = agentDay(state, 3);
+  return { ...day, time: ['7:30 p.m.', '8:00 p.m.', '8:30 p.m.'][state.dayOffset % 3], location: `${region.location} · North Ridge Observatory` };
 }
 
 function selectedAgentItems(state) {
