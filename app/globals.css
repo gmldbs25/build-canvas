@@ -75,8 +75,10 @@ a {
 
 .statement {
   display: flex;
-  flex-direction: column;
-  gap: 0.15em;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15em 0.75em;
   margin: clamp(2.3rem, 4vw, 4rem) 0 0;
   font-family: "Iowan Old Style", "Noto Serif KR", AppleMyungjo, Batang, serif;
   font-size: clamp(1.05rem, 1.35vw, 1.3rem);
@@ -87,8 +89,8 @@ a {
 
 .identity-link {
   display: inline-block;
-  align-self: flex-start;
-  cursor: default;
+  white-space: nowrap;
+  cursor: pointer;
   text-decoration: none;
 }
 
