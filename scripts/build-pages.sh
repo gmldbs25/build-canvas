@@ -64,4 +64,6 @@ cp -R projects/web-evolution/. dist-pages/web-evolution/
 mkdir -p dist-pages/elsewhere
 cp -R extras/elsewhere/. dist-pages/elsewhere/
 
+node scripts/finalize-pages.mjs
+
 find dist-pages -name ".DS_Store" -delete
