@@ -44,16 +44,34 @@ test('scenario calendar labels preserve civil dates and Korean ranges', () => {
   assert.equal(translateText('Friday, November 20, 2026', 'ko'), '2026년 11월 20일 금요일');
   assert.equal(translateText('Sunday, November 22, 2026', 'ko'), '2026년 11월 22일 일요일');
   assert.equal(translateText('FRI, NOV 20', 'ko'), '11월 20일 금요일');
-  assert.equal(formatKoreanTime('7:48–7:53 p.m.'), '오후 7시 48분~오후 7시 53분');
+  assert.equal(formatKoreanTime('7:48–7:53 p.m.'), '오후 7시 48분~53분');
   const notice = formatMessage('agent.note.advance', {
     dateKo: '2026년 11월 19일 목요일',
     forecastKo: '맑음.',
-    issKo: '오후 7시 48분~오후 7시 53분',
+    issKo: '오후 7시 48분~53분',
     eventDateKo: '2026년 11월 22일 일요일',
-    eventTimeKo: '오후 8시 0분',
+    eventTimeKo: '오후 8시',
   }, 'ko');
   assert.match(notice, /목요일로 이동했습니다/);
   assert.ok(!notice.includes('(으)로'));
   assert.match(notice, /11월 22일 일요일/);
   assert.equal(translateText('5 of 10 results', 'ko'), '검색 결과 10개 중 5개 표시');
+});
+
+ test('remaining QA strings localize with dynamic values', () => {
+  for (const [source, expected] of [
+    ['Nov 30, 2013 · 8:41 am', '2013년 11월 30일 · 오전 8시 41분'],
+    ['Reply to Alex', 'Alex님에게 답글 작성'],
+    ['Share an update', '소식 공유하기'],
+    ['Attach an exhibit photo', '전시 사진 첨부'],
+    ['All updates', '모든 소식'],
+    ['You', '나'],
+    ['Title', '제목'], ['Date', '날짜'], ['Time', '시간'], ['Location', '장소'],
+    ['Delivered by', '제공:'], ['Add to plan', '계획에 추가'],
+    ['Issued Thursday, November 19, 2026 · 2:00 p.m. local · Simulated bulletin', '발행: 2026년 11월 19일 목요일 · 오후 2시 (현지 시각) · 가상 공지'],
+    ['local archive search in progress · step 3 of 4', '로컬 보관 자료 검색 중 · 4단계 중 3단계'],
+    ['2 comments', '댓글 2개'], ['See more photos tagged', '태그로 사진 더 보기:'], ['1 of 1', '1개 중 1번째'],
+  ]) assert.equal(translateText(source, 'ko'), expected, source);
+  assert.equal(formatKoreanTime('8:00 p.m.'), '오후 8시');
+  assert.equal(formatKoreanTime('8:58–9:03 p.m.'), '오후 8시 58분~9시 3분');
 });
