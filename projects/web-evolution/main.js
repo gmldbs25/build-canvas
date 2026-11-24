@@ -48,6 +48,7 @@ languagePanel?.addEventListener('click', (event) => {
   const chosen = event.target.closest('[data-language]')?.dataset.language;
   if (chosen) {
     setLocale(chosen);
+    syncLanguageUrl();
     if (event.target.closest('.language-popover')) closeLanguagePopover(true);
     return;
   }
@@ -231,8 +232,19 @@ function route() {
   return { intro: false, era: id, page: Object.hasOwn(eras[id].pages, requested) ? requested : 'home', tab: window.history.state?.tab, from, articleContext: context };
 }
 
+function syncLanguageUrl() {
+  const url = new URL(window.location.href);
+  if (url.searchParams.get('lang') === getLocale()) return;
+  url.searchParams.set('lang', getLocale());
+  window.history.replaceState(window.history.state, '', url);
+}
+
+function introUrl(from = null) {
+  return './?lang=' + getLocale() + (from ? '#' + encodeURIComponent(from) : '');
+}
+
 function pageUrl(page = trail.pages[trail.index]) {
-  return `?era=${era}${page === 'home' ? '' : `&page=${encodeURIComponent(page)}`}${articleContext?.from ? `&from=${encodeURIComponent(articleContext.from)}` : ''}`;
+  return `?era=${era}${page === 'home' ? '' : `&page=${encodeURIComponent(page)}`}${articleContext?.from ? `&from=${encodeURIComponent(articleContext.from)}` : ''}&lang=${getLocale()}`;
 }
 
 function isModernEra(id = era) {
@@ -814,7 +826,7 @@ document.addEventListener('click', (event) => {
     const from = articleContext?.from || validArticleSection(new URL(window.location.href).searchParams.get('from')) || 'prologue';
     const depth = articleContext?.depth;
     if (Number.isFinite(depth) && depth > 0) window.history.go(-depth);
-    else window.location.assign(`./#${encodeURIComponent(from)}`);
+    else window.location.assign(introUrl(from));
     return;
   }
   const savedPage = event.target.closest('#bookmark-panel [data-bookmark-page]');
@@ -842,7 +854,7 @@ document.addEventListener('click', (event) => {
     if (articleLink) {
       const from = targetFrom || validArticleSection(articleLink.dataset.from) || 'prologue';
       articleContext = { from, sourceHref: articleLink.getAttribute('href'), scrollY: window.scrollY, depth: 0 };
-      window.history.replaceState(articleHistoryState(window.history.state, 0), '', `./#${encodeURIComponent(from)}`);
+      window.history.replaceState(articleHistoryState(window.history.state, 0), '', introUrl(from));
     }
     if (targetEra === era && exhibit && !exhibit.hidden) {
       if (navLink.dataset.page || targetPage !== 'home') goTo(targetPage);
@@ -860,6 +872,9 @@ document.addEventListener('click', (event) => {
 });
 
 window.addEventListener('popstate', () => {
+  const requested = new URL(window.location.href).searchParams.get('lang');
+  if (requested === 'ko' || requested === 'en') setLocale(requested);
+  syncLanguageUrl();
   const next = route();
   articleContext = next.articleContext;
   if (next.intro) return showIntro({ anchor: next.from, scrollY: next.articleContext?.scrollY });
@@ -880,7 +895,7 @@ window.addEventListener('keydown', (event) => {
 document.querySelector('#intro-link')?.addEventListener('click', (event) => {
   event.preventDefault();
   const from = articleContext?.from;
-  window.history.pushState(articleHistoryState({}, 0), '', from ? `./#${encodeURIComponent(from)}` : './');
+  window.history.pushState(articleHistoryState({}, 0), '', introUrl(from));
   showIntro({ anchor: from, scrollY: articleContext?.scrollY });
   intro.querySelector('.cover-start').focus({ preventScroll: true });
 });
@@ -890,3 +905,4 @@ articleContext = initial.articleContext;
 if (initial.intro) showIntro({ anchor: initial.from, scrollY: initial.articleContext?.scrollY });
 else selectEra(initial.era, initial.page);
 syncLanguageUI();
+syncLanguageUrl();
