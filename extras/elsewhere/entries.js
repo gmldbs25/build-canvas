@@ -14,7 +14,7 @@ export const mediaEntries = [
   {
     id: "demon-slayer",
     title: "귀멸의 칼날",
-    review: "정든 캐릭터들이 매 번 목숨을 걸고 싸운다, 과몰입러는 너무 사무치고 눈물난다. + 야무진 액션 작화는 봐도봐도 계속 보고싶음.",
+    review: "정든 캐릭터들이 매번 목숨을 걸고 싸운다, 과몰입러는 너무 사무치고 눈물난다. + 야무진 액션 작화는 봐도봐도 계속 보고싶음.",
     image: "https://image.tmdb.org/t/p/original/4oy1X4QDgwxmUycIxU7T2VrQkIr.jpg",
     imageSource: "https://www.themoviedb.org/tv/85937/images/posters",
     imageAlt: "귀멸의 칼날 TV 애니메이션 대표 포스터",
@@ -22,7 +22,7 @@ export const mediaEntries = [
   {
     id: "haikyuu",
     title: "하이큐",
-    review: "가장 현실적인 두근거림이 느껴진다, 중고생으로 돌아간다면 온 마음 바쳐서 축구부활동 하고싶어요.",
+    review: "가장 현실적인 두근거림이 느껴진다, 중고생으로 돌아간다면 온 마음 바쳐서 축구부 활동 하고싶어요.",
     image: "https://m.media-amazon.com/images/M/MV5BNjkyNDI2MTgtN2Y3NS00M2RjLWJhNDMtMmNmZmUwMDQwZTE1XkEyXkFqcGdeQXVyNjAwNDUxODI%40._V1_.jpg",
     imageSource: "https://www.imdb.com/title/tt3398540/mediaviewer/rm1636504833/",
     imageAlt: "하이큐 TV 애니메이션 대표 포스터",
