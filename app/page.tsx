@@ -24,21 +24,21 @@ const works = [
   },
   {
     index: "04",
-    title: "컴퓨터가 데이터를 기억하는 방식",
+    title: "컴퓨터가 기억하는 방식",
     type: "NAND FLASH · INTERACTIVE EXPLAINER",
     year: "2026.09",
     href: "./nand-flash/",
   },
   {
     index: "03",
-    title: "FROM TRANSFORMER TO AGENT SYSTEMS",
+    title: "LLM to AGENT",
     type: "AI · INTERACTIVE EXPLAINER",
     year: "2026.08",
     href: "./transformer-to-agent/",
   },
   {
     index: "02",
-    title: "ORCA",
+    title: "World Models × ORCA",
     type: "AI · INTERACTIVE STORY",
     year: "2026.07",
     href: "./orca/",
@@ -60,7 +60,9 @@ export default function Home() {
           build <span className="cursor-mark" aria-hidden="true">_</span> canvas
         </h1>
         <p className="statement">
-          <a className="identity-link" href="./elsewhere/" aria-label="elsewhere 페이지 열기">by heeyoon. ✦</a>
+          <span>by heeyoon. ✦</span>
+          {" · "}<a className="identity-link" href="https://github.com/gmldbs25" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          {" · "}<a className="identity-link" href="./elsewhere/" aria-label="애니메이션 감상 기록">elsewhere →</a>
         </p>
       </section>
 
@@ -82,7 +84,7 @@ export default function Home() {
                 <span className="work-type">{work.type}</span>
                 <span className="work-year">{work.year}</span>
                 <span className="work-arrow" aria-hidden="true">
-                  ↗
+                  →
                 </span>
               </a>
             </li>
