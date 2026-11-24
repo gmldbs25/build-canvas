@@ -61,8 +61,8 @@ export default function Home() {
         </h1>
         <p className="statement">
           <span>by heeyoon. ✦</span>
-          {" · "}<a className="identity-link" href="https://github.com/gmldbs25" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-          {" · "}<a className="identity-link" href="./elsewhere/" aria-label="애니메이션 감상 기록">elsewhere →</a>
+          <a className="identity-link" href="https://github.com/gmldbs25" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          <a className="identity-link" href="./elsewhere/" aria-label="애니메이션 감상 기록">elsewhere →</a>
         </p>
       </section>
 
