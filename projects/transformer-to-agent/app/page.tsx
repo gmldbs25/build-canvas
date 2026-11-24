@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { DetailsDrawer } from "@/components/details-drawer";
+import { DetailsDrawer, DetailsArticle } from "@/components/details-drawer";
 import { OverviewOverlay } from "@/components/overview-overlay";
 import { Scene } from "@/components/scene";
 import { scenes, TOTAL_SCENES } from "@/content/pages";
@@ -259,7 +259,26 @@ export default function Home() {
         onSelect={selectFromOverview}
         onClose={() => setOverviewOpen(false)}
       />
-      <div className="desktop-notice">이 프레젠테이션은 Desktop 화면에 최적화되어 있습니다.</div>
+      <section className="desktop-notice mobile-reading" aria-label="모바일 읽기 모드">
+        <header className="mobile-reading-header">
+          <a href="../">← Build Canvas</a>
+          <h1>LLM to AGENT</h1>
+          <p>모바일 읽기 모드 · 각 장의 기술 설명을 순서대로 읽을 수 있습니다.</p>
+        </header>
+        <nav className="mobile-reading-toc" aria-label="목차">
+          {scenes.filter(item => item.details.length > 0).map(item => (
+            <a key={item.id} href={`#read-${item.id}`}>{item.number} · {item.title}</a>
+          ))}
+        </nav>
+        {scenes.filter(item => item.details.length > 0).map(item => (
+          <section key={item.id} id={`read-${item.id}`} className="mobile-reading-scene">
+            <p className="mobile-reading-number">{item.number}{item.act !== null ? ` · ACT ${item.act}` : ""}</p>
+            <h2>{item.title}</h2>
+            <DetailsArticle scene={item} />
+          </section>
+        ))}
+        <footer><a href="../">← Build Canvas 작품 목록</a></footer>
+      </section>
     </main>
   );
 }
