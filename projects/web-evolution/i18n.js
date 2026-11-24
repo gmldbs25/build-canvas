@@ -25,12 +25,24 @@ try { const saved = globalThis.localStorage?.getItem(STORAGE_KEY); if(saved==='k
 export function getLocale(){return locale}
 export function message(key,lang=locale){const pair=messages[key];return pair?pair[lang==='ko'?1:0]:key}
 export function getSceneText(era,kind,original,lang=locale){return lang==='en'?(sceneEnglish[String(era)]?.[kind]||original):original}
+export function formatKoreanTime(value){
+  const render=(h,m,period)=>((period.toLowerCase()==='p'?'오후':'오전')+' '+Number(h)+'시 '+Number(m)+'분');
+  return String(value).replace(/(\d{1,2}):(\d{2})\s*[–—-]\s*(\d{1,2}):(\d{2})\s*([ap])\.m\./gi,(_m,h1,m1,h2,m2,p)=>render(h1,m1,p)+'~'+render(h2,m2,p))
+    .replace(/(\d{1,2}):(\d{2})\s*([ap])\.m\./gi,(_m,h,m,p)=>render(h,m,p));
+}
+function resolveKoreanDirection(value){
+  return value.replace(/([가-힣])\(으\)로/g,(_m,last)=>{
+    const final=(last.charCodeAt(0)-0xac00)%28;
+    return last+(final===0||final===8?'로':'으로');
+  });
+}
 export function formatMessage(key,params={},lang=locale){
  const pair=runtimeMessages[key]||messages[key];if(!pair)return key;
- return pair[lang==='ko'?1:0].replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(full,name)=>{
+ const formatted=pair[lang==='ko'?1:0].replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g,(full,name)=>{
  const specific=name+(lang==='ko'?'Ko':'En');
  return Object.hasOwn(params,specific)?String(params[specific]):Object.hasOwn(params,name)?String(params[name]):full;
 });
+ return lang==='ko'?resolveKoreanDirection(formatted):formatted;
 }
 export function bindMessage(node,key,params={}){node.dataset.i18nMessage=key;node.dataset.i18nParams=JSON.stringify(params);node.textContent=(node.dataset.i18nPrefix||'')+formatMessage(key,params);return node;}
 export function translateText(value,lang=locale){
@@ -54,9 +66,17 @@ export function translateText(value,lang=locale){
   if (lang === 'ko') {
     result = result.replace(' · local scenario for ', ' · 지역 시나리오: ');
     result = result.replace(/\b(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday), (?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}\b/g, (dateText) => {
-      const date = new Date(dateText);
+      // A calendar date is not a local-midnight instant. Parse in UTC before formatting in UTC.
+      const date = new Date(dateText + ' UTC');
       return Number.isNaN(date.getTime()) ? dateText : new Intl.DateTimeFormat('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long', timeZone:'UTC' }).format(date);
     });
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const weekdays={SUN:'일',MON:'월',TUE:'화',WED:'수',THU:'목',FRI:'금',SAT:'토'};
+    result=result.replace(/\b(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2})\b/gi,(_m,weekday,month,day)=>{
+      const monthIndex=months.findIndex((name)=>name.toLowerCase()===month.toLowerCase());
+      return (monthIndex+1)+'월 '+Number(day)+'일 '+weekdays[weekday.toUpperCase()]+'요일';
+    });
+    result=formatKoreanTime(result);
   }
   return result;
 }
