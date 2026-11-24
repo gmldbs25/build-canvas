@@ -36,6 +36,44 @@ function InlineMarkup({ value }: { value: string }) {
   return <>{inlineMarkup(value)}</>;
 }
 
+export function DetailsArticle({ scene }: { scene: SceneDefinition }) {
+  return (
+    <article className="details-article">
+      {scene.details.map((block, blockIndex) => {
+        const key = `${scene.id}-${blockIndex}`;
+        if (block.type === "heading") {
+          return block.level === 2
+            ? <h3 key={key}><InlineMarkup value={block.text} /></h3>
+            : <h4 key={key}><InlineMarkup value={block.text} /></h4>;
+        }
+        if (block.type === "paragraph") {
+          return <p key={key}><InlineMarkup value={block.text} /></p>;
+        }
+        if (block.type === "quote") {
+          return <blockquote key={key}><InlineMarkup value={block.text} /></blockquote>;
+        }
+        if (block.type === "code") {
+          return (
+            <pre data-language={block.language || undefined} key={key}>
+              <code>{block.value}</code>
+            </pre>
+          );
+        }
+        const List = block.ordered ? "ol" : "ul";
+        return (
+          <List key={key}>
+            {block.items.map((item, itemIndex) => (
+              <Fragment key={`${key}-${itemIndex}`}>
+                <li><InlineMarkup value={item} /></li>
+              </Fragment>
+            ))}
+          </List>
+        );
+      })}
+    </article>
+  );
+}
+
 export function DetailsDrawer({ open, scene, scrollRef, onClose }: DetailsDrawerProps) {
   const drawerRef = useRef<HTMLElement>(null);
 
@@ -81,39 +119,7 @@ export function DetailsDrawer({ open, scene, scrollRef, onClose }: DetailsDrawer
           className="details-scroll"
           tabIndex={open ? 0 : -1}
         >
-          <article className="details-article">
-            {scene.details.map((block, blockIndex) => {
-              const key = `${scene.id}-${blockIndex}`;
-              if (block.type === "heading") {
-                return block.level === 2
-                  ? <h3 key={key}><InlineMarkup value={block.text} /></h3>
-                  : <h4 key={key}><InlineMarkup value={block.text} /></h4>;
-              }
-              if (block.type === "paragraph") {
-                return <p key={key}><InlineMarkup value={block.text} /></p>;
-              }
-              if (block.type === "quote") {
-                return <blockquote key={key}><InlineMarkup value={block.text} /></blockquote>;
-              }
-              if (block.type === "code") {
-                return (
-                  <pre data-language={block.language || undefined} key={key}>
-                    <code>{block.value}</code>
-                  </pre>
-                );
-              }
-              const List = block.ordered ? "ol" : "ul";
-              return (
-                <List key={key}>
-                  {block.items.map((item, itemIndex) => (
-                    <Fragment key={`${key}-${itemIndex}`}>
-                      <li><InlineMarkup value={item} /></li>
-                    </Fragment>
-                  ))}
-                </List>
-              );
-            })}
-          </article>
+          <DetailsArticle scene={scene} />
         </div>
       </aside>
     </>
