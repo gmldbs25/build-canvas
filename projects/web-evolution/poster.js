@@ -19,21 +19,6 @@ function attribution(photo) {
     : `${photo.credit} · ${photo.license} · image cropped and color-adjusted${photo.shareAlike ? ' · edited poster should also be shared under CC BY-SA 2.0' : ''}`;
 }
 
-function wrapText(ctx, text, maxWidth) {
-  const words = String(text).split(/\s+/);
-  const lines = [];
-  let line = '';
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(candidate).width > maxWidth) {
-      lines.push(line);
-      line = word;
-    } else line = candidate;
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
 export function createPoster() {
   const photos = getPhotoRecords();
   const initialPhoto = photos.find(({ id }) => id === 'eclipse-a') || photos[0];
@@ -100,7 +85,7 @@ export function createPoster() {
       <div class="poster-editor-layout">
         <section class="poster-preview-column" aria-label="Poster preview">
           <div class="poster-preview-toolbar"><strong>Live preview</strong><button type="button" data-before aria-pressed="false">Show original</button></div>
-          <figure class="poster-artboard">
+          <figure class="poster-artboard" style="--poster-photo-ratio:${OUTPUT.width} / ${OUTPUT.photoHeight}; --poster-paper-ratio:${OUTPUT.width} / ${OUTPUT.height - OUTPUT.photoHeight}">
             <div class="poster-art-image" data-image-frame tabindex="0" role="group" aria-label="Photo crop. Drag the image or use arrow keys to reposition it.">
               <img class="poster-source-image" data-source-image src="${escapeHtml(photo?.image || './media/eclipse-2004-a.webp')}" alt="${escapeHtml(photo?.alt || 'Lunar eclipse photograph')}" draggable="false">
               <div class="poster-photo-shade" aria-hidden="true"></div>
@@ -128,10 +113,10 @@ export function createPoster() {
           <fieldset class="poster-control-set"><legend>Photo</legend>
             <label>Choose an eclipse photograph <select name="photo">${imageOptions()}</select></label>
             <p class="poster-license-warning" data-license-warning>${photo?.shareAlike ? 'This image is CC BY-SA 2.0. The edited poster export must retain the same license.' : 'The export includes a visible photo credit and license line.'}</p>
-            <label class="poster-range-label">Zoom <output data-output="zoom">${state.zoom}%</output><input type="range" name="zoom" min="100" max="230" step="1" value="${state.zoom}"></label>
-            <label class="poster-range-label">Horizontal crop <output data-output="cropX">${state.cropX}%</output><input type="range" name="cropX" min="0" max="100" step="1" value="${state.cropX}"></label>
-            <label class="poster-range-label">Vertical crop <output data-output="cropY">${state.cropY}%</output><input type="range" name="cropY" min="0" max="100" step="1" value="${state.cropY}"></label>
-            <label class="poster-range-label">Brightness <output data-output="brightness">${state.brightness}%</output><input type="range" name="brightness" min="55" max="145" step="1" value="${state.brightness}"></label>
+            <label class="poster-range-label" for="poster-zoom">Zoom <output for="poster-zoom" data-output="zoom">${state.zoom}%</output><input type="range" id="poster-zoom" aria-valuetext="${state.zoom}%" name="zoom" min="100" max="230" step="1" value="${state.zoom}"></label>
+            <label class="poster-range-label" for="poster-cropX">Horizontal crop <output for="poster-cropX" data-output="cropX">${state.cropX}%</output><input type="range" id="poster-cropX" aria-valuetext="${state.cropX}%" name="cropX" min="0" max="100" step="1" value="${state.cropX}"></label>
+            <label class="poster-range-label" for="poster-cropY">Vertical crop <output for="poster-cropY" data-output="cropY">${state.cropY}%</output><input type="range" id="poster-cropY" aria-valuetext="${state.cropY}%" name="cropY" min="0" max="100" step="1" value="${state.cropY}"></label>
+            <label class="poster-range-label" for="poster-brightness">Brightness <output for="poster-brightness" data-output="brightness">${state.brightness}%</output><input type="range" id="poster-brightness" aria-valuetext="${state.brightness}%" name="brightness" min="55" max="145" step="1" value="${state.brightness}"></label>
             <p class="poster-crop-hint">Drag the photo, or focus it and use arrow keys. Shift + arrow moves farther.</p>
           </fieldset>
         </section>
@@ -164,6 +149,8 @@ export function createPoster() {
     for (const key of ['zoom', 'cropX', 'cropY', 'brightness']) {
       const output = root.querySelector(`[data-output="${key}"]`);
       if (output) output.value = `${state[key]}%`;
+      const slider = root.querySelector(`input[type="range"][name="${key}"]`);
+      if (slider) slider.setAttribute('aria-valuetext', `${state[key]}%`);
     }
     const creditLink = root.querySelector('.poster-image-source');
     if (creditLink && photo) {
@@ -274,43 +261,93 @@ export function createPoster() {
       if (!context) throw new Error('Canvas is unavailable.');
       context.fillStyle = '#f4f0e8';
       context.fillRect(0, 0, OUTPUT.width, OUTPUT.height);
-      const scale = Math.max(OUTPUT.width / image.naturalWidth, OUTPUT.photoHeight / image.naturalHeight) * (showingBefore ? 1 : state.zoom / 100);
-      const drawWidth = image.naturalWidth * scale;
-      const drawHeight = image.naturalHeight * scale;
-      const overX = Math.max(0, drawWidth - OUTPUT.width);
-      const overY = Math.max(0, drawHeight - OUTPUT.photoHeight);
-      const cropX = showingBefore ? 50 : state.cropX;
-      const cropY = showingBefore ? 50 : state.cropY;
+      const frame = root.querySelector('[data-image-frame]');
+      const copy = root.querySelector('.poster-art-copy');
+      if (!frame || !copy) throw new Error('Poster preview is unavailable.');
+      const frameRect = frame.getBoundingClientRect();
+      const copyRect = copy.getBoundingClientRect();
+      if (!frameRect.width || !copyRect.height) throw new Error('Poster preview is hidden.');
+      const zoom = showingBefore ? 1 : state.zoom / 100;
+      const cover = Math.max(OUTPUT.width / image.naturalWidth, OUTPUT.photoHeight / image.naturalHeight);
+      const baseWidth = image.naturalWidth * cover;
+      const baseHeight = image.naturalHeight * cover;
+      const cropX = (showingBefore ? 50 : state.cropX) / 100;
+      const cropY = (showingBefore ? 50 : state.cropY) / 100;
+      const drawX = OUTPUT.width / 2 + ((OUTPUT.width - baseWidth) * cropX - OUTPUT.width / 2) * zoom;
+      const drawY = OUTPUT.photoHeight / 2 + ((OUTPUT.photoHeight - baseHeight) * cropY - OUTPUT.photoHeight / 2) * zoom;
       context.save();
+      context.beginPath();
+      context.rect(0, 0, OUTPUT.width, OUTPUT.photoHeight);
+      context.clip();
       context.filter = `brightness(${showingBefore ? 100 : state.brightness}%)`;
-      context.drawImage(image, -overX * cropX / 100, -overY * cropY / 100, drawWidth, drawHeight);
+      context.drawImage(image, drawX, drawY, baseWidth * zoom, baseHeight * zoom);
       context.restore();
-      const shade = context.createLinearGradient(0, OUTPUT.photoHeight * .56, 0, OUTPUT.photoHeight);
-      shade.addColorStop(0, 'rgba(5, 12, 23, 0)');
-      shade.addColorStop(1, 'rgba(5, 12, 23, .68)');
+      const shade = context.createLinearGradient(0, OUTPUT.photoHeight * .35, 0, OUTPUT.photoHeight);
+      shade.addColorStop(0, 'rgba(6, 16, 29, 0)');
+      shade.addColorStop(1, showingBefore ? 'rgba(6, 16, 29, .5333)' : 'rgba(6, 16, 29, .7686)');
       context.fillStyle = shade;
       context.fillRect(0, 0, OUTPUT.width, OUTPUT.photoHeight);
-      context.fillStyle = '#f5f1e8';
-      context.font = 'bold 23px Arial, sans-serif';
-      context.fillText('NORTH RIDGE OBSERVATORY', 72, 74);
-      context.font = 'bold 86px Georgia, serif';
-      const titleLines = wrapText(context, showingBefore ? 'Observing Night' : (state.title || 'Observing Night'), OUTPUT.width - 150).slice(0, 2);
-      const bodyTop = OUTPUT.photoHeight + 50;
-      titleLines.forEach((line, index) => context.fillText(line, 72, bodyTop + 90 + index * 94));
-      const afterTitle = bodyTop + 90 + titleLines.length * 94;
-      context.fillStyle = '#52677d';
-      context.font = 'bold 30px Arial, sans-serif';
-      context.fillText(showingBefore ? 'Saturday, October 19, 2013 · 8:30 p.m.' : `${state.date || 'Date to be announced'} · ${state.time || 'Time to be announced'}`, 75, afterTitle + 6);
-      context.font = '28px Arial, sans-serif';
-      wrapText(context, showingBefore ? 'West Terrace · North Ridge Observatory' : (state.location || 'Location to be announced'), OUTPUT.width - 150).slice(0, 2).forEach((line, index) => context.fillText(line, 75, afterTitle + 58 + index * 35));
-      context.fillStyle = '#54616e';
-      context.font = '16px Arial, sans-serif';
-      const credit = attribution(photo);
-      const creditLines = wrapText(context, credit, OUTPUT.width - 150).slice(0, 2);
-      creditLines.forEach((line, index) => context.fillText(line, 75, OUTPUT.height - 43 - (creditLines.length - index - 1) * 19));
-      if (photo.shareAlike) {
-        context.font = 'bold 16px Arial, sans-serif';
-        context.fillText('Edited poster: share under CC BY-SA 2.0', 75, OUTPUT.height - 12);
+
+      // The visible DOM is the text-layout authority: use its computed font,
+      // colors, line wraps and positions rather than a second hard-coded layout.
+      function drawPreviewText(element, area, outY, outHeight) {
+        if (!element) return;
+        const sx = OUTPUT.width / area.width;
+        const sy = outHeight / area.height;
+        const css = getComputedStyle(element);
+        context.save();
+        context.translate(0, outY);
+        context.scale(sx, sy);
+        context.fillStyle = css.color;
+        context.font = `${css.fontStyle} ${css.fontWeight} ${css.fontSize} ${css.fontFamily}`;
+        if ('letterSpacing' in context) context.letterSpacing = css.letterSpacing === 'normal' ? '0px' : css.letterSpacing;
+        context.textBaseline = 'alphabetic';
+        const metrics = context.measureText('Mg한');
+        const ascent = metrics.fontBoundingBoxAscent ?? parseFloat(css.fontSize) * .8;
+        const descent = metrics.fontBoundingBoxDescent ?? parseFloat(css.fontSize) * .2;
+        const lines = [];
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        const range = document.createRange();
+        let node;
+        while ((node = walker.nextNode())) {
+          let offset = 0;
+          for (const char of node.data) {
+            range.setStart(node, offset);
+            offset += char.length;
+            range.setEnd(node, offset);
+            const box = range.getBoundingClientRect();
+            if (!box.width || !box.height) continue;
+            let line = lines.find((candidate) => Math.abs(candidate.top - box.top) < 2);
+            if (!line) {
+              line = { top: box.top, bottom: box.bottom, left: box.left, text: '' };
+              lines.push(line);
+            }
+            line.text += char;
+          }
+        }
+        for (const line of lines) {
+          const baseline = (line.top + line.bottom + ascent - descent) / 2;
+          context.fillText(line.text, line.left - area.left, baseline - area.top);
+        }
+        context.restore();
+      }
+      drawPreviewText(frame.querySelector('.poster-art-brand'), frameRect, 0, OUTPUT.photoHeight);
+      for (const selector of ['.poster-small-label', '[data-poster-title]', '.poster-date-line', '[data-poster-location]', '[data-poster-credit]']) {
+        drawPreviewText(copy.querySelector(selector), copyRect, OUTPUT.photoHeight, OUTPUT.height - OUTPUT.photoHeight);
+      }
+      const creditElement = copy.querySelector('[data-poster-credit]');
+      if (creditElement) {
+        const creditRect = creditElement.getBoundingClientRect();
+        const css = getComputedStyle(creditElement);
+        const sx = OUTPUT.width / copyRect.width;
+        const sy = (OUTPUT.height - OUTPUT.photoHeight) / copyRect.height;
+        context.strokeStyle = css.borderTopColor;
+        context.lineWidth = Math.max(1, parseFloat(css.borderTopWidth) * sy);
+        const y = OUTPUT.photoHeight + (creditRect.top - copyRect.top) * sy;
+        context.beginPath();
+        context.moveTo((creditRect.left - copyRect.left) * sx, y);
+        context.lineTo((creditRect.right - copyRect.left) * sx, y);
+        context.stroke();
       }
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('The PNG could not be created.');
