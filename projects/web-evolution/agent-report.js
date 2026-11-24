@@ -5,6 +5,9 @@ const reportTime = new Intl.DateTimeFormat('en-US', {
 const publicationDate = new Intl.DateTimeFormat('en-US', {
   month: 'short', day: 'numeric', year: 'numeric',
 });
+const publicationDateKo = new Intl.DateTimeFormat('ko-KR', {
+  month: 'long', day: 'numeric', year: 'numeric',
+});
 
 function reportParagraphs(results, assigned) {
   const korean = getLocale() === 'ko';
@@ -31,7 +34,7 @@ function reportParagraphs(results, assigned) {
 
   if (korean) {
     const weatherSummary = weather ? `Open-Meteo 모델에 따르면 ${weather.source}의 구름량은 ${weather.data.clouds}%, 기온은 ${weather.data.temperature.toFixed(1)}°C입니다.` : '';
-    const latest = article ? `최근에 확인한 NASA 자료는 “${article.title}”입니다(발행: ${publicationDate.format(article.published)}). 원문 제목은 그대로 표시합니다.` : '';
+    const latest = article ? `최근에 확인한 NASA 자료는 “${article.title}”입니다(발행: ${publicationDateKo.format(article.published)}). 원문 제목은 그대로 표시합니다.` : '';
     return [
       `지정된 출처 ${assigned}개 중 ${checked}개를 확인했습니다. ${[weatherSummary,latest].filter(Boolean).join(' ') || '이번 확인에서는 사용할 수 있는 최신 정보를 찾지 못했습니다.'}`,
       '현지 관측을 계획하기 전에는 실제 지역의 최신 예보를 다시 확인하세요. 이 브리핑이 열려 있고 표시되는 동안 5분마다 출처를 확인합니다.',
