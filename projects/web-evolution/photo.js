@@ -84,10 +84,10 @@ function saveFavorites() {
   catch { /* Keep favorites for this visit. */ }
 }
 
-function photoTile(photo) {
+function photoTile(photo, index = 0) {
   const details = [photo.place, photo.date].filter(Boolean).map(escapeHtml).join(' · ');
   const dimensions = photo.width && photo.height ? ` width="${photo.width}" height="${photo.height}"` : '';
-  const image = `<img src="${photo.image}" alt="${escapeHtml(photo.alt)}"${dimensions}>`;
+  const image = `<img src="${photo.image}" alt="${escapeHtml(photo.alt)}"${dimensions} decoding="async"${index >= 3 ? ' loading="lazy"' : ''}>`;
   const caption = `<strong ${String(photo.id).startsWith('upload-') ? 'data-no-translate' : ''}>${escapeHtml(photo.title)}</strong><span>by ${escapeHtml(photo.author)}</span><small>${details}</small>`;
   return photo.page
     ? photoLink(photo.page, `${image}<span class="moon-caption">${caption}</span>`, 'class="moon-card"')
