@@ -247,7 +247,7 @@ window.TEXAS_TRACE_DATA = {
       subtitle: "Austin Local Hub",
       role: "lodging-hub",
       storyType: "basecamp",
-      summary: "🌅 깔끔한 시설의 일몰 맛집 숙소",
+      summary: "🌅 시설이 깔끔하고 아름다운 일몰을 감상할 수 있는 숙소",
       mediaGroupId: "austin-lodging"
     },
     {
