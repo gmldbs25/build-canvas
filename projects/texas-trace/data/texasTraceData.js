@@ -227,7 +227,7 @@ window.TEXAS_TRACE_DATA = {
       subtitle: "미국 입국 및 환승",
       role: "flight-transfer",
       storyType: "flight-transfer",
-      summary: "처음 맛 본 미국 쉨쉨 버거",
+      summary: "처음 맛 본 미국 쉑쉑 버거",
       mediaGroupId: "atlanta-airport"
     },
     {
