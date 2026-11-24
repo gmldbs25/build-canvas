@@ -86,6 +86,10 @@ const STORAGE_KEY = 'build-canvas:web-evolution:locale';
 const listeners = new Set();
 let locale = 'en';
 try { const saved = globalThis.localStorage?.getItem(STORAGE_KEY); if(saved==='ko') locale='ko'; } catch {}
+try {
+  const requested = new URL(globalThis.location.href).searchParams.get('lang');
+  if (requested === 'ko' || requested === 'en') locale = requested;
+} catch { /* Browser-free tests and invalid URLs use stored/default locale. */ }
 export function getLocale(){return locale}
 export function message(key,lang=locale){const pair=messages[key];return pair?pair[lang==='ko'?1:0]:key}
 export function getSceneText(era,kind,original,lang=locale){return lang==='en'?(sceneEnglish[String(era)]?.[kind]||original):original}
