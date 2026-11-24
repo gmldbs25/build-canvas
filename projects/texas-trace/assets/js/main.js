@@ -29,8 +29,15 @@
     progressDots: document.getElementById("progress-dots"),
     prevButton: document.getElementById("prev-step"),
     nextButton: document.getElementById("next-step"),
-    player: document.querySelector(".journey-player")
+    player: document.querySelector(".journey-player"),
+    transitionStatus: document.createElement("p")
   };
+
+  elements.transitionStatus.setAttribute("role", "status");
+  elements.transitionStatus.setAttribute("aria-live", "polite");
+  elements.transitionStatus.hidden = true;
+  elements.transitionStatus.style.cssText = "margin:6px 0;font-size:12px;font-weight:600;line-height:1.5";
+  elements.pointTitle.insertAdjacentElement("afterend", elements.transitionStatus);
 
   function padStep(value) {
     return String(value).padStart(2, "0");
@@ -72,6 +79,8 @@
     if (elements.player) {
       elements.player.classList.toggle("is-transitioning", isTransitioning);
     }
+    elements.transitionStatus.hidden = !isTransitioning;
+    elements.transitionStatus.textContent = isTransitioning && state ? "지도 이동 중… " + padStep(state.currentStepIndex + 1) + "번째 장소" : "";
     if (state) {
       updateControls(state);
     }
