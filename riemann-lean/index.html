@@ -124,8 +124,8 @@
       </header>
       <noscript><p>이 실험은 JavaScript가 필요합니다. 영점 60개 중 N개를 더한 근사로 소수 계단을 재구성합니다.</p></noscript>
       <div class="lab">
-        <div class="lab__stage js-only">
-          <div class="lab__instrument">
+        <div class="lab__instrument">
+          <div class="lab__stage js-only">
             <figure class="plate lab-plate" id="labPlate" data-lab-view="wave">
               <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
               <div class="lab__head"><h3>ψ(x) · 리만 명시적 공식 근사</h3><span class="live">LIVE</span><span id="labBadge">N 15 · σ 0.50</span></div>
@@ -136,7 +136,8 @@
               </div>
               <figcaption>첫 60개 영점 중 <span id="labModelN">15</span>개만 사용한 근사입니다. σ는 고정된 γ에 실수부만 바꾼 모형입니다. 계단을 만드는 것은 오차 ψ(x) − x.</figcaption>
             </figure>
-            <details id="labControls" class="lab-controls" open>
+          </div>
+          <details id="labControls" class="lab-controls" open>
               <summary>실험대</summary>
               <p class="lab-hint">점을 끌어 1/2 선 밖으로 옮겨 보세요. 오른쪽 계단이 파동에 잠식됩니다.</p>
               <div class="controls">
@@ -160,8 +161,7 @@
                 <p class="spectrum-caption">진폭 ∝ x<sup>σ</sup> / |ρ| — 낮은 γ가 큰 소리를 낸다.</p>
                 <p id="labStatus" role="status" aria-live="polite"></p>
               </div>
-            </details>
-          </div>
+          </details>
         </div>
         <div class="lab__steps">
           <article class="step page" data-step="1" data-n="1" data-sigma="0.50">

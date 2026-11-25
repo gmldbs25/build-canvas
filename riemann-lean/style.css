@@ -138,12 +138,12 @@ footer { position: relative; z-index: 1; }
 #sieve .is-one { color: var(--c-muted); }
 
 .lab { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(340px,.8fr); gap: 28px; align-items: start; }
-.lab__stage { position: sticky; top: var(--hud-height); display: grid; align-content: safe center; height: calc(100vh - var(--hud-height)); height: calc(100svh - var(--hud-height)); overflow-y: auto; }
+.lab__stage { display: grid; align-content: center; min-width: 0; }
 .act--lab { min-height: 460vh; }
 .step { min-height: 90vh; display: grid; align-content: center; padding: 24px; border-left: 2px solid transparent; }
 .step h3 { margin: .25em 0 .5em; }
 .step.is-active { border-left: 2px solid var(--c-accent); }
-.lab__instrument { min-width: 0; padding: 18px; }
+.lab__instrument { position: sticky; top: var(--hud-height); align-self: start; min-width: 0; height: calc(100vh - var(--hud-height)); height: calc(100svh - var(--hud-height)); overflow-y: auto; padding: 18px; }
 .lab__head { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 7px 10px; }
 .lab__head h3 { grid-column: 1; margin: 0; font-size: clamp(15px,1.35vw,18px); line-height: 1.3; }
 .lab__head .live { grid-column: 2; grid-row: 1; }
@@ -305,13 +305,14 @@ html.no-js h3 .only-math { display: inline !important; }
   .act__head { grid-template-columns: 52px 1fr; gap: 8px; }
   .prose { margin-left: 60px; }
   .lab { display: block; }
-  .lab__stage { display: block; height: 52vh; height: 52svh; z-index: 3; scrollbar-width: thin; background: var(--c-bg); }
+  .lab__instrument { display: contents; }
+  .lab__stage { position: sticky; top: var(--hud-height); display: block; height: 52vh; height: 52svh; z-index: 3; overflow: visible; background: var(--c-bg); }
   .act--lab { min-height: 0; }
   .lab__head #labBadge { display: block; }
   .lab__charts { grid-template-columns: minmax(0,1fr); }
   .lab-tabs { display: flex; }
   #labPlate[data-lab-view="wave"] #planePane, #labPlate[data-lab-view="plane"] #wavePane { display: none; }
-  .lab__instrument { margin: 8px; padding: 10px; }
+  .lab__instrument { margin: 0; padding: 0; }
   .lab-plate { padding: 10px; }
   .lab__steps { padding-top: 14px; }
   .step { min-height: 78vh; }
