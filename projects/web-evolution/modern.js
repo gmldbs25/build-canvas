@@ -599,7 +599,7 @@ function planMarkup(state, poster) {
   const currentPoster = posterSnapshot(poster);
   const proposal = scheduleProposal(items, state);
   const posterHasUpdate = Boolean(state.posterUpdates[key]);
-  return `<article class="plan-review-page"><p class="briefing-eyebrow">MY OBSERVING PLAN / ${day.shortDate.toUpperCase()}</p><h2>Review the evening</h2><p class="plan-intro"><span>${escapeHtml(region.label)}</span> · <span>${escapeHtml(region.location)}</span> · <span data-i18n-message="agent.selectedItems" data-i18n-params='{"count":${items.length},"noun":"${items.length===1?'item':'items'}"}'>${formatMessage('agent.selectedItems',{count:items.length,noun:items.length===1?'item':'items'})}</span></p>
+  return `<article class="plan-review-page"><p class="briefing-eyebrow">MY OBSERVING PLAN / ${day.shortDate.toUpperCase()}</p><h2>Review the evening</h2><p class="plan-intro"><span>${escapeHtml(region.label)}</span> · <span>${escapeHtml(region.location)}</span> · <span data-selected-items data-i18n-message="agent.selectedItems" data-i18n-params='{"count":${items.length},"noun":"${items.length===1?'item':'items'}"}'>${formatMessage('agent.selectedItems',{count:items.length,noun:items.length===1?'item':'items'})}</span></p>
     ${matchesSaved ? '<p class="plan-saved" role="status">This plan is saved on this device.</p>' : approved ? '<p class="plan-changed" role="status">Your selections changed after the last save. Save again to update this plan.</p>' : ''}
     ${items.length ? `<ol class="plan-timeline">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><span class="plan-kind">${item.category}</span><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.summary)}</p><span>${escapeHtml(item.location)}</span><div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2026, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div></div><label class="plan-pick"><input type="checkbox" data-plan-item="${item.id}" checked><span>Keep</span></label></li>`).join('')}</ol>` : '<p class="no-briefing-items">No items are selected. Return to the briefing and choose at least one idea.</p>'}
     <section class="poster-proposal" aria-labelledby="poster-proposal-title"><div><p class="briefing-eyebrow">OPTIONAL / 2013 FIELDWORK POSTER</p><h3 id="poster-proposal-title">Proposed schedule change</h3><p>Proposal from the official notice, separate from your selected sky-plan activities. Only date, time, and location fields are proposed. Existing poster edits stay in place. ${sceneLink(2026, 'source-event', 'Open the notice →')}</p></div>
@@ -915,6 +915,7 @@ export function createModern(poster) {
     root.querySelectorAll('[data-plan-count]').forEach((node) => {
       bindMessage(node,'agent.planCount',{count,noun:count===1?'item':'items'});
     });
+    root.querySelectorAll('[data-selected-items]').forEach(node => bindMessage(node,'agent.selectedItems',{count,noun:count===1?'item':'items'}));
     const save = root.querySelector('[data-agent-action="approve-plan"]');
     const download = root.querySelector('[data-agent-action="download-ics"]');
     if (save) save.disabled = count === 0;

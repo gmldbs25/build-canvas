@@ -62,7 +62,7 @@
 .answer-copy sup a:hover, .overview-sources a:hover { background: #e2e9fa; }
 .overview-sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; padding-top: 11px; border-top: 1px solid #e0e5ef; }
 .overview-sources a { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid #d5deef; border-radius: 16px; color: #3d4d6c; background: #f5f7fc; font-size: 11px; text-decoration: none; }
-.overview-sources a span { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; color: #3b4e92; background: #e2e9fc; font-weight: 750; }
+.overview-sources a > span:first-child { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; color: #3b4e92; background: #e2e9fc; font-weight: 750; }
 .overview-disclaimer { margin: 10px 0 0; color: #65718a; font-size: 11px; }
 .web-results { margin-top: 22px; }
 .web-results h3 { margin: 0 0 2px; color: #35435c; font-size: 15px; }
