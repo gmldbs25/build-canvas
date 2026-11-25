@@ -27,12 +27,15 @@ jobs:
       - run: npm ci
       - run: chmod +x scripts/*.sh projects/orca/scripts/*.sh projects/transformer-to-agent/scripts/*.sh
       - run: npm run build:pages
+      - name: Check exported portfolio completion badge
+        run: |
+          node --input-type=module -e "import assert from 'node:assert/strict'; import fs from 'node:fs'; const html=fs.readFileSync('dist-pages/index.html','utf8'); assert.match(html,/The Evolution of the Web/); assert.doesNotMatch(html,/class=\"work-status\"/);"
       - name: Run Work 7 localization unit tests
         run: node --test tests/web-evolution-i18n.test.mjs tests/web-evolution-reading.test.mjs tests/web-evolution-workspace.test.mjs
       - name: Install browser runner
         run: |
           npm install --no-save --package-lock=false playwright@1.58.2
-          npx playwright install --with-deps chromium
+          npx playwright install chromium --only-shell
       - name: Test EN/KR interactions across nine viewports
         run: node tests/web-evolution-browser.mjs
       - name: Validate authored rich text and dynamic locale state
