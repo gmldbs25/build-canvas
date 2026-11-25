@@ -31,6 +31,12 @@ try{
  const ctx=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
  const page=await ctx.newPage();
  page.on('pageerror',e=>errors.push(e.message));
+ const consoleErrors=[];
+ page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text())});
+ // Successful, deterministic external-source fixtures keep application errors distinct
+ // from public API/network outages. The separate context below exercises failed requests.
+ await page.route(/api\.open-meteo\.com/,route=>route.fulfill({json:{current:{time:1795125600,temperature_2m:12,cloud_cover:20}},headers:{'access-control-allow-origin':'*'}}));
+ await page.route(/spaceflightnewsapi\.net/,route=>route.fulfill({json:{results:[{title:'NASA source fixture',published_at:'2026-11-19T14:00:00Z',url:'https://www.nasa.gov/',summary:'Test source'}]},headers:{'access-control-allow-origin':'*'}}));
  await page.goto(baseUrl+'?era=1993&page=home');
  const lead=page.locator('[data-i18n-rich="93.home.lead"]');
  await lead.waitFor();
@@ -140,6 +146,7 @@ try{
      }
    }
  }
+ assert.deepEqual(consoleErrors,[],'No console errors in the curated successful-source routes');
  await ctx.close();
 
  // Mock network failures deterministically. Locale switching itself must not refetch sources.
