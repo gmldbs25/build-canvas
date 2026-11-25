@@ -2,7 +2,7 @@ name: Work 7 bilingual browser QA
 
 on:
   push:
-    branches: [main]
+    branches: [main, work7-final-ko-qa]
     paths:
       - 'projects/web-evolution/**'
       - 'tests/web-evolution-browser.mjs'
@@ -27,6 +27,8 @@ jobs:
       - run: npm ci
       - run: chmod +x scripts/*.sh projects/orca/scripts/*.sh projects/transformer-to-agent/scripts/*.sh
       - run: npm run build:pages
+      - name: Run Work 7 localization unit tests
+        run: node --test tests/web-evolution-i18n.test.mjs
       - name: Install browser runner
         run: |
           npm install --no-save --package-lock=false playwright@1.58.2
