@@ -90,7 +90,7 @@ try{
  for(const topic of ['time','place','both']){
    await page.goto(baseUrl+'?era=2023&lang=ko');
    await page.locator('[data-search="'+topic+'"]').click();
-   await page.locator('.search-ready').waitFor({timeout:15000});
+   await page.locator('[data-search-stage="complete"]').waitFor({timeout:15000});
    const answer=page.locator('.answer-copy');
    assert.doesNotMatch(await answer.innerText(),/[A-Za-z]/,topic+' answer');
    assert.match(await answer.innerText(),/관측회|테라스/);
@@ -102,6 +102,43 @@ try{
    assert.match(await answer.innerText(),/Observing Night/);
    await choose(page,'ko');
    assert.doesNotMatch(await answer.innerText(),/[A-Za-z]/);
+ }
+ // Check the actual localized labels and route layout at desktop and mobile widths.
+ for(const [width,height] of [[1440,900],[390,844],[844,390]]){
+   await page.setViewportSize({width,height});
+   for(const [route,selectors] of [
+     ['era=1998', ['nav[aria-label="Orbit Room 페이지"]']],
+     ['era=2001', ['nav[aria-label="검색 색인 섹션"]']],
+     ['era=2005', ['nav[aria-label="Moonstream 사진 탐색"]','.upload-button']],
+     ['era=2005&page=eclipse-a', ['.flickr-breadcrumb']],
+     ['era=2013', ['[aria-label="Pacebook 홈"]','[aria-label="피드 탐색"]','[aria-label="게시물 필터"]','[aria-label="친구 및 사진 출처"]']],
+     ['era=2013&page=poster', ['label[for="poster-zoom"]','.poster-image-source']],
+     ['era=2023', ['nav[aria-label="검색 탐색"]']],
+     ['era=2026&page=plan', ['.plan-intro','[aria-label="천문대 페이지"]','[aria-label="브리핑 설정 및 선택한 계획"]']]
+   ]){
+     await page.goto(baseUrl+'?'+route+'&lang=ko',{waitUntil:'domcontentloaded'});
+     await page.locator('#screen .page-content').waitFor();
+     for(const selector of selectors){
+       const target=page.locator(selector).first();
+       await target.waitFor({state:'attached'});
+       const label=await target.getAttribute('aria-label');
+       assert.match(label||await target.innerText(),/[가-힣]/,route+' '+selector);
+     }
+     assert.equal(await page.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-innerWidth)),0,route+' '+width+'x'+height);
+     if(route.includes('page=plan')){
+       const times=page.locator('.plan-timeline time');
+       assert.ok(await times.count()>0);
+       for(const time of await times.all())assert.equal(await time.evaluate(el=>getComputedStyle(el).whiteSpace),'nowrap');
+       await page.locator('.plan-timeline [data-plan-item="moon"]').uncheck();
+       await page.locator('.plan-timeline [data-plan-item="iss"]').uncheck();
+       assert.match(await page.locator('.plan-intro').innerText(),/선택한 항목 1개/);
+       // Restore selection so each viewport starts with the same plan.
+       await page.goto(baseUrl+'?era=2026&lang=ko');
+       await page.locator('.briefing-scenario summary').click();
+       await page.locator('.briefing-card [data-plan-item="moon"]').check();
+       await page.locator('.briefing-card [data-plan-item="iss"]').check();
+     }
+   }
  }
  await ctx.close();
 

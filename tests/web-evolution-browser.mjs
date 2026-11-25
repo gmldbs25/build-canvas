@@ -111,6 +111,8 @@ try {
   // Audit every registered exhibit route in the selected Korean locale.
   const routeContext=await browser.newContext({viewport:{width:1440,height:900}});
   const routePage=await routeContext.newPage();
+  const routeErrors=[];
+  routePage.on('pageerror',error=>routeErrors.push(error.message));
   await routePage.goto(baseUrl+'?era=1993',{waitUntil:'domcontentloaded'});
   await routePage.locator('#screen .page-content').waitFor();
   await choose(routePage,'ko');
@@ -144,6 +146,7 @@ try {
       return {length:root.innerText?.length||root.textContent?.length||0,english,fragments:fragments.slice(0,8)};
     });
     assert.ok(result.length>15,'missing page content at '+era+'/'+pageId);
+    assert.equal(await routePage.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-innerWidth)),0,'document overflow at '+era+'/'+pageId);
     if(result.english.length)untranslated.set(era+'/'+pageId,result.english);
     if(result.fragments.length)englishFragments.set(era+'/'+pageId,result.fragments);
   }
@@ -156,6 +159,7 @@ try {
   const knownAuthoredEnglish=["West Terrace record with local time, weather and field notes.","Optical arrangement and configuration used during the lunar session.","October comparison readings and scale correction.","README, units and reduced notes for the lunar limb.","Working names, atlas references and corrections to the first list.","Questions on time notation and a reply linked from their server.","Proposed the Web at CERN and built its first browser and server.","Worked with Berners-Lee at CERN and helped promote the project.","Developed the first X Window System version of Mosaic at NCSA.","North Ridge Observatory Data Desk · revision 1 · 28 October 1993","Entries cited in October logs","r0 · 2 October: names copied from observing card.","Lyra Observatory computing group · received 29 October · copy filed at North Ridge","More pages from this neighborhood","Eclipse science and observing activities","North Ridge Astronomy Club calendar","Thanks for sharing this moment.","Search the web, then explore a generated overview.","Read the official event notice →","Select items for my plan →","A web prepared for agents","NASA image release · 22 August 2022. Selected again for the 7:40 p.m. sky-talk slot; local agenda timing is simulated."];
   const leaked=[...englishFragments].flatMap(([route,fragments])=>fragments.filter(s=>knownAuthoredEnglish.some(en=>s.includes(en))).map(s=>({route,text:s})));
   assert.deepEqual(leaked,[],'Authored English fragments must be translated; see KOREAN_NODE_REVIEW');
+  assert.deepEqual(routeErrors,[],'no uncaught JavaScript errors across exhibit routes');
   await routeContext.close();
 
   console.log('Work 7 bilingual browser smoke passed: 9 viewports, guestbook, local search, Pacebook, Orbit Search, poster and agent.');

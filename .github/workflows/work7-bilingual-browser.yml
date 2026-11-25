@@ -28,7 +28,7 @@ jobs:
       - run: chmod +x scripts/*.sh projects/orca/scripts/*.sh projects/transformer-to-agent/scripts/*.sh
       - run: npm run build:pages
       - name: Run Work 7 localization unit tests
-        run: node --test tests/web-evolution-i18n.test.mjs
+        run: node --test tests/web-evolution-i18n.test.mjs tests/web-evolution-reading.test.mjs tests/web-evolution-workspace.test.mjs
       - name: Install browser runner
         run: |
           npm install --no-save --package-lock=false playwright@1.58.2
