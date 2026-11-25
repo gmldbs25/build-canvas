@@ -123,7 +123,7 @@ function renderSieve() {
         const gap = n - previous;
         const mark = document.createElement('i');
         mark.style.setProperty('--gap', `${gap}px`);
-        mark.style.setProperty('--at', `${n}%`);
+        mark.style.setProperty('--at', `${((n - 1) / 99) * 100}%`);
         marks.append(mark);
         if (gap > largest.gap) largest = { gap, previous, current: n };
       }

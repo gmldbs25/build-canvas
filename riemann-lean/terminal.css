@@ -70,11 +70,18 @@ html[data-mode="math"] .term-bg > pre { opacity: .07; }
 .term-bg > pre { mask-image: linear-gradient(transparent,#000 4%,#000 94%,transparent); }
 html[data-era="terminal"] .seam__code { position: absolute; inset: 0; opacity: .65; transform: translateY(var(--code-shift,0%)); }
 html[data-era="terminal"] .seam__code > * { opacity: .18; }
+html .seam__code { font-size: 10.5px; }
 html .seam__layer[data-layer="code"] { background: linear-gradient(var(--seam-scrim,transparent),var(--seam-scrim,transparent)),var(--t-deep); }
 html[data-era="terminal"] .seam__layer { color: var(--seam-readable,var(--t-ink)); }
 @media(max-width:900px) {
   .code-wall { grid-template-columns: 1fr; font-size: 9px; }
   .code-wall > *:nth-child(n+2) { display: none; }
+  html .seam__code { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  html .seam__code > *:nth-child(n+2) { display: block; }
+}
+@media(max-width:639px) {
+  html .seam__code { grid-template-columns: 1fr; font-size: 10px; }
+  html .seam__code > *:nth-child(n+2) { display: none; }
 }
 html[data-era="terminal"] .hud, html[data-era="terminal"] main, html[data-era="terminal"] footer { position: relative; z-index: 1; }
 html[data-era="terminal"] .hud { position: sticky; z-index: 30; border-color: var(--t-rule); background: rgb(11 15 20 / 91%); }

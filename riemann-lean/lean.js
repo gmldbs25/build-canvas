@@ -53,18 +53,18 @@ function decorateCode(pre) {
     const line = create('span', '', 'code-line');
     const number = create('span', index + 1, 'line-no');
     const check = create('span', '✓', 'line-check');
+    const content = create('span', '', 'code-text');
     number.setAttribute('aria-hidden', 'true');
     check.setAttribute('aria-hidden', 'true');
-    line.append(number, check);
+    line.append(number, check, content);
     if (index === 0) {
-      line.append(create('span', text, 'syn-comment'));
+      content.append(create('span', text, 'syn-comment'));
     } else {
       for (const part of text.split(/(\btheorem\b|\bby\b|\bintro\b|\brw\b|\bexact\b|ℝ)/)) {
-        line.append(tokenClasses[part] ? create('span', part, tokenClasses[part]) : document.createTextNode(part));
+        content.append(tokenClasses[part] ? create('span', part, tokenClasses[part]) : document.createTextNode(part));
       }
     }
     code.append(line);
-    if (index < originalLines.length - 1) code.append('\n');
     return line;
   });
   pre.replaceChildren(code);
