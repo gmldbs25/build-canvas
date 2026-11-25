@@ -655,14 +655,136 @@ export const richMessages={
     ],
     "ko": [
       "따뜻한 겉옷을 입고 지역 자원봉사자들과 ",
-      "에서 만나세요. Ridge Road 북쪽 입구를 이용하세요."
+      "에서 만나세요. 리지 로드 북쪽 입구를 이용하세요."
     ],
     "labels": [
-      null
+      ["West Terrace, North Ridge Observatory","노스리지 천문대 서쪽 테라스"]
     ]
   }
 };
+Object.assign(richMessages, {
+  "23.answer.time.first": {
+    "en": [
+      "North Ridge Observatory’s next public Observing Night is ",
+      "."
+    ],
+    "ko": [
+      "노스리지 천문대의 다음 공개 관측회는 ",
+      "에 열립니다."
+    ],
+    "labels": [
+      [
+        "Saturday, 18 November 2023",
+        "2023년 11월 18일 토요일"
+      ]
+    ]
+  },
+  "23.answer.place.first": {
+    "en": [
+      "The public Observing Night takes place on the ",
+      "."
+    ],
+    "ko": [
+      "공개 관측회는 ",
+      "에서 열립니다."
+    ],
+    "labels": [
+      [
+        "West Terrace at North Ridge Observatory",
+        "노스리지 천문대 서쪽 테라스"
+      ]
+    ]
+  },
+  "23.answer.both.first": {
+    "en": [
+      "North Ridge Observatory’s public Observing Night is on ",
+      " at the ",
+      "."
+    ],
+    "ko": [
+      "노스리지 천문대의 공개 관측회는 ",
+      "에 ",
+      "에서 열립니다."
+    ],
+    "labels": [
+      [
+        "Saturday, 18 November 2023",
+        "2023년 11월 18일 토요일"
+      ],
+      [
+        "West Terrace",
+        "서쪽 테라스"
+      ]
+    ]
+  },
+  "23.answer.time.second": {
+    "en": [
+      "The event begins at ",
+      "; the terrace opens at 8:15 p.m."
+    ],
+    "ko": [
+      "관측회는 ",
+      "에 시작하며, 테라스는 오후 8시 15분부터 개방합니다."
+    ],
+    "labels": [
+      [
+        "8:30 p.m.",
+        "오후 8시 30분"
+      ]
+    ]
+  },
+  "23.answer.place.second": {
+    "en": [
+      "Use the ",
+      " to reach the terrace."
+    ],
+    "ko": [
+      "테라스로 가려면 ",
+      "를 이용하세요."
+    ],
+    "labels": [
+      [
+        "north entrance on Ridge Road",
+        "리지 로드 북쪽 입구"
+      ]
+    ]
+  },
+  "23.answer.both.second": {
+    "en": [
+      "The program begins at ",
+      " and the terrace opens at 8:15 p.m. Use the north entrance on Ridge Road."
+    ],
+    "ko": [
+      "관측회는 ",
+      "에 시작하며, 테라스는 오후 8시 15분부터 개방합니다. 리지 로드 북쪽 입구를 이용하세요."
+    ],
+    "labels": [
+      [
+        "8:30 p.m.",
+        "오후 8시 30분"
+      ]
+    ]
+  }
+});
 export const runtimeMessages={
+ "23.answer.time.third":["The official notice and community calendar agree on the start time.","공식 공지와 커뮤니티 일정표에서 같은 시작 시각을 확인할 수 있습니다."],
+ "23.answer.place.third":["The observatory notice and public calendar both list the West Terrace.","천문대 공지와 공개 일정표 모두 서쪽 테라스를 관측 장소로 안내합니다."],
+ "23.answer.both.third":["The observatory notice and public calendar confirm the date, time and West Terrace location.","천문대 공지와 공개 일정표에서 관측회의 날짜, 시작 시각, 서쪽 테라스 위치를 확인할 수 있습니다."],
+ "23.results.time.firstTitle":["Observing Night · North Ridge Observatory","공개 관측회 · 노스리지 천문대"],
+ "23.results.place.firstTitle":["Visit the West Terrace · North Ridge Observatory","서쪽 테라스 방문 안내 · 노스리지 천문대"],
+ "23.results.both.firstTitle":["Observing Night details · North Ridge Observatory","공개 관측회 상세 안내 · 노스리지 천문대"],
+ "23.results.time.secondTitle":["November public nights calendar","11월 공개 관측회 일정"],
+ "23.results.place.secondTitle":["Directions and public nights calendar","찾아오는 길과 공개 관측회 일정"],
+ "23.results.both.secondTitle":["November date, time and venue calendar","11월 관측회 날짜·시각·장소 안내"],
+ "23.results.time.firstSnippet":["Public observing begins Saturday, 18 November at 8:30 p.m. The terrace opens at 8:15 p.m.","공개 관측회는 11월 18일 토요일 오후 8시 30분에 시작합니다. 테라스는 오후 8시 15분부터 개방합니다."],
+ "23.results.place.firstSnippet":["Find the West Terrace using the north entrance on Ridge Road. Doors open before the program.","리지 로드 북쪽 입구를 통해 서쪽 테라스로 오세요. 관측회 시작 전부터 입장할 수 있습니다."],
+ "23.results.both.firstSnippet":["Saturday, 18 November 2023 · 8:30 p.m. · West Terrace at North Ridge Observatory. Terrace opens at 8:15 p.m.","2023년 11월 18일 토요일 오후 8시 30분 · 노스리지 천문대 서쪽 테라스. 오후 8시 15분부터 입장할 수 있습니다."],
+ "23.results.time.secondSnippet":["This month’s calendar lists North Ridge Observatory’s public program for Saturday evening.","이달 일정표에는 노스리지 천문대의 토요일 저녁 공개 관측회가 안내되어 있습니다."],
+ "23.results.place.secondSnippet":["The observatory calendar lists the public program and points visitors to the official notice for updates.","천문대 일정표에서 공개 관측회 일정을 확인할 수 있습니다. 변경 사항은 공식 공지를 참고하세요."],
+ "23.results.both.secondSnippet":["The November calendar confirms the Saturday program and West Terrace venue; check the observatory notice for updates.","11월 일정표에서도 토요일 관측회와 서쪽 테라스 장소를 확인할 수 있습니다. 변경 사항은 천문대 공지를 참고하세요."],
+ "23.source.observatory":["North Ridge Observatory","노스리지 천문대"],
+ "23.source.calendar":["Community Calendar","커뮤니티 일정표"],
+ "agent.selectedItems":["{count} selected {noun}","선택한 항목 {count}개"],
  'photo.favorite.add':['Add to favorites','즐겨찾기에 추가'],
  'photo.favorite.saved':['In favorites','즐겨찾기에 저장됨'],
  'photo.count':['{count} photos','사진 {count}장'],

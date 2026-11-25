@@ -86,6 +86,23 @@ try{
  assert.match(await firstPost.locator('.pace-like-count').innerText(),/좋아요/);
  await choose(page,'en');
  assert.match(await firstPost.locator('.pace-like-count').innerText(),/likes/);
+ // Final Korean authored copy: three examples and EN round trip.
+ for(const topic of ['time','place','both']){
+   await page.goto(baseUrl+'?era=2023&lang=ko');
+   await page.locator('[data-search="'+topic+'"]').click();
+   await page.locator('.search-ready').waitFor({timeout:15000});
+   const answer=page.locator('.answer-copy');
+   assert.doesNotMatch(await answer.innerText(),/[A-Za-z]/,topic+' answer');
+   assert.match(await answer.innerText(),/관측회|테라스/);
+   for(const result of await page.locator('.web-result').all()){
+     assert.doesNotMatch(await result.locator('a').innerText(),/[A-Za-z]/);
+     assert.doesNotMatch(await result.locator('p').innerText(),/[A-Za-z]/);
+   }
+   await choose(page,'en');
+   assert.match(await answer.innerText(),/Observing Night/);
+   await choose(page,'ko');
+   assert.doesNotMatch(await answer.innerText(),/[A-Za-z]/);
+ }
  await ctx.close();
 
  // Mock network failures deterministically. Locale switching itself must not refetch sources.

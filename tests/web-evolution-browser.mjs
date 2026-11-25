@@ -21,6 +21,7 @@ await new Promise((ok,fail)=>server.listen(4179,'127.0.0.1',err=>err?fail(err):o
 const browser=await chromium.launch({headless:true});
 const baseUrl='http://127.0.0.1:4179/web-evolution/';
 const localeKey='build-canvas:web-evolution:locale';
+function routeWithoutLang(value){const url=new URL(value);url.searchParams.delete('lang');return url.href;}
 async function choose(page,lang){
   const large=page.locator('.sidebar-language-options');
   if(await large.isVisible())await large.locator('[data-language="'+lang+'"]').click();
@@ -43,7 +44,8 @@ try {
     await choose(page,'ko');
     assert.equal(await page.evaluate(k=>localStorage.getItem(k),localeKey),'ko');
     assert.equal(await page.evaluate(()=>window.__screenRef===document.querySelector('#screen')),true);
-    assert.equal(await page.evaluate(()=>window.__originalHref===location.href),true);
+    assert.equal(routeWithoutLang(page.url()),routeWithoutLang(await page.evaluate(()=>window.__originalHref)));
+    assert.equal(new URL(page.url()).searchParams.get('lang'),'ko');
     await page.reload({waitUntil:'domcontentloaded'});
     await page.locator('#screen .mosaic-page').waitFor();
     assert.equal(await page.locator('#screen').getAttribute('lang'),'ko');
@@ -71,7 +73,7 @@ try {
   await page.locator('.classic-result').first().waitFor({timeout:7500});
   const searchHref=page.url();
   await choose(page,'en');
-  assert.equal(page.url(),searchHref);
+  assert.equal(routeWithoutLang(page.url()),routeWithoutLang(searchHref));
   assert.ok((await page.locator('.classic-result').count())>0);
   await page.goto(baseUrl+'?era=2013');
   await page.locator('#pace-status').fill('Draft text stays unchanged');
@@ -87,7 +89,7 @@ try {
   await page.locator('.search-result-shell').waitFor();
   const resultUrl=page.url();
   await choose(page,'ko');
-  assert.equal(page.url(),resultUrl);
+  assert.equal(routeWithoutLang(page.url()),routeWithoutLang(resultUrl));
   await page.goto(baseUrl+'?era=2013&page=poster');
   await page.locator('.poster-editor input[name=title]').fill('Custom saved poster');
   const saved=await page.evaluate(()=>localStorage.getItem('web-evolution-fieldwork-poster-v1'));

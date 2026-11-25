@@ -131,7 +131,7 @@ export function photoPage(page) {
   const photos = [...uploadedPhotos, ...memberPhotos];
   return `<article class="photo-page photostream-page">
     <header class="photo-community-head"><div><p class="photo-kicker">moonstream · photo sharing</p><h2>Community photostream</h2><p>Backyard astronomy · field photos, eclipse sequences, and images worth comparing.</p></div><button class="upload-button" type="button" data-upload-open>↑ Upload</button></header>
-    <nav class="photo-tabs" aria-label="Moonstream">${photoLink('home', 'Photostream', 'aria-current="page"')}${photoLink('sets', 'Sets')}${photoLink('favorites', 'Favorites')}</nav>
+    <nav class="photo-tabs" aria-label="Moonstream photo navigation">${photoLink('home', 'Photostream', 'aria-current="page"')}${photoLink('sets', 'Sets')}${photoLink('favorites', 'Favorites')}</nav>
     <nav class="photo-tag-nav stream-tag-nav" aria-label="Explore community tags"><strong>Explore tags</strong>
       ${['lunar-eclipse', 'observing', 'telescopes', 'planets', 'comets', 'moon'].map((tag) => tagLink(tag, tagLabels[tag], page)).join('')}
     </nav>

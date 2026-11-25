@@ -98,6 +98,10 @@ function sceneLink(era, page, label, current = false) {
   return `<a href="?era=${era}&amp;page=${page}" data-page="${page}"${current ? ' aria-current="page"' : ''}>${label}</a>`;
 }
 
+function searchLocalized(key) {
+  return `<span data-i18n-message="${key}">${escapeHtml(formatMessage(key))}</span>`;
+}
+
 function searchAnswer(topic, progress) {
   const time = topic === 'time';
   const place = topic === 'place';
@@ -111,50 +115,33 @@ function searchAnswer(topic, progress) {
     : place
       ? 'Use the <strong>north entrance on Ridge Road</strong> to reach the terrace.'
       : 'The program begins at <strong>8:30 p.m.</strong> and the terrace opens at 8:15 p.m. Use the north entrance on Ridge Road.';
-  const third = time
-    ? 'The official notice and community calendar agree on the start time.'
-    : place
-      ? 'The observatory notice and public calendar both list the West Terrace.'
-      : 'The observatory notice and public calendar confirm the date, time and West Terrace location.';
   return `<article class="ai-overview" aria-labelledby="ai-overview-title">
     <div class="ai-overview-heading"><div><span class="answer-label"><span aria-hidden="true">✦</span> Orbit Search AI overview</span><span class="experiment-label">Search Labs experiment · simulated</span></div><span class="overview-spark" aria-hidden="true">✧</span></div>
     <h3 id="ai-overview-title">Observing Night</h3>
     <div class="answer-copy">
-      ${progress >= 1 ? `<p>${first}</p>` : ''}
-      ${progress >= 2 ? `<p>${second}</p>` : ''}
-      ${progress >= 3 ? `<p>${third} <sup>${sceneLink(2023, 'notice', '<span class="sr-only">Source </span>1')} ${sceneLink(2023, 'archive', '<span class="sr-only">Source </span>2')}</sup></p>` : ''}
+      ${progress >= 1 ? `<p data-i18n-rich="23.answer.${topic}.first">${first}</p>` : ''}
+      ${progress >= 2 ? `<p data-i18n-rich="23.answer.${topic}.second">${second}</p>` : ''}
+      ${progress >= 3 ? `<p>${searchLocalized(`23.answer.${topic}.third`)} <sup>${sceneLink(2023, 'notice', '<span class="sr-only">Source </span>1')} ${sceneLink(2023, 'archive', '<span class="sr-only">Source </span>2')}</sup></p>` : ''}
     </div>
     ${progress >= 3 ? `<div class="overview-sources" aria-label="Cited sources">
-      ${sceneLink(2023, 'notice', '<span>1</span> North Ridge Observatory')}
-      ${sceneLink(2023, 'archive', '<span>2</span> Community Calendar')}
+      ${sceneLink(2023, 'notice', `<span>1</span> ${searchLocalized('23.source.observatory')}`)}
+      ${sceneLink(2023, 'archive', `<span>2</span> ${searchLocalized('23.source.calendar')}`)}
     </div><p class="overview-disclaimer">AI-generated summary · Check the source pages for details.</p>` : ''}
   </article>`;
 }
 
 function webResults(topic) {
-  const time = topic === 'time';
-  const place = topic === 'place';
-  const firstSnippet = time
-    ? 'Public observing begins Saturday, 18 November at 8:30 p.m. The terrace opens at 8:15 p.m.'
-    : place
-      ? 'Find the West Terrace using the north entrance on Ridge Road. Doors open before the program.'
-      : 'Saturday, 18 November 2023 · 8:30 p.m. · West Terrace at North Ridge Observatory. Terrace opens at 8:15 p.m.';
-  const secondSnippet = time
-    ? 'This month’s calendar lists North Ridge Observatory’s public program for Saturday evening.'
-    : place
-      ? 'The observatory calendar lists the public program and points visitors to the official notice for updates.'
-      : 'The November calendar confirms the Saturday program and West Terrace venue; check the observatory notice for updates.';
   return `<section class="web-results" aria-label="Web results">
     <h3>Web results</h3>
     <article class="web-result">
       <span class="result-domain">observatory.example <small>› news › 2023-observing-night</small></span>
-      ${sceneLink(2023, 'notice', time ? 'Observing Night · North Ridge Observatory' : place ? 'Visit the West Terrace · North Ridge Observatory' : 'Observing Night details · North Ridge Observatory')}
-      <p>${firstSnippet}</p>
+      ${sceneLink(2023, 'notice', searchLocalized(`23.results.${topic}.firstTitle`))}
+      <p>${searchLocalized(`23.results.${topic}.firstSnippet`)}</p>
     </article>
     <article class="web-result">
       <span class="result-domain">calendar.example <small>› 2023 › november</small></span>
-      ${sceneLink(2023, 'archive', time ? 'November public nights calendar' : place ? 'Directions and public nights calendar' : 'November date, time and venue calendar')}
-      <p>${secondSnippet}</p>
+      ${sceneLink(2023, 'archive', searchLocalized(`23.results.${topic}.secondTitle`))}
+      <p>${searchLocalized(`23.results.${topic}.secondSnippet`)}</p>
     </article>
   </section>`;
 }
@@ -612,7 +599,7 @@ function planMarkup(state, poster) {
   const currentPoster = posterSnapshot(poster);
   const proposal = scheduleProposal(items, state);
   const posterHasUpdate = Boolean(state.posterUpdates[key]);
-  return `<article class="plan-review-page"><p class="briefing-eyebrow">MY OBSERVING PLAN / ${day.shortDate.toUpperCase()}</p><h2>Review the evening</h2><p class="plan-intro">${escapeHtml(region.label)} · ${escapeHtml(region.location)} · ${items.length} selected item${items.length === 1 ? '' : 's'}</p>
+  return `<article class="plan-review-page"><p class="briefing-eyebrow">MY OBSERVING PLAN / ${day.shortDate.toUpperCase()}</p><h2>Review the evening</h2><p class="plan-intro"><span>${escapeHtml(region.label)}</span> · <span>${escapeHtml(region.location)}</span> · <span data-i18n-message="agent.selectedItems" data-i18n-params='{"count":${items.length},"noun":"${items.length===1?'item':'items'}"}'>${formatMessage('agent.selectedItems',{count:items.length,noun:items.length===1?'item':'items'})}</span></p>
     ${matchesSaved ? '<p class="plan-saved" role="status">This plan is saved on this device.</p>' : approved ? '<p class="plan-changed" role="status">Your selections changed after the last save. Save again to update this plan.</p>' : ''}
     ${items.length ? `<ol class="plan-timeline">${items.map((item) => `<li><time datetime="${item.date}T${item.start}">${escapeHtml(item.time)}</time><div><span class="plan-kind">${item.category}</span><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.summary)}</p><span>${escapeHtml(item.location)}</span><div class="briefing-sources">${item.sourcePages.map((source, index) => sceneLink(2026, source, `Source: ${item.sourceLabels[index]}`)).join('')}</div></div><label class="plan-pick"><input type="checkbox" data-plan-item="${item.id}" checked><span>Keep</span></label></li>`).join('')}</ol>` : '<p class="no-briefing-items">No items are selected. Return to the briefing and choose at least one idea.</p>'}
     <section class="poster-proposal" aria-labelledby="poster-proposal-title"><div><p class="briefing-eyebrow">OPTIONAL / 2013 FIELDWORK POSTER</p><h3 id="poster-proposal-title">Proposed schedule change</h3><p>Proposal from the official notice, separate from your selected sky-plan activities. Only date, time, and location fields are proposed. Existing poster edits stay in place. ${sceneLink(2026, 'source-event', 'Open the notice →')}</p></div>

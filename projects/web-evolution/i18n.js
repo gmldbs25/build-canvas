@@ -30,6 +30,18 @@ const qaPairs = [
   ["Photostream","사진 모음"],
   ["Sets","앨범"],
   ["Upload","업로드"],
+  ["↑ Upload","↑ 업로드"],
+  ["Moonstream photo navigation","Moonstream 사진 탐색"],
+  ["Browse by tag","태그로 둘러보기"],
+  ["Explore community tags","커뮤니티 태그 탐색"],
+  ["Search Labs experiment · simulated","검색 실험실 · 시뮬레이션"],
+  ["Observing Night","공개 관측회"],
+  ["West Terrace · Ridge Road","서쪽 테라스 · 리지 로드"],
+  ["South overlook · Bluff Road","남쪽 전망대 · 블러프 로드"],
+  ["North pad · Mesa Access Road","북쪽 관측 구역 · 메사 진입로"],
+  ["Coastline Bluff Field Station","해안 절벽 관측소"],
+  ["High Desert Mesa","고지대 사막 관측소"],
+  ["Community Calendar","커뮤니티 일정표"],
   ["← Community photostream","← 커뮤니티 사진 모음"],
   ["Browse the local index","로컬 색인 둘러보기"],
   ["Example:","예시:"],
@@ -169,8 +181,7 @@ export function translateText(value,lang=locale){
     const enlarge=trimmed.match(/^Enlarge photo shared by (.+)$/);
     if(enlarge)return s.replace(trimmed,enlarge[1]+'님이 공유한 사진 확대');
     const checked=trimmed.match(/^Checked (.+) local$/);
-    if(checked)return s.replace(trimmed,'확인: '+formatKoreanTime(checked[1])+' (현지 시각)');
-    if(trimmed==='at the')return s.replace(trimmed, ',');
+    if(checked)return s.replace(trimmed,'확인: '+translateText(checked[1], 'ko')+' (현지 시각)');
     const commentBy=trimmed.match(/^Write a comment on (.+?)’s post$/);
     if(commentBy)return s.replace(trimmed,commentBy[1]+'님의 게시물에 댓글 작성');
     if(trimmed==='Write a comment on your post')return s.replace(trimmed,'내 게시물에 댓글 작성');
@@ -248,7 +259,7 @@ function applyRich(node,lang){
  }
  for(let i=0;i<inline.length;i++){
   const label=record.labels[i]?.[lang==='ko'?1:0];
-  if(label!==null&&label!==undefined&&inline[i].tagName==='A')inline[i].textContent=label;
+  if(label!==null&&label!==undefined&&['A','STRONG'].includes(inline[i].tagName)&&inline[i].textContent!==label)inline[i].textContent=label;
  }
  richState.set(node,lang);
 }
@@ -286,7 +297,7 @@ export function applyLocale(root,lang=locale){
   const elements=[root,...root.querySelectorAll('*')];
   for(const element of elements){
     if(protectedNode(element))continue;
-    for(const attr of ['aria-label','title','placeholder','alt'])changeAttr(element,attr,lang);
+    for(const attr of ['aria-label','title','placeholder','alt','label'])changeAttr(element,attr,lang);
   }
   // Only exhibit-owned wrappers are switched. Live-source subtrees retain their source language.
   for(const element of elements){

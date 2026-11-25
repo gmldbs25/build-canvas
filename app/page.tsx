@@ -6,7 +6,7 @@ const works = [
     type: "WEB HISTORY · INTERACTIVE EXHIBIT",
     year: "2026.11",
     href: "./web-evolution/",
-    inProgress: true,
+    inProgress: false,
   },
   {
     index: "06",

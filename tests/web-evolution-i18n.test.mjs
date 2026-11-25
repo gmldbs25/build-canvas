@@ -75,3 +75,9 @@ test('scenario calendar labels preserve civil dates and Korean ranges', () => {
   assert.equal(formatKoreanTime('8:00 p.m.'), '오후 8시');
   assert.equal(formatKoreanTime('8:58–9:03 p.m.'), '오후 8시 58분~9시 3분');
 });
+
+
+test('final QA localization labels and explicit search messages', () => {
+  for (const [en,ko] of [["Fieldwork poster editor ↗","현장 관측 포스터 편집기 ↗"],["Photo credits ↗","사진 출처 ↗"],["Attach a photo","사진 첨부"],["Pacebook home","Pacebook 홈"],["Feed navigation","피드 탐색"],["Your feed","내 피드"],["Filter posts","게시물 필터"],["Discussion","토론"],["Friends and photo credits","친구 및 사진 출처"],["Enlarge photo shared by Alex","Alex님이 공유한 사진 확대"],["Photostream","사진 모음"],["Sets","앨범"],["↑ Upload","↑ 업로드"],["← Community photostream","← 커뮤니티 사진 모음"],["Browse the local index","로컬 색인 둘러보기"],["Example:","예시:"],["Search index sections","검색 색인 섹션"],["Keep","유지"],["Open notice →","공지 열기 →"],["SPACE RESEARCH + IMAGES","우주 연구 및 이미지"],["Source: NASA · Webb image release","출처: NASA · 웹 망원경 이미지 공개"],["OPTIONAL / 2013 FIELDWORK POSTER","선택 사항 / 2013 현장 관측 포스터"],["Observatory pages","천문대 페이지"],["Briefing settings and selected plan","브리핑 설정 및 선택한 계획"],["Zoom","확대"],["Open photo source ↗","사진 원본 열기 ↗"],["Photo","사진"],["Orbit Room pages","Orbit Room 페이지"],["Answer generation progress","답변 생성 진행률"],["Search navigation","검색 탐색"],["Checked Fri, Nov 20 · 2:00 p.m. local","확인: 11월 20일 금요일 · 오후 2시 (현지 시각)"]]) assert.equal(translateText(en,'ko'),ko,en);
+  for (const topic of ['time','place','both']) for (const key of ['firstTitle','secondTitle','firstSnippet','secondSnippet']) assert.doesNotMatch(formatMessage('23.results.'+topic+'.'+key,{},'ko'),/[A-Za-z]/);
+});
