@@ -91,12 +91,12 @@
           <figure class="sieve-plate plate">
             <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
             <p class="label">1–100 · 소수 표</p>
+            <noscript><p class="sieve-noscript">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</p></noscript>
             <div class="sieve-layout">
               <div id="sieve" role="img" aria-label="1부터 100까지의 소수 표. 소수 25개, 가장 넓은 빈 구간은 89에서 97까지 8칸."></div>
               <div id="primeGaps" aria-hidden="true"></div>
             </div>
-            <figcaption id="sieveCaption">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
-            <noscript><p class="sieve-noscript">JavaScript를 켜면 1–100 수표와 소수 사이 간격 표시를 볼 수 있습니다.</p></noscript>
+            <figcaption id="sieveCaption" class="js-only">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
           </figure>
           <blockquote class="riemann-quote">
             <p>“물론 이에 대한 엄밀한 증명이 있었으면 한다. 다만 몇 차례의 덧없는 시도 끝에, 당장의 목적에는 필요치 않아 보여 그 추구는 잠시 접어두었다.”</p>
@@ -125,8 +125,8 @@
       </header>
       <noscript><p>이 실험은 JavaScript가 필요합니다. 영점 60개 중 N개를 더한 근사로 소수 계단을 재구성합니다.</p></noscript>
       <div class="lab">
-        <div class="lab__instrument">
-          <div class="lab__stage js-only">
+        <div class="lab__instrument js-only">
+          <div class="lab__stage">
             <figure class="plate lab-plate" id="labPlate" data-lab-view="wave">
               <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
               <div class="lab__head"><h3>ψ(x) · 리만 명시적 공식 근사</h3><span class="live">LIVE</span><span id="labBadge">N 15 · σ 0.50</span></div>
@@ -187,7 +187,6 @@
             <div class="only-math">
               <p>폰 망골트 명시적 공식. 합은 비자명 영점 전체. 계단의 점프 앞에서 근사는 링잉을 보이며, N을 늘리면 좁아진다.</p>
               <div class="formula" role="math" aria-label="리만 명시적 공식. 프사이 x는 x 빼기 영점에 대한 x의 로 제곱 나누기 로의 합, 빼기 로그 2파이, 빼기 2분의 1 로그 1 빼기 x의 마이너스 2제곱."><span>ψ(x)</span><span class="op">=</span><span>x</span><span class="op">−</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">ρ</span></span><span class="frac"><span class="frac__num">x<sup>ρ</sup></span><span class="frac__den">ρ</span></span><span class="op">−</span><span>ln(2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>ln(1 − x<sup>−2</sup>)</span></div>
-              <p>계단이 점프하는 지점에서 명시적 공식의 극한값은 좌우 값의 평균입니다. 그래프의 실제 계단은 그 지점까지 포함한 합을 사용합니다.</p>
             </div>
           </article>
           <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
@@ -211,7 +210,7 @@
           <div class="formula" role="math" aria-label="진폭은 2 곱하기 x의 시그마 제곱을 시그마 제곱 더하기 감마 제곱의 제곱근으로 나눈 값입니다. 위상은 atan2 감마, 시그마입니다.">
             <span>켤레쌍의 합</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ² + γ²)</span></span><span>· cos(γu − φ), φ = atan2(γ, σ)</span><span>진폭 A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ<sub>k</sub></sup></span><span class="frac__den">√(σ<sub>k</sub>² + γ<sub>k</sub>²)</span></span>
           </div>
-          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 x<sup>σ</sup>는 √x보다 빠르게 증가한다.</p>
+          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 x<sup>σ</sup>가 계단 높이 x를 따라잡는다.</p>
         </div>
       </details>
       <p class="page-num" aria-hidden="true">— 2 —</p>
@@ -240,7 +239,6 @@
               <p class="seam__audit"><span data-fact="proof.sorry">0</span> sorry · <span data-fact="proof.admit">0</span> admit · <span data-fact="proof.extraAxioms">0</span> 추가 공리</p>
             </div>
           </div>
-          <p class="seam__disclaimer">쪽수와 코드 줄 수는 단위가 다릅니다. 배율에 수학적 의미는 없습니다.</p>
           <p class="seam__detail">쪽수와 코드 줄 수는 단위가 다르다. 배율에 수학적 의미는 없다. 다만 60줄을 한 쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽, 종이 0.1mm로 쌓으면 약 <span data-fact="stackMeters">29</span>m다. 두께로만 비교한 어림이다.</p>
         </div>
       </div>

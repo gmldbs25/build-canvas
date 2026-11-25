@@ -1,5 +1,3 @@
-/* Dark terminal reading mode. The faint codewall stays atmospheric behind
-   the content, with low contrast lines and a restrained scanline layer. */
 :root {
   --t-bg: #0B0F14;
   --t-deep: #070A0D;
@@ -73,6 +71,7 @@ html[data-era="terminal"] .seam__code > * { opacity: .18; }
 html .seam__code { font-size: 10.5px; }
 html .seam__layer[data-layer="code"] { background: linear-gradient(var(--seam-scrim,transparent),var(--seam-scrim,transparent)),var(--t-deep); }
 html[data-era="terminal"] .seam__layer { color: var(--seam-readable,var(--t-ink)); }
+html [data-layer="code"] .seam__number { color: var(--t-ink); }
 @media(max-width:900px) {
   .code-wall { grid-template-columns: 1fr; font-size: 9px; }
   .code-wall > *:nth-child(n+2) { display: none; }

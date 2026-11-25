@@ -68,6 +68,7 @@ cp -R extras/elsewhere/. dist-pages/elsewhere/
 mkdir -p dist-pages/riemann-lean dist-pages/share
 cp riemann-lean/{index.html,style.css,paper.css,terminal.css,data.js,psi.js,lean.js,main.js,favicon.svg} dist-pages/riemann-lean/
 cp share/work-08.png dist-pages/share/
+cp IMPLEMENTATION_NOTES.md dist-pages/
 
 node scripts/finalize-pages.mjs
 

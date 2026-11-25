@@ -472,14 +472,14 @@ export function initLab(root = document) {
       const x = px(sigmaValues[i]);
       const y = py(GAMMA[i]);
       planeCtx.beginPath();
-      planeCtx.arc(x, y, i === selectedIndex ? 5 : 3.5, 0, Math.PI * 2);
+      planeCtx.arc(x, y, i === selectedIndex ? 6 : 4, 0, Math.PI * 2);
       planeCtx.fillStyle = active ? colors.accent : colors.muted;
-      planeCtx.globalAlpha = active ? (i === selectedIndex ? 1 : 0.76) : 0.25;
+      planeCtx.globalAlpha = active ? 1 : 0.6;
       planeCtx.fill();
       planeCtx.globalAlpha = 1;
       if (i === selectedIndex) {
         planeCtx.beginPath();
-        planeCtx.arc(x, y, 7.2, 0, Math.PI * 2);
+        planeCtx.arc(x, y, 8.2, 0, Math.PI * 2);
         planeCtx.strokeStyle = colors.ink;
         planeCtx.lineWidth = 1;
         planeCtx.stroke();
@@ -489,7 +489,7 @@ export function initLab(root = document) {
         const label = document.documentElement.dataset.mode === 'math'
           ? `γ${i + 1} ${fmt(GAMMA[i], 2)}`
           : `γ${i + 1}`;
-        planeCtx.fillText(label, Math.min(x + 9, width - planeCtx.measureText(label).width - 3), y - 4 - i * 5);
+        planeCtx.fillText(label, Math.min(x + 9, width - planeCtx.measureText(label).width - 3), y - 8 - i * 8);
       }
     }
   }
