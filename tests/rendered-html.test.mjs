@@ -24,7 +24,8 @@ test("renders the portfolio entry content", async () => {
   const html = await response.text();
   assert.equal(response.status, 200);
   assert.match(html, /<title>build _ canvas<\/title>/);
-  assert.match(html, /by heeyoon\. ✦/);
+  assert.match(html, /<p class="statement"><a class="identity-link" href="\.\/elsewhere\/">by heeyoon\. ✦<\/a><\/p>/);
+  assert.doesNotMatch(html, /GitHub ↗|elsewhere →/);
   assert.match(html, /href="\.\/web-evolution\/"/);
   assert.match(html, /class="work-index-group"><span class="work-index">07<\/span><\/span><strong>The Evolution of the Web<\/strong>/);
   assert.equal((html.match(/class="work-status"/g) ?? []).length, 0);
