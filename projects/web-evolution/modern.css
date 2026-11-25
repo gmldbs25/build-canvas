@@ -392,8 +392,8 @@
 .plan-saved, .plan-changed, .poster-updated { padding: 8px 11px; border-radius: 6px; color: #245d43 !important; background: #e5f2e7; font-size: 11px; }
 .plan-changed { color: #795226 !important; background: #fbf0df; }
 .plan-timeline { display: grid; gap: 0; margin: 18px 0 23px; padding: 0; list-style: none; }
-.plan-timeline > li { display: grid; grid-template-columns: 75px minmax(0, 1fr) auto; align-items: start; gap: 11px; padding: 15px 0; border-bottom: 1px solid var(--brief-line); }
-.plan-timeline > li > time { padding-top: 2px; color: #a16234; font-size: 12px; font-weight: 750; }
+.plan-timeline > li { display: grid; grid-template-columns: max-content minmax(0, 1fr) auto; align-items: start; gap: 11px; padding: 15px 0; border-bottom: 1px solid var(--brief-line); }
+.plan-timeline > li > time { white-space: nowrap; padding-top: 2px; color: #a16234; font-size: 12px; font-weight: 750; }
 .plan-timeline > li > div { display: grid; gap: 4px; }
 .plan-kind { color: #59736a; font: 700 9px ui-monospace, monospace; letter-spacing: .06em; }
 .plan-timeline strong { color: #294b3b; font-size: 15px; }
