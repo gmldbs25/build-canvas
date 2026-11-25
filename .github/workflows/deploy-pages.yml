@@ -62,8 +62,14 @@ jobs:
           node --check projects/web-evolution/monitor.js
           node --test tests/web-evolution-i18n.test.mjs
 
+      - name: Verify hidden elsewhere archive
+        run: node --test tests/elsewhere.test.mjs
+
       - name: Build portfolio
         run: npm run build:pages
+
+      - name: Verify exported elsewhere poster
+        run: cmp extras/elsewhere/assets/attack-on-titan.webp dist-pages/elsewhere/assets/attack-on-titan.webp
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

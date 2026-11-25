@@ -3,10 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { mediaEntries } from "../extras/elsewhere/entries.js";
 
-test("elsewhere cards stay data-driven and valid", () => {
+test("elsewhere cards stay data-driven and valid", async () => {
   assert.equal(mediaEntries.length, 7);
-  assert.match(mediaEntries[0].image, /^https:\/\/a\.storyblok\.com\//);
-  assert.match(mediaEntries[0].image, /\/4090x5784\/.*\/m\/1200x0\/filters:quality\(88\):format\(webp\)$/);
+  assert.equal(mediaEntries[0].image, "./assets/attack-on-titan.webp");
   assert.deepEqual(mediaEntries.map((item) => item.title), [
     "진격의 거인",
     "귀멸의 칼날",
@@ -19,7 +18,7 @@ test("elsewhere cards stay data-driven and valid", () => {
   const expectedReviews = [
     "거인이라는 자극적 소재 뒤의 “인간” 이야기. 인간 세상엔 영원한 악역도, 선인도 없다. 그냥 “만화” 로만 보기엔 너무 아까울 작품.",
     "정든 캐릭터들이 매 번 목숨을 걸고 싸운다, 과몰입러는 너무 사무치고 눈물난다. + 야무진 액션 작화는 봐도봐도 계속 보고싶음.",
-    "가장 현실적인 두근거림이 느껴진다, 중고생으로 돌아간다면 온 마음 바쳐서 축구부활동 하고싶어요.",
+    "가장 현실적인 두근거림이 느껴진다, 중고생으로 돌아간다면 온 마음 바쳐서 축구부 활동 하고싶어요.",
     "소년 성장 스토리 정석, A반 전체에 애정 한가득 줘버림. 마지막시즌 작화 환상 + 바쿠고의 서사는 정말 ..",
     "모든게 느린 만화가 보는 내내 치유해주는 기분, “시간”에 대해 생각해보기 좋았다. + 전부 너무 귀여움",
     "곤과 키르아의 성장 이야기 만으로도 애정이 듬뿍 생긴다. 특히 키르아가 변해가는 모습을 아빠의 마음으로 본 느낌.",
@@ -29,7 +28,14 @@ test("elsewhere cards stay data-driven and valid", () => {
   assert.equal(new Set(mediaEntries.map((entry) => entry.id)).size, mediaEntries.length);
   for (const entry of mediaEntries) {
     assert.ok(entry.id && entry.title && typeof entry.review === "string" && entry.image);
-    assert.match(entry.image, /^https:\/\//);
+    if (entry.image.startsWith("./")) {
+      const bytes = await readFile(new URL(entry.image, new URL("../extras/elsewhere/", import.meta.url)));
+      assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+      assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+      assert.ok(bytes.length > 10000, "Local poster must contain the actual image");
+    } else {
+      assert.match(entry.image, /^https:\/\//);
+    }
   }
 });
 
@@ -64,8 +70,8 @@ test("elsewhere is a static, isolated, mobile-first Pages route", async () => {
   assert.match(renderer, /viewer\?\.open/);
   assert.match(page, /<dialog class="poster-dialog"/);
   assert.match(page, /id="poster-viewer-close"/);
-  assert.match(page, /main\.js\?v=aot-poster-hd-1/);
-  assert.match(renderer, /entries\.js\?v=aot-poster-hd-1/);
+  assert.match(page, /main\.js\?v=aot-poster-local-1/);
+  assert.match(renderer, /entries\.js\?v=aot-poster-local-1/);
   assert.match(stylesheet, /\.poster-viewer-image/);
   assert.match(stylesheet, /max-height: calc\(100dvh - 140px\)/);
   assert.match(renderer, /if \(entry\.review && entry\.review\.trim\(\)\)/);

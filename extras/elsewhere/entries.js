@@ -7,7 +7,7 @@ export const mediaEntries = [
     id: "attack-on-titan",
     title: "진격의 거인",
     review: "거인이라는 자극적 소재 뒤의 “인간” 이야기. 인간 세상엔 영원한 악역도, 선인도 없다. 그냥 “만화” 로만 보기엔 너무 아까울 작품.",
-    image: "https://a.storyblok.com/f/178900/4090x5784/a810650153/c8a8b63b80b85744d18e952ae0b21b7a1637197683_main.jpg/m/1200x0/filters:quality(88):format(webp)",
+    image: "./assets/attack-on-titan.webp",
     imageSource: "https://www.crunchyroll.com/news/latest/2021/11/14/attack-on-titan-final-season-unleashes-new-part-2-key-visual",
     imageAlt: "진격의 거인 The Final Season Part 2 공식 키 비주얼 (작품 로고 포함)",
   },
