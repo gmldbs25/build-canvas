@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ko" class="no-js" data-mode="intuition" data-era="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="1859년 여덟 쪽짜리 논문에서 2026년 1,740만 줄의 Lean 증명까지. 소수의 파동을 직접 만지고, 기계가 쓴 증명을 직접 검사해 보는 Build Canvas Work 08.">
+  <title>소수의 파동, 기계가 쓴 증명 · 리만 가설과 Lean | Build Canvas</title>
+  <link rel="canonical" href="https://gmldbs25.github.io/build-canvas/riemann-lean/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Build Canvas">
+  <meta property="og:title" content="소수의 파동, 기계가 쓴 증명">
+  <meta property="og:description" content="1859년 여덟 쪽, 2026년 1,740만 줄. 소수의 파동을 만지고, 기계가 쓴 증명을 검사한다.">
+  <meta property="og:url" content="https://gmldbs25.github.io/build-canvas/riemann-lean/">
+  <meta property="og:image" content="https://gmldbs25.github.io/build-canvas/share/work-08.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="소수의 파동, 기계가 쓴 증명">
+  <meta name="twitter:description" content="1859년 여덟 쪽, 2026년 1,740만 줄. 소수의 파동을 만지고, 기계가 쓴 증명을 검사한다.">
+  <meta name="twitter:image" content="https://gmldbs25.github.io/build-canvas/share/work-08.png">
+  <meta name="theme-color" content="#E4E1D2" id="metaTheme">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./paper.css">
+  <link rel="stylesheet" href="./terminal.css">
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+  <div class="paper-bg" aria-hidden="true"><div class="paper-bg__grid"></div><div class="paper-bg__grain"></div></div>
+  <div class="term-bg code-wall" aria-hidden="true"></div>
+  <div class="seam-rule" aria-hidden="true"></div>
+
+  <header class="hud" id="hud">
+    <a class="brand" href="../" aria-label="Build Canvas 홈 (H)">build <span>_</span> canvas <b>Work 08</b><span class="brand-sub"> / RIEMANN × LEAN</span></a>
+    <nav class="chapters" aria-label="막 이동">
+      <a href="#act1" aria-label="1막 혼돈 속의 리듬">01<span class="chapter-name"> 혼돈</span></a>
+      <a href="#act2" aria-label="2막 리만의 악보">02<span class="chapter-name"> 파동</span></a>
+      <a href="#act3" aria-label="3막 기계가 쓴 증명">03<span class="chapter-name"> Lean</span></a>
+      <a href="#act4" aria-label="4막 변곡점">04<span class="chapter-name"> 변곡</span></a>
+    </nav>
+    <div class="hud__right">
+      <span class="era" id="era"><b>1859</b> · PAPER</span>
+      <button class="mode js-only" id="modeToggle" type="button" aria-pressed="false" aria-label="수학과 모드"><span>직관</span><span>수학<span class="mode-long">과</span></span></button>
+    </div>
+    <div class="progress" id="progress" aria-hidden="true"></div>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="heroTitle">
+      <div class="hero__plate plate">
+        <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
+        <span class="hero__folio label">Riemann, 1859 · <span data-fact="paper.range">671–680</span></span>
+        <div class="hero__content">
+          <p class="label">WORK 08 · RIEMANN HYPOTHESIS × LEAN 4</p>
+          <h1 id="heroTitle">소수의 <em>파동</em>,<br>기계가 쓴 증명</h1>
+          <p class="hero__english" lang="en">The Waves of Primes, the Proof a Machine Wrote</p>
+          <p class="lede">1859년, 여덟 쪽짜리 논문이 던진 질문 하나. 2026년, 1,740만 줄의 코드가 그 질문에 답했다. 다만 그 답을 끝까지 읽은 사람은 아직 없다.</p>
+          <p class="label hero__meta">1859 → 2026 · 167년 · 읽기 약 16분 · 인터랙션 2개</p>
+        </div>
+        <div class="hero__art" aria-hidden="true">
+          <svg viewBox="0 0 400 320" fill="none">
+            <defs>
+              <pattern id="engraving-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" stroke="currentColor" stroke-opacity=".18" stroke-width="1"/></pattern>
+            </defs>
+            <rect x="1" y="1" width="398" height="318" fill="url(#engraving-grid)" stroke="currentColor" stroke-opacity=".25"/>
+            <path d="M34 250H367M34 250V31M34 220H366M34 160H366M34 100H366" stroke="currentColor" stroke-opacity=".3"/>
+            <path d="M34 248.6H37.4V246.3H40.8V244.9H44.2V241.6H51V237.6H54.4V236.2H57.8V233.9H64.6V229H71.4V223.8H81.6V222.3H85V216.5H91.8V210.5H105.4V204.1H112.2V200.8H118.9V198.5H125.7V191.6H132.5V184.6H135.9V183.2H152.9V175.8H166.5V168.1H173.3V160.4H186.9V152.5H193.7V148.6H207.3V140.4H227.7V132.1H234.5V123.6H244.7V122.2H254.9V113.6H268.5V104.9H275.3V96.1H295.6V87.1H302.4V84.8H309.2V75.8H329.6V66.6H356.8V57.2H367" stroke="currentColor" stroke-width="1.7"/>
+            <path class="hero__wave" d="M34 249.3L36.1 248.6L38.2 246.4L40.4 246.4L42.5 244.8L44.6 241.7L46.7 241.5L48.8 241.5L51 239.8L53.1 237.9L55.2 236L57.3 235.6L59.5 234L61.6 234L63.7 233.4L65.8 229.1L67.9 229L70.1 228.9L72.2 224.7L74.3 223.5L76.4 223.9L78.5 223.8L80.7 223.4L82.8 223.1L84.9 219.3L87 216.3L89.1 216.9L91.3 214.6L93.4 210.7L95.5 210.2L97.6 210.6L99.8 210.5L101.9 210.8L104 209.6L106.1 206.2L108.2 203.7L110.4 203.3L112.5 202.8L114.6 201L116.7 199.8L118.8 199.9L121 199.6L123.1 198L125.2 195.6L127.3 193.4L129.4 191.5L131.6 189.1L133.7 186.4L135.8 184.1L137.9 182.9L140.1 182.7L142.2 183L144.3 183.5L146.4 183.8L148.5 183.4L150.7 181.9L152.8 179.7L154.9 177.3L157 175.7L159.1 175.2L161.3 175.4L163.4 175.4L165.5 174.3L167.6 171.7L169.7 168.3L171.9 164.9L174 162.4L176.1 161.1L178.2 160.8L180.4 160.8L182.5 160.4L184.6 159.2L186.7 157L188.8 154.5L191 152L193.1 150.2L195.2 149.2L197.3 149L199.4 149L201.6 148.8L203.7 147.9L205.8 146.2L207.9 144L210 141.8L212.2 140.2L214.3 139.5L216.4 139.7L218.5 140.4L220.6 141L222.8 141L224.9 140L227 137.8L229.1 134.8L231.3 131.4L233.4 128.3L235.5 125.9L237.6 124.4L239.7 123.7L241.9 123.4L244 123.4L246.1 123.1L248.2 122.4L250.3 121.3L252.5 119.8L254.6 118.3L256.7 116.8L258.8 115.5L260.9 114.2L263.1 113L265.2 111.6L267.3 109.9L269.4 107.8L271.6 105.4L273.7 102.8L275.8 100.3L277.9 98.2L280 96.6L282.2 95.6L284.3 95.2L286.4 95.1L288.5 95.2L290.6 95.1L292.8 94.6L294.9 93.6L297 92L299.1 89.8L301.2 87.3L303.4 84.8L305.5 82.4L307.6 80.3L309.7 78.8L311.9 77.7L314 77L316.1 76.6L318.2 76.3L320.3 76L322.5 75.4L324.6 74.5L326.7 73.4L328.8 72L330.9 70.5L333.1 69L335.2 67.7L337.3 66.7L339.4 66L341.5 65.7L343.7 65.6L345.8 65.7L347.9 65.9L350 65.9L352.2 65.7L354.3 65.1L356.4 64.1L358.5 62.7L360.6 60.9L362.8 58.7L364.9 56.4L367 54" stroke-width="2"/>
+            <path d="M34 281.3L36.1 282.3L38.2 280.8L40.4 282.7L42.5 282.3L44.6 279.5L46.7 281.1L48.8 283.1L51 282.5L53.1 281.5L55.2 280.4L57.3 281.9L59.5 281.4L61.6 283.3L63.7 284.5L65.8 279.7L67.9 281.7L70.1 283.5L72.2 278.8L74.3 278.9L76.4 281.6L78.5 283.5L80.7 284.8L82.8 286.3L84.9 282.4L87 279.7L89.1 282.7L91.3 281.1L93.4 277L95.5 278.1L97.6 280.9L99.8 282.7L101.9 285.1L104 285.2L106.1 281.9L108.2 280.1L110.4 281.5L112.5 282.6L114.6 281.9L116.7 282L118.8 284L121 285.7L123.1 285.1L125.2 283.3L127.3 282L129.4 281L131.6 279.3L133.7 277L135.8 275.4L137.9 275.5L140.1 277.2L142.2 279.7L144.3 282.5L146.4 284.9L148.5 286.2L150.7 286L152.8 284.5L154.9 282.8L157 282.3L159.1 283.5L161.3 285.8L163.4 287.8L165.5 288L167.6 286.1L169.7 282.7L171.9 279.4L174 277.5L176.1 277.5L178.2 279.1L180.4 281.1L182.5 282.4L184.6 282.4L186.7 281.1L188.8 279.1L191 277.2L193.1 276.4L195.2 276.9L197.3 278.5L199.4 280.6L201.6 282.2L203.7 282.8L205.8 282.2L207.9 280.8L210 279.4L212.2 278.8L214.3 279.7L216.4 282L218.5 285.1L220.6 288.1L222.8 290.1L224.9 290.4L227 289L229.1 286.3L231.3 283.1L233.4 280.2L235.5 278.5L237.6 278.1L239.7 278.9L241.9 280.6L244 282.5L246.1 284L248.2 284.9L250.3 285.2L252.5 284.9L254.6 284.5L256.7 284.2L258.8 284.1L260.9 284.2L263.1 284.3L265.2 284.1L267.3 283.4L269.4 282.1L271.6 280.4L273.7 278.4L275.8 276.5L277.9 275.2L280 274.7L282.2 275.1L284.3 276.4L286.4 278.3L288.5 280.5L290.6 282.3L292.8 283.6L294.9 283.9L297 283.4L299.1 282L301.2 280.2L303.4 278.2L305.5 276.4L307.6 275.2L309.7 274.8L311.9 275.1L314 276L316.1 277.4L318.2 279L320.3 280.4L322.5 281.5L324.6 282.2L326.7 282.4L328.8 282.2L330.9 281.9L333.1 281.6L335.2 281.5L337.3 281.9L339.4 282.9L341.5 284.3L343.7 286.2L345.8 288.4L347.9 290.6L350 292.6L352.2 294.3L354.3 295.4L356.4 295.8L358.5 295.6L360.6 294.8L362.8 293.5L364.9 291.8L367 290.1" stroke="currentColor" stroke-opacity=".4"/>
+            <text x="36" y="23" fill="currentColor" font-size="15">ψ(x)</text>
+            <text x="351" y="269" fill="currentColor" font-size="13">x</text>
+            <text x="36" y="307" fill="currentColor" font-size="13">ψ(x) − x</text>
+          </svg>
+          <span class="seal">RIEMANN <i>1859</i> BERLIN</span>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#act1"><span aria-hidden="true">↓</span> 스크롤 · 네 개의 막</a>
+    </section>
+
+    <section id="act1" class="act wrap" aria-labelledby="act1Title">
+      <header class="act__head page">
+        <p class="label">1막 · 혼돈 속의 리듬</p>
+        <h2 id="act1Title">소수는 규칙 없이 나타난다</h2>
+        <p class="lede">2, 3, 5, 7, 11. 1과 자기 자신으로만 나누어지는 수. 다음 소수가 어디에 있을지 알려 주는 공식은 없다.</p>
+      </header>
+      <div class="article-grid">
+        <div class="prose page">
+          <p class="dropcap">97 다음은 101, 그다음은 103. 두 수가 두 칸 차로 붙어 있는가 하면, 89에서 97로 갈 때는 여덟 칸이 비어 있다. 수가 커질수록 구멍은 넓어지고, 어디에 큰 구멍이 생길지는 미리 알 수 없다. 소수 목록은 끝까지 무질서해 보인다.</p>
+          <p>그런데 1859년 11월, 베를린 학술원에 제출된 여덟 쪽짜리 논문은 이 무질서가 사실은 파동의 합이라고 말한다. 서른세 살의 베른하르트 리만이 쓴, 수론에 관한 그의 유일한 논문이었다.</p>
+          <figure class="sieve-plate plate">
+            <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
+            <p class="label">1–100 · 소수 표</p>
+            <div class="sieve-layout">
+              <div id="sieve" role="img" aria-label="1부터 100까지의 소수 표. 소수 25개, 가장 넓은 빈 구간은 89에서 97까지 8칸."></div>
+              <div id="primeGaps" aria-hidden="true"></div>
+            </div>
+            <figcaption id="sieveCaption">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
+          </figure>
+          <blockquote class="riemann-quote">
+            <p>“물론 이에 대한 엄밀한 증명이 있었으면 한다. 다만 몇 차례의 덧없는 시도 끝에, 당장의 목적에는 필요치 않아 보여 그 추구는 잠시 접어두었다.”</p>
+            <cite>— 베른하르트 리만, 1859, 여덟 쪽 중</cite>
+            <p class="only-math" lang="de"><small>Hievon wäre allerdings ein strenger Beweis zu wünschen; ich habe indeß die Aufsuchung desselben, nach einigen flüchtigen vergeblichen Versuchen vorläufig bei Seite gelassen…</small></p>
+          </blockquote>
+        </div>
+        <details class="note" open>
+          <summary>소수를 세는 방법</summary>
+          <p class="only-intuition">소수를 하나하나 외우는 건 불가능하다. 그래서 수학자들은 소수를 ‘세는’ 쪽을 택했다. 계단의 높이가 소수의 개수, 계단의 흔들림이 오차다. 오차를 알면 소수가 어디에 몰려 있는지도 알 수 있다.</p>
+          <div class="only-math">
+            <p>π(x) = #{ p ≤ x : p 소수 }, π(x) ~ x / ln x (소수 정리, 1896).</p>
+            <p>리만이 실제로 다룬 것은 ψ(x) = Σ<sub>p<sup>k</sup> ≤ x</sub> ln p — 소수의 거듭제곱까지 로그로 세는 더 깔끔한 계단이다. π 대신 ψ를 쓰면 오일러 곱과의 연결이 정확해지고, 점프의 크기가 ln p로 단순해진다.</p>
+            <div class="formula" role="math" aria-label="프사이 x는 x 이하의 소수 거듭제곱에 대해 로그 p를 모두 더한 값"><span>ψ(x)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">p<sup>k</sup> ≤ x</span></span><span>ln p</span><span>(p 소수, k ≥ 1)</span></div>
+          </div>
+        </details>
+      </div>
+      <p class="page-num" aria-hidden="true">— 1 —</p>
+    </section>
+
+    <section id="act2" class="act act--lab wrap" aria-labelledby="act2Title">
+      <header class="act__head page">
+        <p class="label">2막 · 리만의 악보</p>
+        <h2 id="act2Title">오차는 파동의 합이다</h2>
+        <p class="lede">리만은 소수의 개수를 세는 함수를 복소수 위로 옮겼다. 그 함수가 0이 되는 점들, 영점이 소수 계단의 흔들림을 만드는 주파수가 된다.</p>
+      </header>
+      <noscript><p>이 실험은 JavaScript가 필요합니다. 영점 60개 중 N개를 더한 근사로 소수 계단을 재구성합니다.</p></noscript>
+      <div class="lab">
+        <div class="lab__stage js-only">
+          <div class="lab__instrument">
+            <figure class="plate lab-plate" id="labPlate" data-lab-view="wave">
+              <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
+              <div class="lab__head"><h3>ψ(x) · 리만 명시적 공식 근사</h3><span class="live">LIVE</span><span id="labBadge">N 15 · σ 0.50</span></div>
+              <div class="lab-tabs" role="group" aria-label="실험실 그래프"><button type="button" data-lab-tab="wave" aria-controls="wavePane" aria-pressed="true">파동</button><button type="button" data-lab-tab="plane" aria-controls="planePane" aria-pressed="false">복소평면</button></div>
+              <div class="lab__charts">
+                <div id="wavePane"><canvas id="psiCanvas" role="img" aria-label="ψ(x) 소수 계단과 영점 근사"></canvas><span id="psiSummary" class="sr-only" aria-live="polite"></span></div>
+                <div id="planePane"><canvas id="planeCanvas" aria-hidden="true"></canvas><span id="planeSummary" class="sr-only"></span></div>
+              </div>
+              <figcaption>첫 60개 영점 중 <span id="labModelN">15</span>개만 사용한 근사입니다. σ는 고정된 γ에 실수부만 바꾼 모형입니다. 계단을 만드는 것은 오차 ψ(x) − x.</figcaption>
+            </figure>
+            <details id="labControls" class="lab-controls" open>
+              <summary>실험대</summary>
+              <p class="lab-hint">점을 끌어 1/2 선 밖으로 옮겨 보세요. 오른쪽 계단이 파동에 잠식됩니다.</p>
+              <div class="controls">
+                <div class="range-group">
+                  <div class="range-row"><label for="nRange">영점 개수 N</label><output id="nValue" for="nRange">15</output></div>
+                  <input type="range" id="nRange" min="1" max="60" step="1" value="15">
+                  <div class="presets" role="group" aria-label="영점 개수 프리셋">
+                    <button type="button" data-preset="1" aria-pressed="false">1</button><button type="button" data-preset="3" aria-pressed="false">3</button><button type="button" data-preset="15" aria-pressed="true">15</button><button type="button" data-preset="30" aria-pressed="false">30</button><button type="button" data-preset="60" aria-pressed="false">60</button>
+                  </div>
+                </div>
+                <div class="range-group">
+                  <div class="range-row"><label for="sigmaRange">선택한 영점 σ</label><output id="sigmaValue" for="sigmaRange">0.500</output></div>
+                  <input type="range" id="sigmaRange" min="0.500" max="0.850" step="0.005" value="0.500" aria-describedby="planeSummary">
+                  <div class="sigma-actions"><label><input type="checkbox" id="allTogether"> 모두 함께</label><button type="button" id="resetSigma">모두 0.50으로</button></div>
+                </div>
+              </div>
+              <div class="spectrum-panel">
+                <h4>영점별 파동 · x = 100에서의 기여</h4>
+                <p id="labReadout"></p>
+                <div id="spectrum" role="group" aria-label="영점별 파동의 기여. 좌우로 스크롤할 수 있습니다."></div>
+                <p class="spectrum-caption">진폭 ∝ x<sup>σ</sup> / |ρ| — 낮은 γ가 큰 소리를 낸다.</p>
+                <p id="labStatus" role="status" aria-live="polite"></p>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="lab__steps">
+          <article class="step page" data-step="1" data-n="1" data-sigma="0.50">
+            <p class="label">S1</p><h3>소수만 남기는 곱</h3>
+            <p>제타 함수는 모든 자연수의 합이면서, 동시에 모든 소수의 곱이다. ζ(s) = Σ n⁻ˢ = Π (1 − p⁻ˢ)⁻¹. 소수만 남기는 이 항등식이 출발점이다. 리만은 이 함수를 s = 1만 빼고 모든 복소수로 이어 붙였다.</p>
+            <div class="only-math">
+              <p>급수와 곱은 Re(s) &gt; 1에서 수렴한다. 해석적 연속으로 s = 1의 단순극만 남기고 전 평면으로 확장된다.</p>
+              <div class="formula" role="math" aria-label="제타 s는 자연수 n의 마이너스 s 제곱의 합, 또는 소수 p에 대한 1 빼기 p의 마이너스 s 제곱의 역수의 곱입니다. s의 실수부는 1보다 큽니다."><span>ζ(s)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">n ≥ 1</span></span><span>n<sup>−s</sup></span><span class="op">=</span><span class="sum"><span class="sum__body">Π</span><span class="sum__sub">p 소수</span></span><span>(1 − p<sup>−s</sup>)<sup>−1</sup>,</span><span>Re(s) &gt; 1</span></div>
+            </div>
+          </article>
+          <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
+            <p class="label">S2</p><h3>임계 띠의 영점</h3>
+            <p>이어 붙인 함수의 영점은 두 종류다. 음의 짝수에서 생기는 자명한 영점, 그리고 0 &lt; Re(s) &lt; 1의 띠 안에 있는 비자명한 영점. 소수의 리듬을 만드는 것은 후자다.</p>
+            <div class="only-math">
+              <p>함수방정식 π<sup>−s/2</sup> Γ(s/2) ζ(s) = π<sup>−(1−s)/2</sup> Γ((1−s)/2) ζ(1−s). 자명한 영점 s = −2, −4, −6, … . 임계 띠 0 &lt; Re(s) &lt; 1.</p>
+              <div class="formula" role="math" aria-label="크사이 s는 이분의 일 곱하기 s 곱하기 s 빼기 일 곱하기 파이의 마이너스 s 나누기 이 제곱 곱하기 감마 s 나누기 이 곱하기 제타 s. 크사이 s는 크사이 일 빼기 s와 같습니다."><span>ξ(s)</span><span class="op">=</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>s(s−1)</span><span>π<sup>−s/2</sup></span><span>Γ(s/2)</span><span>ζ(s),</span><span>ξ(s) = ξ(1−s)</span></div>
+            </div>
+          </article>
+          <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
+            <p class="label">S3</p><h3>매끄러운 직선에서 파동을 빼면</h3>
+            <p>ψ(x) = x − Σ_ρ x^ρ/ρ − ln 2π − ½ ln(1 − x⁻²). 영점 하나가 사인파 하나다. 주파수는 γ, 진폭은 x^σ. 영점을 더할수록 계단의 모서리가 살아난다.</p>
+            <div class="only-math">
+              <p>폰 망골트 명시적 공식. 합은 비자명 영점 전체. 계단의 점프 앞에서 근사는 링잉을 보이며, N을 늘리면 좁아진다.</p>
+              <div class="formula" role="math" aria-label="리만 명시적 공식. 프사이 x는 x 빼기 영점에 대한 x의 로 제곱 나누기 로의 합, 빼기 로그 2파이, 빼기 2분의 1 로그 1 빼기 x의 마이너스 2제곱."><span>ψ(x)</span><span class="op">=</span><span>x</span><span class="op">−</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">ρ</span></span><span class="frac"><span class="frac__num">x<sup>ρ</sup></span><span class="frac__den">ρ</span></span><span class="op">−</span><span>ln(2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>ln(1 − x<sup>−2</sup>)</span></div>
+              <p>계단이 점프하는 지점에서 명시적 공식의 극한값은 좌우 값의 평균입니다. 그래프의 실제 계단은 그 지점까지 포함한 합을 사용합니다.</p>
+            </div>
+          </article>
+          <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
+            <p class="label">S4</p><h3><span class="only-intuition">1/2</span><span class="only-math">Re(s) = 1/2</span>의 의미</h3>
+            <p>리만 가설은 진폭에 대한 주장이다. 모든 비자명 영점의 실수부가 1/2이면 파동의 진폭은 √x로 얌전하다. 계단 높이 x에 묻혀, 합주가 유지된다. 1/2을 벗어나면 이야기가 달라진다. 영점 하나만 밀어내도 그 악기만 볼륨이 폭주한다.</p>
+            <div class="only-math">
+              <div class="formula" role="math" aria-label="리만 가설은 모든 비자명 영점의 실수부가 이분의 일이라는 뜻입니다. 이는 프사이 및 소수 계수 함수의 오차 상한과 동치입니다."><span>RH: 모든 비자명 영점 ρ에 대해 Re(ρ) = 1/2</span><span>RH ⇔ ψ(x) = x + O(√x log²x)</span><span>RH ⇔ π(x) = Li(x) + O(√x log x)</span></div>
+            </div>
+            <p class="model-limit">이 실험실은 ζ를 다시 계산하지 않습니다. 고정된 γ에 σ만 바꾼 가상의 영점 모형입니다. 한 영점과 그 켤레만 옮기면 실제 ζ 영점의 함수방정식 대칭을 충족하지 않습니다.</p>
+          </article>
+        </div>
+      </div>
+      <details class="note lab-note" open>
+        <summary>영점 하나가 악기 하나</summary>
+        <p class="only-intuition">오케스트라를 떠올려 보자. 영점 하나가 악기 하나다. 음높이는 γ, 음량이 커지는 속도는 σ. 모든 악기가 √x만큼만 커져야 계단이라는 합주가 유지된다. 하나라도 더 크게 커지면, 그 음이 합주를 덮는다.</p>
+        <div class="only-math">
+          <p>영점 하나가 악기 하나다.</p>
+          <div class="formula" role="math" aria-label="켤레 영점의 기여를 합치면 2 곱하기 x의 시그마 제곱 곱하기 시그마 코사인 감마 u 더하기 감마 사인 감마 u를 시그마 제곱 더하기 감마 제곱으로 나눈 값입니다.">
+            <span>ρ = σ + iγ, ρ̄ = σ − iγ, u = ln x</span><span>x<sup>ρ</sup>/ρ + x<sup>ρ̄</sup>/ρ̄</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup> (σ cos(γu) + γ sin(γu))</span><span class="frac__den">σ² + γ²</span></span>
+          </div>
+          <div class="formula" role="math" aria-label="진폭은 2 곱하기 x의 시그마 제곱을 시그마 제곱 더하기 감마 제곱의 제곱근으로 나눈 값입니다. 위상은 atan2 감마, 시그마입니다.">
+            <span>켤레쌍의 합</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ² + γ²)</span></span><span>· cos(γu − φ), φ = atan2(γ, σ)</span><span>진폭 A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ<sub>k</sub></sup></span><span class="frac__den">√(σ<sub>k</sub>² + γ<sub>k</sub>²)</span></span>
+          </div>
+          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 x<sup>σ</sup>는 √x보다 빠르게 증가한다.</p>
+        </div>
+      </details>
+      <p class="page-num" aria-hidden="true">— 2 —</p>
+    </section>
+
+    <section id="seam" class="seam" aria-labelledby="seamTitle">
+      <div class="seam__sticky">
+        <div class="seam__inner wrap">
+          <div class="seam__copy">
+            <p class="label">SEAM · 1859 → 2026</p>
+            <h2 id="seamTitle">여덟 쪽에서 1,740만 줄로</h2>
+            <p>1859년의 논문은 여덟 쪽이었다. 2026년 11월, 같은 정리의 Lean 증명은 <span data-fact="proof.files">175,187</span>개 파일, <span data-fact="proof.lines">17,374,215</span>줄이었다. 사람이 읽는 형태와 기계가 검사하는 형태의 거리다.</p>
+          </div>
+          <div class="seam__visual js-only" aria-hidden="true">
+            <div class="seam__layer" data-layer="paper">
+              <div class="seam__sheets"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="seam__number"><strong class="seam__counter" id="paperCounter" data-fact="paper.pages">8</strong><span>1859 · 베를린 · 여덟 쪽</span></div>
+            </div>
+            <div class="seam__layer" data-layer="pages">
+              <div class="seam__stripes"></div>
+              <div class="seam__number"><strong class="seam__counter" id="pageCounter" data-fact="pagesEquivalent">289,570</strong><span>60줄/쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽 · 0.1mm/장이면 약 <span data-fact="stackMeters">29</span>m</span></div>
+            </div>
+            <div class="seam__layer" data-layer="code">
+              <div class="seam__code code-wall"></div>
+              <div class="seam__number"><strong class="seam__counter" id="lineCounter" data-fact="proof.lines">17,374,215</strong><span>화면의 줄은 전체의 약 0.007%</span></div>
+              <p class="seam__audit"><span data-fact="proof.sorry">0</span> sorry · <span data-fact="proof.admit">0</span> admit · <span data-fact="proof.extraAxioms">0</span> 추가 공리</p>
+            </div>
+          </div>
+          <p class="seam__disclaimer">쪽수와 코드 줄 수는 단위가 다릅니다. 배율에 수학적 의미는 없습니다.</p>
+          <p class="seam__detail">쪽수와 코드 줄 수는 단위가 다르다. 배율에 수학적 의미는 없다. 다만 60줄을 한 쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽, 종이 0.1mm로 쌓으면 약 <span data-fact="stackMeters">29</span>m다. 두께로만 비교한 어림이다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="act3" class="act act--terminal wrap" aria-labelledby="act3Title">
+      <header class="act__head page">
+        <p class="label">3막 · 기계가 쓴 증명</p>
+        <h2 id="act3Title">아무도 읽지 못한 증명</h2>
+        <p class="lede"><time datetime="2026-11-20" data-fact="proof.announced" data-format="date">2026년 11월 20일</time>, 앤트로픽의 수학자 레벤트 알푀게가 Claude와 약 여섯 주 동안 작업한 리만 가설의 Lean 증명을 공개했다. 정식 논문 대신 코드가 먼저 나왔다.</p>
+      </header>
+      <figure class="fact-plate">
+        <dl class="fact-grid">
+          <div><dt>파일</dt><dd data-fact="proof.files">175,187</dd></div>
+          <div><dt>줄</dt><dd data-fact="proof.lines">17,374,215</dd></div>
+          <div><dt>sorry</dt><dd data-fact="proof.sorry">0</dd></div>
+          <div><dt>표준 공리</dt><dd data-fact="proof.axioms" data-format="length">3</dd></div>
+          <div><dt>정리</dt><dd data-fact="proof.theorems">5</dd></div>
+          <div><dt>소스</dt><dd data-fact="proof.sourceBytes" data-format="gb">1.03GB</dd></div>
+        </dl>
+        <figcaption><span data-fact="proof.theorems">5</span>개 정리 = 리만 가설 + 디리클레 L-함수에 대한 일반화 리만 가설(GRH).</figcaption>
+      </figure>
+
+      <div class="article-grid">
+        <div class="prose page">
+          <p>하루 뒤 Lean FRO와 Mathlib 이니셔티브가 공동 성명을 냈다. 명제와 증명 모두 옳다고 인증했다. 그 뒤 며칠 동안 독립 커널들이 같은 증명 수출 파일을 다시 읽었다. <span data-fact="proof.exportBytes" data-format="gb">61.57GB</span>짜리 파일 하나를, 서로 다른 프로그램들이 같은 결론으로 통과시켰다.</p>
+          <p>자연어 논문은 읽다가 비약을 눈으로 넘긴다. Lean은 명제를 타입으로, 증명을 그 타입의 항으로 다룬다. 커널이 타입을 통과시키면, 그 명제는 참이다. 1,740만 줄을 읽는 대신, 몇천 줄짜리 커널을 믿고 그 위에 명제를 세우는 것이다.</p>
+          <aside class="warning">
+            <h3>형식 검증이 보증하지 않는 것</h3>
+            <p>2026년 9월 8일 OpenAI가 나비에–스토크스의 유한 시간 폭발을 증명했다고 발표했을 때, 10월 KCL과 케임브리지 연구진은 Lean 번역본이 원 논문과 다른 조건을 쓴다고 지적했다. 논문의 Lemma 8.6은 m+4 도함수를 요구하는데, Lean 코드는 m+5를 요구했다. 더 약한 명제를 증명한 셈이다. 코드가 컴파일된다는 것과, 그 코드가 우리가 말하는 정리를 증명한다는 것은 다른 문제다.</p>
+          </aside>
+          <p>그래서 리만 건에서는 두 가지를 따로 확인했다. 코드가 증명한 명제가 Mathlib의 리만 가설과 같은가(comparator), 그 코드가 정말 그 명제를 증명하는가(커널).</p>
+        </div>
+        <details class="note" open>
+          <summary>타입 검사</summary>
+          <p class="only-intuition">증명을 코드로 쓴다는 건, 논리의 모든 디딤돌에 ‘이건 맞아’ 도장을 찍어 달라는 뜻이다. 사람이 읽는 논문은 비약을 눈으로 넘기지만, 타입 검사기는 넘기지 않는다. 그래서 1,740만 줄이어도 “맞다”고 말할 수 있다.</p>
+          <div class="only-math">
+            <p>커리–하워드 대응: 명제 = 타입, 증명 = 그 타입의 항. 가정 <code>h : a = b</code>는 “a = b의 증명”을 담은 변수다. <code>exact hab</code>는 요구된 타입의 항을 내놓는 일이고, 타입이 어긋나면 커널이 거부한다. 검증은 “읽어서 납득”이 아니라 “타입이 맞는지 계산”이다.</p>
+            <div class="formula" role="math" aria-label="명제와 타입이 대응합니다. 증명과 그 타입의 항이 대응합니다."><span>명제 ↔ 타입</span><span>증명 ↔ 그 타입의 항</span></div>
+          </div>
+        </details>
+      </div>
+
+      <figure class="diagram">
+        <div class="diagram__flow" role="img" aria-label="자연어 논문을 Lean 명제와 증명으로 번역합니다. Comparator가 Mathlib 명제와 비교하고, 독립 커널이 증명을 확인합니다.">
+          <div class="diagram__box">자연어 논문</div>
+          <div class="diagram__arrow">① 번역 → <small>2026.10 나비에–스토크스<br>m+4 → m+5</small></div>
+          <div class="diagram__box">Lean 명제·증명</div>
+          <div class="diagram__arrow">② 커널 → <small>nanoda · con-leche · Lean kernel</small></div>
+          <div class="diagram__box">참</div>
+          <div class="diagram__compare">↳ Mathlib 명제 · comparator ↗</div>
+        </div>
+        <figcaption>① 코드가 증명한 명제가 우리가 말하는 그 정리인가<br>② 그 코드가 정말 그 명제를 증명하는가</figcaption>
+      </figure>
+
+      <section id="lean" class="lean plate" data-lean-view="code" aria-labelledby="leanTitle">
+        <header class="lean__head">
+          <p class="label">직접 눌러 보기 · MINI LEAN 4 INFOVIEW</p>
+          <h3 id="leanTitle">전술 세 번으로 끝나는 장난감 정리</h3>
+        </header>
+        <div class="lean__tabs js-only" role="group" aria-label="Lean 화면">
+          <button type="button" data-lean-tab="code" aria-controls="leanCodePane" aria-pressed="true">코드</button>
+          <button type="button" data-lean-tab="goal" aria-controls="leanGoalPane" aria-pressed="false">Goal</button>
+        </div>
+        <div class="lean__grid">
+          <div class="lean__code" id="leanCodePane">
+            <div class="lean__bar"><i></i><i></i><i></i><span>Main.lean</span></div>
+            <pre id="leanCode" tabindex="0" aria-label="Lean 코드, 좌우로 스크롤"><code>/- 장난감 정리: 가정을 순서대로 꺼내 쓰는 연습 -/
+theorem wave_balance (a b : ℝ) :
+    a = b → 0 &lt; b → 0 &lt; a := by
+  intro h hab
+  rw [h]
+  exact hab</code></pre>
+          </div>
+          <div class="lean__info js-only" id="leanGoalPane">
+            <div class="lean__bar"><span>Lean 4 · Infoview</span><span id="kernelStatus">커널 대기</span></div>
+            <div class="lean__body">
+              <div id="goal" role="status" aria-live="polite"></div>
+              <div id="leanError" class="lean__error" aria-live="assertive"></div>
+              <p id="leanHint" class="lean__hint" aria-live="polite"></p>
+            </div>
+            <div class="lean__foot"><span id="progressTxt">0 / 3 전술</span><span id="kernelTxt">대기</span></div>
+          </div>
+        </div>
+        <div class="lean__tactics js-only">
+          <button type="button" data-step="1" aria-describedby="goal">intro h hab</button>
+          <button type="button" data-step="2" aria-describedby="goal" disabled>rw [h]</button>
+          <button type="button" data-step="3" aria-describedby="goal" disabled>exact hab</button>
+          <button type="button" id="wrongBtn" class="is-wrong" aria-describedby="goal" disabled>exact h</button>
+          <button type="button" id="resetLean" class="is-ghost">↺ 다시</button>
+        </div>
+        <noscript><p>정답 순서 <code>intro → rw → exact</code></p></noscript>
+        <p class="lean__note">이 화면은 실제 Lean 4의 Goal State와 오류 형식을 옮겨 만든 재현입니다. 진짜 커널을 호출하지는 않습니다.</p>
+      </section>
+
+      <details class="mathlib">
+        <summary>실제 명제는 이렇게 생겼다 · Mathlib.RiemannHypothesis</summary>
+        <pre tabindex="0" aria-label="Mathlib 명제 코드, 좌우로 스크롤"><code>def RiemannHypothesis : Prop :=
+  ∀ (s : ℂ) (_ : riemannZeta s = 0)
+    (_ : ¬∃ n : ℕ, s = -2 * (n + 1))
+    (_ : s ≠ 1), s.re = 1 / 2</code></pre>
+        <p>리만 제타의 자명한 영점(−2, −4, …)과 s = 1의 극을 빼고, 남은 모든 영점의 실수부가 1/2임을 말한다. 이 정의는 Mathlib에 있으며, 검증 과제의 명제와 같다.</p>
+        <p><a href="https://math.mit.edu/~drew/grh/#what-was-verified" target="_blank" rel="noopener noreferrer">MIT · What was verified</a></p>
+      </details>
+      <p class="page-num" aria-hidden="true">— 3 —</p>
+    </section>
+
+    <section id="act4" class="act act--terminal wrap" aria-labelledby="act4Title">
+      <p class="label">4막 · 변곡점</p>
+      <h2 id="act4Title" class="end-quote">증명은 끝났고,<br><em>이해</em>는 이제 시작이다.</h2>
+      <div class="prose page">
+        <p>1859년의 여덟 쪽은 사람이 읽고 이해할 수 있었다. 2026년의 1,740만 줄은 아니다. 알푀게 자신도, 이 증명을 사람이 읽을 수 있는 글로 옮기면 25만 쪽이 넘을 것이라고 적었다. 지금 수학자들은 AI를 동원해 그 코드를 거꾸로 해독하며, 왜 맞는지를 다시 쓰고 있다.</p>
+        <p>종이와 연필만 있으면 누구나 같은 출발선에 선다는 것이 수학의 오랜 자부심이었다. 이제 그 출발선은 어떤 모델과 얼마의 연산에 닿아 있느냐가 바꾼다. 다만 결승선은 아직 열려 있다. 기계가 내놓은 답을 이해하는 일은 여전히 사람의 몫이다.</p>
+      </div>
+      <p class="endmark">— 167년, 종이 여덟 쪽에서 코드 1,740만 줄까지.</p>
+      <p class="page-num" aria-hidden="true">— 4 —</p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="footer-grid">
+      <p>WORK 08 · 소수의 파동, 기계가 쓴 증명<br>BUILD CANVAS · 2026.11</p>
+      <p>HTML · CSS · Canvas · 외부 라이브러리 0<br>수치 확인 <time datetime="2026-11-25" data-fact="asOf">2026-11-25</time></p>
+    </div>
+    <p class="methods">이 페이지의 ψ(x) 시뮬레이터는 첫 60개 영점 가운데 선택한 N개만 사용한 근사입니다. 리만 가설의 증명이 아닙니다. 미니 Lean 화면은 실제 커널을 호출하지 않는 재현이고, 배경의 코드월은 분위기를 위한 장식입니다. 8쪽과 1,740만 줄의 비교는 단위가 달라 배율에 수학적 의미가 없습니다.</p>
+    <h2>출처</h2>
+    <ol class="sources">
+      <li><a href="https://de.wikisource.org/wiki/Über_die_Anzahl_der_Primzahlen_unter_einer_gegebenen_Größe" target="_blank" rel="noopener noreferrer">Riemann, <cite>Über die Anzahl der Primzahlen unter einer gegebenen Grösse</cite>, 1859, S. <span data-fact="paper.range">671–680</span> · Wikisource</a></li>
+      <li><a href="https://leanprover-community.github.io/blog/posts/riemann-hypothesis/" target="_blank" rel="noopener noreferrer">Lean FRO · Mathlib Initiative, “Lean verification of the Riemann Hypothesis”, <time datetime="2026-11-21" data-fact="proof.certified">2026-11-21</time></a></li>
+      <li><a href="https://math.mit.edu/~drew/grh/" target="_blank" rel="noopener noreferrer">A. Sutherland, “RH Lean proof: verification files”, MIT, 2026-11-20~24</a></li>
+      <li><a href="https://github.com/leanprover-community/riemann-hypothesis" target="_blank" rel="noopener noreferrer"><code>leanprover-community/riemann-hypothesis</code> README</a></li>
+      <li><a href="https://alpo.ge/remark.pdf" target="_blank" rel="noopener noreferrer">L. Alpöge, “Remark”, <time datetime="2026-11-20" data-fact="proof.announced">2026-11-20</time></a></li>
+      <li><a href="https://www.kcl.ac.uk/news/openais-navier-stokes-proof-called-into-question" target="_blank" rel="noopener noreferrer">KCL, “OpenAI’s Navier–Stokes proof called into question”, 2026-10-27</a> · <a href="https://arxiv.org/abs/2610.08144" target="_blank" rel="noopener noreferrer">arXiv:2610.08144</a></li>
+      <li><a href="https://github.com/openai/NavierStokesAndEuler" target="_blank" rel="noopener noreferrer">OpenAI, <code>NavierStokesAndEuler</code>, 2026-09-08</a></li>
+    </ol>
+  </footer>
+  <div id="shortcuts" role="status" hidden>H 홈 · 1–4 막 이동 · M 모드 전환 · Esc 닫기</div>
+  <div id="selftest" hidden></div>
+</body>
+</html>

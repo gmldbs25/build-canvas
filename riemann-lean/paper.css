@@ -1,0 +1,95 @@
+/* Archival paper atmosphere: material, grid and moving red margin rule. */
+:root {
+  --p-base: #E4E1D2;
+  --p-deep: #D8D5C3;
+  --p-surface: #EFEBDA;
+  --p-surface-2: #E9E5D4;
+  --p-ink: #17243A;
+  --p-blue: #1B3B6F;
+  --p-seal: #7A2838;
+  --p-muted: #5E5B4E;
+  --p-pencil: #6B6A5C;
+  --p-rule: #C9C4B0;
+}
+html[data-era="paper"] {
+  --c-bg: var(--p-base);
+  --c-surface: var(--p-surface);
+  --c-surface-raised: var(--p-surface-2);
+  --c-ink: var(--p-ink);
+  --c-muted: var(--p-muted);
+  --c-rule: var(--p-rule);
+  --c-accent: var(--p-seal);
+  --c-accent-2: var(--p-blue);
+  --c-focus: var(--p-blue);
+  --c-good: #2E7D4F;
+  --c-warn: #A05A12;
+  --c-bad: #8C2F39;
+  --c-seal: var(--p-seal);
+  --c-mono: var(--p-blue);
+  --c-code-bg: var(--p-surface-2);
+  background: var(--p-base);
+}
+.paper-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 85% at 50% -10%,rgba(255,255,255,.55),transparent 62%), radial-gradient(95% 70% at 50% 112%,rgba(115,100,62,.12),transparent 60%), linear-gradient(180deg,#E7E4D5 0%,#E4E1D2 46%,#DAD7C5 100%);
+  opacity: calc(1 - var(--m,0));
+  will-change: opacity;
+}
+.paper-bg__grid {
+  position: absolute;
+  inset: 0;
+  opacity: .48;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb,#1B3B6F 7%,transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb,#1B3B6F 7%,transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb,#1B3B6F 9%,transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb,#1B3B6F 9%,transparent) 1px, transparent 1px);
+  background-size: 8px 8px,8px 8px,64px 64px,64px 64px;
+}
+.paper-bg__grain {
+  position: absolute;
+  inset: 0;
+  opacity: calc(.2 * (1 - var(--m,0)));
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+}
+.seam-rule {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--rule-x,6.5vw);
+  z-index: 4;
+  width: 1px;
+  background: var(--rule-c,var(--p-seal));
+  pointer-events: none;
+  opacity: var(--rule-alpha,.42);
+}
+html[data-era="paper"] #progress { background: var(--p-seal); }
+html[data-era="paper"] .hud { border-color: var(--p-rule); }
+html[data-era="paper"] .hero__plate { box-shadow: 0 2px 7px color-mix(in srgb,var(--p-ink) 8%,transparent); }
+html[data-era="paper"] .seal { color: var(--p-seal); border-color: var(--p-seal); }
+html[data-era="paper"] .plate::after, html[data-era="paper"] .hero__plate::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--p-ink),var(--p-ink)) left top / 12px 1px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) left top / 1px 12px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) right top / 12px 1px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) right top / 1px 12px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) left bottom / 12px 1px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) left bottom / 1px 12px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) right bottom / 12px 1px no-repeat,
+    linear-gradient(var(--p-ink),var(--p-ink)) right bottom / 1px 12px no-repeat;
+  opacity: .55;
+}
+html[data-era="paper"] .act { border-color: color-mix(in srgb,var(--p-pencil) 48%,var(--p-rule)); }
+@media(max-width:900px) {
+  .seam-rule { left: 22px; }
+}

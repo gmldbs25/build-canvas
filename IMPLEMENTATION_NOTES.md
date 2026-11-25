@@ -1,0 +1,47 @@
+# Work 08 구현 메모
+
+## 명세 적용
+
+- 승인 프로토타입은 작업 공간과 저장소의 `work8/prototype.html` 경로에서 확인할 수 없었습니다. 제공된 구현 명세와 원고를 사용했습니다.
+- 작품 소스는 명세의 루트 `riemann-lean/`에 두었습니다. 홈의 실제 소스인 `app/page.tsx`의 작품 배열 맨 위에 08을 추가했습니다.
+- 3막 제목은 명세 안의 두 표기 중 최종 원고인 부록 A의 “아무도 읽지 못한 증명”을 사용했습니다.
+- 수학과 주석에서 이탈한 항의 성장률을 `x` 대신 `√x`와 비교했습니다. `1/2 < σ < 1`에서도 `x^σ/x`는 0으로 수렴합니다. 명시적 공식의 점프 지점에는 좌우 극한의 평균을 사용한다는 설명을 추가했습니다. 그래프의 실제 계단과 RMS는 명세대로 오른쪽 연속값을 사용합니다.
+- HTML에는 스크립트가 꺼진 경우 사용할 수치와 원고를 담았습니다. 실험실 수치는 계산하고, 사실 카드와 브리지의 수치는 `data.js`의 `FACTS`에서 렌더합니다.
+- 논문은 리만 가설을 제기했습니다. 브리지에서 비교하는 대상은 논문 자체의 쪽수와 Lean 제출물 전체의 줄 수입니다.
+
+## 시각 결정
+
+- 체 셀은 모바일에서 폭에 맞춰 축소하고 넓은 화면에서는 44px까지 표시합니다.
+- 스펙트럼의 기본 양수는 종이 인장색과 터미널 시안, 음수는 보조색입니다.
+- 모바일 실험대는 기본으로 열립니다.
+- 브리지 B의 가로선은 데스크톱 290개와 모바일 145개입니다.
+- 인장은 108px를 기본으로 사용합니다.
+- Lean 코드는 13px에 줄 높이 1.65를 사용합니다.
+- 파비콘은 버건디 원형 인장에 임계선의 `1/2`를 배치했습니다.
+
+## 빌드·배포
+
+- 정적 작품만 확인할 때는 저장소 루트에서 `python3 -m http.server 8080` 후 `/riemann-lean/`을 엽니다.
+- 홈까지 확인하려면 `npm run build:pages` 후 `node scripts/serve-pages.mjs`로 `/build-canvas/`을 엽니다. 기존 Pages 빌드가 작품 파일과 공유 PNG를 `dist-pages/`로 복사하고 사이트맵에 작품을 추가합니다.
+- `main`의 기존 Deploy to GitHub Pages 워크플로를 사용합니다. 작품의 OG/Twitter 메타는 같은 아티팩트에 들어가는 공유 이미지를 가리킵니다.
+
+## 수치 확인 근거
+
+- [Lean FRO · Mathlib Initiative 공동 성명](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/)
+- [MIT 검증 기록](https://math.mit.edu/~drew/grh/)
+- [The Lean proof of the Riemann hypothesis in numbers](https://riemannhypothesissolved.com/proof-in-numbers/)
+- [K. Ormsby, Checking a claimed Lean proof of the Riemann Hypothesis](https://e-infinity.space/writing/checking-a-claimed-lean-proof-of-rh/)
+
+## 한계
+
+- 복소평면은 제공된 영점의 허수부를 고정한 모형을 보여 줍니다.
+- 미니 Infoview는 브라우저에서 동작하는 상태 머신으로 Lean 4의 목표와 오류를 재현합니다.
+- 종이 쪽수와 코드 줄 수의 비교는 60줄을 한 쪽으로 가정한 시각적 어림입니다.
+
+## 로컬 검증
+
+- Chromium `?selftest=1`은 320·390·768·1024·1280·1440px에서 20/20 PASS입니다. 가로 넘침, 페이지 오류, 외부 리소스 요청은 관측되지 않았습니다.
+- 네 스텝과 역방향 프리셋, N 슬라이더 프리셋, σ 키보드, 영점 드래그와 스냅, 스펙트럼, 모바일 실험대, Lean의 두 오류와 완료·초기화를 직접 검증했습니다.
+- 스크립트가 꺼진 상태에서도 수학과 주석, 탐구 안내, 사실 카드, Lean 코드와 정답 순서가 표시됩니다.
+- 브라우저 기능 검증은 Chromium 기준입니다.
+- Chromium 일반 속도 스크롤에서 50ms 이상 long task 0회였습니다. 4× CPU 제한에서는 LCP 0.76초, CLS 0.036을 측정했고, 같은 빠른 스크롤 중 long task가 발생했습니다.

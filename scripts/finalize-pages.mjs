@@ -58,8 +58,10 @@ for (const page of pages) {
   if (!/<\/head>/i.test(html)) throw new Error("Missing head in " + filename);
   await writeFile(filename, html.replace(/<\/head>/i, tags + "\n</head>"));
 }
+// Work 08 supplies its own share card and metadata.
+const sitemapSlugs = [...pages.map(page => page.slug), "riemann-lean"];
 // The unlisted personal archive intentionally stays outside the public sitemap.
-await writeFile(path.join(dist, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + pages.map(page => '<url><loc>' + base + (page.slug ? page.slug + '/' : '') + '</loc></url>').join("\n") + '\n</urlset>\n');
+await writeFile(path.join(dist, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + sitemapSlugs.map(slug => '<url><loc>' + base + (slug ? slug + '/' : '') + '</loc></url>').join("\n") + '\n</urlset>\n');
 await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: " + base + "sitemap.xml\n");
 await writeFile(path.join(dist, "404.html"), `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>404 · Build Canvas</title><style>body{margin:0;padding:clamp(24px,8vw,100px);font:16px/1.7 system-ui,sans-serif;background:#f6f5f1;color:#20262d}main{max-width:640px;margin:auto}h1{font-size:clamp(42px,12vw,84px);margin:0}a{color:inherit;text-underline-offset:4px}</style></head><body><main><p>build _ canvas</p><h1>404</h1><h2>페이지를 찾을 수 없습니다.</h2><p>주소가 변경되었거나 존재하지 않는 페이지입니다.</p><p><a href="${base}">← 작품 목록으로 돌아가기</a></p></main></body></html>`);
 console.log("Pages metadata, share cards, sitemap, and 404 generated.");

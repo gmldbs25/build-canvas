@@ -64,6 +64,11 @@ cp -R projects/web-evolution/. dist-pages/web-evolution/
 mkdir -p dist-pages/elsewhere
 cp -R extras/elsewhere/. dist-pages/elsewhere/
 
+# Work 08 carries its own metadata and a checked-in hero capture.
+mkdir -p dist-pages/riemann-lean dist-pages/share
+cp riemann-lean/{index.html,style.css,paper.css,terminal.css,data.js,psi.js,lean.js,main.js,favicon.svg} dist-pages/riemann-lean/
+cp share/work-08.png dist-pages/share/
+
 node scripts/finalize-pages.mjs
 
 find dist-pages -name ".DS_Store" -delete

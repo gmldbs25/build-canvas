@@ -1,5 +1,6 @@
 // Keep the newest work first. Add future projects at the top with the next index.
 const works = [
+  { index: "08", title: "소수의 파동, 기계가 쓴 증명", type: "RIEMANN HYPOTHESIS · LEAN FORMAL VERIFICATION", year: "2026.11", href: "./riemann-lean/" },
   {
     index: "07",
     title: "The Evolution of the Web",
