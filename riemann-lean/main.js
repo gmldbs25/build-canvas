@@ -111,30 +111,68 @@ function renderSieve() {
   const cells = document.createDocumentFragment();
   const marks = document.createDocumentFragment();
   const primes = [];
+  const intervals = [];
   let largest = { gap: 0, previous: 0, current: 0 };
   for (let n = 1; n <= 100; n++) {
     const prime = n > 1 && !primes.some(p => p * p <= n && n % p === 0);
-    const cell = document.createElement('span');
+    const cell = document.createElement('button');
+    cell.type = 'button';
     cell.textContent = n;
+    cell.tabIndex = n === 1 ? 0 : -1;
+    let factorDetail = '';
     if (prime) {
       cell.className = 'is-prime';
       const previous = primes.at(-1);
       if (previous) {
         const gap = n - previous;
-        const mark = document.createElement('i');
-        mark.style.setProperty('--gap', `${gap}px`);
-        mark.style.setProperty('--at', `${((n - 1) / 99) * 100}%`);
+        const mark = document.createElement('button');
+        mark.type = 'button';
+        mark.className = 'prime-gap';
+        mark.style.setProperty('--gap-height', `${gap * 4}px`);
+        mark.dataset.tooltip = `${previous} → ${n} · ${gap}칸 공백`;
+        mark.setAttribute('aria-label', `${previous}에서 ${n}까지 ${gap}칸 공백`);
+        mark.dataset.gap = `${previous}-${n}`;
+        mark.addEventListener('click', () => {
+          document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 선택한 간격 ${previous} → ${n} · ${gap}칸 공백`;
+          document.querySelectorAll('.prime-gap.is-selected').forEach(item => item.classList.remove('is-selected'));
+          mark.classList.add('is-selected');
+        });
         marks.append(mark);
+        intervals.push(mark);
         if (gap > largest.gap) largest = { gap, previous, current: n };
       }
       primes.push(n);
-    } else if (n === 1) cell.className = 'is-one';
+    } else {
+      const divisor = n === 1 ? null : primes.find(p => p * p <= n && n % p === 0);
+      cell.className = n === 1 ? 'is-one' : 'is-composite';
+      if (divisor) factorDetail = ` · ${divisor}의 배수`;
+    }
+    const pi = primes.length;
+    const psi = psiTrue(n).toFixed(3);
+    cell.dataset.tooltip = `${cell.className === 'is-prime' ? '소수' : n === 1 ? '소수 아님' : '합성수'}${factorDetail} · π(${n})=${pi} · ψ(${n})≈${psi}`;
+    cell.setAttribute('aria-label', `${n}, ${cell.className === 'is-prime' ? '소수' : '소수가 아님'}, π(${n})=${pi}, ψ(${n}) 약 ${psi}`);
+    cell.addEventListener('click', () => {
+      document.getElementById('sieveCaption').textContent = cell.dataset.tooltip;
+      document.querySelectorAll('#sieve .is-selected').forEach(item => item.classList.remove('is-selected'));
+      cell.classList.add('is-selected');
+    });
+    cell.addEventListener('keydown', event => {
+      const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -10, ArrowDown: 10 };
+      if (!offsets[event.key]) return;
+      event.preventDefault();
+      const next = Math.max(1, Math.min(100, n + offsets[event.key]));
+      sieve.querySelectorAll('button').forEach(item => { item.tabIndex = Number(item.textContent) === next ? 0 : -1; });
+      sieve.querySelector(`button:nth-child(${next})`)?.focus();
+    });
     cells.append(cell);
   }
   sieve.replaceChildren(cells);
   gaps.replaceChildren(marks);
   const { gap, previous, current } = largest;
   document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 가장 넓은 빈 구간 ${gap}칸 (${previous} → ${current})`;
+  const largestGap = intervals.find(mark => mark.dataset.gap === `${previous}-${current}`);
+  largestGap?.classList.add('is-largest');
+  if (largestGap) largestGap.dataset.tooltip = `${previous} → ${current} · ${gap}칸 공백 · 1–100에서 가장 넓은 간격`;
 }
 
 function buildCodeWalls() {
@@ -153,15 +191,10 @@ function applyMorph() {
   if (t === lastMorph || (t > 0 && t < 1 && Math.abs(t - lastMorph) < 0.002)) return;
   lastMorph = t;
   root.style.setProperty('--m', t.toFixed(4));
-  const keys = { deep: 'bg', ink: 'ink', muted: 'muted', rule: 'line' };
-  for (const [from, to] of Object.entries(keys)) {
-    seam.style.setProperty(`--seam-${to}`, lerpRGB(PALETTE.paper[from], PALETTE.term[from], t));
-  }
+  seam.style.setProperty('--seam-bg', lerpRGB(PALETTE.paper.deep, PALETTE.term.deep, t));
   seamRule.style.setProperty('--rule-c', lerpRGB(PALETTE.paper.margin, PALETTE.term.margin, t));
-  seamRule.style.setProperty('--rule-alpha', lerp(0.42, 0.25, t));
-  seamRule.style.setProperty('--rule-x', `${lerp(6.5, 3.2, t).toFixed(2)}vw`);
+  seamRule.style.setProperty('--rule-alpha', lerp(0.35, 0.24, t));
   seam.style.setProperty('--seam-readable', t < 0.46 ? '#070A0D' : '#FFFFFF');
-  seam.style.setProperty('--seam-scrim', 'rgba(11,15,20,.4)');
   setEra(t >= 0.55 ? 'terminal' : 'paper');
 }
 
@@ -183,7 +216,9 @@ function applyBridge() {
   const lines = reduced.matches ? 1 : ease(0.58, 0.93, p);
   pageCounter.textContent = formatInt(Math.round(FACTS.pagesEquivalent * pages));
   lineCounter.textContent = formatInt(Math.round(FACTS.proof.lines * lines));
+  seam.style.setProperty('--seam-code-opacity', opacity[2]);
   seam.style.setProperty('--code-shift', reduced.matches ? '0%' : `${-8 * lines}%`);
+  seam.style.setProperty('--scale-progress', `${(lines * 100).toFixed(1)}%`);
 }
 
 function renderScroll() {
@@ -244,6 +279,7 @@ root.classList.remove('no-js');
 renderFacts();
 renderSieve();
 buildCodeWalls();
+seam.style.setProperty('--scale-paper', `${FACTS.paper.pages / FACTS.pagesEquivalent * 100}%`);
 initLean(document.getElementById('lean'));
 initLab(document.getElementById('act2'));
 

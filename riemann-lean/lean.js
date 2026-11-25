@@ -42,12 +42,21 @@ function create(tag, text, className) {
   return node;
 }
 
+const tokenClass = {
+  theorem: 'syn-key', by: 'syn-key', intro: 'syn-tactic', rw: 'syn-tactic', exact: 'syn-tactic',
+  'ℝ': 'syn-type', 'ℂ': 'syn-type', Prop: 'syn-type', '∀': 'syn-op', '→': 'syn-op', '⊢': 'syn-op'
+};
+
+function appendSyntax(node, text) {
+  const parts = text.split(/(\b(?:theorem|by|intro|rw|exact|Prop)\b|[ℝℂ∀→⊢])/);
+  for (const part of parts) {
+    const className = Object.hasOwn(tokenClass, part) ? tokenClass[part] : null;
+    node.append(className ? create('span', part, className) : document.createTextNode(part));
+  }
+}
+
 function decorateCode(pre) {
   const originalLines = pre.textContent.split('\n');
-  const tokenClasses = {
-    theorem: 'syn-key', by: 'syn-key',
-    intro: 'syn-tactic', rw: 'syn-tactic', exact: 'syn-tactic', 'ℝ': 'syn-type'
-  };
   const code = document.createElement('code');
   const lines = originalLines.map((text, index) => {
     const line = create('span', '', 'code-line');
@@ -60,9 +69,7 @@ function decorateCode(pre) {
     if (index === 0) {
       content.append(create('span', text, 'syn-comment'));
     } else {
-      for (const part of text.split(/(\btheorem\b|\bby\b|\bintro\b|\brw\b|\bexact\b|ℝ)/)) {
-        content.append(tokenClasses[part] ? create('span', part, tokenClasses[part]) : document.createTextNode(part));
-      }
+      appendSyntax(content, text);
     }
     code.append(line);
     return line;
@@ -100,11 +107,17 @@ export function initLean(root) {
     const stateChanged = previousState !== state;
     if (stateChanged || !goal.childNodes.length) {
       const context = state ? LEAN.context : LEAN.context.slice(0, 1);
+      const animatedGoal = stateChanged && previousState !== undefined && !reduced.matches;
+      const goalState = create('pre', '', complete ? 'lean__complete' : '');
+      appendSyntax(goalState, complete ? LEAN.goals[state] : '⊢ ' + LEAN.goals[state]);
+      const contextState = document.createElement('pre');
+      appendSyntax(contextState, context.join('\n'));
+      if (animatedGoal) goalState.classList.add('goal-enter');
       goal.replaceChildren(
         create('p', 'Context', 'lean__label'),
-        create('pre', context.join('\n')),
+        contextState,
         create('p', 'Goal', 'lean__label'),
-        create('pre', complete ? LEAN.goals[state] : '⊢ ' + LEAN.goals[state], complete ? 'lean__complete' : '')
+        goalState
       );
     }
     if (error === 'mismatch') {

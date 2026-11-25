@@ -10,6 +10,7 @@
   --p-pencil: #6B6A5C;
   --p-rule: #C9C4B0;
 }
+html { --font-sans: "Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif; --font-serif: "Noto Serif KR", "MaruBuri", serif; --font-mono: "JetBrains Mono", "Pretendard Variable", monospace; }
 html[data-era="paper"] {
   --c-bg: var(--p-base);
   --c-surface: var(--p-surface);
@@ -60,12 +61,12 @@ html[data-era="paper"] {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: var(--rule-x,6.5vw);
+  left: 14px;
   z-index: 4;
   width: 1px;
   background: var(--rule-c,var(--p-seal));
   pointer-events: none;
-  opacity: var(--rule-alpha,.42);
+  opacity: var(--rule-alpha,.35);
 }
 html[data-era="paper"] #progress { background: var(--p-seal); }
 html[data-era="paper"] .hud { border-color: var(--p-rule); }
@@ -89,6 +90,84 @@ html[data-era="paper"] .plate::after, html[data-era="paper"] .hero__plate::after
   opacity: .55;
 }
 html[data-era="paper"] .act { border-color: color-mix(in srgb,var(--p-pencil) 48%,var(--p-rule)); }
-@media(max-width:900px) {
-  .seam-rule { left: 22px; }
+
+/* The prime table is a small, keyboard navigable explorer. */
+#sieve > button {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--p-rule);
+  background: var(--p-surface);
+  color: var(--p-ink);
+  font: 500 12px/1 var(--font-mono);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#sieve > button.is-prime { color: var(--p-blue); font-weight: 700; background: var(--p-surface-2); border-bottom: 2px solid var(--p-seal); }
+#sieve > button.is-one { color: var(--p-muted); }
+#sieve > button.is-selected, #sieve > button:focus-visible { outline: 2px solid var(--p-blue); outline-offset: 1px; z-index: 2; }
+#sieve > button::after, .prime-gap::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  width: max-content;
+  max-width: min(230px, calc(100vw - 56px));
+  padding: 5px 7px;
+  transform: translate(-50%, 3px);
+  border: 1px solid var(--p-rule);
+  background: var(--p-ink);
+  color: var(--p-surface);
+  font: 10px/1.4 var(--font-sans);
+  white-space: normal;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .14s ease, transform .14s ease, visibility .14s;
+}
+#sieve > button:hover::after, #sieve > button:focus-visible::after,
+.prime-gap:hover::after, .prime-gap:focus-visible::after { opacity: 1; visibility: visible; transform: translate(-50%,0); }
+#primeGaps {
+  display: grid;
+  grid-template-columns: repeat(24,minmax(0,1fr));
+  gap: 1px;
+  height: 36px;
+  padding: 0 0 1px;
+  border-block: 1px solid var(--p-rule);
+  background: linear-gradient(transparent calc(50% - 1px),var(--p-rule) 50%,transparent calc(50% + 1px));
+}
+.prime-gap {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.prime-gap::before {
+  content: "";
+  position: absolute;
+  inset-inline: 15%;
+  bottom: 0;
+  height: var(--gap-height);
+  background: color-mix(in srgb,var(--p-blue) 55%,var(--p-rule));
+}
+.prime-gap.is-largest::before, .prime-gap:hover::before, .prime-gap.is-selected::before { background: var(--p-seal); }
+.prime-gap.is-selected, .prime-gap:focus-visible { outline: 2px solid var(--p-blue); outline-offset: 1px; }
+.prime-gap::after { bottom: calc(100% + 4px); }
+#sieve > button:nth-child(10n+1)::after, #sieve > button:nth-child(10n+2)::after,
+.prime-gap:nth-child(-n+5)::after { left: 0; transform: none; }
+#sieve > button:nth-child(10n+9)::after, #sieve > button:nth-child(10n+10)::after,
+.prime-gap:nth-child(n+20)::after { right: 0; left: auto; transform: none; }
+
+@media (max-width: 639px) {
+  #sieve > button { font-size: 10px; }
+  .seam-rule { left: 12px; }
+  #sieve > button:nth-child(10n+3)::after { left: 0; transform: none; }
+  #sieve > button:nth-child(10n+8)::after { right: 0; left: auto; transform: none; }
 }

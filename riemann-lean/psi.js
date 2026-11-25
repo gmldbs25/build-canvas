@@ -10,6 +10,9 @@ const SIGMA_MIN = 0.5;
 const SIGMA_STEP = 0.005;
 const SIGMA_STEPS = Math.round((0.85 - SIGMA_MIN) / SIGMA_STEP) + 1;
 const MAX_DPR = 2;
+const PLANE_TOP = 170;
+const SPECTRUM_TICKS = [0, 7, 15, 23, 31, 39, 47, 55, 59];
+const CHART_FONT = '10px "JetBrains Mono", "Pretendard Variable", monospace';
 
 function sievePrimes(limit) {
   const composite = new Uint8Array(limit + 1);
@@ -140,17 +143,20 @@ function sigmasForCount(count, sigmaValues) {
   return Array.from({ length }, (_, index) => sigmaValues[index] ?? 0.5);
 }
 
+function sampleZeroAt(index, k, sigma, grid) {
+  const gamma = GAMMA[k];
+  const sigmaIndex = Math.max(0, Math.min(SIGMA_STEPS - 1, Math.round((sigma - SIGMA_MIN) / SIGMA_STEP)));
+  const offset = index * GAMMA.length + k;
+  const power = grid.powers[index * SIGMA_STEPS + sigmaIndex];
+  return 2 * power * (sigma * grid.cosines[offset] + gamma * grid.sines[offset]) / (sigma * sigma + gamma * gamma);
+}
+
 function sampleApproxAt(index, sigmas, grid = GRID) {
   const x = grid.xs[index];
   const logX = grid.lnXs[index];
   let sum = 0;
-  const offset = index * GAMMA.length;
   for (let k = 0; k < sigmas.length; k += 1) {
-    const sigma = sigmas[k];
-    const gamma = GAMMA[k];
-    const sigmaIndex = Math.max(0, Math.min(SIGMA_STEPS - 1, Math.round((sigma - SIGMA_MIN) / SIGMA_STEP)));
-    const denominator = sigma * sigma + gamma * gamma;
-    sum += 2 * grid.powers[index * SIGMA_STEPS + sigmaIndex] * (sigma * grid.cosines[offset + k] + gamma * grid.sines[offset + k]) / denominator;
+    sum += sampleZeroAt(index, k, sigmas[k], grid);
   }
   return x - sum - TWO_PI_LOG - 0.5 * Math.log(1 - Math.exp(-2 * logX));
 }
@@ -191,7 +197,25 @@ export function initLab(root = document) {
   const ctx = psiCanvas.getContext('2d');
   const planeCtx = planeCanvas.getContext('2d');
   if (!ctx || !planeCtx) return () => {};
+  const planeCoordinate = query('#planeCoordinate');
+  const waveKey = query('#waveKey');
+  const spectrumDetail = query('#spectrumDetail');
+  const labStatus = query('#labStatus');
   planeCanvas.style.touchAction = 'pan-y';
+  const spectrumTicks = SPECTRUM_TICKS.map((index) => {
+    const tick = document.createElement('span');
+    tick.className = 'spectrum__tick';
+    tick.style.gridColumn = String(index + 1);
+    tick.style.gridRow = '1';
+    tick.dataset.gammaTick = String(Math.round(GAMMA[index]));
+    tick.setAttribute('aria-hidden', 'true');
+    return tick;
+  });
+  spectrum?.append(...spectrumTicks);
+  const spectrumButtons = [];
+  const spectrumContributions = [];
+  let previewIndex = null;
+  let planePointer = null;
 
   let count = Math.max(1, Math.min(GAMMA.length, Number(nRange.value) || 15));
   const sigmaValues = new Float64Array(GAMMA.length);
@@ -223,8 +247,9 @@ export function initLab(root = document) {
       ink: value('--c-ink', terminal ? '#d8e3f0' : '#17243a'),
       muted: value('--c-muted', terminal ? '#8395a7' : '#5e5b4e'),
       rule: value('--c-line', value('--c-rule', terminal ? '#1e2a36' : '#c9c4b0')),
-      accent: value('--c-accent', terminal ? '#7fd8ff' : '#1b3b6f'),
+      accent: value('--c-accent-2', terminal ? '#7fd8ff' : '#1b3b6f'),
       margin: value('--c-bad', terminal ? '#ff7a7a' : '#962830'),
+      highlight: value('--c-warn', terminal ? '#f9ba78' : '#a05a12'),
       paper: value('--c-surface', terminal ? '#101720' : '#efebda'),
     };
   }
@@ -258,12 +283,14 @@ export function initLab(root = document) {
     if (destroyed || document.hidden || !isInView || !psiCanvas.getClientRects().length) return;
     const { width, height } = resizeCanvas(psiCanvas, ctx);
     if (width < 10 || height < 10) return;
-    const plot = { x: 42, y: 14, w: width - 54, h: (height - 48) * 0.62 };
-    const residual = { x: plot.x, y: plot.y + plot.h + 26, w: plot.w, h: Math.max(1, height - (plot.y + plot.h + 35)) };
+    const plot = { x: 32, y: 13, w: width - 59, h: Math.round((height - 65) * 0.65) };
+    const residual = { x: plot.x, y: plot.y + plot.h + 31, w: plot.w, h: height - plot.h - 65 };
     const xPos = (x) => plot.x + (x - LENS.xMin) / (LENS.xMax - LENS.xMin) * plot.w;
     const yPos = (y) => plot.y + plot.h - y / LENS.yMax * plot.h;
     const residualY = (value) => residual.y + residual.h - (value + LENS.residual) / (2 * LENS.residual) * residual.h;
     const sigmas = sigmasForCount(count, sigmaValues);
+    const preview = previewIndex !== null && previewIndex < count ? previewIndex : selectedIndex;
+    const escaped = sigmas.some(value => value > SIGMA_MIN);
     const values = waveValues;
     const errors = waveResiduals;
     for (let i = 0; i < GRID_SIZE; i += 1) {
@@ -274,7 +301,7 @@ export function initLab(root = document) {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = colors.paper;
     ctx.fillRect(0, 0, width, height);
-    ctx.font = '10px ui-monospace, SFMono-Regular, Menlo, monospace';
+    ctx.font = CHART_FONT;
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.rule;
     ctx.fillStyle = colors.muted;
@@ -288,14 +315,18 @@ export function initLab(root = document) {
       ctx.stroke();
       ctx.fillText(String(y), 8, py + 3);
     }
+    ctx.textAlign = 'center';
     for (const x of [2, 20, 40, 60, 80, 100]) {
       const px = xPos(x);
       ctx.beginPath();
       ctx.moveTo(px, plot.y);
       ctx.lineTo(px, plot.y + plot.h);
       ctx.stroke();
-      ctx.fillText(String(x), px - 7, plot.y + plot.h + 13);
+      ctx.fillText(String(x), px, height - 5);
     }
+
+    ctx.textAlign = 'left';
+    ctx.fillText('x', width - 10, height - 5);
 
     // The main term x is shown as a restrained dashed guide.
     ctx.save();
@@ -322,8 +353,23 @@ export function initLab(root = document) {
     ctx.lineTo(xPos(LENS.xMax), yPos(current));
     ctx.stroke();
 
+    if (escaped) {
+      ctx.save();
+      ctx.beginPath();
+      for (let i = 0; i < GRID_SIZE; i += 1) {
+        const py = yPos(Math.max(0, Math.min(LENS.yMax, values[i])));
+        ctx.lineTo(xPos(GRID.xs[i]), py);
+      }
+      for (let i = GRID_SIZE - 1; i >= 0; i -= 1) ctx.lineTo(xPos(GRID.xs[i]), yPos(GRID.truths[i]));
+      ctx.closePath();
+      ctx.globalAlpha = 0.19;
+      ctx.fillStyle = colors.margin;
+      ctx.fill();
+      ctx.restore();
+    }
+
     // Selected truncated explicit formula.
-    ctx.strokeStyle = colors.accent;
+    ctx.strokeStyle = escaped ? colors.margin : colors.accent;
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i < GRID_SIZE; i += 1) {
@@ -337,17 +383,36 @@ export function initLab(root = document) {
     // Residual plot, symmetric around zero with clipping markers at ±10.
     ctx.strokeStyle = colors.rule;
     ctx.lineWidth = 1;
-    for (const level of [-10, 0, 10]) {
+    for (const level of [-LENS.residual, 0, LENS.residual]) {
       const py = residualY(level);
       ctx.beginPath();
       ctx.moveTo(residual.x, py);
       ctx.lineTo(residual.x + residual.w, py);
+      ctx.strokeStyle = level === 0 ? colors.muted : colors.rule;
       ctx.stroke();
       ctx.fillStyle = colors.muted;
-      ctx.fillText(String(level), 9, py + 3);
+      ctx.fillText(String(level), 4, py + 3);
     }
     ctx.fillStyle = colors.muted;
-    ctx.fillText('ψ(x) − x', 8, residual.y - 8);
+    ctx.fillText('ψ(x) − x', residual.x, residual.y - 10);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(residual.x, residual.y, residual.w, residual.h);
+    ctx.clip();
+    if (escaped) {
+      const shade = ctx.createLinearGradient(residual.x, 0, residual.x + residual.w, 0);
+      shade.addColorStop(0, 'transparent');
+      shade.addColorStop(1, colors.margin);
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = shade;
+      ctx.beginPath();
+      ctx.moveTo(xPos(LENS.xMin), residualY(0));
+      for (let i = 0; i < GRID_SIZE; i += 1) ctx.lineTo(xPos(GRID.xs[i]), residualY(errors[i]));
+      ctx.lineTo(xPos(LENS.xMax), residualY(0));
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
     ctx.strokeStyle = colors.ink;
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -361,8 +426,8 @@ export function initLab(root = document) {
     }
     ctx.lineTo(xPos(LENS.xMax), residualY(residualValue - LENS.xMax));
     ctx.stroke();
-    ctx.strokeStyle = colors.accent;
-    ctx.lineWidth = 1.25;
+    ctx.strokeStyle = escaped ? colors.margin : colors.accent;
+    ctx.lineWidth = 1.35;
     ctx.beginPath();
     for (let i = 0; i < GRID_SIZE; i += 1) {
       const x = xPos(GRID.xs[i]);
@@ -371,6 +436,17 @@ export function initLab(root = document) {
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.strokeStyle = colors.highlight;
+    ctx.lineWidth = previewIndex === null ? 1.2 : 1.8;
+    ctx.globalAlpha = previewIndex === null ? 0.75 : 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    for (let i = 0; i < GRID_SIZE; i += 1) {
+      ctx.lineTo(xPos(GRID.xs[i]), residualY(-sampleZeroAt(i, preview, sigmas[preview], GRID)));
+    }
+    ctx.stroke();
+    ctx.restore();
+
     ctx.fillStyle = colors.margin;
     for (let i = 0; i < GRID_SIZE; i += 1) {
       if (errors[i] > LENS.residual && (i === 0 || errors[i - 1] <= LENS.residual)) {
@@ -417,80 +493,121 @@ export function initLab(root = document) {
       ctx.beginPath();
       ctx.arc(pointX, residualY(Math.max(-LENS.residual, Math.min(LENS.residual, approx - x))), 3, 0, Math.PI * 2);
       ctx.fill();
+      const label = `x ${fmt(x, 1)} · ψ ${fmt(exact, 2)} · 근사 ${fmt(approx, 2)}`;
+      ctx.fillStyle = colors.paper;
+      ctx.fillRect(plot.x + 3, plot.y + 3, ctx.measureText(label).width + 9, 17);
       ctx.fillStyle = colors.ink;
-      ctx.fillText(`x ${fmt(x, 1)} · ψ ${fmt(exact, 2)} · 근사 ${fmt(approx, 2)}`, plot.x + 4, plot.y + 12);
+      ctx.fillText(label, plot.x + 7, plot.y + 15);
     }
+  }
+
+  function planePlot(width, height) {
+    return { x: 31, y: 25, w: width - 48, h: height - 51 };
+  }
+
+  function planePoint(plot, index) {
+    return [plot.x + sigmaValues[index] * plot.w, plot.y + (1 - GAMMA[index] / PLANE_TOP) * plot.h];
   }
 
   function drawPlane() {
     if (destroyed || document.hidden || !isInView || !planeCanvas.getClientRects().length) return;
     const { width, height } = resizeCanvas(planeCanvas, planeCtx);
-    if (width < 10 || height < 10) return;
-    const plot = { x: 36, y: 14, w: width - 48, h: height - 44 };
+    if (width < 70 || height < 70) return;
+    const plot = planePlot(width, height);
     const px = (re) => plot.x + re * plot.w;
-    const py = (im) => plot.y + plot.h - im / 170 * plot.h;
-    planeCtx.clearRect(0, 0, width, height);
+    const py = (im) => plot.y + plot.h - im / PLANE_TOP * plot.h;
     planeCtx.fillStyle = colors.paper;
     planeCtx.fillRect(0, 0, width, height);
     planeCtx.save();
-    planeCtx.globalAlpha = 0.04;
+    planeCtx.globalAlpha = 0.045;
     planeCtx.fillStyle = colors.accent;
     planeCtx.fillRect(plot.x, plot.y, plot.w, plot.h);
     planeCtx.restore();
-    planeCtx.font = '10px ui-monospace, SFMono-Regular, Menlo, monospace';
+    planeCtx.font = CHART_FONT;
+    planeCtx.lineWidth = 1;
     planeCtx.strokeStyle = colors.rule;
     planeCtx.fillStyle = colors.muted;
-    for (const re of [0, 0.25, 0.5, 0.75, 1]) {
+    planeCtx.fillText('Im(ρ)', 6, 15);
+    planeCtx.textAlign = 'center';
+    for (const [re, label] of [[0, '0'], [0.5, '½'], [1, '1']]) {
       planeCtx.beginPath();
       planeCtx.moveTo(px(re), plot.y);
       planeCtx.lineTo(px(re), plot.y + plot.h);
       planeCtx.stroke();
-      planeCtx.fillText(re.toFixed(re === 0 || re === 1 ? 0 : 2), px(re) - 10, plot.y + plot.h + 14);
+      planeCtx.fillText(label, px(re), plot.y + plot.h + 15);
     }
+    planeCtx.textAlign = 'right';
     for (const im of [0, 40, 80, 120, 160]) {
       planeCtx.beginPath();
       planeCtx.moveTo(plot.x, py(im));
       planeCtx.lineTo(plot.x + plot.w, py(im));
       planeCtx.stroke();
-      planeCtx.fillText(String(im), 4, py(im) + 3);
+      planeCtx.fillText(String(im), plot.x - 5, py(im) + 3);
     }
+    planeCtx.fillText('Re(ρ)', width - 6, plot.y + plot.h + 24);
     planeCtx.save();
-    planeCtx.setLineDash([4, 4]);
+    planeCtx.setLineDash([3, 4]);
     planeCtx.strokeStyle = colors.accent;
-    planeCtx.lineWidth = 1.5;
+    planeCtx.globalAlpha = 0.6;
     planeCtx.beginPath();
     planeCtx.moveTo(px(0.5), plot.y);
     planeCtx.lineTo(px(0.5), plot.y + plot.h);
     planeCtx.stroke();
     planeCtx.restore();
-    planeCtx.fillStyle = colors.muted;
-    planeCtx.fillText('실수부 Re(ρ)', plot.x + plot.w - 72, plot.y + plot.h + 30);
-    planeCtx.fillText('허수부 Im(ρ)', 4, plot.y + 10);
 
     for (let i = 0; i < GAMMA.length; i += 1) {
       const active = i < count;
-      const x = px(sigmaValues[i]);
-      const y = py(GAMMA[i]);
+      const [x, y] = planePoint(plot, i);
+      const distanceBefore = GAMMA[i] - (GAMMA[i - 1] ?? 0);
+      const distanceAfter = (GAMMA[i + 1] ?? PLANE_TOP) - GAMMA[i];
+      const spacing = Math.min(distanceBefore, distanceAfter) / PLANE_TOP * plot.h;
+      const radius = active ? Math.max(0.85, Math.min(2.6, spacing * 0.43)) : 0.8;
       planeCtx.beginPath();
-      planeCtx.arc(x, y, i === selectedIndex ? 6 : 4, 0, Math.PI * 2);
-      planeCtx.fillStyle = active ? colors.accent : colors.muted;
-      planeCtx.globalAlpha = active ? 1 : 0.6;
+      planeCtx.arc(x, y, radius, 0, Math.PI * 2);
+      planeCtx.fillStyle = active ? (sigmaValues[i] > SIGMA_MIN ? colors.margin : colors.accent) : colors.muted;
+      planeCtx.globalAlpha = active ? 1 : 0.26;
       planeCtx.fill();
-      planeCtx.globalAlpha = 1;
-      if (i === selectedIndex) {
-        planeCtx.beginPath();
-        planeCtx.arc(x, y, 8.2, 0, Math.PI * 2);
-        planeCtx.strokeStyle = colors.ink;
-        planeCtx.lineWidth = 1;
-        planeCtx.stroke();
-      }
-      if (i < 3) {
-        planeCtx.fillStyle = colors.ink;
-        const label = document.documentElement.dataset.mode === 'math'
-          ? `γ${i + 1} ${fmt(GAMMA[i], 2)}`
-          : `γ${i + 1}`;
-        planeCtx.fillText(label, Math.min(x + 9, width - planeCtx.measureText(label).width - 3), y - 8 - i * 8);
-      }
+    }
+    planeCtx.globalAlpha = 1;
+    planeCtx.textAlign = 'left';
+    const target = previewIndex !== null && previewIndex < count ? previewIndex : selectedIndex;
+    const [targetX, targetY] = planePoint(plot, target);
+    const targetColor = sigmaValues[target] > SIGMA_MIN ? colors.margin : colors.accent;
+    planeCtx.save();
+    planeCtx.fillStyle = targetColor;
+    planeCtx.globalAlpha = 0.14;
+    planeCtx.beginPath();
+    planeCtx.arc(targetX, targetY, planePointer === null ? 10 : 13, 0, Math.PI * 2);
+    planeCtx.fill();
+    planeCtx.restore();
+    planeCtx.strokeStyle = targetColor;
+    planeCtx.lineWidth = 1;
+    planeCtx.beginPath();
+    planeCtx.arc(targetX, targetY, 7, 0, Math.PI * 2);
+    planeCtx.stroke();
+    planeCtx.fillStyle = targetColor;
+    planeCtx.beginPath();
+    planeCtx.arc(targetX, targetY, 3.2, 0, Math.PI * 2);
+    planeCtx.fill();
+
+    // Stagger the first markers around the line; the target always gets its own label.
+    for (const i of [0, 1, 2]) {
+      if (i >= count || i === target) continue;
+      labelPoint(i, i === 1);
+    }
+    labelPoint(target, target === 1);
+
+    function labelPoint(index, left) {
+      const [x, y] = planePoint(plot, index);
+      const label = `γ${index + 1}`;
+      const textWidth = planeCtx.measureText(label).width;
+      const placeLeft = left || x + 11 + textWidth > width - 3;
+      const labelX = placeLeft ? x - 11 - textWidth : x + 11;
+      const labelY = y + (index === 0 ? 6 : -1);
+      planeCtx.fillStyle = colors.paper;
+      planeCtx.fillRect(labelX - 1, labelY - 10, textWidth + 2, 13);
+      planeCtx.fillStyle = index === target ? targetColor : colors.muted;
+      planeCtx.fillText(label, labelX, labelY);
     }
   }
 
@@ -503,46 +620,68 @@ export function initLab(root = document) {
     });
   }
 
+  function updatePreview() {
+    const index = previewIndex !== null && previewIndex < count ? previewIndex : selectedIndex;
+    const gamma = GAMMA[index];
+    const value = sigmaValues[index];
+    const coordinate = `ρ = ${fmt(value, 3)} + ${fmt(gamma, 2)}i`;
+    setText(planeCoordinate, coordinate);
+    if (planeCoordinate) planeCoordinate.dataset.regime = value > SIGMA_MIN ? 'escaped' : 'critical';
+    setText(waveKey, `γ${index + 1}의 파동`);
+    const contribution = spectrumContributions[index];
+    if (Number.isFinite(contribution)) {
+      const phase = Math.atan2(gamma, value) * 180 / Math.PI;
+      setText(spectrumDetail, `γ${index + 1} = ${fmt(gamma, 6)} · φ ${fmt(phase, 1)}° · 항 ${contribution >= 0 ? '+' : ''}${fmt(contribution, 2)}`);
+    }
+    draw();
+  }
+
   function updateSpectrum() {
     if (!spectrum) return;
-    while (spectrum.children.length > count) spectrum.lastElementChild.remove();
-    while (spectrum.children.length < count) {
-      const index = spectrum.children.length;
+    const slots = Math.min(60, Math.max(16, Math.ceil(count / 8) * 8));
+    spectrum.style.setProperty('--spectrum-slots', slots);
+    for (const tick of spectrumTicks) {
+      tick.toggleAttribute('data-mobile-hidden', Number(tick.style.gridColumn) > slots);
+    }
+    while (spectrumButtons.length > count) spectrumButtons.pop().remove();
+    while (spectrumButtons.length < count) {
+      const index = spectrumButtons.length;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'spectrum__bar';
       button.dataset.index = String(index);
       button.dataset.gamma = String(GAMMA[index]);
+      button.style.gridColumn = String(index + 1);
+      button.style.gridRow = '1';
       const bar = document.createElement('i');
       bar.setAttribute('aria-hidden', 'true');
       button.append(bar);
-      const tooltip = document.createElement('span');
-      tooltip.className = 'spectrum__tooltip';
-      button.append(tooltip);
       spectrum.append(button);
+      spectrumButtons.push(button);
     }
     let maxAbs = 0;
-    const contributions = GAMMA.slice(0, count).map((gamma, index) => {
-      const termSigma = sigmaValues[index];
-      const value = 2 * (100 ** termSigma) * (termSigma * X100_COS[index] + gamma * X100_SIN[index]) / (termSigma * termSigma + gamma * gamma);
+    for (let i = 0; i < count; i += 1) {
+      const gamma = GAMMA[i];
+      const termSigma = sigmaValues[i];
+      const value = 2 * (100 ** termSigma) * (termSigma * X100_COS[i] + gamma * X100_SIN[i]) / (termSigma * termSigma + gamma * gamma);
+      spectrumContributions[i] = value;
       maxAbs = Math.max(maxAbs, Math.abs(value));
-      return value;
-    });
+    }
     const scale = maxAbs || 1;
     for (let i = 0; i < count; i += 1) {
-      const button = spectrum.children[i];
+      const button = spectrumButtons[i];
       const gamma = GAMMA[i];
+      const contribution = spectrumContributions[i];
       const phaseDegrees = Math.atan2(gamma, sigmaValues[i]) * 180 / Math.PI;
-      const sign = contributions[i] < 0 ? 'negative' : 'positive';
-      button.dataset.sign = sign;
+      const negative = contribution < 0;
+      const escaped = sigmaValues[i] > SIGMA_MIN;
+      button.dataset.sign = negative ? 'negative' : 'positive';
       button.toggleAttribute('data-selected', i === selectedIndex);
       button.setAttribute('aria-pressed', String(i === selectedIndex));
-      button.setAttribute('aria-label', `영점 ${i + 1}, 감마 ${gamma.toFixed(6)}, 위상 ${fmt(phaseDegrees, 1)}도, 부호 있는 기여 ${fmt(contributions[i], 4)}`);
+      button.setAttribute('aria-label', `영점 ${i + 1}, 감마 ${gamma.toFixed(6)}, 위상 ${fmt(phaseDegrees, 1)}도, 부호 있는 기여 ${fmt(contribution, 4)}${escaped ? ', 임계선 이탈' : ''}`);
       const bar = button.firstElementChild;
-      bar.style.setProperty('--height', `${Math.max(1, Math.abs(contributions[i]) / scale * 44)}px`);
-      const escaped = sigmaValues[i] > 0.5;
-      bar.style.setProperty('--bar-color', escaped ? 'var(--c-warn)' : contributions[i] < 0 ? 'var(--c-muted)' : 'var(--c-accent)');
-      button.lastElementChild.textContent = `γ ${gamma.toFixed(6)} · φ ${fmt(phaseDegrees, 1)}° · ${contributions[i] >= 0 ? '+' : ''}${fmt(contributions[i], 2)}${escaped ? ' · 이탈' : ''}`;
+      bar.style.setProperty('--height', `${Math.max(2, Math.abs(contribution) / scale * 25)}px`);
+      bar.style.setProperty('--bar-color', escaped ? 'var(--c-bad)' : negative ? 'var(--c-muted)' : 'var(--c-accent-2)');
     }
   }
 
@@ -564,11 +703,11 @@ export function initLab(root = document) {
     setText(query('#planeSummary'), `선택한 영점 γ${selectedIndex + 1} = ${selectedGamma.toFixed(6)}, 실수부 σ = ${sigma.toFixed(3)}. 임계선은 Re(ρ) = 1/2입니다.`);
     const badge = query('#labBadge');
     if (badge) {
-      badge.dataset.regime = Math.abs(sigma - 0.5) < 0.02 ? 'critical' : 'escaped';
+      badge.dataset.regime = sigma === SIGMA_MIN ? 'critical' : 'escaped';
       badge.textContent = `N ${activeCount} · γ${selectedIndex + 1} σ ${sigma.toFixed(2)}`;
     }
     updateSpectrum();
-    draw();
+    updatePreview();
     queueStatus(stats, escapedCount, summary);
   }
 
@@ -578,7 +717,8 @@ export function initLab(root = document) {
       const state = escapedCount ? `△ 이탈 · 영점 ${escapedCount}개가 임계선 밖` : '✓ 조율됨 · 모든 영점이 임계선 위';
       const endpoint = count === 1 ? ' · 영점 1개 · 가장 낮은 음만' : count === GAMMA.length ? ' · 영점 60개 · 화면의 근사 한계' : '';
       const error = stats.rms < 1 ? '계단과의 평균 오차 1.0 미만' : '계단과의 평균 오차 1.0 이상';
-      setText(query('#labStatus'), `${state}${endpoint} · ${error}`);
+      if (labStatus) labStatus.dataset.regime = escapedCount ? 'escaped' : 'critical';
+      setText(labStatus, `${state}${endpoint} · ${error}`);
       setText(query('#psiSummary'), summary);
     }, 400);
   }
@@ -601,7 +741,7 @@ export function initLab(root = document) {
     if (allTogetherInput) allTogetherInput.checked = allTogether;
     if (plate) {
       plate.dataset.labView = activeTab;
-      plate.dataset.sigmaState = Math.abs(sigma - 0.5) < 0.02 ? 'critical' : 'escaped';
+      plate.dataset.sigmaState = sigmaValues.subarray(0, count).some(value => value > SIGMA_MIN) ? 'escaped' : 'critical';
     }
     for (const tab of all('.lab-tabs [data-lab-tab]')) {
       const selected = tab.dataset.labTab === activeTab;
@@ -612,7 +752,7 @@ export function initLab(root = document) {
       button.setAttribute('aria-pressed', String(Number(button.dataset.preset) === count));
     }
     if (refreshMetrics) updateMetrics();
-    else draw();
+    else updatePreview();
   }
 
   function cancelTween() {
@@ -736,6 +876,16 @@ export function initLab(root = document) {
       updateControls();
     }, { signal });
   }
+  function previewBar(target) {
+    const bar = target instanceof Element ? target.closest('.spectrum__bar') : null;
+    previewIndex = bar && spectrum.contains(bar) ? Number(bar.dataset.index) : null;
+    updatePreview();
+  }
+
+  spectrum?.addEventListener('pointerover', (event) => previewBar(event.target), { signal });
+  spectrum?.addEventListener('pointerleave', () => previewBar(document.activeElement), { signal });
+  spectrum?.addEventListener('focusin', (event) => previewBar(event.target), { signal });
+  spectrum?.addEventListener('focusout', (event) => previewBar(event.relatedTarget), { signal });
   spectrum?.addEventListener('click', (event) => {
     const button = event.target.closest('.spectrum__bar');
     if (!button || !spectrum.contains(button)) return;
@@ -756,33 +906,49 @@ export function initLab(root = document) {
     pointerX = null;
     draw();
   }, { signal });
-  planeCanvas.addEventListener('pointerdown', (event) => {
+  function movePlanePoint(event) {
     const rect = planeCanvas.getBoundingClientRect();
-    const plot = { x: 36, y: 14, w: rect.width - 48, h: rect.height - 44 };
-    const handleX = rect.left + plot.x + sigmaValues[selectedIndex] * plot.w;
-    const handleY = rect.top + plot.y + (1 - GAMMA[selectedIndex] / 170) * plot.h;
-    if (Math.hypot(event.clientX - handleX, event.clientY - handleY) > 11) return;
-    criticalSnap = sigmaValues[selectedIndex] <= 0.52;
-    const targetSigma = snapDraggedSigma((event.clientX - rect.left - plot.x) / plot.w);
-    isDragging = true;
-    cancelTween();
-    planeCanvas.setPointerCapture(event.pointerId);
-    sigma = targetSigma;
+    const plot = planePlot(rect.width, rect.height);
+    sigma = snapDraggedSigma((event.clientX - rect.left - plot.x) / plot.w);
     if (allTogether) sigmaValues.fill(sigma, 0, count);
     else sigmaValues[selectedIndex] = sigma;
+    updateControls();
+  }
+
+  planeCanvas.addEventListener('pointerdown', (event) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    const rect = planeCanvas.getBoundingClientRect();
+    const plot = planePlot(rect.width, rect.height);
+    let nearest = -1;
+    let distance = event.pointerType === 'touch' ? 18 : 10;
+    for (let i = 0; i < count; i += 1) {
+      const [x, y] = planePoint(plot, i);
+      const next = Math.hypot(event.clientX - rect.left - x, event.clientY - rect.top - y);
+      if (next >= distance) continue;
+      nearest = i;
+      distance = next;
+    }
+    if (nearest < 0) return;
+    cancelTween();
+    selectedIndex = nearest;
+    previewIndex = null;
+    criticalSnap = sigmaValues[selectedIndex] <= 0.52;
+    isDragging = true;
+    planePointer = event.pointerId;
+    planeCanvas.setPointerCapture(event.pointerId);
+    planeCanvas.setAttribute('data-dragging', '');
     updateControls();
   }, { signal });
   planeCanvas.addEventListener('pointermove', (event) => {
-    if (!isDragging || !planeCanvas.hasPointerCapture(event.pointerId)) return;
-    const rect = planeCanvas.getBoundingClientRect();
-    const targetSigma = snapDraggedSigma((event.clientX - rect.left - 36) / (rect.width - 48));
-    sigma = targetSigma;
-    if (allTogether) sigmaValues.fill(sigma, 0, count);
-    else sigmaValues[selectedIndex] = sigma;
-    updateControls();
+    if (planePointer === event.pointerId) movePlanePoint(event);
   }, { signal });
-  planeCanvas.addEventListener('pointerup', () => { isDragging = false; }, { signal });
-  planeCanvas.addEventListener('pointercancel', () => { isDragging = false; criticalSnap = false; }, { signal });
+  planeCanvas.addEventListener('lostpointercapture', () => {
+    planePointer = null;
+    isDragging = false;
+    criticalSnap = false;
+    planeCanvas.removeAttribute('data-dragging');
+    draw();
+  }, { signal });
 
   const plateObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
     isInView = entries.some((entry) => entry.isIntersecting);
@@ -798,6 +964,7 @@ export function initLab(root = document) {
     resizeObserver.observe(psiCanvas);
     resizeObserver.observe(planeCanvas);
   }
+  document.fonts?.ready.then(draw);
   window.addEventListener('resize', draw, { passive: true, signal });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && drawFrame) {

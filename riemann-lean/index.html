@@ -20,6 +20,11 @@
   <meta name="twitter:image" content="https://gmldbs25.github.io/build-canvas/share/work-08.png">
   <meta name="theme-color" content="#E4E1D2" id="metaTheme">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./paper.css">
   <link rel="stylesheet" href="./terminal.css">
@@ -93,10 +98,10 @@
             <p class="label">1–100 · 소수 표</p>
             <noscript><p class="sieve-noscript">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</p></noscript>
             <div class="sieve-layout">
-              <div id="sieve" role="img" aria-label="1부터 100까지의 소수 표. 소수 25개, 가장 넓은 빈 구간은 89에서 97까지 8칸."></div>
-              <div id="primeGaps" aria-hidden="true"></div>
+              <div id="sieve" role="group" aria-label="1부터 100까지의 소수 표"></div>
+              <div id="primeGaps" role="group" aria-label="연속한 소수 사이의 간격"></div>
             </div>
-            <figcaption id="sieveCaption" class="js-only">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
+            <figcaption id="sieveCaption" class="js-only" aria-live="polite">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
           </figure>
           <blockquote class="riemann-quote">
             <p>“물론 이에 대한 엄밀한 증명이 있었으면 한다. 다만 몇 차례의 덧없는 시도 끝에, 당장의 목적에는 필요치 않아 보여 그 추구는 잠시 접어두었다.”</p>
@@ -132,8 +137,8 @@
               <div class="lab__head"><h3>ψ(x) · 리만 명시적 공식 근사</h3><span class="live">LIVE</span><span id="labBadge">N 15 · σ 0.50</span></div>
               <div class="lab-tabs" role="group" aria-label="실험실 그래프"><button type="button" data-lab-tab="wave" aria-controls="wavePane" aria-pressed="true">파동</button><button type="button" data-lab-tab="plane" aria-controls="planePane" aria-pressed="false">복소평면</button></div>
               <div class="lab__charts">
-                <div id="wavePane"><canvas id="psiCanvas" role="img" aria-label="ψ(x) 소수 계단과 영점 근사"></canvas><span id="psiSummary" class="sr-only" aria-live="polite"></span></div>
-                <div id="planePane"><canvas id="planeCanvas" aria-hidden="true"></canvas><span id="planeSummary" class="sr-only"></span></div>
+                <div id="wavePane"><div class="lab-chart-key"><span>실제 ψ(x)</span><span>영점 근사</span><span id="waveKey">γ₁의 파동</span></div><canvas id="psiCanvas" role="img" aria-label="ψ(x) 소수 계단과 영점 근사"></canvas><span id="psiSummary" class="sr-only" aria-live="polite"></span></div>
+                <div id="planePane"><output id="planeCoordinate" class="plane-coordinate" aria-live="off">ρ = 0.500 + 14.13i</output><canvas id="planeCanvas" aria-hidden="true"></canvas><span id="planeSummary" class="sr-only"></span></div>
               </div>
               <figcaption>첫 60개 영점 중 <span id="labModelN">15</span>개만 사용한 근사입니다. σ는 고정된 γ에 실수부만 바꾼 모형입니다. 계단을 만드는 것은 오차 ψ(x) − x.</figcaption>
             </figure>
@@ -156,9 +161,10 @@
                 </div>
               </div>
               <div class="spectrum-panel">
-                <h4>영점별 파동 · x = 100에서의 기여</h4>
+                <h4>영점별 감산항 · x = 100에서</h4>
                 <p id="labReadout"></p>
-                <div id="spectrum" role="group" aria-label="영점별 파동의 기여. 좌우로 스크롤할 수 있습니다."></div>
+                <div class="spectrum__plot"><div id="spectrum" role="group" aria-label="γ가 작은 순서대로 나열한 영점의 기여. 좌우로 스크롤할 수 있습니다."></div></div>
+                <output id="spectrumDetail" class="spectrum__detail" aria-live="off"></output>
                 <p class="spectrum-caption">진폭 ∝ x<sup>σ</sup> / |ρ| — 낮은 γ가 큰 소리를 낸다.</p>
                 <p id="labStatus" role="status" aria-live="polite"></p>
               </div>
@@ -218,10 +224,11 @@
 
     <section id="seam" class="seam" aria-labelledby="seamTitle">
       <div class="seam__sticky">
+        <div class="seam__code code-wall js-only" aria-hidden="true"></div>
         <div class="seam__inner wrap">
           <div class="seam__copy">
             <p class="label">SEAM · 1859 → 2026</p>
-            <h2 id="seamTitle">여덟 쪽에서 1,740만 줄로</h2>
+            <h2 id="seamTitle">여덟 쪽에서<br>1,740만 줄로</h2>
             <p>1859년의 논문은 여덟 쪽이었다. 2026년 11월, 같은 정리의 Lean 증명은 <span data-fact="proof.files">175,187</span>개 파일, <span data-fact="proof.lines">17,374,215</span>줄이었다. 사람이 읽는 형태와 기계가 검사하는 형태의 거리다.</p>
           </div>
           <div class="seam__visual js-only" aria-hidden="true">
@@ -234,9 +241,13 @@
               <div class="seam__number"><strong class="seam__counter" id="pageCounter" data-fact="pagesEquivalent">289,570</strong><span>60줄/쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽 · 0.1mm/장이면 약 <span data-fact="stackMeters">29</span>m</span></div>
             </div>
             <div class="seam__layer" data-layer="code">
-              <div class="seam__code code-wall"></div>
-              <div class="seam__number"><strong class="seam__counter" id="lineCounter" data-fact="proof.lines">17,374,215</strong><span>화면의 줄은 전체의 약 0.007%</span></div>
+              <div class="seam__number"><strong class="seam__counter" id="lineCounter" data-fact="proof.lines">17,374,215</strong><span>배경에 배치한 줄은 전체의 약 0.007%</span></div>
               <p class="seam__audit"><span data-fact="proof.sorry">0</span> sorry · <span data-fact="proof.admit">0</span> admit · <span data-fact="proof.extraAxioms">0</span> 추가 공리</p>
+            </div>
+            <div class="seam__scale" aria-hidden="true">
+              <div><span>1859 · 8쪽</span><i></i></div>
+              <div><span>2026 · <span data-fact="proof.lines">17,374,215</span>줄</span><i><b></b></i></div>
+              <small>60줄/쪽으로 환산한 분량</small>
             </div>
           </div>
           <p class="seam__detail">쪽수와 코드 줄 수는 단위가 다르다. 배율에 수학적 의미는 없다. 다만 60줄을 한 쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽, 종이 0.1mm로 쌓으면 약 <span data-fact="stackMeters">29</span>m다. 두께로만 비교한 어림이다.</p>

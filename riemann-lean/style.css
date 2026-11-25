@@ -133,61 +133,127 @@ footer { position: relative; z-index: 1; }
 #sieveCaption { margin-bottom: 0; color: var(--c-muted); font: 11px/1.5 var(--font-mono); }
 .sieve-noscript { margin: 9px 0 0; color: var(--c-muted); font: 11px/1.5 var(--font-mono); }
 #primeGaps { position: relative; width: 100%; height: 12px; border-bottom: 1px solid var(--c-rule); }
-#primeGaps > i { position: absolute; left: var(--at); bottom: 0; width: 1px; height: var(--gap); background: var(--c-accent); opacity: .78; }
 #sieve > span { position: relative; display: grid; place-items: center; min-width: 0; aspect-ratio: 1; border: 1px solid var(--c-rule); background: var(--c-surface-raised); color: var(--c-ink); font: 12px/1 var(--font-mono); }
 #sieve .is-prime { color: var(--c-accent-2); font-weight: 700; border-bottom-color: var(--c-seal); }
 #sieve .is-one { color: var(--c-muted); }
 
-.lab { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(340px,.8fr); gap: 28px; align-items: start; }
-.lab__stage { display: grid; align-content: center; min-width: 0; }
+.lab { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: clamp(22px,3vw,52px); align-items: start; }
+.lab__stage { min-width: 0; }
 .act--lab { min-height: 460vh; }
-.step { min-height: 90vh; display: grid; align-content: center; padding: 24px; border-left: 2px solid transparent; }
+.step { min-height: 90vh; display: grid; align-content: center; padding: clamp(20px,2.25vw,34px); border-left: 2px solid transparent; }
 .step h3 { margin: .25em 0 .5em; }
-.step.is-active { border-left: 2px solid var(--c-accent); }
-.lab__instrument { position: sticky; top: var(--hud-height); align-self: start; min-width: 0; height: calc(100vh - var(--hud-height)); height: calc(100svh - var(--hud-height)); overflow-y: auto; padding: 18px; }
-.lab__head { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 7px 10px; }
-.lab__head h3 { grid-column: 1; margin: 0; font-size: clamp(15px,1.35vw,18px); line-height: 1.3; }
-.lab__head .live { grid-column: 2; grid-row: 1; }
-.lab__head #labBadge { display: none; grid-column: 2; grid-row: 2; white-space: nowrap; }
-.live { color: var(--c-good); font: 10px/1 var(--font-mono); letter-spacing: .1em; }
+.step.is-active { border-left-color: var(--c-accent); }
+.lab__instrument {
+  position: sticky;
+  top: calc(var(--hud-height) + 16px);
+  align-self: start;
+  min-width: 0;
+  padding: clamp(12px,1.3vw,20px);
+  box-shadow: 0 14px 40px -28px var(--c-muted), 0 2px 5px #3024120c;
+}
+.lab__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 10px; margin-bottom: 8px; }
+.lab__head h3 { margin: 0; font: 600 clamp(14px,1.3vw,18px)/1.35 var(--font-sans); }
+.lab__head #labBadge { display: none; }
+.live { color: var(--c-good); font: 10px/1 var(--font-mono); letter-spacing: .08em; }
+.live::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: currentColor; vertical-align: 1px; }
 .lab-plate { min-width: 0; margin: 0; }
-.lab__charts { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,.7fr); gap: 12px; align-items: center; }
-.lab__charts > div { min-width: 0; }
-.lab-plate figcaption { margin-top: 13px; color: var(--c-muted); font-size: 12px; line-height: 1.6; }
-.lab-controls { margin-top: 13px; padding: 12px; border: 1px solid var(--c-rule); background: var(--c-surface); }
+#labPlate { padding: clamp(9px,1vw,14px); }
+.lab__charts { display: grid; grid-template-columns: minmax(0,1.72fr) minmax(0,1fr); gap: 8px; }
+.lab__charts > div { min-width: 0; border: 1px solid var(--c-rule); background: var(--c-surface); }
+.lab-plate figcaption { margin-top: 7px; color: var(--c-muted); font-size: 11px; line-height: 1.5; }
+.lab-chart-key, .plane-coordinate {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--c-rule);
+  background: var(--c-surface-raised);
+  color: var(--c-muted);
+  font: 10px/1.35 var(--font-mono);
+}
+.lab-chart-key { flex-wrap: wrap; gap: 3px 9px; }
+.lab-chart-key span::before { content: ""; display: inline-block; width: 10px; margin-right: 4px; border-top: 2px solid var(--c-ink); vertical-align: 3px; }
+.lab-chart-key span:nth-child(2)::before { border-color: var(--c-accent-2); }
+.lab-chart-key span:nth-child(3)::before { border-color: var(--c-warn); border-top-style: dashed; }
+#labPlate[data-sigma-state="escaped"] .lab-chart-key span:nth-child(2)::before { border-color: var(--c-bad); }
+.plane-coordinate { color: var(--c-accent); font-weight: 600; }
+.plane-coordinate[data-regime="escaped"] { color: var(--c-bad); }
+#psiCanvas, #planeCanvas { display: block; width: 100%; height: clamp(184px,calc(32svh - 48px),300px); }
+#planeCanvas { cursor: crosshair; }
+#planeCanvas[data-dragging] { cursor: ew-resize; }
+.lab-controls { margin-top: 9px; padding: 10px 12px; border: 1px solid var(--c-rule); background: var(--c-surface); }
 .lab-controls summary { color: var(--c-accent); font: 11px/1.4 var(--font-mono); cursor: pointer; }
-.lab-hint, .spectrum-caption { color: var(--c-muted); font-size: 12px !important; line-height: 1.5 !important; }
+.act .lab-hint, .act .spectrum-caption { color: var(--c-muted); font-size: 12px; line-height: 1.5; }
+.lab-hint { margin: 5px 0 8px; }
+.controls { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
 .range-group { min-width: 0; }
-.range-group > input[type="range"] { width: 100%; margin: 3px 0 5px; accent-color: var(--c-accent); }
-.presets, .sigma-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
-.presets button, .sigma-actions button { min-height: 34px; padding: 6px 9px; border: 1px solid var(--c-rule); background: var(--c-surface-raised); color: var(--c-ink); font: 10px var(--font-mono); cursor: pointer; }
-.presets button[aria-pressed="true"] { border-color: var(--c-accent); color: var(--c-accent); }
-.sigma-actions { justify-content: space-between; margin-top: 8px; color: var(--c-muted); font: 11px var(--font-mono); }
-.spectrum-panel { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--c-rule); }
-.spectrum-panel h4 { margin: 0; font: 12px/1.5 var(--font-mono); }
-.spectrum-panel p { margin: 4px 0; }
-#labStatus { min-height: 1.4em; color: var(--c-muted); font: 11px/1.4 var(--font-mono); }
-.lab__steps { min-width: 0; }
-.lab__instrument h3 { margin-top: 0; }
-#labPlate { padding: 16px; }
-#psiCanvas { display: block; width: 100%; aspect-ratio: 2.1; }
-#planeCanvas { display: block; width: 100%; height: 180px; }
-.controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.range-group > input[type="range"] { display: block; width: 100%; height: 22px; margin: 0 0 5px; accent-color: var(--c-accent); cursor: pointer; }
 .range-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; font: 11px/1.4 var(--font-mono); }
 .range-row output { min-width: 4ch; color: var(--c-accent); text-align: right; }
-#labReadout, #labBadge { color: var(--c-muted); font: 12px/1.55 var(--font-mono); }
-#labBadge[data-regime="escaped"] { color: var(--c-warn); }
+.presets, .sigma-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.presets button, .sigma-actions button {
+  min-height: 28px;
+  padding: 4px 7px;
+  border: 1px solid var(--c-rule);
+  border-radius: 3px;
+  background: var(--c-surface-raised);
+  color: var(--c-ink);
+  font: 11px var(--font-mono);
+  cursor: pointer;
+}
+.presets button { flex: 1; }
+.presets button:hover, .sigma-actions button:hover { border-color: var(--c-accent); }
+.presets button[aria-pressed="true"] { border-color: var(--c-accent); background: var(--c-accent); color: var(--c-bg); }
+.sigma-actions { justify-content: space-between; color: var(--c-muted); font: 11px var(--font-sans); }
+.sigma-actions label { display: flex; align-items: center; gap: 4px; }
+.sigma-actions input { margin: 0; accent-color: var(--c-accent); }
+.spectrum-panel { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--c-rule); }
+.spectrum-panel h4 { margin: 0; font: 600 12px/1.5 var(--font-mono); }
+.spectrum-panel p { margin: 4px 0; }
+#labReadout, #labBadge, #labStatus { color: var(--c-muted); font: 11px/1.45 var(--font-mono); }
+#labBadge[data-regime="escaped"], #labStatus[data-regime="escaped"] { color: var(--c-bad); }
+#labStatus { margin-bottom: 0; min-height: 1.45em; }
+.lab__steps { min-width: 0; }
 .lab-tabs, .lean__tabs { display: none; }
 .lab-tabs button[aria-pressed="true"], .lean__tabs button[aria-pressed="true"] { box-shadow: inset 0 -2px var(--c-accent); }
-#labPlate[data-highlight="1"] #wavePane, #labPlate[data-highlight="2"] #planePane, #labPlate[data-highlight="3"] #wavePane { outline: 1px solid var(--c-rule); }
+#labPlate[data-highlight="1"] #wavePane, #labPlate[data-highlight="2"] #planePane, #labPlate[data-highlight="3"] #wavePane { border-color: var(--c-accent); }
 .lab__instrument:has(#labPlate[data-highlight="4"]) .spectrum-panel { border-color: var(--c-accent); }
-#spectrum { display: flex; justify-content: space-between; height: clamp(96px,12vh,120px); overflow-x: auto; scrollbar-width: thin; background: linear-gradient(transparent calc(50% - .5px),var(--c-rule) 50%,transparent calc(50% + .5px)); }
-.spectrum__bar { position: relative; display: block; flex: 0 0 clamp(3px, calc((100% - 177px) / 60), 8px); height: 100%; padding: 0; border: 0; outline: 0; background: transparent; cursor: pointer; }
-.spectrum__bar i { position: absolute; left: 50%; right: auto; width: 100%; transform: translateX(-50%); inset-block: auto 50%; min-height: 2px; height: var(--height,2px); background: var(--bar-color,var(--c-accent)); }
-.spectrum__bar[data-selected] i { outline: 1px solid var(--c-accent); outline-offset: 1px; }
-.spectrum__bar[data-sign="negative"] i { inset-block: 50% auto; }
-.spectrum__tooltip { position: absolute; top: 0; left: 0; z-index: 2; padding: 4px 6px; background: var(--c-ink); color: var(--c-bg); font: 10px var(--font-mono); white-space: nowrap; opacity: 0; pointer-events: none; }
-.spectrum__bar:hover .spectrum__tooltip, .spectrum__bar:focus-visible .spectrum__tooltip { opacity: 1; }
+.spectrum__plot {
+  position: relative;
+  padding: 0 18px 0 17px;
+  border: 1px solid var(--c-rule);
+  background: var(--c-surface-raised);
+}
+.spectrum__plot::before, .spectrum__plot::after { position: absolute; color: var(--c-muted); font: 9px/1 var(--font-mono); }
+.spectrum__plot::before { content: "0"; top: 25px; left: 5px; }
+.spectrum__plot::after { content: "γ"; bottom: 4px; right: 5px; }
+#spectrum {
+  display: grid;
+  grid-template-columns: repeat(60,minmax(0,1fr));
+  height: 71px;
+  padding-bottom: 14px;
+  background: linear-gradient(var(--c-rule),var(--c-rule)) 0 10px / 100% 1px no-repeat,
+    linear-gradient(var(--c-muted),var(--c-muted)) 0 28px / 100% 1px no-repeat,
+    linear-gradient(var(--c-rule),var(--c-rule)) 0 46px / 100% 1px no-repeat;
+}
+.spectrum__bar { position: relative; display: block; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.spectrum__bar:focus-visible { z-index: 1; outline-offset: -1px; }
+.spectrum__bar i {
+  position: absolute;
+  left: 50%;
+  width: clamp(2px,62%,8px);
+  transform: translateX(-50%);
+  bottom: 50%;
+  height: var(--height,2px);
+  background: var(--bar-color,var(--c-accent));
+}
+.spectrum__bar[data-sign="negative"] i { top: 50%; bottom: auto; }
+.spectrum__bar[data-selected] i, .spectrum__bar:hover i, .spectrum__bar:focus-visible i { background: var(--c-warn); }
+.spectrum__tick { position: relative; pointer-events: none; }
+.spectrum__tick::before, .spectrum__tick::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); }
+.spectrum__tick::before { top: 100%; width: 1px; height: 4px; background: var(--c-muted); }
+.spectrum__tick::after { content: attr(data-gamma-tick); top: calc(100% + 5px); color: var(--c-muted); font: 9px/1 var(--font-mono); white-space: nowrap; }
+.spectrum__detail { display: block; min-height: 1.4em; margin-top: 4px; color: var(--c-accent); font: 10px/1.4 var(--font-mono); }
 
 .lean { overflow: hidden; }
 .lean.plate { margin: 30px 0; }
@@ -254,24 +320,36 @@ footer h2 { margin-top: 32px; font: 400 28px/1.2 var(--font-serif); }
 #shortcuts { position: fixed; z-index: 50; right: 18px; bottom: 64px; max-width: calc(100vw - 36px); padding: 12px 16px; border: 1px solid var(--c-rule); background: var(--c-ink); color: var(--c-bg); font: 11px/1.5 var(--font-mono); pointer-events: none; }
 #shortcuts[hidden] { display: none; }
 #seam { position: relative; height: 240vh; }
-.seam__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; isolation: isolate; background: #DAD7C5; }
-.seam__sticky::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #0B0F14; opacity: var(--m,0); will-change: opacity; }
-.seam__inner { position: relative; display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: 5vw; height: 100%; }
-.seam__copy h2 { margin: 12px 0; font: 400 clamp(36px,4vw,58px)/1.06 var(--font-serif); }
-.seam__copy p { color: inherit; font-size: 15px; line-height: 1.7; }
-.seam__copy { position: relative; z-index: 2; max-width: 420px; color: var(--seam-readable,var(--c-ink)); }
-.seam__visual { position: relative; height: min(72vh,700px); min-height: 340px; overflow: hidden; border: 1px solid var(--seam-line,var(--c-rule)); contain: paint; }
-.seam__layer { position: absolute; inset: 0; display: grid; align-content: center; padding: 4vw; opacity: var(--alpha,0); transform: translateY(var(--offset,0px)); color: var(--seam-readable,var(--c-ink)); }
-.seam__stripes { position: absolute; inset: 0; background: linear-gradient(transparent calc(100% - 1px),color-mix(in srgb,currentColor 28%,transparent) 100%); background-size: 100% calc(100% / 290); }
-.seam__sheets { position: absolute; inset: 60% 19% auto; display: grid; gap: 6px; }
-.seam__sheets i { height: 2px; background: color-mix(in srgb,currentColor 42%,transparent); }
+.seam__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; isolation: isolate; overflow: clip; background: var(--seam-bg,#DAD7C5); }
+.seam__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.15fr);
+  align-items: center;
+  gap: clamp(28px,6vw,120px);
+  width: min(1520px,100% - 96px);
+  height: 100%;
+  color: var(--seam-readable,#111419);
+}
+.seam__copy { position: relative; z-index: 1; }
+.seam__copy h2 { max-width: 10.6em; margin: 16px 0 22px; font: 600 clamp(36px,4.2vw,74px)/1.19 var(--font-serif); letter-spacing: -.045em; }
+.seam__copy p { max-width: 44ch; color: inherit; font-size: clamp(14px,1.25vw,18px); line-height: 1.75; }
+.seam__copy .label { font: 600 11px/1.4 var(--font-mono); letter-spacing: .14em; }
+.seam__visual { position: relative; height: min(58svh,630px); min-height: 290px; }
+.seam__layer { position: absolute; inset: 0; opacity: var(--alpha,0); transform: translateY(var(--offset,0px)); }
+.seam__layer[data-layer="paper"] { --alpha: 1; }
+.seam__stripes {
+  position: absolute; inset: 8% 6% 15%;
+  background: repeating-linear-gradient(transparent 0 2px,color-mix(in srgb,currentColor 14%,transparent) 2px 3px);
+  mask-image: radial-gradient(ellipse at center,transparent 26%,#000 66%,transparent 92%);
+}
+.seam__sheets { position: absolute; inset: 62% 16% auto; display: grid; gap: 6px; }
+.seam__sheets i { height: 2px; background: color-mix(in srgb,currentColor 36%,transparent); }
 [data-layer="paper"] .seam__number { bottom: 23%; }
-.seam__code { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; overflow: hidden; color: var(--seam-muted,var(--c-muted)); font: 10.5px/1.8 var(--font-mono); }
-.seam__code > pre { overflow: hidden; white-space: pre; text-overflow: clip; mask-image: linear-gradient(to right,#000 85%,transparent); }
-.seam__number { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; color: inherit; font: 12px/1.5 var(--font-mono); }
-.seam__counter { max-width: 100%; font: 600 clamp(40px,5vw,68px)/1 var(--font-mono); white-space: nowrap; }
-.seam__audit { position: absolute; left: 16px; bottom: 14px; color: var(--seam-muted,var(--c-muted)); font: 10px var(--font-mono); }
-.seam__detail { position: absolute; left: 0; bottom: 38px; max-width: 43%; color: var(--seam-readable,var(--c-ink)); font: 10px/1.5 var(--font-mono); }
+.seam__number { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; font: 12px/1.5 var(--font-mono); }
+.seam__counter { font: 600 clamp(36px,5.8vw,100px)/1 var(--font-mono); letter-spacing: -.055em; white-space: nowrap; }
+.seam__audit { position: absolute; right: 0; bottom: 22%; left: 0; margin: 0; text-align: center; font: 10px/1.5 var(--font-mono); }
+.seam__detail { position: absolute; left: 0; bottom: clamp(18px,6svh,68px); max-width: 58ch; margin: 0; font: 11px/1.6 var(--font-mono); }
 .no-js #seam, .no-js .seam__sticky { height: auto; }
 .no-js .seam__inner { display: block; padding-block: 40px; }
 .no-js .seam__detail { position: static; max-width: 66ch; }
@@ -309,19 +387,21 @@ html.no-js h3 .only-math { display: inline !important; }
   .prose { margin-left: 60px; }
   .lab { display: block; }
   .lab__instrument { display: contents; margin: 0; padding: 0; }
-  .lab__stage { position: sticky; top: var(--hud-height); display: block; height: 52vh; height: 52svh; z-index: 3; overflow: visible; background: var(--c-bg); }
+  .lab__stage { position: sticky; top: var(--hud-height); display: block; z-index: 3; overflow: visible; background: var(--c-bg); }
   .act--lab { min-height: 0; }
-  .lab__head #labBadge { display: block; }
+  .lab__head #labBadge { display: block; margin-left: auto; }
   .lab__charts { grid-template-columns: minmax(0,1fr); }
   .lab-tabs { display: flex; }
   #labPlate[data-lab-view="wave"] #planePane, #labPlate[data-lab-view="plane"] #wavePane { display: none; }
   .lab-plate { padding: 10px; }
   .lab__steps { padding-top: 14px; }
   .step { min-height: 78vh; }
-  #spectrum { justify-content: flex-start; }
-  .controls { grid-template-columns: minmax(0,1fr); }
-  .spectrum__bar { flex: 0 0 calc(100% / 12); }
-  .spectrum__bar i { width: clamp(3px,50%,8px); }
+  #spectrum { grid-template-columns: repeat(var(--spectrum-slots,60),minmax(20px,1fr)); overflow-x: auto; scrollbar-width: thin; height: 81px; padding-bottom: 24px; }
+  .spectrum__plot { padding-inline: 14px; }
+  .spectrum__tick[data-mobile-hidden] { display: none; }
+  #psiCanvas, #planeCanvas { height: clamp(166px,25svh,208px); }
+  .lab-controls { padding: 10px; }
+  .presets button, .sigma-actions button { min-height: 34px; }
 }
 @media (max-width: 639px) {
   .hud { padding-inline: 10px; }
@@ -350,7 +430,6 @@ html.no-js h3 .only-math { display: inline !important; }
   .lab-tabs { gap: 6px; margin: 0 0 8px; }
   .lab-tabs button, .lean__tabs button { flex: 1; min-height: 38px; border: 1px solid var(--c-rule); background: var(--c-surface); font: 10px var(--font-mono); }
   #labPlate[data-lab-view="wave"] #planePane, #labPlate[data-lab-view="plane"] #wavePane { display: none; }
-  #planeCanvas { height: 200px; }
   .lab-plate figcaption { margin-top: 7px; font-size: 10px; line-height: 1.45; }
   .lab-hint { margin-block: 6px; }
   .lean__info { padding: 12px; }
@@ -365,8 +444,6 @@ html.no-js h3 .only-math { display: inline !important; }
   .seam__inner { display: block; padding-top: max(58px,9vh); }
   .seam__copy { max-width: 100%; }
   .seam__visual { height: 38svh; min-height: 180px; margin-top: 16px; }
-  .seam__stripes { background-size: 100% calc(100% / 145); }
-  .seam__code { grid-template-columns: 1fr; font-size: 10px; }
   .seam__number .seam__counter { font-size: 32px; }
   .footer-grid { align-items: flex-start; flex-direction: column; }
   .seam__detail { display: block; position: static; max-width: none; margin-top: 12px; }
@@ -383,12 +460,10 @@ html.no-js h3 .only-math { display: inline !important; }
   .lab__head { gap: 4px 6px; }
   .lab__head h3 { font-size: 14px; }
   .lab-tabs { margin-bottom: 4px; }
-  #psiCanvas { height: min(19svh,108px); aspect-ratio: auto; }
-  #planeCanvas { height: min(22svh,124px); }
+  #psiCanvas, #planeCanvas { height: 166px; }
 }
 @media (min-width: 900px) {
-  #psiCanvas, #planeCanvas { height: 260px; }
-  #psiCanvas { aspect-ratio: auto; }
+  .act--lab.wrap { width: min(1344px,100% - 88px); }
 }
 @media (min-width: 900px) and (max-height: 700px) {
   .hero { min-height: calc(100svh - var(--hud-height)); padding-block: 18px 12px; }
@@ -398,10 +473,8 @@ html.no-js h3 .only-math { display: inline !important; }
   .hero__art { width: min(34%,340px); }
   .scroll-cue { margin-top: 10px; }
 }
-@media (min-width: 900px) and (max-height: 840px) {
-  .lab-controls { padding: 9px; }
-  .range-group { margin-top: 7px; }
-  #spectrum { margin-top: 4px; }
+@media (min-width: 900px) and (max-height: 630px) {
+  .lab__instrument { position: relative; top: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
