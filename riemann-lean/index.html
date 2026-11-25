@@ -61,7 +61,7 @@
           <h1 id="heroTitle">소수의 <em>파동</em>,<br>기계가 쓴 증명</h1>
           <p class="hero__english" lang="en">The Waves of Primes, the Proof a Machine Wrote</p>
           <p class="lede">1859년, 여덟 쪽짜리 논문이 던진 질문 하나. 2026년, 1,740만 줄의 코드가 그 질문에 답했다. 다만 그 답을 끝까지 읽은 사람은 아직 없다.</p>
-          <p class="label hero__meta">1859 → 2026 · 167년 · 읽기 약 16분 · 인터랙션 2개</p>
+          <p class="label hero__meta">1859 → 2026 · 167년 · 읽기 약 <span data-fact="readingMinutes">18</span>분 · 인터랙션 2개</p>
         </div>
         <div class="hero__art" aria-hidden="true">
           <svg viewBox="0 0 400 320" fill="none">
@@ -91,8 +91,11 @@
       </header>
       <div class="article-grid">
         <div class="prose page">
-          <p class="dropcap">97 다음은 101, 그다음은 103. 두 수가 두 칸 차로 붙어 있는가 하면, 89에서 97로 갈 때는 여덟 칸이 비어 있다. 수가 커질수록 구멍은 넓어지고, 어디에 큰 구멍이 생길지는 미리 알 수 없다. 소수 목록은 끝까지 무질서해 보인다.</p>
-          <p>그런데 1859년 11월, 베를린 학술원에 제출된 여덟 쪽짜리 논문은 이 무질서가 사실은 파동의 합이라고 말한다. 서른세 살의 베른하르트 리만이 쓴, 수론에 관한 그의 유일한 논문이었다.</p>
+          <p class="dropcap">아흔일곱 다음은 101, 그다음은 103. 두 수가 두 칸 차로 붙어 있는가 하면, 89에서 97로 갈 때는 여덟 칸이 비어 있다. 수가 커질수록 구멍은 넓어지고, 어디에 큰 구멍이 생길지는 미리 알 수 없다. 소수 목록은 끝까지 무질서해 보인다.</p>
+          <h3>원자와 계단</h3>
+          <p>소수는 수의 원자다. 1보다 큰 어떤 자연수든 소수의 곱으로 쪼갤 수 있고, 그 방법은 하나뿐이다. 3,600은 2로 네 번, 3으로 두 번, 5로 두 번 나누어떨어진다. 다른 방법으로 쪼갤 수 없다. 이 사실은 고대부터 알려져 있었고 지금은 산술의 기본정리라고 부른다. 원자의 목록은 끝이 없고, 원자 사이의 거리는 제멋대로다.</p>
+          <h3>왜 소수를 세는가</h3>
+          <p>무질서와 규칙이 공존한다. 개별 소수의 위치를 한눈에 예측하기는 어렵지만, 전체를 세면 규칙이 보인다. x 근처의 소수 밀도는 대략 1/ln x다. 100 근처에서는 다섯 수 중 하나꼴이고, 10억 근처에서는 스물한 수 중 하나꼴이다. 수가 커질수록 소수는 드물어지지만, 드물어지는 방식은 매끄럽다.</p>
           <figure class="sieve-plate plate">
             <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
             <p class="label">1–100 · 소수 표</p>
@@ -103,18 +106,30 @@
             </div>
             <figcaption id="sieveCaption" class="js-only" aria-live="polite">소수 25개 · 가장 넓은 빈 구간 8칸 (89 → 97)</figcaption>
           </figure>
+          <p>이 관찰은 1792년 무렵, 열다섯 살의 가우스가 소수 표를 들여다보며 얻은 것이다. 가우스의 관찰이 정리가 된 것은 그로부터 약 100년 뒤다. 1896년, 아다마르와 드 라 발레푸생이 각자 소수 정리를 증명했다. 리만은 그보다 37년 앞서, 이 정리가 왜 참인지에 대한 훨씬 깊은 그림을 그려 놓았다. 그리고 그 그림의 한 부분은 아직 완성되지 않았다.</p>
+          <p>1859년 11월, 서른세 살의 베른하르트 리만은 베를린 학술원에 여덟 쪽짜리 논문을 제출한다. 수론에 관한 그의 유일한 논문이었다. 제목은 「주어진 크기보다 작은 소수의 개수에 대하여」. 논문은 소수를 세는 함수에 대한 관찰로 시작해, 그 과정에서 스스로 증명하지 못한 추측 하나를 남긴다.</p>
           <blockquote class="riemann-quote">
             <p>“물론 이에 대한 엄밀한 증명이 있었으면 한다. 다만 몇 차례의 덧없는 시도 끝에, 당장의 목적에는 필요치 않아 보여 그 추구는 잠시 접어두었다.”</p>
             <cite>— 베른하르트 리만, 1859, 여덟 쪽 중</cite>
             <p class="only-math" lang="de"><small>Hievon wäre allerdings ein strenger Beweis zu wünschen; ich habe indeß die Aufsuchung desselben, nach einigen flüchtigen vergeblichen Versuchen vorläufig bei Seite gelassen…</small></p>
           </blockquote>
+          <p class="only-intuition">계단을 상상해 보자. 1부터 걸어 올라가는데, 발끝이 소수에 닿을 때마다 한 칸씩 오른다. 2에서 한 칸, 3에서 한 칸, 4에서는 아무 일도 없다. 5에서 한 칸. 계단은 끝이 없고 칸의 간격은 들쭉날쭉하다. 리만의 방법을 현대식으로 쓰면, 로그로 가중한 계단을 매끄러운 직선과 파동의 합으로 표현할 수 있다. 직선은 "대략 몇 개"를 말하고, 파동은 "얼마나 어긋나는지"를 말한다.</p>
+          <div class="only-math">
+            <p>π(x)는 x 이하의 소수 개수다. 소수 정리 π(x) ∼ x/ln x (1896). 가우스의 추정에 나오는 로그 적분은 더 정확하다.</p>
+            <div class="formula" role="math" aria-label="로그 적분 엘 아이 엑스는 이부터 엑스까지 로그 티의 역수를 적분한 값이다."><span>Li(x)</span><span class="op">=</span><span class="sum"><span class="sum__body">∫</span><span class="sum__sub">2 ≤ t ≤ x</span></span><span class="frac"><span class="frac__num">dt</span><span class="frac__den">ln t</span></span></div>
+            <p>리만이 다룬 것은 소수 거듭제곱을 가중해 센 함수다. 현대의 명시적 공식은 이를 체비쇼프 함수 ψ(x)로 나타낸다. ψ(x) ∼ x는 소수 정리와 동치다. π 대신 ψ를 쓰는 이유는 세 가지다.</p>
+            <div class="formula" role="math" aria-label="로그 제타 에스는 소수 피와 양의 정수 케이에 대해 피의 마이너스 케이 에스 제곱을 케이로 나눈 값의 합이다. 에스의 실수부는 일보다 크다."><span>ln ζ(s)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">p 소수</span></span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">k ≥ 1</span></span><span class="frac"><span class="frac__num">p<sup>−ks</sup></span><span class="frac__den">k</span></span><span>(Re(s) &gt; 1)</span></div>
+            <p>① 오일러 곱의 로그가 소수 위의 합이 되어 곱셈이 덧셈이 된다. ② ψ의 점프는 정확히 ln p이고, 점프의 위치가 소수 거듭제곱(4, 8, 9, 16, 25 …)이다. ③ 명시적 공식이 ψ에서는 닫힌 형태를 갖는다. π로 돌아가려면 소수 거듭제곱의 기여를 걷어 내고 부분적분을 한다.</p>
+            <p>즉 ψ는 소수 거듭제곱을 로그 눈금으로 센 계단이다. 1859년 논문의 가중 계단과는 점프의 가중치가 다르다.</p>
+          </div>
         </div>
         <details class="note" open>
           <summary>소수를 세는 방법</summary>
-          <p class="only-intuition">소수를 하나하나 외우는 건 불가능하다. 그래서 수학자들은 소수를 ‘세는’ 쪽을 택했다. 계단의 높이가 소수의 개수, 계단의 흔들림이 오차다. 오차를 알면 소수가 어디에 몰려 있는지도 알 수 있다.</p>
+          <p class="only-intuition">소수를 하나하나 외우는 건 불가능하다. 그래서 수학자들은 소수를 "세는" 쪽을 택했다. 계단의 높이가 소수의 개수, 매끄러운 근사에서 어긋난 만큼이 오차다. 두 지점의 높이를 비교하면 그 사이에 소수가 얼마나 몰려 있는지 알 수 있다. 근사만으로는 계단이 정확히 어디서 오르는지 알기 어렵다.</p>
           <div class="only-math">
             <p>π(x) = #{ p ≤ x : p 소수 }, π(x) ~ x / ln x (소수 정리, 1896).</p>
-            <p>리만이 실제로 다룬 것은 ψ(x) = Σ<sub>p<sup>k</sup> ≤ x</sub> ln p — 소수의 거듭제곱까지 로그로 세는 더 깔끔한 계단이다. π 대신 ψ를 쓰면 오일러 곱과의 연결이 정확해지고, 점프의 크기가 ln p로 단순해진다.</p>
+            <p>로그 눈금으로 보면 희박함이 밀도로 바뀐다. 100 근처에서 소수는 다섯 수에 하나, 10억 근처에서는 스물한 수에 하나다. 밀도 1/ln x는 x가 커질수록 천천히 0에 가까워진다. ψ를 쓰면 로그 가중치가 이 감소를 상쇄해 평균 기울기가 1에 가까워진다.</p>
+            <p>ψ(x)는 소수의 거듭제곱까지 로그로 세는 계단이다. π 대신 ψ를 쓰면 오일러 곱과 연결되고, 점프의 크기가 ln p로 단순해진다.</p>
             <div class="formula" role="math" aria-label="프사이 x는 x 이하의 소수 거듭제곱에 대해 로그 p를 모두 더한 값"><span>ψ(x)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">p<sup>k</sup> ≤ x</span></span><span>ln p</span><span>(p 소수, k ≥ 1)</span></div>
           </div>
         </details>
@@ -128,6 +143,10 @@
         <h2 id="act2Title">오차는 파동의 합이다</h2>
         <p class="lede">리만은 소수의 개수를 세는 함수를 복소수 위로 옮겼다. 그 함수가 0이 되는 점들, 영점이 소수 계단의 흔들림을 만드는 주파수가 된다.</p>
       </header>
+      <div class="prose lab-intro page">
+        <p>이 막은 읽기보다 만지는 편이 빠르다. 왼쪽의 계단이 실제 소수의 리듬이고, 그 위에 겹친 얇은 선들이 계단을 흉내 내는 파동이다. 아래로 내려가면서 영점을 하나씩 더하고 빼 보면, 파동이 어떻게 계단의 모서리를 되살리는지, 하나만 어긋나면 근사가 어떻게 달라지는지 볼 수 있다.</p>
+        <p>용어를 먼저 정리하자. 영점은 제타 함수가 0이 되는 복소수다. 복소수는 실수부와 허수부 두 숫자로 이루어지므로, 영점 하나는 평면 위의 점 하나다. 리만은 이 점들이 소수 계단의 흔들림을 만드는 주파수와 연결된다고 보았다. 이 주장에는 두 부분이 있다. 영점이 파동을 만든다는 부분은 1895년 폰 망골트가 정리로 증명했다. 비자명한 영점이 모두 한 직선 위에 있다는 부분이 리만이 증명하지 못한 가설이다. 앞의 것은 명시적 공식, 뒤의 것이 리만 가설이다. 이 둘을 섞으면 리만 가설을 이해할 수 없다.</p>
+      </div>
       <noscript><p>이 실험은 JavaScript가 필요합니다. 영점 60개 중 N개를 더한 근사로 소수 계단을 재구성합니다.</p></noscript>
       <div class="lab">
         <div class="lab__instrument js-only">
@@ -173,41 +192,87 @@
         <div class="lab__steps">
           <article class="step page" data-step="1" data-n="1" data-sigma="0.50">
             <p class="label">S1</p><h3>소수만 남기는 곱</h3>
-            <p>제타 함수는 모든 자연수의 합이면서, 동시에 모든 소수의 곱이다. ζ(s) = Σ n⁻ˢ = Π (1 − p⁻ˢ)⁻¹. 소수만 남기는 이 항등식이 출발점이다. 리만은 이 함수를 s = 1만 빼고 모든 복소수로 이어 붙였다.</p>
+            <p>제타 함수는 두 얼굴을 가진다. 하나는 모든 자연수를 더한 합이고, 다른 하나는 모든 소수를 곱한 곱이다. 왼쪽 식을 풀어 쓰면 1에 2의 −s제곱, 3의 −s제곱, 4의 −s제곱을 차례로 더한 무한급수이고, 오른쪽 식은 소수마다 괄호 하나를 두고 곱한다. 두 값이 같다는 것은 우연이 아니다. 오른쪽 곱을 전개하면 모든 자연수가 정확히 한 번씩 나오기 때문이다. 쪼개는 방법이 하나뿐이라는 사실이 두 식을 같게 만든다.</p>
+            <div class="formula" role="math" aria-label="제타 s는 자연수 n의 마이너스 s 제곱의 합, 또는 소수 p에 대한 1 빼기 p의 마이너스 s 제곱의 역수의 곱입니다. s의 실수부는 1보다 큽니다."><span>ζ(s)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">n ≥ 1</span></span><span>n<sup>−s</sup></span><span class="op">=</span><span class="sum"><span class="sum__body">Π</span><span class="sum__sub">p 소수</span></span><span>(1 − p<sup>−s</sup>)<sup>−1</sup>,</span><span>Re(s) &gt; 1</span></div>
+          </article>
+          <article class="step page" data-step="1" data-n="1" data-sigma="0.50">
+            <p>이 항등식의 값어치는 압축에 있다. 소수는 무한하고 제멋대로인데, 그 전부가 함수 하나의 모양 속에 들어간다. 함수의 모양은 미적분으로 다룰 수 있다. 소수의 문제를 함수의 문제로 바꿔 놓은 셈이다. 오일러가 1737년에 이 곱을 발견했을 때 s는 실수였다. 리만은 s를 복소수로 넓혔다. 폭이 넓어지자 함수가 훨씬 많은 것을 말해 주기 시작했다.</p>
+            <p>넓히는 데는 조건이 붙는다. 원래의 합과 곱은 s의 실수부가 1보다 클 때만 수렴한다. 그 바깥에서도 해석적 연속으로 함수값을 정할 수 있다. 리만은 제타 함수에 보정 인자를 곱해 s를 1−s로 바꾸어도 값이 같은 함수방정식을 얻었다. 이렇게 이어 붙인 함수가 리만 제타 함수다.</p>
+          </article>
+          <article class="step page" data-step="1" data-n="1" data-sigma="0.50">
+            <p class="only-intuition">레고 상자를 상상해 보자. 블록은 무한히 많고 크기는 제각각이다. 어떤 탑을 쌓아도 같은 탑을 만드는 조합은 하나뿐이다. 제타 함수의 곱은 이 상자를 블록별로 정리한 목록이고, 합은 그 상자로 만들 수 있는 모든 탑의 목록이다. 같은 것을 두 방향에서 센 셈이다. 비유에서 블록의 조합은 실제로 자연수를 소수의 곱으로 나타내는 방법이다. 리만이 한 일은 이 목록을 실수라는 좁은 선에서 복소평면이라는 넓은 판으로 옮긴 것이다. 판이 넓어지자 선 위에서는 보이지 않던 구조가 드러났다.</p>
             <div class="only-math">
-              <p>급수와 곱은 Re(s) &gt; 1에서 수렴한다. 해석적 연속으로 s = 1의 단순극만 남기고 전 평면으로 확장된다.</p>
-              <div class="formula" role="math" aria-label="제타 s는 자연수 n의 마이너스 s 제곱의 합, 또는 소수 p에 대한 1 빼기 p의 마이너스 s 제곱의 역수의 곱입니다. s의 실수부는 1보다 큽니다."><span>ζ(s)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">n ≥ 1</span></span><span>n<sup>−s</sup></span><span class="op">=</span><span class="sum"><span class="sum__body">Π</span><span class="sum__sub">p 소수</span></span><span>(1 − p<sup>−s</sup>)<sup>−1</sup>,</span><span>Re(s) &gt; 1</span></div>
+              <p>급수와 곱은 Re(s) &gt; 1에서 수렴한다. 해석적 연속으로 s = 1의 단순극만 남기고 전 평면으로 확장된다. 영점이 있는 띠 0 &lt; Re(s) &lt; 1에서는 급수가 발산한다. 급수만으로는 그 띠의 값을 볼 수 없다. 해석적 연속은 유일하다(항등정리). 완성된 함수 ξ(s)는 전해석이고 ξ(s) = ξ(1−s)를 만족한다.</p>
+              <p>곱의 수렴 조건도 짚어 둘 만하다. 오일러 곱은 Σ p^−σ가 수렴할 때, 즉 σ &gt; 1일 때 절대수렴한다. σ = 1에서 이 급수는 소수의 역수 합이 되어 발산한다. ζ가 s = 1에 갖는 극이 이 발산에 반영된다.</p>
             </div>
           </article>
           <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
             <p class="label">S2</p><h3>임계 띠의 영점</h3>
-            <p>이어 붙인 함수의 영점은 두 종류다. 음의 짝수에서 생기는 자명한 영점, 그리고 0 &lt; Re(s) &lt; 1의 띠 안에 있는 비자명한 영점. 소수의 리듬을 만드는 것은 후자다.</p>
+            <p>이어 붙인 함수의 영점은 두 종류다. 하나는 음의 짝수 −2, −4, −6 … 에서 생긴다. 함수방정식의 감마 인자에서 오는 자명한 영점이다. 다른 하나는 실수부가 0과 1 사이인 띠 안에 있다. 비자명한 영점, 소수의 리듬을 만드는 것은 이쪽이다. 리만은 논문에서 이 띠 안의 영점이 실수부 1/2인 직선 위에 있다고 주장했다. 그 선을 임계선이라고 부른다.</p>
+            <p>영점의 위치는 규칙적이지 않다. 허수부가 양인 첫 영점의 높이는 <span data-fact="lab.firstHeights.0">14.134725</span>…, 둘째는 <span data-fact="lab.firstHeights.1">21.022</span>…, 셋째는 <span data-fact="lab.firstHeights.2">25.010</span>… 이다. 등차수열도 아니고, 소수처럼 들쭉날쭉하다. 그런데 개수는 매끄럽다. 높이 T 아래에 있는 영점의 수는 T가 커질수록 T log T에 비례해 늘어난다. 개별 위치는 불규칙해 보여도 전체 개수에는 뚜렷한 성장률이 있다. 소수에서 보았던 그 이중성이 영점에서 다시 나타난다.</p>
+          </article>
+          <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
             <div class="only-math">
-              <p>함수방정식 π<sup>−s/2</sup> Γ(s/2) ζ(s) = π<sup>−(1−s)/2</sup> Γ((1−s)/2) ζ(1−s). 자명한 영점 s = −2, −4, −6, … . 임계 띠 0 &lt; Re(s) &lt; 1.</p>
+              <p>함수방정식은 아래와 같다. 자명한 영점은 s = −2, −4, −6, … 이다. 임계 띠는 0 &lt; Re(s) &lt; 1이다.</p>
               <div class="formula" role="math" aria-label="크사이 s는 이분의 일 곱하기 s 곱하기 s 빼기 일 곱하기 파이의 마이너스 s 나누기 이 제곱 곱하기 감마 s 나누기 이 곱하기 제타 s. 크사이 s는 크사이 일 빼기 s와 같습니다."><span>ξ(s)</span><span class="op">=</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>s(s−1)</span><span>π<sup>−s/2</sup></span><span>Γ(s/2)</span><span>ζ(s),</span><span>ξ(s) = ξ(1−s)</span></div>
+            </div>
+            <p>왜 하필 1/2인가. 함수방정식과 켤레 대칭이 영점을 1/2을 기준으로 거울처럼 짝지어 놓기 때문이다. 어떤 영점이 1/2에서 왼쪽으로 0.1만큼 떨어져 있으면, 오른쪽으로 0.1만큼 떨어진 곳에도 반드시 영점이 있다. 그래서 "왼쪽에 없다"를 증명하면 "오른쪽에도 없다"가 따라온다. 리만이 던진 질문은 절반만 증명하면 끝나는 질문이었던 셈이다.</p>
+            <p>수조 개가 넘는 영점이 계산으로 확인되었고, 확인한 범위에서는 전부 그 선 위에 있었다. 그러나 유한한 확인은 증명이 아니다. 선 위에서 하나라도 벗어난 영점이 어딘가에 있으면, 가설이 주는 소수 분포의 오차 보증도 성립하지 않는다.</p>
+          </article>
+          <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
+            <p class="only-intuition">종을 상상해 보자. 종을 한 번 치면 소리는 하나지만, 그 안에는 여러 배음이 섞여 있다. 종의 모양에 따라 어떤 배음이 얼마나 세게 울리는지가 달라진다. 이 비유에서 계단의 흔들림은 하나의 소리이고, 영점은 그 소리를 이루는 배음이다. 실제로는 영점의 높이가 로그 눈금에서 파동의 주파수를, 실수부가 파동이 커지는 속도를 정한다. 리만 가설은 이 종의 모든 배음이 같은 방식으로 커진다고 말한다.</p>
+            <div class="only-math">
+              <div class="formula" role="math" aria-label="엔 티는 티를 이 파이로 나눈 값에 그 로그를 곱한 뒤 티를 이 파이로 나눈 값을 빼고 로그 티 크기의 오차를 더한 값이다."><span>N(T)</span><span class="op">=</span><span class="frac"><span class="frac__num">T</span><span class="frac__den">2π</span></span><span>log(T/2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">T</span><span class="frac__den">2π</span></span><span class="op">+</span><span>O(log T)</span></div>
+              <p>영점 개수의 점근식은 리만–폰 망골트 공식이다. 제타 급수의 계수가 실수이므로 해석적 연속에서도 켤레 대칭 ζ(s̄) = conj ζ(s)가 따라오고, 영점은 켤레쌍으로 나타난다. 함수방정식 대칭 s ↔ 1−s와 켤레 대칭을 합치면, 임계선을 벗어난 영점은 네 개씩(ρ, ρ̄, 1−ρ, 1−ρ̄) 묶여 나타난다. 그래서 σ &gt; 1/2인 영점이 없음을 보이는 것만으로 충분하다.</p>
             </div>
           </article>
           <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
             <p class="label">S3</p><h3>매끄러운 직선에서 파동을 빼면</h3>
-            <p>ψ(x) = x − Σ_ρ x^ρ/ρ − ln 2π − ½ ln(1 − x⁻²). 영점 하나가 사인파 하나다. 주파수는 γ, 진폭은 x^σ. 영점을 더할수록 계단의 모서리가 살아난다.</p>
+            <p>명시적 공식은 이 글에서 가장 아름다운 부분이다. 소수의 계단을 매끄러운 직선과 영점마다 하나씩 있는 파동, 그리고 작은 보정항으로 쪼갠다. 직선은 x다. 파동의 항은 x^ρ/ρ 꼴이고, ρ가 영점이다. 복소수를 지수로 올리면 회전이 되므로, 켤레 영점 한 쌍을 묶으면 로그 눈금 위를 도는 사인파 하나가 된다.</p>
+            <div class="formula" role="math" aria-label="리만 명시적 공식. 좌우 극한을 평균한 프사이 x는 x 빼기 영점에 대한 x의 로 제곱 나누기 로의 합, 빼기 로그 2파이, 빼기 2분의 1 로그 1 빼기 x의 마이너스 2제곱."><span>ψ<sub>0</sub>(x)</span><span class="op">=</span><span>x</span><span class="op">−</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">ρ</span></span><span class="frac"><span class="frac__num">x<sup>ρ</sup></span><span class="frac__den">ρ</span></span><span class="op">−</span><span>ln(2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>ln(1 − x<sup>−2</sup>)</span></div>
+            <p>임계선 위 영점의 거듭제곱에서 실수부만 남기면, 로그 눈금에서 흔들리는 코사인 파동이 된다. 주파수는 γ, 진폭은 √x에 비례한다. γ가 클수록 촘촘하게 흔들리고, x가 커질수록 크게 흔들린다. 켤레쌍 <span data-fact="lab.zeroCount">60</span>개를 더하면 <span data-fact="lab.zeroCount">60</span>개의 파동이 겹친다. 실험대의 스펙트럼 막대 하나가 이 파동 하나를 나타낸다.</p>
+          </article>
+          <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
+            <p>겹친 파동은 여러 구간에서 서로를 상쇄한다. 주파수가 제각각이라 어느 지점에서든 부호가 뒤섞인다. 소수의 거듭제곱 근처에서는 파동의 합이 눈에 띄게 달라져 계단이 ln p만큼 올라가는 모양을 되살린다. 더 많은 영점을 넣으면 점프 근처의 전이가 좁아지고, 모서리가 더 날카로워진다.</p>
+            <p>실험대에서 N을 1에서 15로 올리면 계단과의 평균제곱근 오차가 <span data-fact="lab.rms.0">1.34</span>에서 <span data-fact="lab.rms.1">0.89</span>로 줄고, <span data-fact="lab.zeroCount">60</span>으로 올리면 <span data-fact="lab.rms.2">0.63</span>까지 내려간다. 반대로 N=1이면 파동 하나가 계단 전체를 흉내 내려다 실패하는 모습이 그대로 보인다. 낮은 음 하나로는 화음을 만들 수 없다.</p>
             <div class="only-math">
               <p>폰 망골트 명시적 공식. 합은 비자명 영점 전체. 계단의 점프 앞에서 근사는 링잉을 보이며, N을 늘리면 좁아진다.</p>
-              <div class="formula" role="math" aria-label="리만 명시적 공식. 프사이 x는 x 빼기 영점에 대한 x의 로 제곱 나누기 로의 합, 빼기 로그 2파이, 빼기 2분의 1 로그 1 빼기 x의 마이너스 2제곱."><span>ψ(x)</span><span class="op">=</span><span>x</span><span class="op">−</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">ρ</span></span><span class="frac"><span class="frac__num">x<sup>ρ</sup></span><span class="frac__den">ρ</span></span><span class="op">−</span><span>ln(2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>ln(1 − x<sup>−2</sup>)</span></div>
+              <div class="formula" role="math" aria-label="로의 실수부가 이분의 일이면 엑스의 로 제곱은 엑스의 제곱근에 감마 로그 엑스의 코사인 더하기 아이 곱하기 감마 로그 엑스의 사인을 곱한 값이다."><span>x<sup>ρ</sup></span><span class="op">=</span><span>√x · (cos(γ ln x) + i sin(γ ln x)),</span><span>(ρ = 1/2 + iγ)</span></div>
+            </div>
+          </article>
+          <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
+            <p>여기서 리만 가설이 다시 등장한다. 파동의 진폭은 x^σ에 비례한다. σ가 1/2이면 진폭이 √x에 비례하고, 계단 높이 x에 비해 상대적으로 점점 작아진다. σ가 1/2보다 크면 진폭이 √x보다 빠르게 자란다. 실험대에서 영점 하나를 선 밖으로 밀어내면 그 파동의 몫이 다른 파동에 비해 점점 커진다.</p>
+            <p class="only-intuition">오케스트라를 상상해 보자. 악기가 저마다 다른 음을 내면 소리가 겹치고, 어떤 순간에는 파동의 마루가 포개져 소리가 커진다. 소수 계단의 점프를 되살리는 파동의 합을 이렇게 상상해 볼 수 있다. 실제로는 음파 대신 영점별 항을 더하며, 소수 거듭제곱에서는 점프 양쪽 높이의 평균값으로 수렴한다.</p>
+            <div class="only-math">
+              <p>켤레쌍을 묶으면 항 하나가 실수 함수가 된다. 아래 노트에서 ρ = σ + iγ, u = ln x일 때의 기여를 볼 수 있다. γ가 큰 영점일수록 진폭이 작다. 스펙트럼에서 낮은 γ의 막대가 큰 이유가 이것이다.</p>
+              <div class="formula" role="math" aria-label="진폭은 이 곱하기 엑스의 시그마 제곱을 시그마 제곱과 감마 제곱의 합의 제곱근으로 나눈 값이다. 위상은 아크탄젠트 투 감마, 시그마다."><span>A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ<sup>2</sup> + γ<sup>2</sup>)</span></span><span>φ = atan2(γ, σ)</span></div>
+              <p>점프에서 명시적 공식의 값은 좌우 극한의 평균이다. 유한한 N에서 근사는 점프 앞에서 링잉을 보이고, N을 늘리면 링잉의 폭이 좁아지지만 초과 진폭은 완전히 사라지지 않는다. 이것은 푸리에 급수의 깁스 현상과 같은 성질이다.</p>
             </div>
           </article>
           <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
             <p class="label">S4</p><h3><span class="only-intuition">1/2</span><span class="only-math">Re(s) = 1/2</span>의 의미</h3>
-            <p>리만 가설은 진폭에 대한 주장이다. 모든 비자명 영점의 실수부가 1/2이면 파동의 진폭은 √x로 얌전하다. 계단 높이 x에 묻혀, 합주가 유지된다. 1/2을 벗어나면 이야기가 달라진다. 영점 하나만 밀어내도 그 악기만 볼륨이 폭주한다.</p>
+            <p>리만 가설은 파동의 진폭을 묶는 주장이다. 모든 비자명 영점의 실수부가 1/2이면 각 파동의 진폭은 √x에 비례한다. 이때 계단 전체의 오차는 √x에 로그 보정이 곱해진 크기로 제한된다.</p>
             <div class="only-math">
               <div class="formula" role="math" aria-label="리만 가설은 모든 비자명 영점의 실수부가 이분의 일이라는 뜻입니다. 이는 프사이 및 소수 계수 함수의 오차 상한과 동치입니다."><span>RH: 모든 비자명 영점 ρ에 대해 Re(ρ) = 1/2</span><span>RH ⇔ ψ(x) = x + O(√x log²x)</span><span>RH ⇔ π(x) = Li(x) + O(√x log x)</span></div>
             </div>
-            <p class="model-limit">이 실험실은 ζ를 다시 계산하지 않습니다. 고정된 γ에 σ만 바꾼 가상의 영점 모형입니다. 한 영점과 그 켤레만 옮기면 실제 ζ 영점의 함수방정식 대칭을 충족하지 않습니다.</p>
+            <p>왜 1/2이 한계인가. 첫 번째 영점이 만드는 파동의 진폭이 이미 √x에 비례한다. 영점이 존재하는 이상 오차의 성장 지수를 1/2보다 더 낮게 묶을 수는 없다. 리만 가설은 오차의 성장 지수가 그 한계에 머문다고 말한다.</p>
+          </article>
+          <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
+            <p>1/2을 벗어나면 어떻게 되는가. 진폭이 x^σ에 비례해 자라므로 오차가 √x에 로그 보정을 붙인 규모를 넘어서는 구간이 생긴다. 계단의 상대 오차는 여전히 작아질 수 있지만, 절대 오차를 그 규모 안에 가둘 수는 없다. 지금 우리가 아는 무조건부 오차 한계는 √x에 로그 보정을 붙인 한계보다 훨씬 크다. 리만 가설을 증명한다는 것은 그 간격을 좁힌다는 뜻이다.</p>
+            <p class="model-limit">실험대는 ζ를 다시 계산하지 않는다. 고정된 γ에 σ만 바꾼 모형이다. x가 100까지인 이 창에서는 σ를 0.85로 밀어도 계단이 무너지는 것처럼 보이지 않는다. 차이는 √x와 x^0.85의 거리가 x와 함께 벌어지면서 드러난다. 화면에서 보이는 것은 그 차이의 시작점이다.</p>
+          </article>
+          <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
+            <p class="only-intuition">합주를 상상해 보자. 지휘자는 모든 악기가 같은 방식으로 커지기를 요구한다. 하나가 더 빠르게 커지면 연주가 계속될수록 그 악기가 더 두드러진다. 비유에서 악기의 음량은 실제로 영점 하나가 만드는 파동의 진폭이다. 리만 가설은 모든 영점에서 진폭의 성장 지수가 같다고 말한다. 수조 개가 넘는 영점이 그 조건을 지켰지만, 확인한 것과 증명한 것은 다르다.</p>
+            <div class="only-math">
+              <p>동치 관계의 방향도 정확히 알아 둘 만하다. RH에서 위 두 오차 한계가 따르는 것은 폰 코흐(1901)의 정리다. 역으로 그 정도의 오차 한계가 성립하면 모든 영점의 실수부가 1/2이므로, 두 명제는 동치다. 영점 없는 영역에서 얻는 고전적인 무조건부 오차 한계는 x exp(−c√(log x)) 꼴이고, √x에 로그를 곱한 한계와는 거리가 멀다. RH는 또한 (x, x + C√x log^2 x) 구간에 소수가 있음을 보장한다. 간격에 대한 보증이 곧 소수 분포에 대한 보증이다.</p>
+              <p>모형에서 한 영점과 그 켤레만 옮기면 실제 ζ 영점의 함수방정식 대칭을 충족하지 않는다.</p>
+            </div>
           </article>
         </div>
       </div>
       <details class="note lab-note" open>
         <summary>영점 하나가 악기 하나</summary>
-        <p class="only-intuition">오케스트라를 떠올려 보자. 영점 하나가 악기 하나다. 음높이는 γ, 음량이 커지는 속도는 σ. 모든 악기가 √x만큼만 커져야 계단이라는 합주가 유지된다. 하나라도 더 크게 커지면, 그 음이 합주를 덮는다.</p>
+        <p class="only-intuition">오케스트라를 상상해 보자. 영점 하나가 악기 하나다. 음높이는 파동의 주파수, 음량이 커지는 속도는 진폭이 커지는 속도에 해당한다. 음량이 더 빨리 커지는 악기가 있으면 연주가 계속될수록 더 두드러진다. 진폭에는 영점의 높이도 들어간다. 높이가 큰 영점은 같은 조건에서 처음부터 작게 울린다. 그래서 스펙트럼에서 왼쪽의 낮은 음들이 더 크게 보인다.</p>
         <div class="only-math">
           <p>영점 하나가 악기 하나다.</p>
           <div class="formula" role="math" aria-label="켤레 영점의 기여를 합치면 2 곱하기 x의 시그마 제곱 곱하기 시그마 코사인 감마 u 더하기 감마 사인 감마 u를 시그마 제곱 더하기 감마 제곱으로 나눈 값입니다.">
@@ -216,7 +281,7 @@
           <div class="formula" role="math" aria-label="진폭은 2 곱하기 x의 시그마 제곱을 시그마 제곱 더하기 감마 제곱의 제곱근으로 나눈 값입니다. 위상은 atan2 감마, 시그마입니다.">
             <span>켤레쌍의 합</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ² + γ²)</span></span><span>· cos(γu − φ), φ = atan2(γ, σ)</span><span>진폭 A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ<sub>k</sub></sup></span><span class="frac__den">√(σ<sub>k</sub>² + γ<sub>k</sub>²)</span></span>
           </div>
-          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 x<sup>σ</sup>가 계단 높이 x를 따라잡는다.</p>
+          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 진폭은 x^σ/|ρ|에 비례해 자라며, 충분히 큰 x에서 √x의 오차 예산을 넘어선다.</p>
         </div>
       </details>
       <p class="page-num" aria-hidden="true">— 2 —</p>
@@ -229,7 +294,9 @@
           <div class="seam__copy">
             <p class="label">SEAM · 1859 → 2026</p>
             <h2 id="seamTitle">여덟 쪽에서<br>1,740만 줄로</h2>
-            <p>1859년의 논문은 여덟 쪽이었다. 2026년 11월, 같은 정리의 Lean 증명은 <span data-fact="proof.files">175,187</span>개 파일, <span data-fact="proof.lines">17,374,215</span>줄이었다. 사람이 읽는 형태와 기계가 검사하는 형태의 거리다.</p>
+            <p>1859년의 논문은 여덟 쪽이었다. 2026년 11월, 같은 문제를 다룬 Lean 증명은 <span data-fact="proof.files">175,187</span>개 파일, <span data-fact="proof.lines">17,374,215</span>줄이었다.</p>
+            <p>두 문서는 같은 질문을 다루지만 다른 독자를 향한다. 논문은 사람에게 말을 건다. 독자가 따라오는지 확인하며, 비약을 설명으로 메우고, 왜 이 단계가 필요한지 설득한다. Lean 파일은 검사기에게 말을 건다. 증명의 각 항이 어떤 타입을 갖는지, 맞는지는 검사기가 계산한다.</p>
+            <p>60줄을 한 쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽, 종이 0.1mm로 쌓으면 약 <span data-fact="stackMeters">29</span>m다. 다만 방향은 분명하다. 검사 가능한 지식의 부피가, 읽을 수 있는 지식의 부피보다 훨씬 빠르게 커지고 있다.</p>
           </div>
           <div class="seam__visual js-only" aria-hidden="true">
             <div class="seam__layer" data-layer="paper">
@@ -250,7 +317,7 @@
               <small>60줄/쪽으로 환산한 분량</small>
             </div>
           </div>
-          <p class="seam__detail">쪽수와 코드 줄 수는 단위가 다르다. 배율에 수학적 의미는 없다. 다만 60줄을 한 쪽으로 치면 <span data-fact="pagesEquivalent">289,570</span>쪽, 종이 0.1mm로 쌓으면 약 <span data-fact="stackMeters">29</span>m다. 두께로만 비교한 어림이다.</p>
+          <p class="seam__detail">쪽수와 코드 줄 수는 단위가 다르다. 배율에 수학적 의미는 없다. 두께로만 비교한 어림이다.</p>
         </div>
       </div>
     </section>
@@ -270,25 +337,36 @@
           <div><dt>정리</dt><dd data-fact="proof.theorems">5</dd></div>
           <div><dt>소스</dt><dd data-fact="proof.sourceBytes" data-format="gb">1.03GB</dd></div>
         </dl>
-        <figcaption><span data-fact="proof.theorems">5</span>개 정리 = 리만 가설 + 디리클레 L-함수에 대한 일반화 리만 가설(GRH).</figcaption>
+        <figcaption><span data-fact="proof.theorems">5</span>개 정리 가운데 리만 가설과, 디리클레 L-함수에 대한 일반화 리만 가설(GRH)이 포함된다.</figcaption>
       </figure>
 
       <div class="article-grid">
         <div class="prose page">
           <p>하루 뒤 Lean FRO와 Mathlib 이니셔티브가 공동 성명을 냈다. 명제와 증명 모두 옳다고 인증했다. 그 뒤 며칠 동안 독립 커널들이 같은 증명 수출 파일을 다시 읽었다. <span data-fact="proof.exportBytes" data-format="gb">61.57GB</span>짜리 파일 하나를, 서로 다른 프로그램들이 같은 결론으로 통과시켰다.</p>
           <p>자연어 논문은 읽다가 비약을 눈으로 넘긴다. Lean은 명제를 타입으로, 증명을 그 타입의 항으로 다룬다. 커널이 타입을 통과시키면, 그 명제는 참이다. 1,740만 줄을 읽는 대신, 몇천 줄짜리 커널을 믿고 그 위에 명제를 세우는 것이다.</p>
+          <h3>Lean은 무엇인가</h3>
+          <p>Lean은 수학을 위한 프로그래밍 언어다. 여기서는 증명을 적어서 검사받는 언어로 쓴다. Lean으로 정리를 적으면 그 정리는 타입이 된다. 증명은 그 타입을 가진 값이 된다. 프로그램이 컴파일되는 대신 증명이 타입 검사를 통과한다. 타입이 맞지 않으면 증명으로 받아들여지지 않는다.</p>
+          <p>검사를 하는 프로그램을 커널이라고 부른다. Lean 4의 커널은 몇천 줄 규모의 작은 프로그램이다. 이 작은 프로그램이 <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄에서 만들어진 증명 항을 검사한다. 각 선언이 어떤 타입을 갖는지, 그 타입이 앞선 선언들과 규칙에 맞게 엮였는지만 확인한다. 커널은 리만 가설이 무엇인지 모른다. 그래도 된다. <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄은 신뢰하지 않는 입력이고, 신뢰하는 것은 커널과 사용한 공리이기 때문이다.</p>
+          <h3>비워 둔 자리</h3>
+          <p>증명 중간에 "여기는 나중에 채우겠다"고 비워 두는 표시가 있다. Lean에서는 <code>sorry</code>라고 쓴다. 정리의 증명이 <code>sorry</code>에 의존하면 빈 부분은 가정으로 남는다. 검사기는 통과시키지만 통과의 의미가 달라진다. 이 증명에는 <code>sorry</code>가 <span data-fact="proof.sorry">0</span>개, <code>admit</code>이 <span data-fact="proof.admit">0</span>개다. 새로 들여온 공리도 <span data-fact="proof.extraAxioms">0</span>개다. 표준 공리 세 개만 쓴다. 명제 외연성, 선택, 몫.</p>
+          <h3>신뢰의 피라미드</h3>
+          <p>이 구조를 신뢰의 피라미드라고 부를 수 있다. 맨 아래에 작은 커널이 있고, 그 위에 거대한 라이브러리가 있다. 위층은 얼마든지 틀릴 수 있다. 타입이 맞지 않는 선언은 커널에서 걸린다. 그래서 <span data-fact="proof.files">175,187</span>개 파일을 사람이 읽지 않아도 된다. <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄을 읽는 대신, 몇천 줄짜리 커널과 공리를 믿고 그 위에 명제를 세우는 것이다.</p>
           <aside class="warning">
             <h3>형식 검증이 보증하지 않는 것</h3>
             <p>2026년 9월 8일 OpenAI가 나비에–스토크스의 유한 시간 폭발을 증명했다고 발표했을 때, 10월 KCL과 케임브리지 연구진은 Lean 번역본이 원 논문과 다른 조건을 쓴다고 지적했다. 논문의 Lemma 8.6은 m+4 도함수를 요구하는데, Lean 코드는 m+5를 요구했다. 더 약한 명제를 증명한 셈이다. 코드가 컴파일된다는 것과, 그 코드가 우리가 말하는 정리를 증명한다는 것은 다른 문제다.</p>
+            <p>이것이 형식 검증의 진짜 병목이다. 증명을 검사하는 일은 자동화되었다. <strong>명제가 우리가 말하는 명제인지 확인하는 일</strong>은 아직 사람의 몫이다. 번역이 틀리면 검증은 완벽하게 통과하면서 다른 정리를 증명한다.</p>
           </aside>
           <p>그래서 리만 건에서는 두 가지를 따로 확인했다. 코드가 증명한 명제가 Mathlib의 리만 가설과 같은가(comparator), 그 코드가 정말 그 명제를 증명하는가(커널).</p>
         </div>
         <details class="note" open>
           <summary>타입 검사</summary>
-          <p class="only-intuition">증명을 코드로 쓴다는 건, 논리의 모든 디딤돌에 ‘이건 맞아’ 도장을 찍어 달라는 뜻이다. 사람이 읽는 논문은 비약을 눈으로 넘기지만, 타입 검사기는 넘기지 않는다. 그래서 1,740만 줄이어도 “맞다”고 말할 수 있다.</p>
+          <p class="only-intuition">증명을 코드로 쓴다는 건, 논리의 모든 디딤돌에 "이건 맞아" 도장을 찍어 달라는 뜻이다. 사람이 읽는 논문은 비약을 눈으로 넘긴다. "자명하다", "일반성을 잃지 않고", "독자가 쉽게 확인할 수 있다" 같은 문장이 그 자리를 지나간다. 타입 검사기는 그런 문장을 읽지 않는다. 검사할 항이 없으면 멈춘다. 그래서 <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄이어도 검사가 가능하다. 대신 그 <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄을 사람이 읽기는 어렵다.</p>
+          <p class="only-intuition">공증인을 상상해 보자. 공증인은 계약이 유리한지 불리한지 판단하지 않는다. 서명이 진짜인지, 날인이 제대로 찍혔는지만 확인한다. 이 비유에서 공증인 역할을 하는 커널은 실제로 증명의 타입을 검사한다. 그래서 계약서에 무엇이 적혔는지 확인하는 일은 따로 필요하다. 나비에–스토크스 사건이 그랬다.</p>
           <div class="only-math">
             <p>커리–하워드 대응: 명제 = 타입, 증명 = 그 타입의 항. 가정 <code>h : a = b</code>는 “a = b의 증명”을 담은 변수다. <code>exact hab</code>는 요구된 타입의 항을 내놓는 일이고, 타입이 어긋나면 커널이 거부한다. 검증은 “읽어서 납득”이 아니라 “타입이 맞는지 계산”이다.</p>
             <div class="formula" role="math" aria-label="명제와 타입이 대응합니다. 증명과 그 타입의 항이 대응합니다."><span>명제 ↔ 타입</span><span>증명 ↔ 그 타입의 항</span></div>
+            <p>커널이 검사하는 것은 타입 검사다. Lean 4의 기반은 의존 타입 이론이고, 커널은 각 선언의 타입이 정의적 동등성(definitional equality)까지 포함해 맞는지 계산한다. <code>rw [h]</code>는 등식 h로 목표를 다시 쓰는 전술이고, <code>exact t</code>는 t의 타입이 목표와 정의적으로 같을 때 통과한다. <code>exact h</code>가 거부되는 이유는 h의 타입 <code>a = b</code>와 목표 <code>0 &lt; a</code>가 같지 않기 때문이며, 오류 메시지의 "type mismatch"가 그것이다.</p>
+            <p>검증 대상 명제는 Mathlib의 <code>RiemannHypothesis</code> 정의와 비교한다(comparator). 증명이 그 정의와 정의적으로 같은 명제를 세우는지, 그리고 그 증명이 실제로 그 명제의 항인지를 따로 확인하는 구조다. 커널이 통과해도 명제가 다르면 소용이 없고, 명제가 같아도 커널이 통과하지 못하면 소용이 없다.</p>
           </div>
         </details>
       </div>
@@ -304,6 +382,14 @@
         </div>
         <figcaption>① 코드가 증명한 명제가 우리가 말하는 그 정리인가<br>② 그 코드가 정말 그 명제를 증명하는가</figcaption>
       </figure>
+
+      <div class="prose page">
+        <h3>1,740만 줄은 무엇으로 되어 있나</h3>
+        <p><span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄은 어떤 모양인가. 대부분은 정의와 보조 정리다. 제타 함수를 정의하고, 해석적 연속을 구성하고, 감마 함수의 성질을 옮기고, 명시적 공식을 증명하고, 마지막에 리만 가설을 조립한다. 상당 부분은 이미 있는 정리와 정의를 형식 언어로 옮긴 결과다. 알푀게는 사람을 위한 글로 풀면 <span data-fact="proof.humanReadablePages" data-format="tenThousands">25</span>만 쪽이 넘을 것으로 추정했다. 옮기는 일에는 기계가 쓰였고, 옮긴 증명이 형식 규칙에 맞는지는 검사기가 확인한다.</p>
+        <h3>미니 Lean 안내</h3>
+        <p>아래 상자는 그 과정을 세 번의 클릭으로 옮겨 놓은 재현이다. 처음 상태에서 목표는 <code>a = b → 0 &lt; b → 0 &lt; a</code>다. 화살표는 "이것이 주어지면 저것을 보여라"라는 뜻이므로, 가정이 두 개 쌓여 있다. <code>intro h hab</code>는 그 두 가정을 꺼내 이름을 붙인다. h는 <code>a = b</code>의 증명, hab은 <code>0 &lt; b</code>의 증명이다. Goal 창이 바뀌는 것이 이 동작의 전부다.</p>
+        <p><code>rw [h]</code>는 h를 써서 목표를 다시 쓴다. a = b이므로 목표의 a를 b로 바꿀 수 있고, 목표는 <code>0 &lt; b</code>가 된다. 마지막으로 <code>exact hab</code>는 <code>0 &lt; b</code>의 증명을 그대로 내놓는다. 목표와 타입이 같으니 통과한다. 일부러 틀린 버튼도 있다. <code>intro h hab</code> 직후 <code>exact h</code>를 누르면 거부가 표시된다. h는 <code>a = b</code>의 증명인데 요구된 타입은 <code>0 &lt; a</code>이기 때문이다. 통과와 거부 사이에 해석의 여지가 없다.</p>
+      </div>
 
       <section id="lean" class="lean plate" data-lean-view="code" aria-labelledby="leanTitle">
         <header class="lean__head">
@@ -361,8 +447,12 @@ theorem wave_balance (a b : ℝ) :
       <p class="label">4막 · 변곡점</p>
       <h2 id="act4Title" class="end-quote">증명은 끝났고,<br><em>이해</em>는 이제 시작이다.</h2>
       <div class="prose page">
-        <p>1859년의 여덟 쪽은 사람이 읽고 이해할 수 있었다. 2026년의 1,740만 줄은 아니다. 알푀게 자신도, 이 증명을 사람이 읽을 수 있는 글로 옮기면 25만 쪽이 넘을 것이라고 적었다. 지금 수학자들은 AI를 동원해 그 코드를 거꾸로 해독하며, 왜 맞는지를 다시 쓰고 있다.</p>
-        <p>종이와 연필만 있으면 누구나 같은 출발선에 선다는 것이 수학의 오랜 자부심이었다. 이제 그 출발선은 어떤 모델과 얼마의 연산에 닿아 있느냐가 바꾼다. 다만 결승선은 아직 열려 있다. 기계가 내놓은 답을 이해하는 일은 여전히 사람의 몫이다.</p>
+        <p>1859년의 여덟 쪽은 사람이 읽고 이해할 수 있었다. 2026년의 <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄은 아니다. 알푀게 자신도, 이 증명을 사람이 읽을 수 있는 글로 옮기면 <span data-fact="proof.humanReadablePages" data-format="tenThousands">25</span>만 쪽이 넘을 것이라고 적었다. 지금 수학자들은 AI를 동원해 그 코드를 거꾸로 해독하며, 왜 맞는지를 다시 쓰고 있다.</p>
+        <p>수학의 오랜 자부심은 입장료가 없다는 것이었다. 종이와 연필, 그리고 시간. 그것만 있으면 누구나 같은 출발선에 설 수 있었다. 실력의 차이는 있었지만 출발선의 차이는 없었다. 1859년의 리만도, 그 논문을 처음 펼친 대학원생도 같은 여덟 쪽을 손에 들고 시작했다.</p>
+        <p>2026년의 출발선은 다르다. <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄을 검사하려면 검사기를 돌릴 기계가 필요하고, 그 검사기를 믿을 근거가 필요하고, 애초에 그 증명을 만들어 낼 모델에 접근할 수 있어야 한다. 수학은 이제 연산과 모델에 닿아 있는 사람과 그렇지 않은 사람을 나눈다. 이것이 이 사건의 실제 변곡점이다. 증명이 기계로 넘어간 것이 아니라, 증명을 만들고 확인하는 입구가 기계 뒤에 숨은 것이다.</p>
+        <p>그렇다고 결승선이 닫힌 것은 아니다. 기계가 내놓은 것은 답이지 이해가 아니다. <span data-fact="proof.humanReadablePages" data-format="tenThousands">25</span>만 쪽짜리 증명은 다음 정리를 낳지 못한다. 왜 그런지 모르면 일반화할 수 없고, 일반화하지 못하면 새로운 질문을 만들 수 없다. 수학의 진보는 정리의 목록이 아니라 정리 사이를 잇는 이해에서 온다. 그 이해는 아직 사람의 몫이다.</p>
+        <p>지금 수학자들이 하는 일이 그것이다. <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄을 읽는 대신, 그 코드가 어떤 아이디어로 조립되었는지 역으로 추적한다. 증명을 사람이 읽을 수 있는 서사로 다시 쓰는 작업이고, 어쩌면 원래의 논문이 하려던 일을 167년 만에 다시 하는 일이다.</p>
+        <p>리만이 1859년에 남긴 것은 답이 아니라 질문이었다. 기계가 그 질문에 답을 붙였다. 이제 우리가 할 일은 그 답을 읽는 것이다. 여덟 쪽을 읽는 데 하루가 걸렸다면, <span data-fact="proof.lines" data-format="roundedTenThousands">1,740</span>만 줄을 읽는 데는 아마 한 세대가 걸릴 것이다.</p>
       </div>
       <p class="endmark">— 167년, 종이 여덟 쪽에서 코드 1,740만 줄까지.</p>
       <p class="page-num" aria-hidden="true">— 4 —</p>

@@ -93,6 +93,8 @@ function renderFacts() {
   const formats = {
     gb: value => `${(value / 1e9).toFixed(2)}GB`,
     length: value => formatInt(value.length),
+    tenThousands: value => formatInt(Math.floor(value / 10000)),
+    roundedTenThousands: value => formatInt(Math.round(value / 100000) * 10),
     date: value => {
       const [year, month, day] = value.split('-');
       return `${year}년 ${Number(month)}월 ${Number(day)}일`;

@@ -10,7 +10,7 @@
   --p-pencil: #6B6A5C;
   --p-rule: #C9C4B0;
 }
-html { --font-sans: "Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif; --font-serif: "Noto Serif KR", "MaruBuri", serif; --font-mono: "JetBrains Mono", "Pretendard Variable", monospace; }
+:root { --font-sans: "Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif; --font-serif: "Noto Serif KR", "MaruBuri", serif; --font-mono: "JetBrains Mono", "Pretendard Variable", monospace; }
 html[data-era="paper"] {
   --c-bg: var(--p-base);
   --c-surface: var(--p-surface);

@@ -808,12 +808,16 @@ export function initLab(root = document) {
     if (Number.isFinite(targetCount) && Number.isFinite(targetSigma)) animateTo(targetCount, targetSigma, sigmaMode);
   }
 
+  let activeStep;
   const stepObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       for (const step of steps) step.classList.toggle('is-active', step === entry.target);
-      if (plate) plate.dataset.highlight = entry.target.dataset.step;
-      if (!isDragging) applyStep(entry.target);
+      const stepNumber = entry.target.dataset.step;
+      if (plate) plate.dataset.highlight = stepNumber;
+      // Continuations share a preset and preserve adjustments made by the reader.
+      if (!isDragging && activeStep !== stepNumber) applyStep(entry.target);
+      activeStep = stepNumber;
     }
   }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 }) : null;
   if (stepObserver) for (const step of steps) stepObserver.observe(step);

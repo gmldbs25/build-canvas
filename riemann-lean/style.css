@@ -96,6 +96,8 @@ footer { position: relative; z-index: 1; }
 .riemann-quote cite { display: block; margin-top: 12px; font: 10px/1.5 var(--font-mono); }
 .riemann-quote small { font-size: 12px; }
 .prose p, .act p { font-size: 18px; line-height: 1.78; }
+.prose p, .lab-note p { margin-block: 1.1em; }
+.step > p:not(.label) { margin-block: 0 1.1em; }
 .act .label, .act .page-num { font-size: 11px; line-height: 1.4; }
 .act .note p { font-size: 14.5px; line-height: 1.65; }
 .page-num { text-align: center; font-family: var(--font-serif); font-style: italic; }
@@ -423,6 +425,8 @@ html.no-js h3 .only-math { display: inline !important; }
   .act h2, .prose h2 { font-size: 40px; }
   .prose { margin-left: 0; }
   .prose p, .act p { font-size: 17px; }
+  .step[data-step="3"] h3 { font-size: clamp(16px,4.4vw,18px); }
+  #act3 .prose > h3:first-child { font-size: clamp(18px,5.1vw,20px); }
   .fact-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   #sieve { gap: 3px; }
   #sieve > span { font-size: 10px; }
@@ -441,12 +445,14 @@ html.no-js h3 .only-math { display: inline !important; }
   .lean__code { border-right: 0; border-bottom: 1px solid var(--c-rule); font-size: 12.5px; line-height: 21px; }
   .lean[data-lean-view="goal"] .lean__code, .lean[data-lean-view="code"] .lean__info { display: none; }
   .lean__tabs { display: flex; gap: 6px; padding: 8px; border-bottom: 1px solid var(--c-rule); }
-  .seam__inner { display: block; padding-top: max(58px,9vh); }
+  .seam__inner { display: block; padding-top: clamp(24px,5svh,40px); }
   .seam__copy { max-width: 100%; }
-  .seam__visual { height: 38svh; min-height: 180px; margin-top: 16px; }
+  .seam__copy h2 { margin: 10px 0 12px; line-height: 1.12; }
+  .seam__copy > p:not(.label) { margin-block: .55em; font-size: 14px; line-height: 1.5; }
+  .seam__visual { height: min(27svh,235px); min-height: 160px; margin-top: 10px; }
   .seam__number .seam__counter { font-size: 32px; }
   .footer-grid { align-items: flex-start; flex-direction: column; }
-  .seam__detail { display: block; position: static; max-width: none; margin-top: 12px; }
+  .seam__detail { display: block; position: static; max-width: none; margin-top: 8px; font-size: 10px; line-height: 1.45; }
   #selftest { right: 8px; bottom: 8px; }
 }
 @media (max-width: 380px) {
