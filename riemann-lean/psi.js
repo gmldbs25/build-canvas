@@ -216,6 +216,7 @@ export function initLab(root = document) {
   const spectrumContributions = [];
   let previewIndex = null;
   let planePointer = null;
+  let rangePointer = null;
 
   let count = Math.max(1, Math.min(GAMMA.length, Number(nRange.value) || 15));
   const sigmaValues = new Float64Array(GAMMA.length);
@@ -226,7 +227,6 @@ export function initLab(root = document) {
   let activeTab = 'wave';
   let currentEra = document.documentElement.dataset.era || 'paper';
   let isInView = false;
-  let isDragging = false;
   let criticalSnap = false;
   let statusTimer = 0;
   let drawFrame = 0;
@@ -801,23 +801,29 @@ export function initLab(root = document) {
     tweenFrame = requestAnimationFrame(tick);
   }
 
+  let activeStep;
+  let appliedStepNumber;
+
   function applyStep(step) {
+    if (!step || rangePointer !== null || planePointer !== null) return;
+    const stepNumber = step.dataset.step;
+    // Continuations share a preset and preserve adjustments made by the reader.
+    if (appliedStepNumber === stepNumber) return;
     const targetCount = Number(step.dataset.n);
     const targetSigma = Number(step.dataset.sigma);
-    const sigmaMode = step.dataset.onlyZero === '0' || step.dataset.firstOnly === 'true' || step.dataset.step === '4' ? 'first' : 'all';
-    if (Number.isFinite(targetCount) && Number.isFinite(targetSigma)) animateTo(targetCount, targetSigma, sigmaMode);
+    if (!Number.isFinite(targetCount) || !Number.isFinite(targetSigma)) return;
+    const sigmaMode = step.dataset.onlyZero === '0' || step.dataset.firstOnly === 'true' || stepNumber === '4' ? 'first' : 'all';
+    appliedStepNumber = stepNumber;
+    animateTo(targetCount, targetSigma, sigmaMode);
   }
 
-  let activeStep;
   const stepObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
-      for (const step of steps) step.classList.toggle('is-active', step === entry.target);
-      const stepNumber = entry.target.dataset.step;
-      if (plate) plate.dataset.highlight = stepNumber;
-      // Continuations share a preset and preserve adjustments made by the reader.
-      if (!isDragging && activeStep !== stepNumber) applyStep(entry.target);
-      activeStep = stepNumber;
+      activeStep = entry.target;
+      for (const step of steps) step.classList.toggle('is-active', step === activeStep);
+      if (plate) plate.dataset.highlight = activeStep.dataset.step;
+      applyStep(activeStep);
     }
   }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 }) : null;
   if (stepObserver) for (const step of steps) stepObserver.observe(step);
@@ -837,9 +843,20 @@ export function initLab(root = document) {
     }, { signal });
   }
 
-  nRange.addEventListener('pointerdown', () => { isDragging = true; cancelTween(); }, { signal });
-  sigmaRange.addEventListener('pointerdown', () => { isDragging = true; cancelTween(); }, { signal });
-  window.addEventListener('pointerup', () => { isDragging = false; }, { signal });
+  for (const range of [nRange, sigmaRange]) {
+    range.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || event.button !== 0) return;
+      rangePointer = event.pointerId;
+      cancelTween();
+    }, { signal });
+  }
+  function finishRangeDrag(event) {
+    if (event.pointerId !== rangePointer) return;
+    rangePointer = null;
+    applyStep(activeStep);
+  }
+  window.addEventListener('pointerup', finishRangeDrag, { signal });
+  window.addEventListener('pointercancel', finishRangeDrag, { signal });
   nRange.addEventListener('input', () => {
     cancelTween();
     count = Number(nRange.value);
@@ -937,7 +954,6 @@ export function initLab(root = document) {
     selectedIndex = nearest;
     previewIndex = null;
     criticalSnap = sigmaValues[selectedIndex] <= 0.52;
-    isDragging = true;
     planePointer = event.pointerId;
     planeCanvas.setPointerCapture(event.pointerId);
     planeCanvas.setAttribute('data-dragging', '');
@@ -948,9 +964,9 @@ export function initLab(root = document) {
   }, { signal });
   planeCanvas.addEventListener('lostpointercapture', () => {
     planePointer = null;
-    isDragging = false;
     criticalSnap = false;
     planeCanvas.removeAttribute('data-dragging');
+    applyStep(activeStep);
     draw();
   }, { signal });
 

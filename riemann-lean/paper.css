@@ -171,3 +171,7 @@ html[data-era="paper"] .act { border-color: color-mix(in srgb,var(--p-pencil) 48
   #sieve > button:nth-child(10n+3)::after { left: 0; transform: none; }
   #sieve > button:nth-child(10n+8)::after { right: 0; left: auto; transform: none; }
 }
+
+@media (max-width: 359px) {
+  #sieve > button::after, .prime-gap::after { max-width: min(230px,calc(100vw - 120px)); }
+}

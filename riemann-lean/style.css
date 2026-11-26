@@ -496,3 +496,10 @@ html.no-js h3 .only-math { display: inline !important; }
   .chapters a[aria-current="location"], .mode, button, input { forced-color-adjust: auto; }
   #sieve > span, .sieve-layout, .step.is-active { border-color: CanvasText; }
 }
+@media (max-width: 899px) and (max-height: 700px) {
+  #seam { height: auto; }
+  .seam__sticky { position: relative; top: auto; height: auto; overflow: clip; }
+  .seam__inner { display: block; height: auto; padding: 24px 0; }
+  .seam__visual { height: min(27svh,235px); min-height: 160px; }
+  .seam__detail { position: static; max-width: none; margin-top: 8px; }
+}
