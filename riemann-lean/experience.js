@@ -448,17 +448,29 @@ function drawSieve(plate, phase, action = false) {
 function drawDensity(plate, phase, action = false) {
   for (const [index, limit] of [100, 1e6].entries()) {
     const revealed = index === 0 || phase;
+    const counting = index === 1 && revealed && action && allowsMotion();
     const row = make(plate, 'div', 'xp__density');
     make(row, 'span', '', fmt(limit) + '까지');
-    const ratio = revealed ? piExact(limit) / limit : 0;
-    make(row, 'b', '', revealed ? fmt(+(100 * ratio).toFixed(2)) + '%' : '?');
+    const count = revealed ? piExact(limit) : 0;
+    const percent = 100 * count / limit;
+    const value = make(row, 'b', '', revealed ? (counting ? '0.00' : fmt(+percent.toFixed(2))) + '%' : '?');
     const track = make(row, 'div', 'xp__track');
     if (revealed) {
       const bar = make(track, 'i');
-      bar.style.width = ratio * 100 + '%';
-      if (action && index === 1) bar.classList.add('is-revealing');
+      bar.style.width = percent + '%';
+      if (counting) {
+        const fill = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+          { duration: 600, easing: 'cubic-bezier(.2,.7,.15,1)', fill: 'both' });
+        function updatePercentage() {
+          if (!value.isConnected) return;
+          const progress = fill.effect.getComputedTiming().progress ?? 0;
+          value.textContent = (percent * progress).toFixed(2) + '%';
+          if (progress < 1) requestAnimationFrame(updatePercentage);
+        }
+        requestAnimationFrame(updatePercentage);
+      }
     }
-    make(row, 'small', '', revealed ? '소수 ' + fmt(piExact(limit)) + '개 / 전체 ' + fmt(limit) + '개' : '아직 세지 않은 범위');
+    make(row, 'small', '', revealed ? '소수 ' + fmt(count) + '개 / 전체 ' + fmt(limit) + '개' : '아직 세지 않은 범위');
   }
 }
 

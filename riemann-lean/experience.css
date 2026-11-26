@@ -108,9 +108,7 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__density { display: grid; grid-template-columns: 1fr auto; align-items: baseline; margin-bottom: 20px; }
 .xp__density b, .xp__balance-value b { color: var(--rubric); font: 500 clamp(32px,4.4vw,72px)/1.15 Georgia,serif; }
 .xp__track { grid-column: 1/-1; height: 22px; background: repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),var(--rule) calc(10% - 1px) 10%); border: 1px solid var(--rule); }
-.xp__track i { display: block; height: 100%; background: var(--rubric); }
-.xp__track i.is-revealing { transform-origin: left center; animation: xp-fill .6s cubic-bezier(.2,.7,.15,1) both; }
-@keyframes xp-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.xp__track i { display: block; height: 100%; background: var(--rubric); transform-origin: left center; }
 .xp__density small, .xp__fine { color: var(--muted); font-size: 12px; }
 .xp__plate svg { display: block; width: 100%; }
 .xp__plate svg text { fill: var(--muted); font: 11px var(--font-mono); }
@@ -165,5 +163,5 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__slider input { grid-column: 1 / -1; width: 100%; min-height: 44px; margin: 0; accent-color: var(--rubric); }
 @media (prefers-reduced-motion: reduce) {
   .xp__numbers .is-newly-erased::after, .xp__numbers .is-newly-circled::after,
-  .xp__track i.is-revealing, .xp__wave.is-drawing { animation: none; }
+  .xp__wave.is-drawing { animation: none; }
 }
