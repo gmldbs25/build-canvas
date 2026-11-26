@@ -13,6 +13,7 @@ const progress = [0, 0, 0, 0];
 const background = [...document.querySelectorAll('body > header, body > main, body > footer, body > .skip')];
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const fmt = value => value.toLocaleString('ko-KR');
+const allowsMotion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
 let initialized = false;
 let saved;
 let returning = false;
@@ -46,9 +47,8 @@ function setStep(step, { opening = false } = {}) {
   stepButtons.forEach((item, index) => item.setAttribute('aria-pressed', String(index + 1 === step)));
 
   if (changed || !xpBody.firstChild) {
-    renderStage();
-    xpBody.scrollTop = 0;
-    if (changed && !opening) xpBody.querySelector('h2').focus({ preventScroll: true });
+    renderStage(false, { transition: changed && !opening });
+    if (changed && !opening) xpBody.querySelector('.xp__spread:not(.is-exiting) h2').focus({ preventScroll: true });
   }
   syncStepUrl();
   if (changed && !opening) emitExperience(true);
@@ -184,7 +184,7 @@ export function initExperience() {
       progress[i]++;
       if (i === 2) state.waves = 60;
       if (i === 3) state.sigma = 0.9;
-      renderStage(true);
+      renderStage(true, { action: true });
     } else if (state.step === 4) closeExperience();
     else setStep(state.step + 1);
   });
@@ -371,11 +371,33 @@ const pages = [
   }
 ];
 
-function renderStage(announceChange = false) {
+function renderStage(announceChange = false, { transition = false, action = false } = {}) {
   const i = state.step - 1;
   const page = pages[i];
   const phase = progress[i];
-  xpBody.replaceChildren();
+  // A later chapter supersedes any unfinished transition. The current chapter
+  // becomes the outgoing layer and the new one is laid out immediately below it.
+  xpBody.querySelectorAll('.xp__spread.is-exiting').forEach(el => {
+    el.getAnimations().forEach(animation => animation.cancel());
+    el.remove();
+  });
+  const outgoing = transition && allowsMotion() ? xpBody.querySelector('.xp__spread') : null;
+  const exitBox = outgoing?.getBoundingClientRect();
+  const bodyBox = outgoing && xpBody.getBoundingClientRect();
+  const exitOpacity = outgoing && getComputedStyle(outgoing).opacity;
+  if (!outgoing) xpBody.replaceChildren();
+  else {
+    outgoing.getAnimations().forEach(animation => animation.cancel());
+    // Keep the outgoing content at the same viewport position when resetting
+    // a scrolled chapter, so the fade starts without a visible snap.
+    outgoing.style.setProperty('--exit-x', `${exitBox.left - bodyBox.left + xpBody.scrollLeft}px`);
+    outgoing.style.setProperty('--exit-y', `${exitBox.top - bodyBox.top}px`);
+    outgoing.style.setProperty('--exit-width', `${exitBox.width}px`);
+    outgoing.classList.add('is-exiting');
+    outgoing.inert = true;
+    outgoing.setAttribute('aria-hidden', 'true');
+  }
+  if (transition) xpBody.scrollTop = 0;
   const spread = make(xpBody, 'div', 'xp__spread');
   const words = make(spread, 'div', 'xp__words');
   make(words, 'p', 'xp__kicker', '관찰 ' + String(i + 1).padStart(2, '0') + '  /  ' + page.topic);
@@ -387,7 +409,20 @@ function renderStage(announceChange = false) {
   make(note, 'p', '', page.notes[phase]);
   const plate = make(spread, 'figure', 'xp__plate');
   make(plate, 'figcaption', '', page.figure);
-  page.render(plate, phase);
+  page.render(plate, phase, action);
+  if (action && allowsMotion()) {
+    note.animate([{ opacity: 0.5 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+  }
+  if (outgoing) {
+    outgoing.animate([
+      { opacity: exitOpacity, transform: 'translateY(0)' },
+      { opacity: 0, transform: 'translateY(-8px)' }
+    ], { duration: 190, easing: 'ease-out' }).onfinish = () => outgoing.remove();
+    spread.animate([
+      { opacity: 0, transform: 'translateY(9px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ], { duration: 250, easing: 'ease-out' });
+  }
   previous.disabled = !phase && !i;
   previous.textContent = phase ? '↶ 한 번 되돌리기' : '← 이전 관찰';
   next.textContent = (page.actions[phase] || page.forward) + ' →';
@@ -395,18 +430,22 @@ function renderStage(announceChange = false) {
   if (announceChange) document.getElementById('xpAnnounce').textContent = page.notes[phase];
 }
 
-function drawSieve(plate, phase) {
+function drawSieve(plate, phase, action = false) {
   const grid = make(plate, 'div', 'xp__numbers');
   for (let n = 1; n <= 20; n++) {
     const erased = (phase >= 1 && n > 2 && n % 2 === 0) || (phase >= 2 && n > 3 && n % 3 === 0);
-    const cell = make(grid, 'span', n === 1 || erased ? 'erased' : phase === 2 ? 'prime' : '', String(n));
+    const newlyErased = action && ((phase === 1 && n > 2 && n % 2 === 0) ||
+      (phase === 2 && n > 3 && n % 3 === 0 && n % 2 !== 0));
+    const newlyCircled = action && phase === 2 && n > 1 && !erased;
+    const cell = make(grid, 'span', [n === 1 || erased ? 'erased' : phase === 2 ? 'prime' : '',
+      newlyErased ? 'is-newly-erased' : '', newlyCircled ? 'is-newly-circled' : ''].filter(Boolean).join(' '), String(n));
     if (n === 1 || erased) cell.setAttribute('aria-label', n + ' 제외');
   }
   make(plate, 'p', 'xp__legend', ['1은 약수가 하나뿐이어서 처음부터 제외해요.',
     '빗금 친 수는 제외했어요. 아직 남은 후보는 10개예요.', '동그라미 친 수가 소수예요.'][phase]);
 }
 
-function drawDensity(plate, phase) {
+function drawDensity(plate, phase, action = false) {
   for (const [index, limit] of [100, 1e6].entries()) {
     const revealed = index === 0 || phase;
     const row = make(plate, 'div', 'xp__density');
@@ -414,7 +453,11 @@ function drawDensity(plate, phase) {
     const ratio = revealed ? piExact(limit) / limit : 0;
     make(row, 'b', '', revealed ? fmt(+(100 * ratio).toFixed(2)) + '%' : '?');
     const track = make(row, 'div', 'xp__track');
-    if (revealed) make(track, 'i').style.width = ratio * 100 + '%';
+    if (revealed) {
+      const bar = make(track, 'i');
+      bar.style.width = ratio * 100 + '%';
+      if (action && index === 1) bar.classList.add('is-revealing');
+    }
     make(row, 'small', '', revealed ? '소수 ' + fmt(piExact(limit)) + '개 / 전체 ' + fmt(limit) + '개' : '아직 세지 않은 범위');
   }
 }
@@ -444,20 +487,20 @@ function explorationSlider(parent, label, min, max, step, value, format, update)
   });
 }
 
-function drawStairs(plate, phase) {
+function drawStairs(plate, phase, action = false) {
   const graph = make(plate, 'div');
-  const paint = count => {
+  const paint = (count, reveal = false) => {
     graph.replaceChildren();
-    plotStairs(graph, count);
+    plotStairs(graph, count, reveal);
   };
-  paint(phase ? state.waves : 0);
+  paint(phase ? state.waves : 0, action);
   if (phase) explorationSlider(plate, '파동 개수 바꿔 보기', 0, 60, 1, state.waves, n => n + '개', count => {
     state.waves = count;
     paint(count);
   });
 }
 
-function plotStairs(plate, count) {
+function plotStairs(plate, count, animateWave = false) {
   const terms = Array(count).fill(0.5);
   const svg = svgElement(plate, 'svg', { viewBox: '0 0 430 207', role: 'img', 'aria-label': count ? '파동 ' + count + '개를 합친 붉은 선과 직접 계산한 검은 계단' : '밋밋한 붉은 선과 울퉁불퉁한 검은 계단' });
   const X = x => 29 + (x - 8) * 19;
@@ -474,17 +517,16 @@ function plotStairs(plate, count) {
     const x = 8 + i / 20;
     return (i ? 'L' : 'M') + X(x).toFixed(2) + ' ' + Y(psiApprox(x, terms)).toFixed(2);
   }).join(' ');
-  svgElement(svg, 'path', { d: wave, class: 'xp__wave' });
+  svgElement(svg, 'path', { d: wave, class: 'xp__wave' + (animateWave ? ' is-drawing' : '') });
   make(plate, 'p', 'xp__legend', '━ 실제 계단　┄ 파동 ' + terms.length + '개를 쓴 근사선');
   make(plate, 'p', 'xp__metric', '평균적인 어긋남 ' + rmsError(terms, 8, 28).toFixed(2));
   make(plate, 'small', 'xp__fine', '계단은 소수 p의 거듭제곱에서 ln p만큼 올라요. 오차는 8부터 28까지 0.25 간격으로 잰 제곱평균제곱근 값이에요.');
 }
 
-function drawBalance(plate, phase) {
+function drawBalance(plate, phase, action = false) {
   const sigma = phase ? state.sigma : 0.5;
   const axis = make(plate, 'div', 'xp__axis');
   const dot = make(axis, 'span', 'xp__dot', sigma.toFixed(2));
-  dot.style.left = sigma * 100 + '%';
   const ticks = make(plate, 'div', 'xp__ticks');
   for (const label of ['0', '½', '1']) make(ticks, 'span', '', label);
   const metric = make(plate, 'div', 'xp__balance-value');
@@ -499,7 +541,12 @@ function drawBalance(plate, phase) {
     number.textContent = ratio.toFixed(ratio < 0.01 ? 5 : 2) + '배';
   };
   update(sigma);
+  const movement = action && allowsMotion() && dot.animate(
+    [{ left: '50%' }, { left: dot.style.left }],
+    { duration: 550, easing: 'cubic-bezier(.2,.75,.2,1)' }
+  );
   if (phase) explorationSlider(plate, '점의 가로 위치 바꿔 보기', 0.5, 0.99, 0.01, sigma, n => n.toFixed(2), value => {
+    if (movement) movement.cancel();
     state.sigma = value;
     update(value);
   });

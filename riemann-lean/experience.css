@@ -81,8 +81,9 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__steps button[aria-pressed=true] { color: var(--rubric); border-color: currentColor; font-weight: 700; }
 .xp__tools button { font-size: 13px; }
 .xp__close span:last-child { display: none; }
-.xp__body { min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; padding: clamp(26px,6vh,70px) max(24px,calc((100vw - 1120px)/2)); }
+.xp__body { position: relative; min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; padding: clamp(26px,6vh,70px) max(24px,calc((100vw - 1120px)/2)); }
 .xp__spread { margin: auto 0; width: 100%; display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); grid-template-rows: auto auto; gap: 32px clamp(36px,5vw,84px); align-items: start; }
+.xp__spread.is-exiting { position: absolute; z-index: 1; inset-inline-start: var(--exit-x); inset-block-start: var(--exit-y); width: var(--exit-width); margin: 0; pointer-events: none; }
 .xp__words { align-self: end; }
 .xp__kicker { color: var(--rubric); font: 600 13px/1.4 var(--font-mono); }
 .xp__words h2 { margin: 18px 0; font: 650 clamp(34px,3.7vw,60px)/1.23 var(--font-serif); letter-spacing: -.058em; color: var(--ink); }
@@ -99,11 +100,17 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__numbers .erased::after, .xp__numbers .prime::after { content: ''; position: absolute; }
 .xp__numbers .erased::after { width: 47%; height: 2px; background: var(--rubric); transform: rotate(-25deg); }
 .xp__numbers .prime::after { height: 83%; aspect-ratio: 1; max-width: 90%; border: 2px solid var(--rubric); border-radius: 51% 46% 50% 44%; transform: rotate(-9deg); }
+.xp__numbers .is-newly-erased::after { transform-origin: center; animation: xp-mark .38s ease-out both; }
+.xp__numbers .is-newly-circled::after { transform-origin: center; animation: xp-circle .42s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes xp-mark { from { transform: scaleX(0) rotate(-25deg); } to { transform: scaleX(1) rotate(-25deg); } }
+@keyframes xp-circle { from { opacity: 0; transform: scale(.35) rotate(-9deg); } to { opacity: 1; transform: scale(1) rotate(-9deg); } }
 .xp__plate .xp__legend { margin-top: 12px; font-size: 14px; }
 .xp__density { display: grid; grid-template-columns: 1fr auto; align-items: baseline; margin-bottom: 20px; }
 .xp__density b, .xp__balance-value b { color: var(--rubric); font: 500 clamp(32px,4.4vw,72px)/1.15 Georgia,serif; }
 .xp__track { grid-column: 1/-1; height: 22px; background: repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),var(--rule) calc(10% - 1px) 10%); border: 1px solid var(--rule); }
 .xp__track i { display: block; height: 100%; background: var(--rubric); }
+.xp__track i.is-revealing { transform-origin: left center; animation: xp-fill .6s cubic-bezier(.2,.7,.15,1) both; }
+@keyframes xp-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .xp__density small, .xp__fine { color: var(--muted); font-size: 12px; }
 .xp__plate svg { display: block; width: 100%; }
 .xp__plate svg text { fill: var(--muted); font: 11px var(--font-mono); }
@@ -111,6 +118,8 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__stair, .xp__wave { fill: none; stroke-width: 2; }
 .xp__stair { stroke: var(--ink); }
 .xp__wave { stroke: var(--rubric); stroke-dasharray: 5 3; }
+.xp__wave.is-drawing { animation: xp-draw .72s ease-out both; }
+@keyframes xp-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 .xp__plate .xp__metric { margin-top: 14px; font-weight: 650; }
 .xp__axis { position: relative; height: 66px; margin: 0 16px; border-bottom: 1px solid var(--ink); }
 .xp__axis::before { content: ''; position: absolute; left: 50%; bottom: -5px; height: 54px; border-left: 1px dashed var(--rubric); }
@@ -154,3 +163,7 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__slider { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 8px; margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 8px; font-size: 13px; }
 .xp__slider b { color: var(--rubric); font-variant-numeric: tabular-nums; }
 .xp__slider input { grid-column: 1 / -1; width: 100%; min-height: 44px; margin: 0; accent-color: var(--rubric); }
+@media (prefers-reduced-motion: reduce) {
+  .xp__numbers .is-newly-erased::after, .xp__numbers .is-newly-circled::after,
+  .xp__track i.is-revealing, .xp__wave.is-drawing { animation: none; }
+}
