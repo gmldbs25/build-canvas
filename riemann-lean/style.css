@@ -90,6 +90,7 @@ footer { position: relative; z-index: 1; }
 .act__head > .label { margin: 0 0 -12px; }
 .act__head .lede { margin-top: 4px; }
 .prose { max-width: 66ch; margin-left: 110px; }
+.prose.page { max-width: calc(66ch + 64px); margin-left: 78px; padding: 24px 32px; }
 .article-grid > .note { position: sticky; top: calc(var(--hud-height) + 40px); }
 .dropcap:first-letter { float: left; margin: .03em .12em 0 0; color: var(--c-accent); font: 400 3.7em/.8 var(--font-serif); }
 .riemann-quote { margin: 34px 0; padding: 20px 24px; border-left: 2px solid var(--c-accent); color: var(--c-muted); font: italic 19px/1.75 var(--font-serif); }
@@ -103,6 +104,8 @@ footer { position: relative; z-index: 1; }
 .page-num { text-align: center; font-family: var(--font-serif); font-style: italic; }
 .page { background: color-mix(in srgb, var(--c-surface) 55%, transparent); }
 .prose > p:first-child { margin-top: 0; }
+.prose.page > h3:first-child { margin-top: 0; }
+.prose.page > p:last-child { margin-bottom: 0; }
 .note, .warning, .diagram, .lean, .lab__instrument { border: 1px solid var(--c-rule); background: var(--c-surface); }
 .note { margin: 26px 0; padding: 20px 23px; }
 .note summary { color: var(--c-accent); font: 11px/1.4 var(--font-mono); letter-spacing: .07em; cursor: pointer; }
@@ -387,6 +390,7 @@ html.no-js h3 .only-math { display: inline !important; }
   .act { padding-block: 72px; }
   .act__head { grid-template-columns: 52px 1fr; gap: 8px; }
   .prose { margin-left: 60px; }
+  .prose.page { margin-left: 46px; }
   .lab { display: block; }
   .lab__instrument { display: contents; margin: 0; padding: 0; }
   .lab__stage { position: sticky; top: var(--hud-height); display: block; z-index: 3; overflow: visible; background: var(--c-bg); }
@@ -424,6 +428,7 @@ html.no-js h3 .only-math { display: inline !important; }
   .act__index { padding-top: 0; }
   .act h2, .prose h2 { font-size: 40px; }
   .prose { margin-left: 0; }
+  .prose.page { max-width: calc(66ch + 28px); margin-left: 0; padding: 16px 14px; }
   .prose p, .act p { font-size: 17px; }
   .step[data-step="3"] h3 { font-size: clamp(16px,4.4vw,18px); }
   #act3 .prose > h3:first-child { font-size: clamp(18px,5.1vw,20px); }
