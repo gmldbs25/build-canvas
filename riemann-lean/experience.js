@@ -382,12 +382,12 @@ function renderStage(announceChange = false) {
   const heading = make(words, 'h2', '', page.title);
   heading.tabIndex = -1;
   make(words, 'p', 'xp__intro', page.intro);
-  const plate = make(spread, 'figure', 'xp__plate');
-  make(plate, 'figcaption', '', page.figure);
-  page.render(plate, phase);
   const note = make(spread, 'aside', 'xp__note');
   make(note, 'strong', '', phase ? '관찰 기록' : '해 보는 법');
   make(note, 'p', '', page.notes[phase]);
+  const plate = make(spread, 'figure', 'xp__plate');
+  make(plate, 'figcaption', '', page.figure);
+  page.render(plate, phase);
   previous.disabled = !phase && !i;
   previous.textContent = phase ? '↶ 한 번 되돌리기' : '← 이전 관찰';
   next.textContent = (page.actions[phase] || page.forward) + ' →';
