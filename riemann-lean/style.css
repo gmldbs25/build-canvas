@@ -390,7 +390,7 @@ html.no-js h3 .only-math { display: inline !important; }
   .act { padding-block: 72px; }
   .act__head { grid-template-columns: 52px 1fr; gap: 8px; }
   .prose { margin-left: 60px; }
-  .prose.page { margin-left: 46px; }
+  .prose.page { margin-left: 28px; }
   .lab { display: block; }
   .lab__instrument { display: contents; margin: 0; padding: 0; }
   .lab__stage { position: sticky; top: var(--hud-height); display: block; z-index: 3; overflow: visible; background: var(--c-bg); }
