@@ -12,14 +12,14 @@ export const GAMMA = [
 ];
 
 export const FACTS = {
-  asOf: '2026-11-25',
+  asOf: '2026-11-26',
   readingMinutes: 18,
   lab: {
     zeroCount: GAMMA.length,
     firstHeights: [GAMMA[0].toFixed(6), GAMMA[1].toFixed(3), (Math.trunc(GAMMA[2] * 1000) / 1000).toFixed(3)],
     rms: ['1.34', '0.89', '0.63']
   },
-  paper: { pages: 8, range: '671–680', date: '1859-11', author: 'Bernhard Riemann' },
+  paper: { pages: 10, range: '671–680', date: '1859-11', author: 'Bernhard Riemann' },
   proof: {
     announced: '2026-11-20', certified: '2026-11-21', weeks: 6,
     files: 175187, lines: 17374215, nonBlankLines: 15531759,

@@ -134,11 +134,11 @@ function renderSieve() {
         mark.type = 'button';
         mark.className = 'prime-gap';
         mark.style.setProperty('--gap-height', `${gap * 4}px`);
-        mark.dataset.tooltip = `${previous} → ${n} · ${gap}칸 공백`;
-        mark.setAttribute('aria-label', `${previous}에서 ${n}까지 ${gap}칸 공백`);
+        mark.dataset.tooltip = `${previous} → ${n} · 간격 ${gap}`;
+        mark.setAttribute('aria-label', `${previous}에서 ${n}까지 간격 ${gap}`);
         mark.dataset.gap = `${previous}-${n}`;
         mark.addEventListener('click', () => {
-          document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 선택한 간격 ${previous} → ${n} · ${gap}칸 공백`;
+          document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 선택한 간격 ${previous} → ${n} · 간격 ${gap}`;
           document.querySelectorAll('.prime-gap.is-selected').forEach(item => item.classList.remove('is-selected'));
           mark.classList.add('is-selected');
         });
@@ -174,10 +174,10 @@ function renderSieve() {
   sieve.replaceChildren(cells);
   gaps.replaceChildren(marks);
   const { gap, previous, current } = largest;
-  document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 가장 넓은 빈 구간 ${gap}칸 (${previous} → ${current})`;
+  document.getElementById('sieveCaption').textContent = `소수 ${primes.length}개 · 가장 큰 소수 간격 ${gap} (${previous} → ${current})`;
   const largestGap = intervals.find(mark => mark.dataset.gap === `${previous}-${current}`);
   largestGap?.classList.add('is-largest');
-  if (largestGap) largestGap.dataset.tooltip = `${previous} → ${current} · ${gap}칸 공백 · 1–100에서 가장 넓은 간격`;
+  if (largestGap) largestGap.dataset.tooltip = `${previous} → ${current} · 간격 ${gap} · 1–100에서 가장 넓은 간격`;
 }
 
 function buildCodeWalls() {

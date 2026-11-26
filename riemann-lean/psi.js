@@ -714,8 +714,8 @@ export function initLab(root = document) {
   function queueStatus(stats, escapedCount, summary) {
     window.clearTimeout(statusTimer);
     statusTimer = window.setTimeout(() => {
-      const state = escapedCount ? `△ 이탈 · 영점 ${escapedCount}개가 임계선 밖` : '✓ 조율됨 · 모든 영점이 임계선 위';
-      const endpoint = count === 1 ? ' · 영점 1개 · 가장 낮은 음만' : count === GAMMA.length ? ' · 영점 60개 · 화면의 근사 한계' : '';
+      const state = escapedCount ? `△ 모형 · ${escapedCount}쌍을 임계선 밖으로 이동` : '✓ 모형 · 사용한 영점 쌍이 모두 임계선 위';
+      const endpoint = count === 1 ? ' · 파동 1개 · 가장 낮은 음만' : count === GAMMA.length ? ' · 파동 60개 · 화면의 근사 한계' : '';
       const error = stats.rms < 1 ? '계단과의 평균 오차 1.0 미만' : '계단과의 평균 오차 1.0 이상';
       if (labStatus) labStatus.dataset.regime = escapedCount ? 'escaped' : 'critical';
       setText(labStatus, `${state}${endpoint} · ${error}`);
@@ -734,7 +734,7 @@ export function initLab(root = document) {
     sigmaRange.value = String(sigma);
     setText(nValue, String(count));
     setText(sigmaValue, sigma.toFixed(3));
-    nRange.setAttribute('aria-valuetext', `영점 ${count}개`);
+    nRange.setAttribute('aria-valuetext', `파동 ${count}개`);
     const criticalLabel = sigma === 0.5 ? '임계선 위' : `임계선에서 ${(sigma - 0.5).toFixed(3)} 이탈`;
     sigmaRange.setAttribute('aria-valuetext', `${sigma.toFixed(3)}, ${criticalLabel}`);
     const allTogetherInput = query('#allTogether');
