@@ -1,6 +1,9 @@
 import { CODE_WALL, FACTS, GAMMA, PALETTE } from './data.js';
 import { initLab, psiTrue, psiApprox, rmsError } from './psi.js';
 import { initLean, step as leanStep, getState } from './lean.js';
+import { initExperience, openExperience, closeExperience, isExperienceOpen,
+  PI_ANCHORS, piExact, psiExact, isPrime, firstPrimeAtOrAbove, previousPrime,
+  density, li, amplitude, envelope, crossingX } from './experience.js';
 
 const root = document.documentElement;
 const seam = document.getElementById('seam');
@@ -256,6 +259,7 @@ function toggleMode() {
 }
 
 function handleKeyboard(event) {
+  if (root.dataset.xp === 'open') return;
   if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey
     || event.target.closest('input, textarea, select, [contenteditable]')) return;
   if (event.key === 'Escape') {
@@ -284,6 +288,7 @@ buildCodeWalls();
 seam.style.setProperty('--scale-paper', `${FACTS.paper.pages / FACTS.pagesEquivalent * 100}%`);
 initLean(document.getElementById('lean'));
 initLab(document.getElementById('act2'));
+initExperience();
 
 modeToggle.addEventListener('click', toggleMode);
 inlineNotes.addEventListener('change', openNotes);
@@ -336,6 +341,38 @@ export function runSelfTest() {
   check(root.dataset.mode !== initialMode, true);
   setMode(initialMode);
   check(root.scrollWidth <= innerWidth + 1, true);
+
+  const checkRel = (actual, expected, relTol) => Math.abs(actual - expected) <= Math.abs(expected) * relTol;
+  check(PI_ANCHORS.length === 15 && PI_ANCHORS[5].pi === 78498 &&
+    PI_ANCHORS[11].pi === 37607912018 && PI_ANCHORS[14].pi === 29844570422669 &&
+    piExact(1e6) === 78498, true);
+  check(isPrime(999999999989n) && isPrime(1000000000039n) &&
+    !isPrime(1000000000000n) && !isPrime(3215031751n), true);
+  check(firstPrimeAtOrAbove(10n ** 12n), 1000000000039n);
+  check(10n ** 12n - previousPrime(10n ** 12n), 11n);
+  check(Math.abs(density(1e2) - 0.21715) <= 2e-4 &&
+    Math.abs(density(1e12) - 0.036191) <= 5e-5 && Math.abs(density(1e15) - 0.028952) <= 5e-5, true);
+  check(Math.abs(li(100) - 30.126) <= 0.02 && Math.abs(li(1e6) - 78627.5) <= 2 &&
+    checkRel(li(1e12), 3.76079502808e10, 1e-9), true);
+  const a = amplitude(1e12, 0.9, GAMMA[0]);
+  const band = envelope(1e12);
+  check(checkRel(a, 8909719740.454672, 1e-6) &&
+    checkRel(band, 763473327.9088893, 1e-9) && Math.abs(a / band - 11.67) <= 0.02, true);
+  check(checkRel(crossingX(0.9, GAMMA[0]), 4.092e8, 0.01), true);
+  check(Math.abs(psiExact(400) - 397.830846) <= 0.001 &&
+    Math.abs(rmsError(sigmas(60), 2, 400, 0.25) - 1.2767) <= 0.01, true);
+  const xpRoot = document.getElementById('xpRoot');
+  const deepLink = query.get('xp') === '1' && isExperienceOpen() ? location.href : null;
+  openExperience(4);
+  const opened = root.dataset.xp === 'open' && !xpRoot.hidden &&
+    xpRoot.querySelectorAll('.xp__steps [data-xp-step]').length === 4 &&
+    xpRoot.scrollWidth <= innerWidth + 1;
+  closeExperience();
+  check(opened && !('xp' in root.dataset) && xpRoot.hidden && !document.getElementById('main').inert, true);
+  if (deepLink) {
+    history.replaceState(history.state, '', deepLink);
+    openExperience(Number(query.get('step')) || 1);
+  }
 
   const failed = report.filter(entry => entry.result === 'FAIL');
   const panel = document.getElementById('selftest');

@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./paper.css">
   <link rel="stylesheet" href="./terminal.css">
+  <link rel="stylesheet" href="./experience.css">
   <script type="module" src="./main.js"></script>
 </head>
 <body>
@@ -45,6 +46,9 @@
       <a href="#act4" aria-label="4막 변곡점">04<span class="chapter-name"> 변곡</span></a>
     </nav>
     <div class="hud__right">
+      <button class="xp-entry js-only" id="xpOpen" type="button" aria-haspopup="dialog" aria-controls="xpRoot" aria-label="체험 모드 열기" data-xp-open data-xp-step="1">
+        <span aria-hidden="true">🌌</span><span class="xp-entry__label">체험 모드</span>
+      </button>
       <span class="era" id="era"><b>1859</b> · PAPER</span>
       <button class="mode js-only" id="modeToggle" type="button" aria-pressed="false" aria-label="수학과 모드"><span>직관</span><span>수학<span class="mode-long">과</span></span></button>
     </div>
@@ -62,6 +66,7 @@
           <p class="hero__english" lang="en">The Waves of Primes, the Proof a Machine Wrote</p>
           <p class="lede">1859년, 여덟 쪽짜리 논문이 던진 질문 하나. 2026년, 1,740만 줄의 코드가 그 질문에 답했다. 다만 그 답을 끝까지 읽은 사람은 아직 없다.</p>
           <p class="label hero__meta">1859 → 2026 · 167년 · 읽기 약 <span data-fact="readingMinutes">18</span>분 · 인터랙션 2개</p>
+          <p class="hero__xp js-only"><button type="button" class="xp-link" data-xp-open data-xp-step="1">🌌 체험 모드로 직접 만져 보기 →</button></p>
         </div>
         <div class="hero__art" aria-hidden="true">
           <svg viewBox="0 0 400 320" fill="none">
@@ -95,7 +100,8 @@
           <h3>원자와 계단</h3>
           <p>소수는 수의 원자다. 1보다 큰 어떤 자연수든 소수의 곱으로 쪼갤 수 있고, 그 방법은 하나뿐이다. 3,600은 2로 네 번, 3으로 두 번, 5로 두 번 나누어떨어진다. 다른 방법으로 쪼갤 수 없다. 이 사실은 고대부터 알려져 있었고 지금은 산술의 기본정리라고 부른다. 원자의 목록은 끝이 없고, 원자 사이의 거리는 제멋대로다.</p>
           <h3>왜 소수를 세는가</h3>
-          <p>무질서와 규칙이 공존한다. 개별 소수의 위치를 한눈에 예측하기는 어렵지만, 전체를 세면 규칙이 보인다. x 근처의 소수 밀도는 대략 1/ln x다. 100 근처에서는 다섯 수 중 하나꼴이고, 10억 근처에서는 스물한 수 중 하나꼴이다. 수가 커질수록 소수는 드물어지지만, 드물어지는 방식은 매끄럽다.</p>
+          <p>무질서와 규칙이 공존한다. 개별 소수의 위치를 한눈에 예측하기는 어렵지만, 전체를 세면 규칙이 보인다. x 근처의 소수 밀도는 대략 1/ln x다. 100 근처에서는 다섯 수 중 하나꼴이고, 10억 근처에서는 스물한 수 중 하나꼴이다. 수가 커질수록 소수는 드물어지지만, 드물어지는 방식은 매끄럽다. 간격으로 바꾸면 ln x칸에 하나꼴이다. 100 근처에서 4.6칸, 10¹² 근처에서 27.6칸이다.</p>
+          <p class="xp-link-row js-only"><button type="button" class="xp-link" data-xp-open data-xp-step="1">체험 모드 1단계에서 이 계단을 직접 걸어 보기 →</button></p>
           <figure class="sieve-plate plate">
             <span class="tick tick--left" aria-hidden="true"></span><span class="tick tick--right" aria-hidden="true"></span>
             <p class="label">1–100 · 소수 표</p>
@@ -113,6 +119,7 @@
             <cite>— 베른하르트 리만, 1859, 여덟 쪽 중</cite>
             <p class="only-math" lang="de"><small>Hievon wäre allerdings ein strenger Beweis zu wünschen; ich habe indeß die Aufsuchung desselben, nach einigen flüchtigen vergeblichen Versuchen vorläufig bei Seite gelassen…</small></p>
           </blockquote>
+          <p>계단은 두 가지로 셀 수 있다. 소수마다 한 칸씩 오르는 π(x)와, 소수의 거듭제곱마다 ln p만큼 오르는 ψ(x)다. 체험 모드 2단계는 π(x), 3단계는 ψ(x)를 쓴다.</p>
           <p class="only-intuition">계단을 상상해 보자. 1부터 걸어 올라가는데, 발끝이 소수에 닿을 때마다 한 칸씩 오른다. 2에서 한 칸, 3에서 한 칸, 4에서는 아무 일도 없다. 5에서 한 칸. 계단은 끝이 없고 칸의 간격은 들쭉날쭉하다. 리만의 방법을 현대식으로 쓰면, 로그로 가중한 계단을 매끄러운 직선과 파동의 합으로 표현할 수 있다. 직선은 "대략 몇 개"를 말하고, 파동은 "얼마나 어긋나는지"를 말한다.</p>
           <div class="only-math">
             <p>π(x)는 x 이하의 소수 개수다. 소수 정리 π(x) ∼ x/ln x (1896). 가우스의 추정에 나오는 로그 적분은 더 정확하다.</p>
@@ -146,6 +153,13 @@
       <div class="prose lab-intro page">
         <p>이 막은 읽기보다 만지는 편이 빠르다. 왼쪽의 계단이 실제 소수의 리듬이고, 그 위에 겹친 얇은 선들이 계단을 흉내 내는 파동이다. 아래로 내려가면서 영점을 하나씩 더하고 빼 보면, 파동이 어떻게 계단의 모서리를 되살리는지, 하나만 어긋나면 근사가 어떻게 달라지는지 볼 수 있다.</p>
         <p>용어를 먼저 정리하자. 영점은 제타 함수가 0이 되는 복소수다. 복소수는 실수부와 허수부 두 숫자로 이루어지므로, 영점 하나는 평면 위의 점 하나다. 리만은 이 점들이 소수 계단의 흔들림을 만드는 주파수와 연결된다고 보았다. 이 주장에는 두 부분이 있다. 영점이 파동을 만든다는 부분은 1895년 폰 망골트가 정리로 증명했다. 비자명한 영점이 모두 한 직선 위에 있다는 부분이 리만이 증명하지 못한 가설이다. 앞의 것은 명시적 공식, 뒤의 것이 리만 가설이다. 이 둘을 섞으면 리만 가설을 이해할 수 없다.</p>
+      </div>
+      <div class="xp-cta js-only">
+        <button type="button" class="xp-cta__btn" data-xp-open data-xp-step="1">
+          <span class="xp-cta__icon" aria-hidden="true">🌌</span>
+          <span class="xp-cta__txt"><b>전체화면 체험 모드</b><small>소수에서 리만 가설까지 · 4단계</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
       </div>
       <noscript><p>이 실험은 JavaScript가 필요합니다. 영점 60개 중 N개를 더한 근사로 소수 계단을 재구성합니다.</p></noscript>
       <div class="lab">
@@ -256,6 +270,7 @@
               <div class="formula" role="math" aria-label="리만 가설은 모든 비자명 영점의 실수부가 이분의 일이라는 뜻입니다. 이는 프사이 및 소수 계수 함수의 오차 상한과 동치입니다."><span>RH: 모든 비자명 영점 ρ에 대해 Re(ρ) = 1/2</span><span>RH ⇔ ψ(x) = x + O(√x log²x)</span><span>RH ⇔ π(x) = Li(x) + O(√x log x)</span></div>
             </div>
             <p>왜 1/2이 한계인가. 첫 번째 영점이 만드는 파동의 진폭이 이미 √x에 비례한다. 영점이 존재하는 이상 오차의 성장 지수를 1/2보다 더 낮게 묶을 수는 없다. 리만 가설은 오차의 성장 지수가 그 한계에 머문다고 말한다.</p>
+            <p class="xp-link-row js-only"><button type="button" class="xp-link" data-xp-open data-xp-step="4">체험 모드 4단계에서 x를 10¹⁵까지 밀어 보기 →</button></p>
           </article>
           <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
             <p>1/2을 벗어나면 어떻게 되는가. 진폭이 x^σ에 비례해 자라므로 오차가 √x에 로그 보정을 붙인 규모를 넘어서는 구간이 생긴다. 계단의 상대 오차는 여전히 작아질 수 있지만, 절대 오차를 그 규모 안에 가둘 수는 없다. 지금 우리가 아는 무조건부 오차 한계는 √x에 로그 보정을 붙인 한계보다 훨씬 크다. 리만 가설을 증명한다는 것은 그 간격을 좁힌다는 뜻이다.</p>
@@ -464,7 +479,7 @@ theorem wave_balance (a b : ℝ) :
       <p>WORK 08 · 소수의 파동, 기계가 쓴 증명<br>BUILD CANVAS · 2026.11</p>
       <p>HTML · CSS · Canvas · 외부 라이브러리 0<br>수치 확인 <time datetime="2026-11-25" data-fact="asOf">2026-11-25</time></p>
     </div>
-    <p class="methods">이 페이지의 ψ(x) 시뮬레이터는 첫 60개 영점 가운데 선택한 N개만 사용한 근사입니다. 리만 가설의 증명이 아닙니다. 미니 Lean 화면은 실제 커널을 호출하지 않는 재현이고, 배경의 코드월은 분위기를 위한 장식입니다. 8쪽과 1,740만 줄의 비교는 단위가 달라 배율에 수학적 의미가 없습니다.</p>
+    <p class="methods">이 페이지의 ψ(x) 시뮬레이터는 첫 60개 영점 가운데 선택한 N개만 사용한 근사입니다. 리만 가설의 증명이 아닙니다. 미니 Lean 화면은 실제 커널을 호출하지 않는 재현이고, 배경의 코드월은 분위기를 위한 장식입니다. 8쪽과 1,740만 줄의 비교는 단위가 달라 배율에 수학적 의미가 없습니다. 체험 모드에서 10⁶까지의 소수와 ψ 값은 브라우저가 직접 계산한 것이고, 그 위의 π(10^k)는 알려진 정확값(10¹⁵까지)을 씁니다. 10¹² 근처의 소수 창은 브라우저에서 직접 소수 판정한 실제 값입니다.</p>
     <h2>출처</h2>
     <ol class="sources">
       <li><a href="https://de.wikisource.org/wiki/Über_die_Anzahl_der_Primzahlen_unter_einer_gegebenen_Größe" target="_blank" rel="noopener noreferrer">Riemann, <cite>Über die Anzahl der Primzahlen unter einer gegebenen Grösse</cite>, 1859, S. <span data-fact="paper.range">671–680</span> · Wikisource</a></li>
@@ -478,5 +493,59 @@ theorem wave_balance (a b : ℝ) :
   </footer>
   <div id="shortcuts" role="status" hidden>H 홈 · 1–4 막 이동 · M 모드 전환 · Esc 닫기</div>
   <div id="selftest" hidden></div>
+  <div id="xpRoot" class="xp" hidden>
+    <section class="xp__panel" role="dialog" aria-modal="true" aria-labelledby="xpTitle" aria-describedby="xpDesc">
+      <header class="xp__bar">
+        <p class="xp__brand">WORK 08 <span aria-hidden="true">/</span> 체험 모드</p>
+        <nav class="xp__steps" aria-label="체험 단계">
+          <button type="button" data-xp-step="1" aria-label="1단계 소수" aria-pressed="true"><b>1</b><span>소수</span></button>
+          <button type="button" data-xp-step="2" aria-label="2단계 스케일" aria-pressed="false"><b>2</b><span>스케일</span></button>
+          <button type="button" data-xp-step="3" aria-label="3단계 영점" aria-pressed="false"><b>3</b><span>영점</span></button>
+          <button type="button" data-xp-step="4" aria-label="4단계 1/2" aria-pressed="false"><b>4</b><span>1/2</span></button>
+        </nav>
+        <div class="xp__tools">
+          <button type="button" id="xpClose" class="xp__close" aria-label="아티클로 돌아가기">
+            <span>아티클로 돌아가기 <kbd>Esc</kbd></span><span aria-hidden="true">← 아티클</span>
+          </button>
+        </div>
+      </header>
+      <div class="xp__body" id="xpBody"></div>
+      <footer class="xp__foot">
+        <button type="button" id="xpPrev">← 이전</button>
+        <p class="xp__hint" id="xpHint">1–4 단계 · ←→ 이동 · Esc 닫기</p>
+        <button type="button" id="xpNext" class="is-primary">다음 →</button>
+      </footer>
+    </section>
+    <template id="xpCopy">
+      <div>
+        <h2>1단계 · 소수 골라내기</h2>
+        <p>2부터 시작해, 남은 수의 배수를 차례로 지운다. 끝까지 지워지지 않고 남은 수가 소수다.</p>
+      </div>
+      <div>
+        <h2>2단계 · 무한대 스케일 여행</h2>
+        <p>슬라이더를 밀면 x가 10²에서 10¹⁵까지 자란다. 지수가 2 늘면 x는 100배가 된다.</p>
+        <p class="xp__caption">π(x) 실선과 점 · Li(x), x/ln x 점선 근사. 로그 눈금에서는 계단이 곡선처럼 눌린다. 그러나 계단은 계단이다.</p>
+        <p class="xp__caption">직선 x를 빼고 √x로 나누면 파동만 남는다. 진폭은 √x 근처에서 논다. π 대신 로그로 가중해 세면 ψ(x)가 된다. 점프의 높이가 ln p다.</p>
+        <p class="xp__caption">10⁶까지는 브라우저가 직접 센 값입니다. 그 위의 점은 알려진 정확한 π(10^k) 값이고, 사이는 로그 눈금 위의 직선으로 잇습니다. 파동 곡선의 10⁶ 초과 구간은 영점 60개로 자른 근사입니다.</p>
+      </div>
+      <div>
+        <h2>3단계 · 영점으로 계단 조립하기</h2>
+        <p>영점 하나가 파동 하나다. 낮은 음부터 차례로 켜면 계단의 모서리가 살아난다.</p>
+        <p class="xp__caption">실선 ψ(x) · 점선 영점 근사 · 아래는 선택한 영점의 하모닉입니다.</p>
+        <p class="xp__caption">60개를 모두 켜도 계단의 모서리는 완전히 메워지지 않는다. 남은 오차가 다음 영점의 몫이다.</p>
+        <p class="xp__caption">이 화면은 첫 60개 영점만 쓴 근사입니다. 60개 너머의 영점은 계산하지 않습니다.</p>
+      </div>
+      <div>
+        <h2>4단계 · 1/2의 균형이 무너질 때</h2>
+        <p>영점 하나를 임계선에서 밀어낸다. σ가 1/2을 넘으면 그 항의 진폭은 x^σ로 자란다.</p>
+        <p class="xp__caption">σ ≥ 1인 영역에는 제타 함수의 영점이 없으므로, 모형에서도 1에 닿기 전에서 멈춘다.</p>
+        <p>리만 가설은 ψ(x) = x + O(√x ln²x)와 동치다. σ>1/2인 영점이 하나라도 있으면 이 오차 한계는 성립할 수 없다.</p>
+        <p class="xp__caption">0.50에서는 띠 안에 머문다. 0.90에서는 4.1×10⁸ 지점에서 띠를 넘는다. 0.75는 10¹²에서도, 10¹⁵에서도 아직 띠 안이고, 교차점이 8.1×10¹⁵로 멀어질 뿐이다.</p>
+      </div>
+    </template>
+    <p class="sr-only" id="xpTitle">소수에서 리만 가설까지 — Work 8 체험 모드</p>
+    <p class="sr-only" id="xpDesc">네 단계로 소수 계단, 무한대 스케일, 영점 파동, 임계선 1/2을 직접 조작하는 전체화면 시뮬레이터입니다.</p>
+    <div id="xpAnnounce" class="sr-only" aria-live="polite"></div>
+  </div>
 </body>
 </html>
