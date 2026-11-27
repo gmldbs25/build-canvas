@@ -64,9 +64,9 @@ cp -R projects/web-evolution/. dist-pages/web-evolution/
 mkdir -p dist-pages/elsewhere
 cp -R extras/elsewhere/. dist-pages/elsewhere/
 
-# Work 08 carries its own metadata and a checked-in hero capture.
-mkdir -p dist-pages/riemann-lean dist-pages/share
-cp riemann-lean/{index.html,style.css,paper.css,terminal.css,data.js,psi.js,lean.js,main.js,favicon.svg,experience.js,experience.css} dist-pages/riemann-lean/
+# Work 08 renders its manuscript and chapter navigation into static HTML.
+mkdir -p dist-pages/share
+node riemann-lean/v2/book/build.mjs --output=dist-pages/riemann-lean
 cp share/work-08.png dist-pages/share/
 cp IMPLEMENTATION_NOTES.md dist-pages/
 

@@ -20,6 +20,13 @@ Captured for the local `work8-textbook-v2` branch on 2026-11-27 before any Work 
 - No Work 08 source package or dedicated dependency manifest exists. The repository root uses Node `>=22.13.0`; the observed runtime is Node `v24.22.3`, npm `11.19.1`.
 - Root `node_modules/` is absent in this checkout.
 
-## Screenshot capture attempt
+## Screenshots
 
-The available `/usr/bin/chromium` cannot start in this sandbox. Both direct headless Chromium and the installed Playwright Python package failed before page rendering with `setsockopt: Operation not permitted` from Crashpad; Chromium exited with SIGTRAP. A local HTTP server also could not bind to loopback (`PermissionError: [Errno 1] Operation not permitted`). Consequently, no desktop or mobile screenshot was produced. Re-capture the baseline when a browser environment with Chromium process/socket support is available, before changing `riemann-lean/`.
+Captured before any Work 08 source edits with Playwright Python + `/usr/bin/chromium`, served from a temporary loopback server. The browser used full-page screenshots, device scale factor 1, viewport 1440×1000 and 390×844. External font hosts were unavailable, so font fallback may differ from the published page.
+
+- `baseline-desktop-1440x1000.png` — 1440 × 24517 pixels
+- `baseline-mobile-390x844.png` — 390 × 24279 pixels
+
+Chromium initially failed under the default sandbox (`setsockopt: Operation not permitted` from Crashpad) and succeeded after running the capture with the approved elevated process permissions. No application files were changed to enable capture.
+
+The paired report captures `before-desktop.webp` and `before-mobile.webp` are the above full-page images cropped to their initial viewport at the original pixel dimensions.

@@ -20,27 +20,27 @@
 이 경로는 앞 장의 명시적 공식 실험과 다르다. 명시적 공식은 왜 영점이 소수에 영향을 주는지를 설명하는 학습 도구다. 실제 형식 증명은 별도의 깊은 논증을 통해 영점이 있을 수 없는 영역을 확보한다.
 
 ## Source-read edges (from theorem to directly named dependency)
-각 행은 위 세 파일의 선언 본문에서 실제 등장한 이름을 눈으로 확인한 선별 edge다. 모든 implicit dependency를 포함하지 않는다. 이름의 full namespace는 구현 시 Lean export 또는 source index로 확인한다.
+각 행은 위 세 파일의 선언 본문에서 실제 등장한 이름을 눈으로 확인한 선별 간선이다. Lean Meta/export로 추출한 전체 그래프가 아니며 모든 implicit dependency를 포함하지 않는다. 링크는 고정 commit의 해당 source line으로 간다. 표기된 이름과 간선 방향은 정리 → 직접 참조 의존 항목이다.
 
 | from | to | evidence |
 |---|---|---|
-| riemannHypothesis | New.zeta_zeros_on_line | compact Main.lean |
-| riemannHypothesis | New.grh | compact Main.lean |
-| riemannZeta_eq_zero_re | riemannHypothesis | compact Main.lean |
-| LFunction_ne_zero_of_half_lt_re | New.grh | compact Main.lean |
-| LFunction_eq_zero_re | New.zeros_on_line | compact Main.lean |
-| LFunction_eq_zero_re | New.grh | compact Main.lean |
-| LFunction_eq_zero_re_of_isPrimitive | LFunction_eq_zero_re | compact Main.lean |
-| New.grh | eventually_primeError_le_rpow | compact New/Main.lean |
-| New.grh | entireL_ne_zero_of_primeError_le | compact New/Main.lean |
-| eventually_primeError_le_rpow | star_inequality | compact New/Main.lean |
-| eventually_primeError_le_rpow | exists_data | compact New/Main.lean |
-| eventually_primeError_le_rpow | IsPolar.exists_window_sub_mul_le | compact New/Main.lean |
-| star_inequality | exists_family_covolumeSq_le | compact New/Main.lean |
-| star_inequality | integral_forms_long | compact New/Main.lean |
-| star_inequality | abs_mainHeight_add_remainder_le | compact New/Main.lean |
-| New.zeros_on_line | LFunction_one_sub_eq_zero | compact New/Main.lean |
-| New.zeta_zeros_on_line | completedRiemannZeta_one_sub | compact New/Main.lean |
+| riemannHypothesis | New.zeta_zeros_on_line | [compact Main.lean L5](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L5) |
+| riemannHypothesis | New.grh | [compact Main.lean L5](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L5) |
+| riemannZeta_eq_zero_re | riemannHypothesis | [compact Main.lean L7](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L7) |
+| LFunction_ne_zero_of_half_lt_re | New.grh | [compact Main.lean L8](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L8) |
+| LFunction_eq_zero_re | New.zeros_on_line | [compact Main.lean L10](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L10) |
+| LFunction_eq_zero_re | New.grh | [compact Main.lean L10](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L10) |
+| LFunction_eq_zero_re_of_isPrimitive | LFunction_eq_zero_re | [compact Main.lean L12](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/Main.lean#L12) |
+| New.grh | eventually_primeError_le_rpow | [compact New/Main.lean L172](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L172) |
+| New.grh | entireL_ne_zero_of_primeError_le | [compact New/Main.lean L163](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L163) |
+| eventually_primeError_le_rpow | star_inequality | [compact New/Main.lean L149](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L149) |
+| eventually_primeError_le_rpow | exists_data | [compact New/Main.lean L135](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L135) |
+| eventually_primeError_le_rpow | IsPolar.exists_window_sub_mul_le | [compact New/Main.lean L138](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L138) |
+| star_inequality | exists_family_covolumeSq_le | [compact New/Main.lean L107](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L107) |
+| star_inequality | integral_forms_long | [compact New/Main.lean L119](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L119) |
+| star_inequality | abs_mainHeight_add_remainder_le | [compact New/Main.lean L114](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L114) |
+| New.zeros_on_line | LFunction_one_sub_eq_zero | [compact New/Main.lean L176](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L176) |
+| New.zeta_zeros_on_line | completedRiemannZeta_one_sub | [compact New/Main.lean L184](https://github.com/lsernau/grh-lean/blob/72fead102f663d5c7a407964a13dc0cf9d977207/grh-compact/src/New/Main.lean#L184) |
 
 Important: New.zeros_on_line and New.zeta_zeros_on_line accept nonvanishing as a hypothesis; they do not directly depend on New.grh as global declaration. Endpoint applications connect the proof. Do not draw fabricated direct edges between these generic lemmas and New.grh. The named dependencies below New/Main.lean are reference occurrences, not yet inspected at their own definition locations. Display source occurrence permalink and 'definition pending' until resolved.
 
@@ -52,10 +52,16 @@ View 4: verification ledger, separate MIT original and compact/readable snapshot
 
 ## Evidence links
 - MIT original verification (2026-11-25 22:05 UTC): https://math.mit.edu/~drew/grh/
-- MIT shorter proof verification (2026-11-26 01:52 UTC snapshot): https://math.mit.edu/~drew/shortgrh/
+- MIT shorter proof verification (latest page snapshot checked 2026-11-26 20:46 UTC): https://math.mit.edu/~drew/shortgrh/
 - Lean community statement: https://leanprover-community.github.io/blog/posts/riemann-hypothesis/
 - Human-reading resources: https://rh-lean-roadmap.github.io/rh-lean-roadmap/ and https://nasqret.github.io/riemann-rev/book/intro.html
-- Original proof is a different revision and structure; do not reuse compact names as original edges. Pin original branch SHA from upstream before implementing original view.
+- Original proof is a different revision and structure; do not reuse compact names as original edges. The original archive was published without an upstream Git commit; the frozen mirror pin and endpoint-only use are documented below.
+
+### Original five targets — pinned source mirror checked 2026-11-27
+Alpöge's first release was an archive, not an author Git commit. The frozen community mirror `homeowmorphism/riemann-hypothesis-original` states that it preserves the 2026-11-20 source exactly as published. Its mirror commit is `545e2b54604508ae6845a05d431a9c966cfe7276`. Use that mirror only for the five endpoint declarations and statement source, not as evidence for a dependency graph:
+- Main declarations: https://github.com/homeowmorphism/riemann-hypothesis-original/blob/545e2b54604508ae6845a05d431a9c966cfe7276/src/Main.lean (`riemannHypothesis` L5, `riemannZeta_eq_zero_re` L7, `LFunction_ne_zero_of_half_lt_re` L9, `LFunction_eq_zero_re` L10, `LFunction_eq_zero_re_of_isPrimitive` L12).
+- Four custom statement definitions: https://github.com/homeowmorphism/riemann-hypothesis-original/blob/545e2b54604508ae6845a05d431a9c966cfe7276/src/Statements.lean (L3, L6, L10, L14). `RiemannHypothesis` is Mathlib's definition at `Mathlib/NumberTheory/LSeries/RiemannZeta.lean` L185, pinned to original Mathlib commit `0df444a360eaa60ab8c11dca51a86af692955474`.
+- Provenance: mirror README says it preserves the source exactly as published and notes that the author's release had no source repository commit. MIT's original whole-proof report remains separate: https://math.mit.edu/~drew/grh/ (last updated 2026-11-25 22:05 UTC).
 
 ## Acceptance
 17 edges above are manually source-read seed, not complete dependency extraction. Verify them against fixed revision in implementation, resolve missing source declarations, preserve statements and provenance. Do not use uninspected/third-party hints as actual dependencies. If the original view cannot be backed by genuine source, show original verification summary and compact verified-source graph only. Do not block a usable educational view on importing entire proof. Additional deep graph expansion requires mathematical/source review.

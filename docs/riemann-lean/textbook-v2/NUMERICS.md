@@ -44,8 +44,10 @@ Columns re, im, ζ.re, ζ.im. Scaled tolerance |err|/max(1,|expected|)≤1e−8.
     0.5,14.134725141734693,0,0
     0.5,21.02203963877155,0,0
     0.5,50,-0.081712108320979975,0.330792194038661296
-    1,9.064720283654388,1.34658377586538268,0.109882197134551052
+    1,9.064720283654388,1.34657954283631710,0.109883136796269501
     1.001,0,1000.57728847601163,0
+
+Oracle correction during V2 implementation: the previous row above was inconsistent with its stated mpmath 1.3.0 / 45 dps source. Re-evaluation gives the corrected values shown; the reference candidate and production Euler–Maclaurin implementation agree with the corrected independent result. The 404-point reproducible check remains the acceptance oracle.
 
 At the two rounded zeros the reference residual is approximately 10⁻¹⁵, so zero in the fixture is intentional within tolerance. Also test exact pole (1,0), near-pole (1+1e−8,0), out-of-domain (−3,20), nonfinite input, conjugation. For near-pole status do not display ζ as 0.
 

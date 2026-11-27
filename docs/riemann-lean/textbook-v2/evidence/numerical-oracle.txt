@@ -1,0 +1,1 @@
+PASS: 404 original plus 76 new mpmath zeta points; worst scaled 7.717929e-11, absolute 4.3149728e-10. 60 freshly computed heights (maximum difference 1.3272e-14), 20 mpmath explicit-formula values, 10 SymPy/mpmath counting fixtures.

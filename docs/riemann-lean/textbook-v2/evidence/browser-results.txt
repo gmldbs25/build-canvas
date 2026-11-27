@@ -1,0 +1,14 @@
+320px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+390px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+768px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+1024px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+1440px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+1920px: 12 chapters · 25 labs · 52 questions · no horizontal page overflow
+07–10: numeric readouts, presets, bounds, reset, worker tokens and keyboard/touch inputs
+Pages: home plus seven Work routes, and H navigation intact
+Navigation: old routes, manual study marks, resume and storage reset
+JS disabled: chapter text, math, example, navigation and answer disclosure
+Accessibility: native roles and labels, focus and contrast checks in paper/terminal themes
+Performance Chromium loopback · 390px, CPU 4×, 1.6 Mbps/150 ms: LCP 620 ms, cumulative CLS 0.0000, N change→second frame p95 149 ms, navigation→first zeta map 1972 ms
+320px edge checks: 09-A at x=1000 and N=60, all SVG labels inside the viewBox. 03-A π(1,000,000)=78498, no invalid input or page overflow.
+Targeted Part I–II interactions: factor paths, sieve undo, Ulam arrow keys, gap ratio, log axes, complex operations, Euler angles, partial sums, Euler product, geometric and ζ poles.
