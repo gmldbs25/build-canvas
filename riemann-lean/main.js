@@ -3,7 +3,7 @@ import { initLab, psiTrue, psiApprox, rmsError } from './psi.js';
 import { initLean, step as leanStep, getState } from './lean.js';
 import { initExperience, openExperience, closeExperience, isExperienceOpen,
   PI_ANCHORS, piExact, psiExact, isPrime, firstPrimeAtOrAbove, previousPrime,
-  density, li, amplitude, envelope, crossingX } from './experience.js?v=notebook-film';
+  density, li, amplitude, envelope, crossingX } from './experience.js?v=notebook-guide';
 
 const root = document.documentElement;
 const seam = document.getElementById('seam');

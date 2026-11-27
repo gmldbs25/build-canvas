@@ -192,3 +192,11 @@ html[data-xp="open"] #selftest { z-index: 260; }
 .xp__film-explore { border-top: 1px solid var(--rule); margin-top: 10px; }
 .xp__film-explore summary { display: list-item; padding: 11px 0; cursor: pointer; font-size: 14px; font-weight: 650; color: var(--rubric); }
 .xp__film-explore .xp__slider { margin: 0; border: 0; padding-top: 0; }
+.xp__factors { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 0; margin: 0; }
+.xp__factors dt, .xp__factors dd { padding: 10px 8px; border-bottom: 1px solid var(--rule); }
+.xp__factors dd { margin: 0; color: var(--rubric); font: 500 clamp(22px,3vw,34px)/1.3 Georgia,serif; }
+.xp__film-explore > p { margin: 0 0 9px; font-size: 14px; line-height: 1.5; }
+.xp__foot #xpFilmPlay { position: relative; overflow: hidden; }
+.xp__play-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--rubric); transform-origin: left; }
+.xp__play-time { font-variant-numeric: tabular-nums; font-size: .9em; }
+@media (prefers-reduced-motion: reduce) { .xp__play-fill { display: none; } }

@@ -11,6 +11,8 @@ const stepButtons = [...xpRoot.querySelectorAll('.xp__steps button')];
 const state = { step: 1 };
 let filmPlay;
 let filmTimer = 0;
+let elapsed = 0;
+let started = 0;
 let playing = false;
 const progress = [0, 0, 0, 0];
 const background = [...document.querySelectorAll('body > header, body > main, body > footer, body > .skip')];
@@ -499,11 +501,14 @@ const films = [
     { view: 'count', x: 3, title: '3도 소수예요.', caption: '오른쪽으로 가서 3을 확인해요. 소수 목록에 3을 보태면 2, 3으로 두 개죠. 선을 한 칸 올려 (3, 2)에 점을 찍어요.' },
     { view: 'count', x: 4, title: '4에서는 옆으로만 가요.', caption: '4는 2×2로 나뉘므로 소수가 아니에요. 가로 위치는 4가 되지만 소수는 여전히 2개예요. (3, 2)와 (4, 2)를 이으면 평평한 단이 생겨요.' },
     { view: 'count', x: 5, title: '소수를 만날 때만 올라요.', caption: '5는 소수라서 누적 개수가 3이 돼요. 이렇게 한 수씩 오른쪽으로 가다가 소수에서만 올라선 자취가 바로 소수 계단이에요.' },
-    { view: 'weight', x: 2, title: '파동과 비교할 두 번째 계단이에요.', caption: '리만의 공식으로 물결을 그리려면 소수의 개수 대신 점수를 쌓아요. 소수 p에서 더할 점수는 자연로그 ln p예요. 먼저 2에서 ln 2, 약 0.69만큼 올라가요.' },
-    { view: 'weight', x: 3, title: '3의 몫은 약 1.10이에요.', caption: '3은 2보다 큰 소수여서 오르는 높이도 달라요. 앞서 쌓은 ln 2 위에 ln 3을 더하면 지금까지 쌓은 높이가 약 1.79가 돼요.' },
-    { view: 'weight', x: 4, title: '같은 소수를 곱한 수도 세요.', caption: '아까 4에서는 옆으로만 갔죠. 새 규칙은 4 = 2×2도 세요. 밑이 2이므로 ln 2를 한 번 더 얹어요. 이제 높이는 약 2.48이에요.' },
-    { view: 'weight', x: 5, title: '5에서 높이 4.094에 닿아요.', caption: '소수 5의 몫 ln 5를 보태요. 검은 계단은 5를 지난 뒤에도 다음 점프까지 높이 약 4.094를 유지해요. 이제 이 높이를 파동으로 얼마나 가깝게 그릴 수 있는지 볼게요.' },
-    { view: 'gap', count: 0, title: '같은 자리에서 두 높이를 재요.', caption: '5와 6 사이인 5.5에 자를 세워요. 계단의 높이는 그대로 4.094인데, 파동을 아직 더하지 않은 붉은 밑그림은 3.679예요. 두 점 사이의 세로 거리 약 0.415가 여기서의 오차예요.' },
+    { view: 'factors', title: '이번에는 곱셈을 기록해요.', caption: '개수만 세면 4가 소수 2를 두 번 쓴다는 정보는 남지 않아요. 이번엔 1부터 차례로 만난 수로 모두 나누어떨어지는 가장 작은 수를 기록해요. 2와 3에는 6이면 충분하고, 4까지 포함하려면 12가 필요해요.' },
+    { view: 'weight', x: 2, title: '곱셈 한 번을 계단 한 칸으로.', caption: '몇 배가 됐는지를 더해 가는 높이로 바꾸고 싶어요. 자연로그 ln을 쓰면 곱셈이 덧셈이 돼요. 가로 위치 x는 어디까지 봤는지, p는 새로 필요한 소수예요. x = 2에서는 p = 2라서 높이에 ln 2를 더해요.' },
+    { view: 'weight', x: 3, title: '3을 곱하면 ln 3을 더해요.', caption: '2와 3을 모두 담으려면 2 × 3 = 6이 필요해요. 높이로 쓰면 ln 6 = ln 2 + ln 3이에요. 3을 만난 칸에서 약 1.10만큼 올라요.' },
+    { view: 'weight', x: 4, title: '4에서 왜 또 ln 2일까요?', caption: '2와 4에서 얻은 ln 2를 모으면 ln 4예요. 제타 함수를 소수별 곱으로 쓰고 로그의 변화율을 살펴보면, 소수의 거듭제곱마다 바로 이 점수 ln p가 나와요. 그래서 같은 함수의 영점에서 얻은 물결로 이 계단을 설명할 수 있어요.' },
+    { view: 'weight', x: 5, title: '5까지 기록한 높이는 4.094예요.', caption: '새 소수 5를 곱하면 12 × 5 = 60이에요. 높이는 ln 60, 약 4.094예요. 60은 이미 6으로 나누어떨어져서 6에서는 곱할 게 없어요. 검은 계단이 5에서 6까지 평평한 이유예요.' },
+    { view: 'baseline', count: 0, title: '계단을 미리 그려 볼 수 있을까요?', caption: '멀리까지 정확히 그리려면 소수와 그 거듭제곱을 계속 찾아야 해요. 리만의 공식은 먼저 매끈한 밑그림을 주고 영점의 물결로 고쳐요. 검은 계단 위에 물결을 넣기 전의 붉은 밑그림을 겹쳐 볼게요.' },
+    { view: 'sample', count: 0, title: '비교할 자리부터 정해요.', caption: '5에서 6으로 가는 중간, 5.5에 멈춰요. 새로 셀 정수가 없어서 검은 계단은 5에서 잰 4.094 그대로예요. 이제 같은 세로줄을 따라 붉은 밑그림을 읽을 차례예요.' },
+    { view: 'gap', count: 0, title: '밑그림은 얼마나 낮을까요?', caption: '같은 5.5에서 붉은 점은 3.679예요. 검은 점 4.094에서 빼면 약 0.415. 이 세로 간격이 밑그림이 실제 높이를 놓친 만큼, 즉 이 자리에서의 오차예요.' },
     { view: 'gap', count: 60, title: '5.5에서 두 점이 가까워져요.', caption: '영점은 제타 함수의 값이 0이 되는 점이에요. 그런 점 한 쌍에서 물결 하나가 나와요. 60개를 겹친 붉은 선은 5.5에서 4.118이 돼요. 같은 자리에서 잰 오차가 약 0.024로 줄었어요.' }
   ],
   [
@@ -519,16 +524,16 @@ function stopFilm() {
   clearTimeout(filmTimer);
   filmTimer = 0;
   playing = false;
+  elapsed = 0;
 }
 
 function updatePlayButton() {
   const last = progress[state.step - 1] === films[state.step - 3].length - 1;
-  filmPlay.textContent = playing ? 'Ⅱ 일시정지' : last ? '↻ 다시 재생' : '▷ 연속 재생';
-  filmPlay.setAttribute('aria-label', playing ? '장면 일시정지' : last ? '첫 장면부터 다시 재생' : '이 장면부터 연속 재생');
+  filmPlay.textContent = playing ? 'Ⅱ 일시정지' : last ? '↻ 다시 재생' : elapsed ? '▷ 이어 재생' : '▷ 연속 재생';
+  filmPlay.setAttribute('aria-label', playing ? '장면 일시정지' : last ? '첫 장면부터 다시 재생' : elapsed ? '멈춘 시간부터 이어 재생' : '이 장면부터 연속 재생');
 }
 
 function scheduleFrame() {
-  clearTimeout(filmTimer);
   const frames = films[state.step - 3];
   const i = progress[state.step - 1];
   if (i === frames.length - 1) {
@@ -536,20 +541,38 @@ function scheduleFrame() {
     updatePlayButton();
     return;
   }
-  // Let the drawing finish and leave time to read the entire caption.
-  filmTimer = setTimeout(() => {
-    if (!playing || !isExperienceOpen()) return;
-    progress[state.step - 1]++;
-    renderStage(true, { action: true });
-    scheduleFrame();
-  }, Math.max(5200, frames[i].caption.length * 105));
+  const duration = clamp(frames[i].caption.length * 48, 3500, 6000);
+  started = performance.now() - elapsed;
+  const fill = make(filmPlay, 'i', 'xp__play-fill');
+  fill.setAttribute('aria-hidden', 'true');
+  const seconds = make(filmPlay, 'span', 'xp__play-time');
+  seconds.setAttribute('aria-hidden', 'true');
+  const motion = allowsMotion();
+  function tick() {
+    const time = performance.now() - started;
+    const remaining = Math.max(0, Math.ceil((duration - time) / 1000));
+    seconds.textContent = ' ' + remaining + '초';
+    fill.style.transform = 'scaleX(' + Math.min(1, time / duration) + ')';
+    if (time < duration) {
+      filmTimer = setTimeout(tick, Math.min(motion ? 60 : 500, duration - time));
+    } else {
+      elapsed = 0;
+      progress[state.step - 1]++;
+      renderStage(true, { action: true });
+      scheduleFrame();
+    }
+  }
+  tick();
 }
 
 function toggleFilm() {
   const scene = xpBody.querySelector('.xp__film:not(.is-exiting)');
   const ink = scene?.querySelector('.xp__film-chart');
   if (playing) {
+    const pausedAt = performance.now() - started;
     stopFilm();
+    elapsed = pausedAt;
+    updatePlayButton();
     ink?.getAnimations({ subtree: true }).forEach(animation => animation.pause());
   } else {
     playing = true;
@@ -559,9 +582,9 @@ function toggleFilm() {
     } else ink?.getAnimations({ subtree: true }).forEach(animation => {
       if (animation.playState === 'paused') animation.play();
     });
+    updatePlayButton();
     scheduleFrame();
   }
-  updatePlayButton();
 }
 
 function renderFilm(spread, chapter, i, animate) {
@@ -569,6 +592,7 @@ function renderFilm(spread, chapter, i, animate) {
   const frame = frames[i];
   spread.classList.add('xp__film');
   spread.dataset.filmFrame = String(i + 1);
+  spread.dataset.filmView = frame.view;
   const words = make(spread, 'div', 'xp__words');
   make(words, 'p', 'xp__kicker', '관찰 0' + (chapter + 3) + '  /  ' + (chapter ? '가설 실험' : '계단 그리기'));
   const heading = make(words, 'h2', 'xp__frame-title', frame.title);
@@ -576,7 +600,7 @@ function renderFilm(spread, chapter, i, animate) {
   make(words, 'p', 'xp__subtitle', frame.caption);
   const plate = make(spread, 'figure', 'xp__plate xp__film-plate');
   const strip = make(plate, 'figcaption', 'xp__strip');
-  const section = { count: '소수 세기', weight: '높이 더하기', gap: '오차 재기', wave: '한 물결의 진폭', distance: '같은 눈금으로 비교', scale: '기준과 비교', ending: '관찰의 결론' };
+  const section = { factors: '곱셈 기록', baseline: '계단 위에 밑그림', sample: '비교할 자리', count: '소수 세기', weight: '높이 더하기', gap: '오차 재기', wave: '한 물결의 진폭', distance: '같은 눈금으로 비교', scale: '기준과 비교', ending: '관찰의 결론' };
   make(strip, 'span', '', section[frame.view]);
   make(strip, 'small', '', '장면 ' + (i + 1) + ' / ' + frames.length);
   const timeline = make(plate, 'div', 'xp__timeline');
@@ -584,9 +608,11 @@ function renderFilm(spread, chapter, i, animate) {
   for (let k = 0; k < frames.length; k++) make(timeline, 'i', k <= i ? 'seen' : '');
   const chart = make(plate, 'div', 'xp__film-chart');
   if (frame.view === 'count' || frame.view === 'weight') drawCountingFrame(chart, frame, animate);
-  else if (frame.view === 'gap') drawGapFrame(chart, frame, animate);
+  else if (frame.view === 'factors') drawFactorsFrame(chart);
+  else if (['baseline', 'sample', 'gap'].includes(frame.view)) drawGapFrame(chart, frame, animate);
   else if (frame.view === 'wave' || frame.view === 'distance') drawWaveFrame(chart, frame, animate);
   else drawScaleFrame(chart, frame, 0.9, animate && frame.view === 'scale');
+  if (frame.view === 'weight' && frame.x === 4) primeProductNote(plate);
   if (i === frames.length - 1) exploreLastFrame(plate, chart, chapter, frame);
   previous.disabled = false;
   previous.textContent = i ? '← 이전 장면' : '← 이전 관찰';
@@ -658,6 +684,25 @@ function drawCountingFrame(chart, frame, animate) {
   }
 }
 
+function drawFactorsFrame(chart) {
+  const list = make(chart, 'dl', 'xp__factors');
+  for (const [limit, product] of [['2까지', '2'], ['3까지', '2 × 3 = 6'], ['4까지', '2 × 2 × 3 = 12']]) {
+    make(list, 'dt', '', limit);
+    make(list, 'dd', '', product);
+  }
+  formula(chart, '4가 되면서 새로 필요한 인수는 2 하나예요.');
+}
+
+function primeProductNote(plate) {
+  const details = make(plate, 'details', 'xp__film-explore');
+  make(details, 'summary', '', '제타 함수에도 왜 같은 점수가 나올까요?');
+  make(details, 'p', '', '제타 함수는 소수마다 하나씩 있는 인수들을 곱한 식이에요. 로그를 취하면 곱이 합으로 풀려요. 이 합을 미분해 부호를 바꾸면 소수 p의 거듭제곱마다 ln p가 한 번씩 나타나요.');
+  const equation = make(details, 'p', 'xp__formula-line', '−ζ′(s)/ζ(s) = ∑ₚ ∑ₖ≥₁ (ln p) / p');
+  make(equation, 'sup', '', 'ks');
+  make(details, 'p', 'xp__chart-key', 'p는 모든 소수, k는 1부터 시작하는 정수예요. 이 급수는 실수부가 1보다 큰 s에서 수렴해요. 이 점수를 모은 계단의 높이는 명시적 공식을 통해 영점들과 연결돼요.');
+  details.addEventListener('toggle', () => { if (details.open && playing) toggleFilm(); });
+}
+
 function drawGapFrame(chart, frame, animate) {
   const count = frame.count;
   const exact = psiTrue(5.5);
@@ -665,7 +710,10 @@ function drawGapFrame(chart, frame, animate) {
   const estimate = psiApprox(5.5, terms);
   const x = v => 31 + (v - 4.5) * 153;
   const y = v => 173 - (v - 2.35) * 63;
-  const svg = diagram(chart, 400, 226, '가로 위치 5.5에서 검은 계단과 붉은 근사선의 세로 거리 ' + Math.abs(exact - estimate).toFixed(3));
+  const summary = frame.view === 'baseline' ? '검은 계단 위에 겹친 매끈한 붉은 밑그림' :
+    frame.view === 'sample' ? '5와 6 사이에서 그대로 유지되는 검은 계단 높이 ' + exact.toFixed(3) :
+    '가로 위치 5.5에서 검은 계단과 붉은 근사선의 세로 거리 ' + Math.abs(exact - estimate).toFixed(3);
+  const svg = diagram(chart, 400, 226, summary);
   lettering(svg, 11, 15, '↑ 더해 온 높이', 'start', 'film-axis-title');
   for (const v of [2.5, 3, 3.5, 4, 4.5]) {
     line(svg, x(4.5), y(v), x(6), y(v));
@@ -680,8 +728,20 @@ function drawGapFrame(chart, frame, animate) {
     points.push((i ? 'L' : 'M') + x(at).toFixed(2) + ' ' + y(psiApprox(at, terms)).toFixed(2));
   }
   trace(svg, points.join(' '), 'film-approx', animate);
+  if (frame.view === 'baseline') {
+    lettering(svg, 279, y(exact) - 3, '검은 계단', 'start', 'film-label-ink');
+    lettering(svg, 279, y(estimate) + 16, '붉은 밑그림', 'start', 'film-label');
+    formula(chart, '검은 선은 직접 센 높이 · 붉은 선은 첫 예상');
+    return;
+  }
   line(svg, x(5.5), 27, x(5.5), 180, 'film-guide');
   pin(svg, x(5.5), y(exact));
+  if (frame.view === 'sample') {
+    line(svg, x(5.5) + 6, y(exact), 273, y(exact), 'film-guide');
+    lettering(svg, 280, y(exact) + 4, '실제 4.094', 'start', 'film-label-ink');
+    formula(chart, '5까지 센 높이 = 5.5에서의 높이');
+    return;
+  }
   pin(svg, x(5.5), y(estimate), true);
   // The guided frames share a scale. Allow room for larger exploratory values.
   const rulerTop = Math.max(4.18, estimate + 0.08);
