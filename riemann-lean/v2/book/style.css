@@ -93,7 +93,9 @@ svg, canvas, img { max-width: 100%; }
 .brand b { color: var(--accent); }
 .work-id { font-family: var(--mono); color: var(--muted); white-space: nowrap; border-left: 1px solid var(--border); padding-left: clamp(.6rem, 2vw, 1.65rem); }
 .mast-title { font-weight: 650; }
-.mast-glossary { margin-left: auto; padding: .65rem 0; white-space: nowrap; }
+.mast-story, .mast-glossary { display: flex; align-items: center; min-height: 44px; }
+.masthead .mast-story { margin-left: auto; color: var(--accent); }
+.mast-glossary { white-space: nowrap; }
 .mast-contents > summary { list-style: none; min-height: 44px; display: flex; align-items: center; gap: .35rem; white-space: nowrap; }
 .mast-contents > summary::-webkit-details-marker { display: none; }
 .mast-contents > summary::after { content: "▾"; }
@@ -259,10 +261,13 @@ svg, canvas, img { max-width: 100%; }
   .toc a { min-height: 44px; align-items: center; }
 }
 @media (max-width: 360px) {
-  .masthead { padding-inline: .72rem; gap: .55rem; }
+  .masthead { padding-inline: .72rem; gap: .55rem; font-size: .8rem; }
   .mast-glossary { font-size: .8rem; }
   .mast-contents > summary { font-size: .8rem; }
   .hero h1 { font-size: 1.95rem; }
+}
+@media (max-width: 450px) {
+  .masthead .work-id { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; }

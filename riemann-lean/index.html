@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" class="no-js" data-mode="intuition" data-era="paper">
+<html lang="ko" class="no-js" data-era="paper">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -25,11 +25,11 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=story-textbook">
   <link rel="stylesheet" href="./paper.css">
-  <link rel="stylesheet" href="./terminal.css">
+  <link rel="stylesheet" href="./terminal.css?v=story-textbook">
   <link rel="stylesheet" href="./experience.css?v=notebook-guide">
-  <script type="module" src="./main.js?v=notebook-guide"></script>
+  <script type="module" src="./main.js?v=story-textbook"></script>
 </head>
 <body>
   <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -49,8 +49,8 @@
       <button class="xp-entry js-only" id="xpOpen" type="button" aria-haspopup="dialog" aria-controls="xpRoot" aria-label="체험 모드 열기" data-xp-open data-xp-step="1">
         <span aria-hidden="true">№</span><span class="xp-entry__label">체험 모드</span>
       </button>
+      <a class="textbook-link" href="./textbook/">심화 교과서 ↗</a>
       <span class="era" id="era"><b>1859</b> · PAPER</span>
-      <button class="mode js-only" id="modeToggle" type="button" aria-pressed="false" aria-label="수학과 모드"><span>직관</span><span>수학<span class="mode-long">과</span></span></button>
     </div>
     <div class="progress" id="progress" aria-hidden="true"></div>
   </header>
@@ -117,22 +117,13 @@
           <blockquote class="riemann-quote">
             <p>“물론 이에 대한 엄밀한 증명이 있었으면 한다. 다만 몇 차례의 덧없는 시도 끝에, 당장의 목적에는 필요치 않아 보여 그 추구는 잠시 접어두었다.”</p>
             <cite>— 베른하르트 리만, 1859</cite>
-            <p class="only-math" lang="de"><small>Hievon wäre allerdings ein strenger Beweis zu wünschen; ich habe indeß die Aufsuchung desselben, nach einigen flüchtigen vergeblichen Versuchen vorläufig bei Seite gelassen…</small></p>
           </blockquote>
           <p>소수의 개수를 기록하는 함수 π(x)는 x 이하의 소수가 몇 개인지 알려 준다. 체험 모드 2단계에서 비교한 개수와 비율도 이 함수에서 나온다. 3단계에서는 같은 수들을 두 가지 계단으로 그려 본다.</p>
-          <p class="only-intuition">계단을 상상해 보자. 1부터 걸어가다가 소수를 만날 때마다 한 칸씩 오른다. 2와 3에서는 한 칸씩 오르고, 4에서는 높이가 그대로이며, 5에서는 다시 오른다. 매끄러운 예측 곡선을 이 계단에 겹치면 두 높이의 차이가 생긴다. 리만은 그 차이를 이해할 수 있는 새로운 길을 열었다.</p>
-          <div class="only-math">
-            <p>π(x)는 x 이하의 소수 개수다. 소수 정리 π(x) ∼ x/ln x (1896). 가우스의 추정에 나오는 로그 적분은 더 정확하다.</p>
-            <div class="formula" role="math" aria-label="로그 적분 엘 아이 엑스는 이부터 엑스까지 로그 티의 역수를 적분한 값이다."><span>Li(x)</span><span class="op">=</span><span class="sum"><span class="sum__body">∫</span><span class="sum__sub">2 ≤ t ≤ x</span></span><span class="frac"><span class="frac__num">dt</span><span class="frac__den">ln t</span></span></div>
-          </div>
+          <p>계단을 상상해 보자. 1부터 걸어가다가 소수를 만날 때마다 한 칸씩 오른다. 2와 3에서는 한 칸씩 오르고, 4에서는 높이가 그대로이며, 5에서는 다시 오른다. 매끄러운 예측 곡선을 이 계단에 겹치면 두 높이의 차이가 생긴다. 리만은 그 차이를 이해할 수 있는 새로운 길을 열었다.</p>
         </div>
         <details class="note" open>
           <summary>소수를 세는 방법</summary>
-          <p class="only-intuition">계단의 높이는 지금까지 발견한 소수의 개수다. 두 지점의 높이 차를 보면 그 사이에 소수가 몇 개 있는지 알 수 있다. 매끄러운 예측 곡선이 실제 계단의 높이를 얼마나 잘 따라가는지가 다음 막의 질문이다.</p>
-          <div class="only-math">
-            <p>π(x) = #{ p ≤ x : p 소수 }, π(x) ~ x / ln x (소수 정리, 1896).</p>
-            <p>전체 구간에서 소수가 차지하는 비율 π(x)/x와 x 근처의 평균 밀도는 다른 개념이다. 둘 다 큰 x에서 대략 1/ln x의 규모를 갖지만, 특정한 짧은 구간에 정확히 그만큼의 소수가 있다는 뜻은 아니다.</p>
-          </div>
+          <p>계단의 높이는 지금까지 발견한 소수의 개수다. 두 지점의 높이 차를 보면 그 사이에 소수가 몇 개 있는지 알 수 있다. 매끄러운 예측 곡선이 실제 계단의 높이를 얼마나 잘 따라가는지가 다음 막의 질문이다.</p>
         </details>
       </div>
       <p class="page-num" aria-hidden="true">— 1 —</p>
@@ -167,7 +158,7 @@
                 <div id="wavePane"><div class="lab-chart-key"><span>실제 ψ(x)</span><span>영점 근사</span><span id="waveKey">γ₁의 파동</span></div><canvas id="psiCanvas" role="img" aria-label="ψ(x) 소수 계단과 영점 근사"></canvas><span id="psiSummary" class="sr-only" aria-live="polite"></span></div>
                 <div id="planePane"><output id="planeCoordinate" class="plane-coordinate" aria-live="off">ρ = 0.500 + 14.13i</output><canvas id="planeCanvas" aria-hidden="true"></canvas><span id="planeSummary" class="sr-only"></span></div>
               </div>
-              <figcaption>첫 60개 켤레 영점 쌍 중 <span id="labModelN">15</span>쌍을 사용한 근사입니다. σ는 영점의 가로 좌표, γ는 세로 좌표입니다. σ를 바꾸는 것은 가상의 모형 실험입니다.</figcaption>
+              <figcaption>첫 60개 켤레 영점 쌍 중 <span id="labModelN">15</span>쌍을 사용한 근사입니다 (x=2–100). 검은 계단과 잔차는 오른쪽 연속 ψ를 기준으로 합니다. 영점을 대칭적으로 더하는 명시적 공식은 점프에서 좌우 극한의 평균 ψ₀를 줍니다. 여기서는 ζ를 직접 평가하지 않습니다. σ를 바꾸는 것은 가상의 모형 실험입니다.</figcaption>
             </figure>
           </div>
           <details id="labControls" class="lab-controls" open>
@@ -208,11 +199,7 @@
             <p>여기서 s는 함수에 넣는 수다. 실수뿐 아니라 s = σ + iγ처럼 실수부 σ와 허수부 γ를 가진 복소수도 넣을 수 있다. 이 두 값은 평면 위의 가로·세로 좌표가 된다. 원래의 합과 곱은 σ가 1보다 클 때 절대수렴한다. 해석적 연속은 원래 함수와 일치하는 영역을 유지하면서 정의 범위를 넓히는 방법이다. 리만은 이 방법으로 s = 1을 제외한 복소평면 전체에 제타 함수를 확장했다.</p>
           </article>
           <article class="step page" data-step="1" data-n="1" data-sigma="0.50">
-            <p class="only-intuition">복소평면으로 범위를 넓히면 실수만 넣었을 때에는 만날 수 없었던 영점들을 발견할 수 있다. 이제 소수의 문제를 제타 함수의 모양, 특히 함수값이 0이 되는 위치를 조사하는 문제로 바꿀 수 있다.</p>
-            <div class="only-math">
-              <p>급수와 곱은 Re(s) &gt; 1에서 절대수렴한다. 해석적 연속으로 s = 1의 단순극만 남기고 전 평면으로 확장된다. 영점이 있는 띠 0 &lt; Re(s) &lt; 1에서는 급수가 발산한다. 급수만으로는 그 띠의 값을 볼 수 없다. 해석적 연속은 유일하다(항등정리). 완성된 함수 ξ(s)는 전해석이고 ξ(s) = ξ(1−s)를 만족한다.</p>
-              <p>곱의 수렴 조건도 짚어 둘 만하다. 오일러 곱은 Σ p^−σ가 수렴할 때, 즉 σ &gt; 1일 때 절대수렴한다. σ = 1에서 이 급수는 소수의 역수 합이 되어 발산한다. ζ가 s = 1에 갖는 극이 이 발산에 반영된다.</p>
-            </div>
+            <p>복소평면으로 범위를 넓히면 실수만 넣었을 때에는 만날 수 없었던 영점들을 발견할 수 있다. 이제 소수의 문제를 제타 함수의 모양, 특히 함수값이 0이 되는 위치를 조사하는 문제로 바꿀 수 있다.</p>
           </article>
           <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
             <p class="label">S2</p><h3>임계 띠의 영점</h3>
@@ -220,55 +207,30 @@
             <p>영점의 위치는 규칙적이지 않다. 허수부가 양인 첫 영점의 높이는 <span data-fact="lab.firstHeights.0">14.134725</span>…, 둘째는 <span data-fact="lab.firstHeights.1">21.022</span>…, 셋째는 <span data-fact="lab.firstHeights.2">25.010</span>… 이다. 등차수열도 아니고, 소수처럼 들쭉날쭉하다. 그런데 개수는 매끄럽다. 높이 T 아래에 있는 영점의 수는 T가 커질수록 T log T에 비례해 늘어난다. 개별 위치는 불규칙해 보여도 전체 개수에는 뚜렷한 성장률이 있다. 소수에서 보았던 그 이중성이 영점에서 다시 나타난다.</p>
           </article>
           <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
-            <div class="only-math">
-              <p>함수방정식은 아래와 같다. 제타 함수 ζ의 자명한 영점은 s = −2, −4, −6, … 이다. 임계 띠는 0 &lt; Re(s) &lt; 1이다.</p>
-              <div class="formula" role="math" aria-label="크사이 s는 이분의 일 곱하기 s 곱하기 s 빼기 일 곱하기 파이의 마이너스 s 나누기 이 제곱 곱하기 감마 s 나누기 이 곱하기 제타 s. 크사이 s는 크사이 일 빼기 s와 같습니다."><span>ξ(s)</span><span class="op">=</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>s(s−1)</span><span>π<sup>−s/2</sup></span><span>Γ(s/2)</span><span>ζ(s),</span><span>ξ(s) = ξ(1−s)</span></div>
-            </div>
             <p>왜 하필 1/2인가. 제타 함수에는 영점의 위치를 임계선 양쪽으로 거울처럼 대응시키는 대칭성이 있다. 어떤 비자명한 영점의 가로 좌표가 0.4라면 같은 높이에서 0.6인 영점도 존재해야 한다. 그래서 오른쪽에 영점이 없음을 증명하면 왼쪽에도 없다는 결론이 따라온다. 이 대칭만으로 모든 영점이 가운데에 있다는 결론이 나오지는 않는다.</p>
             <p>수많은 영점이 계산으로 확인되었고, 확인된 범위에서는 모두 임계선 위에 있었다. 그러나 유한한 확인만으로 무한히 많은 영점에 대한 명제를 증명할 수는 없다. 리만 가설이 왜 중요한지는 이제 그 영점들이 소수 계단과 어떻게 연결되는지 보면 드러난다.</p>
           </article>
           <article class="step page" data-step="2" data-n="3" data-sigma="0.50">
-            <p class="only-intuition">영점의 가로 좌표와 세로 좌표는 서로 다른 역할을 한다. 세로 좌표 γ는 로그 눈금 위에서 파동이 얼마나 촘촘하게 흔들리는지를, 가로 좌표 σ는 수의 범위가 커질 때 파동의 진폭이 얼마나 빠르게 성장하는지를 정한다. 다음 구간에서 이 관계를 실제 계단과 연결해 보자.</p>
-            <div class="only-math">
-              <div class="formula" role="math" aria-label="엔 티는 티를 이 파이로 나눈 값에 그 로그를 곱한 뒤 티를 이 파이로 나눈 값을 빼고 로그 티 크기의 오차를 더한 값이다."><span>N(T)</span><span class="op">=</span><span class="frac"><span class="frac__num">T</span><span class="frac__den">2π</span></span><span>log(T/2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">T</span><span class="frac__den">2π</span></span><span class="op">+</span><span>O(log T)</span></div>
-              <p>영점 개수의 점근식은 리만–폰 망골트 공식이다. 제타 급수의 계수가 실수이므로 해석적 연속에서도 켤레 대칭 ζ(s̄) = conj ζ(s)가 따라오고, 영점은 켤레쌍으로 나타난다. 함수방정식 대칭 s ↔ 1−s와 켤레 대칭을 합치면, 임계선을 벗어난 영점은 네 개씩(ρ, ρ̄, 1−ρ, 1−ρ̄) 묶여 나타난다. 그래서 σ &gt; 1/2인 영점이 없음을 보이는 것만으로 충분하다.</p>
-            </div>
+            <p>영점의 가로 좌표와 세로 좌표는 서로 다른 역할을 한다. 세로 좌표 γ는 로그 눈금 위에서 파동이 얼마나 촘촘하게 흔들리는지를, 가로 좌표 σ는 수의 범위가 커질 때 파동의 진폭이 얼마나 빠르게 성장하는지를 정한다. 다음 구간에서 이 관계를 실제 계단과 연결해 보자.</p>
           </article>
           <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
             <p class="label">S3</p><h3>매끄러운 직선에서 파동을 빼면</h3>
             <p>명시적 공식은 이 글에서 가장 아름다운 부분이다. 다만 소수를 하나씩 세는 π(x) 대신, 파동과 연결하기 편한 가중 계단 ψ(x)를 사용한다. 소수 p를 만나면 ln p만큼 오르고, p의 거듭제곱을 만나도 같은 높이만큼 오른다. 예를 들어 2와 4에서는 각각 ln 2를 더한다. 로그 가중치를 쓰면 소수가 희박해지는 효과가 평균적으로 상쇄되어 기준선은 곡선 대신 직선 x가 된다. 오일러 곱을 로그 미분하면 바로 이 가중치가 나타난다. 체험 모드 3단계에서 두 계단의 차이를 볼 수 있다.</p>
             <p>가중 계단의 높이는 직선 x에서 여러 파동과 작은 보정항을 빼서 구할 수 있다. 파동은 제타 함수의 비자명한 영점에서 나온다. 허수부의 부호가 반대인 켤레 영점 한 쌍을 묶으면 실제 그래프에 그릴 수 있는 실수 파동 하나가 된다.</p>
-            <div class="only-math">
-              <div class="formula" role="math" aria-label="프사이 x는 x 이하의 소수 거듭제곱에 대해 로그 p를 모두 더한 값"><span>ψ(x)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">p<sup>k</sup> ≤ x</span></span><span>ln p</span><span>(p 소수, k ≥ 1)</span></div>
-              <div class="formula" role="math" aria-label="마이너스 제타 함수의 로그 미분은 소수 p와 양의 정수 k에 대한 로그 p 곱하기 p의 마이너스 ks 제곱의 합"><span>−ζ′(s)/ζ(s)</span><span class="op">=</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">p 소수, k ≥ 1</span></span><span>(ln p) p<sup>−ks</sup></span><span>(Re(s) &gt; 1)</span></div>
-              <p>오일러 곱의 로그 미분과 페론 공식, 유수 계산을 통해 ψ와 영점이 연결된다. 1859년 논문의 가중 계수 함수와 현대의 ψ는 가중치가 다르다. 아래 명시적 공식은 x &gt; 1에서 점프 양쪽의 평균값 ψ₀(x)를 나타내며, 영점 합은 허수부 높이에 따라 대칭적으로 극한을 취한다.</p>
-            </div>
             <div class="formula" role="math" aria-label="리만 명시적 공식. 좌우 극한을 평균한 프사이 x는 x 빼기 영점에 대한 x의 로 제곱 나누기 로의 합, 빼기 로그 2파이, 빼기 2분의 1 로그 1 빼기 x의 마이너스 2제곱."><span>ψ<sub>0</sub>(x)</span><span class="op">=</span><span>x</span><span class="op">−</span><span class="sum"><span class="sum__body">Σ</span><span class="sum__sub">ρ</span></span><span class="frac"><span class="frac__num">x<sup>ρ</sup></span><span class="frac__den">ρ</span></span><span class="op">−</span><span>ln(2π)</span><span class="op">−</span><span class="frac"><span class="frac__num">1</span><span class="frac__den">2</span></span><span>ln(1 − x<sup>−2</sup>)</span></div>
             <p>영점 ρ = σ + iγ와 그 켤레를 합쳐 얻은 파동은 로그 눈금에서 흔들린다. 주파수는 γ이고 진폭은 x^σ에 비례한다(영점별 계수도 곱해진다). 임계선 위에서는 σ = 1/2이므로 √x에 비례한다. 실험대의 막대 하나는 켤레 영점 한 쌍의 기여를 나타낸다.</p>
           </article>
           <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
             <p>겹친 파동은 여러 구간에서 서로를 상쇄한다. 주파수가 제각각이라 어느 지점에서든 부호가 뒤섞인다. 소수의 거듭제곱 근처에서는 파동의 합이 눈에 띄게 달라져 계단이 ln p만큼 올라가는 모양을 되살린다. 더 많은 영점을 넣으면 점프 근처의 전이가 좁아지고, 모서리가 더 날카로워진다.</p>
             <p>실험대에서 N을 1에서 15, 60으로 바꾸면 더 많은 파동이 겹치며 계단의 모양에 가까워지는 모습을 관찰할 수 있다. 여기서 근사 오차는 제한된 화면 범위와 선택한 영점 수에 대한 값이다. 체험 모드 3단계는 x = 5.5에서 두 높이를 직접 비교한다. 점 하나에서 근사가 좋아지는 것과 무한한 범위에서 오차를 보증하는 것은 다른 문제다.</p>
-            <div class="only-math">
-              <p>폰 망골트 명시적 공식. 합은 비자명 영점 전체. 계단의 점프 앞에서 근사는 링잉을 보이며, N을 늘리면 좁아진다.</p>
-              <div class="formula" role="math" aria-label="로의 실수부가 이분의 일이면 엑스의 로 제곱은 엑스의 제곱근에 감마 로그 엑스의 코사인 더하기 아이 곱하기 감마 로그 엑스의 사인을 곱한 값이다."><span>x<sup>ρ</sup></span><span class="op">=</span><span>√x · (cos(γ ln x) + i sin(γ ln x)),</span><span>(ρ = 1/2 + iγ)</span></div>
-            </div>
           </article>
           <article class="step page" data-step="3" data-n="15" data-sigma="0.50">
             <p>영점의 가로 좌표 σ가 1/2이면 각 파동의 진폭은 √x에 비례한다. 1/2보다 크면 그 파동은 √x보다 더 빠르게 성장한다. 실험대에서 점을 오른쪽으로 옮기면 이 차이를 관찰할 수 있다.</p>
-            <p class="only-intuition">합주를 생각해 보자. 저마다 다른 주파수의 파동이 겹치면서 어떤 곳에서는 서로 상쇄하고 어떤 곳에서는 더해진다. 소수 계단의 모양은 이러한 항들의 합으로 복원된다. 실제 공식은 계단이 뛰는 지점에서 양쪽 높이의 평균으로 수렴한다.</p>
-            <div class="only-math">
-              <p>켤레쌍을 묶으면 항 하나가 실수 함수가 된다. 아래 노트에서 ρ = σ + iγ, u = ln x일 때의 기여를 볼 수 있다. 같은 σ에서 γ가 큰 영점일수록 진폭이 작다. 스펙트럼에서 낮은 γ의 막대가 큰 이유가 이것이다.</p>
-              <div class="formula" role="math" aria-label="진폭은 이 곱하기 엑스의 시그마 제곱을 시그마 제곱과 감마 제곱의 합의 제곱근으로 나눈 값이다. 위상은 아크탄젠트 투 감마, 시그마다."><span>A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ<sup>2</sup> + γ<sup>2</sup>)</span></span><span>φ = atan2(γ, σ)</span></div>
-              <p>점프에서 명시적 공식의 값은 좌우 극한의 평균이다. 유한한 N에서 근사는 점프 앞에서 링잉을 보이고, N을 늘리면 링잉의 폭이 좁아지지만 초과 진폭은 완전히 사라지지 않는다. 이것은 푸리에 급수의 깁스 현상과 같은 성질이다.</p>
-            </div>
+            <p>합주를 생각해 보자. 저마다 다른 주파수의 파동이 겹치면서 어떤 곳에서는 서로 상쇄하고 어떤 곳에서는 더해진다. 소수 계단의 모양은 이러한 항들의 합으로 복원된다. 실제 공식은 계단이 뛰는 지점에서 양쪽 높이의 평균으로 수렴한다.</p>
           </article>
           <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
-            <p class="label">S4</p><h3><span class="only-intuition">1/2</span><span class="only-math">Re(s) = 1/2</span>의 의미</h3>
+            <p class="label">S4</p><h3>1/2의 의미</h3>
             <p>리만 가설 자체는 모든 비자명한 영점의 실수부가 1/2이라는 명제다. 그 명제가 성립하면 개별 파동의 진폭은 √x에 비례하고, 모든 파동을 합친 가중 계단의 오차도 √x에 로그의 제곱을 곱한 규모로 제한된다. 소수를 세는 π(x)의 오차에도 대응하는 한계가 생긴다. 즉 개별 소수의 위치를 알아내는 공식이 아니라, 분포를 예측할 때 오차가 얼마나 빠르게 커질 수 있는지에 대한 보증이다.</p>
-            <div class="only-math">
-              <div class="formula" role="math" aria-label="리만 가설은 모든 비자명 영점의 실수부가 이분의 일이라는 뜻입니다. 이는 프사이 및 소수 계수 함수의 오차 상한과 동치입니다."><span>RH: 모든 비자명 영점 ρ에 대해 Re(ρ) = 1/2</span><span>RH ⇔ ψ(x) = x + O(√x log²x)</span><span>RH ⇔ π(x) = Li(x) + O(√x log x)</span></div>
-            </div>
             <p>왜 1/2이 중요한가. 임계선 위에 실제 영점들이 존재하기 때문에 전체 오차의 성장 지수를 1/2보다 더 낮은 거듭제곱으로 일률적으로 제한할 수 없다. 리만 가설은 그 한계에서 로그 보정을 붙인 정도로 오차를 통제할 수 있다는 결과와 동치다.</p>
             <p class="xp-link-row js-only"><button type="button" class="xp-link" data-xp-open data-xp-step="4">점 하나를 옮겨 파동의 크기 비교하기 →</button></p>
           </article>
@@ -277,27 +239,13 @@
             <p class="model-limit">실험대는 ζ를 다시 계산하지 않는다. 고정된 γ에 σ만 바꾼 모형이다. x가 100까지인 이 창에서는 σ를 0.85로 밀어도 계단이 무너지는 것처럼 보이지 않는다. 차이는 √x와 x^0.85의 거리가 x와 함께 벌어지면서 드러난다. 화면에서 보이는 것은 그 차이의 시작점이다.</p>
           </article>
           <article class="step page" data-step="4" data-n="15" data-sigma="0.85">
-            <p class="only-intuition">체험 모드 4단계에서는 같은 영점 높이를 유지한 채 가로 위치를 0.50에서 0.90으로 바꾸고, x가 10, 100, 1조로 커질 때 진폭을 비교한다. 여기서 사용하는 기준 √x (ln x)²는 오차의 성장 규모이지 상수까지 정해진 실제 상한이 아니다. 점을 옮긴 모형은 실제 제타 함수의 반례도, 리만 가설의 증명도 아니다.</p>
-            <div class="only-math">
-              <p>동치 관계의 방향도 정확히 알아 둘 만하다. RH에서 위 두 오차 한계가 따르는 것은 폰 코흐(1901)의 정리다. 역으로 그 정도의 오차 한계가 성립하면 모든 영점의 실수부가 1/2이므로, 두 명제는 동치다. 영점 없는 영역에서 얻는 고전적인 무조건부 오차 한계는 x exp(−c√(log x)) 꼴이고, √x에 로그를 곱한 한계와는 거리가 멀다. RH는 또한 (x, x + C√x log^2 x) 구간에 소수가 있음을 보장한다. 간격에 대한 보증이 곧 소수 분포에 대한 보증이다.</p>
-              <p>모형에서 한 영점과 그 켤레만 옮기면 실제 ζ 영점의 함수방정식 대칭을 충족하지 않는다.</p>
-            </div>
+            <p>체험 모드 4단계에서는 같은 영점 높이를 유지한 채 가로 위치를 0.50에서 0.90으로 바꾸고, x가 10, 100, 1조로 커질 때 진폭을 비교한다. 여기서 사용하는 기준 √x (ln x)²는 오차의 성장 규모이지 상수까지 정해진 실제 상한이 아니다. 점을 옮긴 모형은 실제 제타 함수의 반례도, 리만 가설의 증명도 아니다.</p>
           </article>
         </div>
       </div>
       <details class="note lab-note" open>
         <summary>켤레 영점 한 쌍이 악기 하나</summary>
-        <p class="only-intuition">켤레 영점 한 쌍이 하나의 악기라고 생각하면 된다. 세로 좌표는 음높이, 가로 좌표는 음량이 커지는 속도에 해당한다. 실제 파동의 진폭에는 영점 높이의 역수에 가까운 계수도 들어간다. 그래서 같은 가로 좌표라면 높이가 낮은 영점 쌍의 파동이 더 크게 보인다.</p>
-        <div class="only-math">
-          <p>켤레 영점 한 쌍이 악기 하나다.</p>
-          <div class="formula" role="math" aria-label="켤레 영점의 기여를 합치면 2 곱하기 x의 시그마 제곱 곱하기 시그마 코사인 감마 u 더하기 감마 사인 감마 u를 시그마 제곱 더하기 감마 제곱으로 나눈 값입니다.">
-            <span>ρ = σ + iγ, ρ̄ = σ − iγ, u = ln x</span><span>x<sup>ρ</sup>/ρ + x<sup>ρ̄</sup>/ρ̄</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup> (σ cos(γu) + γ sin(γu))</span><span class="frac__den">σ² + γ²</span></span>
-          </div>
-          <div class="formula" role="math" aria-label="진폭은 2 곱하기 x의 시그마 제곱을 시그마 제곱 더하기 감마 제곱의 제곱근으로 나눈 값입니다. 위상은 atan2 감마, 시그마입니다.">
-            <span>켤레쌍의 합</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ</sup></span><span class="frac__den">√(σ² + γ²)</span></span><span>· cos(γu − φ), φ = atan2(γ, σ)</span><span>진폭 A<sub>k</sub>(x)</span><span class="op">=</span><span class="frac"><span class="frac__num">2x<sup>σ<sub>k</sub></sup></span><span class="frac__den">√(σ<sub>k</sub>² + γ<sub>k</sub>²)</span></span>
-          </div>
-          <p>σ = 1/2이면 진폭 ∝ √x/|ρ|. σ &gt; 1/2이면 진폭은 x^σ/|ρ|에 비례해 자라며, 충분히 큰 x에서 √x (ln x)²의 일정한 배수보다도 커지는 개별 진폭을 갖는다. 이것만으로 전체 합의 오차를 결정할 수는 없다.</p>
-        </div>
+        <p>켤레 영점 한 쌍이 하나의 악기라고 생각하면 된다. 세로 좌표는 음높이, 가로 좌표는 음량이 커지는 속도에 해당한다. 실제 파동의 진폭에는 영점 높이의 역수에 가까운 계수도 들어간다. 그래서 같은 가로 좌표라면 높이가 낮은 영점 쌍의 파동이 더 크게 보인다.</p>
       </details>
       <p class="page-num" aria-hidden="true">— 2 —</p>
     </section>
@@ -375,14 +323,8 @@
         </div>
         <details class="note" open>
           <summary>타입 검사</summary>
-          <p class="only-intuition">형식 증명에는 자연어의 “자명하다”를 대신할 논리적 근거가 필요하다. Lean의 전술은 그 근거가 되는 증명 항을 만들어 주고, 커널은 만들어진 항을 검사한다. 작성자가 모든 항을 직접 쓰는 것은 아니다.</p>
-          <p class="only-intuition">검증은 문서가 무엇을 주장하는지와 그 주장이 논리적으로 뒷받침되는지를 나누어 살펴보는 일이다. 커널은 후자를 담당한다. 전자는 신뢰할 수 있는 정의와의 비교가 필요하다.</p>
-          <div class="only-math">
-            <p>커리–하워드 대응: 명제 = 타입, 증명 = 그 타입의 항. 가정 <code>h : a = b</code>는 “a = b의 증명”을 담은 변수다. <code>exact hab</code>는 요구된 타입의 항을 내놓는 일이고, 타입이 어긋나면 커널이 거부한다. 검증은 “읽어서 납득”이 아니라 “타입이 맞는지 계산”이다.</p>
-            <div class="formula" role="math" aria-label="명제와 타입이 대응합니다. 증명과 그 타입의 항이 대응합니다."><span>명제 ↔ 타입</span><span>증명 ↔ 그 타입의 항</span></div>
-            <p>커널이 검사하는 것은 타입 검사다. Lean 4의 기반은 의존 타입 이론이고, 커널은 각 선언의 타입이 정의적 동등성(definitional equality)까지 포함해 맞는지 계산한다. <code>rw [h]</code>는 등식 h로 목표를 다시 쓰는 전술이고, <code>exact t</code>는 t의 타입이 목표와 정의적으로 같을 때 통과한다. <code>exact h</code>가 거부되는 이유는 h의 타입 <code>a = b</code>와 목표 <code>0 &lt; a</code>가 같지 않기 때문이며, 오류 메시지의 "type mismatch"가 그것이다.</p>
-            <p>검증 대상 명제는 Mathlib의 <code>RiemannHypothesis</code> 정의와 비교한다(comparator). 표준 정의와 목표 명제가 일치하는지, 그 명제에 맞는 증명 항이 존재하는지를 따로 확인하는 구조다. 커널이 통과해도 명제가 다르면 소용이 없고, 명제가 같아도 커널이 통과하지 못하면 소용이 없다.</p>
-          </div>
+          <p>형식 증명에는 자연어의 “자명하다”를 대신할 논리적 근거가 필요하다. Lean의 전술은 그 근거가 되는 증명 항을 만들어 주고, 커널은 만들어진 항을 검사한다. 작성자가 모든 항을 직접 쓰는 것은 아니다.</p>
+          <p>검증은 문서가 무엇을 주장하는지와 그 주장이 논리적으로 뒷받침되는지를 나누어 살펴보는 일이다. 커널은 후자를 담당한다. 전자는 신뢰할 수 있는 정의와의 비교가 필요하다.</p>
         </details>
       </div>
 
@@ -426,13 +368,13 @@ theorem wave_balance (a b : ℝ) :
   exact hab</code></pre>
           </div>
           <div class="lean__info js-only" id="leanGoalPane">
-            <div class="lean__bar"><span>Lean 4 · Infoview</span><span id="kernelStatus">커널 대기</span></div>
+            <div class="lean__bar"><span>Lean 4 · Infoview 학습용 재현</span><span id="kernelStatus">시뮬레이션 대기</span></div>
             <div class="lean__body">
               <div id="goal" role="status" aria-live="polite"></div>
               <div id="leanError" class="lean__error" aria-live="assertive"></div>
               <p id="leanHint" class="lean__hint" aria-live="polite"></p>
             </div>
-            <div class="lean__foot"><span id="progressTxt">0 / 3 전술</span><span id="kernelTxt">대기</span></div>
+            <div class="lean__foot"><span id="progressTxt">0 / 3 전술</span><span id="kernelTxt">상태 미리보기</span></div>
           </div>
         </div>
         <div class="lean__tactics js-only">
@@ -443,7 +385,7 @@ theorem wave_balance (a b : ℝ) :
           <button type="button" id="resetLean" class="is-ghost">↺ 다시</button>
         </div>
         <noscript><p>정답 순서 <code>intro → rw → exact</code></p></noscript>
-        <p class="lean__note">이 화면은 실제 Lean 4의 Goal State와 오류 형식을 옮겨 만든 재현입니다. 진짜 커널을 호출하지는 않습니다.</p>
+        <p class="lean__note">이 화면은 전술 입력에 따라 미리 정한 상태를 보여 주는 학습용 시뮬레이션입니다. 실제 Lean 4 커널을 호출하거나 증명을 검증하지 않습니다.</p>
       </section>
 
       <details class="mathlib">
@@ -472,6 +414,15 @@ theorem wave_balance (a b : ℝ) :
       <p class="endmark">— 167년, 종이 열 쪽에서 최초 공개 코드 1,740만 줄까지.</p>
       <p class="page-num" aria-hidden="true">— 4 —</p>
     </section>
+    <section class="textbook-bridge" aria-labelledby="textbookTitle">
+      <a class="textbook-bridge__link" href="./textbook/">
+        <span class="textbook-bridge__eyebrow">DEEP DIVE <span aria-hidden="true">/</span> 01–12</span>
+        <span class="textbook-bridge__title" id="textbookTitle">리만 가설, 깊이 읽기</span>
+        <span class="textbook-bridge__detail">12개 챕터 · 25개 인터랙티브 실험</span>
+        <span class="textbook-bridge__detail">소수의 분포에서 형식 증명까지, 질문과 수식과 실험으로 읽습니다.</span>
+        <span class="textbook-bridge__arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
   </main>
 
   <footer class="wrap">
@@ -479,7 +430,7 @@ theorem wave_balance (a b : ℝ) :
       <p>WORK 08 · 소수의 파동, 기계가 쓴 증명<br>BUILD CANVAS · 2026.11</p>
       <p>HTML · CSS · Canvas · 외부 라이브러리 0<br>수치 확인 <time datetime="2026-11-26" data-fact="asOf">2026-11-26</time></p>
     </div>
-    <p class="methods">이 페이지의 ψ(x) 시뮬레이터는 첫 60개 켤레 영점 쌍 가운데 선택한 N쌍만 사용한 근사입니다. 리만 가설의 증명이 아닙니다. 미니 Lean 화면은 실제 커널을 호출하지 않는 재현이고, 배경의 코드월은 분위기를 위한 장식입니다. 10쪽과 1,740만 줄의 비교는 단위가 달라 배율에 수학적 의미가 없습니다. 체험에서 100과 100만까지의 소수 개수는 체로 직접 셉니다. 검은 계단은 소수 거듭제곱에 ln p를 더해 계산하고, 붉은 선은 첫 60쌍 이내의 영점으로 근사합니다.</p>
+    <p class="methods">이 페이지의 ψ(x) 시뮬레이터는 첫 60개 켤레 영점 쌍 가운데 선택한 N쌍만 사용한 근사입니다. 리만 가설의 증명이 아닙니다. 미니 Lean 화면은 전술에 연결한 미리 정한 상태를 보여 주는 학습용 시뮬레이션이며 실제 커널을 호출하거나 증명을 검증하지 않습니다. 배경의 코드월은 분위기를 위한 장식입니다. 10쪽과 1,740만 줄의 비교는 단위가 달라 배율에 수학적 의미가 없습니다. 체험에서 100과 100만까지의 소수 개수는 체로 직접 셉니다. 검은 계단은 소수 거듭제곱에 ln p를 더해 계산하고, 붉은 선은 첫 60쌍 이내의 영점으로 근사합니다.</p>
     <h2>출처</h2>
     <ol class="sources">
       <li><a href="https://de.wikisource.org/wiki/Über_die_Anzahl_der_Primzahlen_unter_einer_gegebenen_Größe" target="_blank" rel="noopener noreferrer">Riemann, <cite>Über die Anzahl der Primzahlen unter einer gegebenen Grösse</cite>, 1859, S. <span data-fact="paper.range">671–680</span> · Wikisource</a></li>
@@ -494,7 +445,7 @@ theorem wave_balance (a b : ℝ) :
       <li><a href="https://www.claymath.org/millennium-problems/rules/" target="_blank" rel="noopener noreferrer">Clay Mathematics Institute · Rules for the Millennium Prize Problems</a></li>
     </ol>
   </footer>
-  <div id="shortcuts" role="status" hidden>H 홈 · 1–4 막 이동 · M 모드 전환 · Esc 닫기</div>
+  <div id="shortcuts" role="status" hidden>H 홈 · 1–4 막 이동 · Esc 닫기</div>
   <div id="selftest" hidden></div>
   <div id="xpRoot" class="xp" hidden>
     <section class="xp__panel" role="dialog" aria-modal="true" aria-labelledby="xpTitle" aria-describedby="xpDesc">

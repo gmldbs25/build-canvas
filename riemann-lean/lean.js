@@ -6,7 +6,7 @@ export const LEAN = {
     '가정을 꺼내려면 intro가 필요합니다.',
     'h : a = b를 써서 목표의 a를 b로 바꿔 보세요.',
     '가정 hab가 목표와 정확히 같은 타입입니다.',
-    '타입 검사 통과. 이 정리는 이제 증명됐습니다.'
+    '예상한 전술 순서가 끝났습니다. 실제 Lean 검증 결과는 아닙니다.'
   ],
   tactics: ['intro', 'rw', 'exact']
 };
@@ -16,7 +16,7 @@ let error = 'none';
 let view;
 
 export function getState() {
-  return { state, error, kernel: state === 3 ? 'pass' : 'pending' };
+  return { state, error, simulation: state === 3 ? 'complete' : 'pending' };
 }
 
 export function step(action) {
@@ -122,17 +122,17 @@ export function initLean(root) {
     }
     if (error === 'mismatch') {
       errorPane.replaceChildren(
-        create('strong', '✗ Lean 커널이 거부했습니다'),
+        create('strong', '✗ 예상 오류 예시 · 시뮬레이션'),
         create('pre', `type mismatch\n  h\nhas type\n  a = b : Prop\nbut is expected to have type\n  ${LEAN.goals[state]} : Prop`),
         create('p', 'h는 등식이고, 목표는 부등식입니다. exact는 목표와 정확히 같은 타입의 항만 받습니다.')
       );
     } else {
       errorPane.replaceChildren();
     }
-    root.dataset.kernel = complete ? 'pass' : 'pending';
+    root.dataset.simulation = complete ? 'complete' : 'pending';
     progress.textContent = `${state} / 3 전술`;
-    status.textContent = complete ? '✓ 커널 통과' : '커널 대기';
-    kernel.textContent = complete ? '✓ 통과' : '대기';
+    status.textContent = complete ? '✓ 시뮬레이션 완료' : '시뮬레이션 대기';
+    kernel.textContent = complete ? '상태 미리보기 완료' : '상태 미리보기';
     clearTimeout(hintTimer);
     const announceHint = () => {
       hint.textContent = LEAN.hints[state];

@@ -3,13 +3,15 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { displayFormula } from './formulas.mjs';
 import { primePowerEvents } from '../core/counting.mjs';
-import { labs, legacy, parts, questions, terms, title } from './contents.mjs';
+import { labs, legacy, parts, questions, terms, textbookRoutes, title } from './contents.mjs';
 
 const base = fileURLToPath(new URL('../', import.meta.url));
 const work = dirname(base.slice(0, -1));
 const docs = resolve(work, '../docs/riemann-lean/textbook-v2');
-const output = resolve(process.argv.find(arg => arg.startsWith('--output='))?.slice(9) ?? join(work, 'dist'));
-const origin = 'https://gmldbs25.github.io/build-canvas/riemann-lean/';
+const pagesRoot = process.argv.find(arg => arg.startsWith('--pages-root='))?.slice('--pages-root='.length);
+const output = pagesRoot ? resolve(pagesRoot, 'textbook')
+  : resolve(process.argv.find(arg => arg.startsWith('--output='))?.slice('--output='.length) ?? join(work, 'dist'));
+const origin = 'https://gmldbs25.github.io/build-canvas/riemann-lean/textbook/';
 const manuscript = (await Promise.all(
   ['MANUSCRIPT-01-07.md', 'MANUSCRIPT-08-12.md'].map(file => readFile(join(docs, file), 'utf8')),
 )).join('\n\n');
@@ -128,7 +130,8 @@ const chapterLink = (id, up, current) => {
 
 function tableOfContents(up, current) {
   return `<nav class="toc" aria-label="전체 차례">
-    <a class="toc-start" href="${up}#prologue">프롤로그</a>
+    <a class="toc-start" href="${up}#contents">교과서 목차</a>
+    <a href="${up}#prologue">프롤로그</a>
     ${parts.map(part => `<section><h2><span>${part.numeral}</span> ${part.title}</h2><ol>${part.chapters.map(id => `<li>${chapterLink(id, up, current)}</li>`).join('')}</ol></section>`).join('')}
     <a href="${up}epilogue/">에필로그</a><a href="${up}glossary/">용어집 · 출처</a>
   </nav>`;
@@ -148,7 +151,8 @@ function page({ label, up = './', slug = '', id = '', body, chapter = false, hea
 <title>${escape(label ? `${label} · ${title}` : title)} | Build Canvas</title>
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="${escape(label ?? title)}">
+<meta property="og:site_name" content="Build Canvas">
+<meta property="og:title" content="${escape(label ? `${label} · 심화 교과서` : `${title} · 심화 교과서`)}">
 <meta property="og:description" content="${escape(description)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="https://gmldbs25.github.io/build-canvas/share/work-08.png">
@@ -163,9 +167,10 @@ ${isDark ? `<link rel="stylesheet" href="${up}v2/proof/style.css">` : ''}
 <body data-page="${id || slug || 'home'}">
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <header class="masthead">
-  <a class="brand" data-home href="${up}../" aria-label="Build Canvas 홈 (H)">build <b>_</b> canvas</a>
-  <a class="work-id" href="${up}">Work 08</a>
-  <a class="mast-title" href="${up}">${title}</a>
+  <a class="brand" data-home href="${up}../../" aria-label="Build Canvas 홈 (H)">build <b>_</b> canvas</a>
+  <span class="work-id">Work 08</span>
+  <a class="mast-title" href="${up}" aria-label="교과서 첫 화면">${title}</a>
+  <a class="mast-story" href="${up}../">← 이야기로 돌아가기</a>
   <a class="mast-glossary" href="${up}glossary/">용어집</a>
   <details class="mast-contents">
     <summary>차례</summary>
@@ -174,7 +179,7 @@ ${isDark ? `<link rel="stylesheet" href="${up}v2/proof/style.css">` : ''}
 </header>
 ${chapter ? `<div class="book-frame"><aside class="book-sidebar">${tableOfContents(up, id)}</aside><main id="main" tabindex="-1" class="chapter">${heading}${body}</main></div>` :
 `<main id="main" tabindex="-1">${body}</main>`}
-<footer class="site-footer"><a href="${up}">Work 08 · ${title}</a><a href="${up}../">Build Canvas ↗</a></footer>
+<footer class="site-footer"><a href="${up}">Work 08 · ${title}</a><a href="${up}../../">Build Canvas ↗</a></footer>
 </body></html>`;
 }
 
@@ -295,4 +300,30 @@ await writeFile(join(output, 'glossary/index.html'), page({
     `<dt><a href="${chapterHref(id, '../')}#${hash}">${word}</a></dt><dd>${definition}</dd>`).join('')}</dl>
   <h2 id="sources">참고문헌 및 검증 자료</h2><p>공개 기록 확인 기준일 2026-11-27</p>${references.map(text => renderBlocks(text)).join('')}</article>`,
 }));
+if (pagesRoot) {
+  for (const route of textbookRoutes) {
+    const dir = join(pagesRoot, route);
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, 'index.html'), `<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="${origin}${route}">
+<title>심화 교과서 주소 변경 | Build Canvas</title>
+</head>
+<body>
+<main><h1>심화 교과서 주소가 바뀌었습니다.</h1>
+<a id="destination" href="../textbook/${route}">새 교과서 페이지로 이동 →</a></main>
+<script>
+  const destination = new URL(document.getElementById('destination').href);
+  destination.search = location.search;
+  destination.hash = location.hash;
+  location.replace(destination.href);
+</script>
+</body>
+</html>`);
+  }
+}
 console.log(`Work 08 · ${chapters.size} chapters, ${seenLabs.size} labs, ${questionCount} answered questions → ${output}`);

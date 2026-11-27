@@ -64,9 +64,10 @@ cp -R projects/web-evolution/. dist-pages/web-evolution/
 mkdir -p dist-pages/elsewhere
 cp -R extras/elsewhere/. dist-pages/elsewhere/
 
-# Work 08 renders its manuscript and chapter navigation into static HTML.
-mkdir -p dist-pages/share
-node riemann-lean/v2/book/build.mjs --output=dist-pages/riemann-lean
+# Work 08 serves the story at its original URL and the textbook one level below.
+mkdir -p dist-pages/share dist-pages/riemann-lean
+cp riemann-lean/{index.html,style.css,paper.css,terminal.css,main.js,data.js,psi.js,lean.js,experience.js,experience.css,favicon.svg} dist-pages/riemann-lean/
+node riemann-lean/v2/book/build.mjs --pages-root=dist-pages/riemann-lean
 cp share/work-08.png dist-pages/share/
 cp IMPLEMENTATION_NOTES.md dist-pages/
 

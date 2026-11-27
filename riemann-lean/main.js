@@ -1,16 +1,15 @@
-import { CODE_WALL, FACTS, GAMMA, PALETTE } from './data.js';
-import { initLab, psiTrue, psiApprox, rmsError } from './psi.js';
-import { initLean, step as leanStep, getState } from './lean.js';
+import { CODE_WALL, FACTS, GAMMA, PALETTE } from './data.js?v=story-textbook';
+import { initLab, psiTrue, psiApprox, rmsError } from './psi.js?v=story-textbook';
+import { initLean, step as leanStep, getState } from './lean.js?v=story-textbook';
 import { initExperience, openExperience, closeExperience, isExperienceOpen,
   PI_ANCHORS, piExact, psiExact, isPrime, firstPrimeAtOrAbove, previousPrime,
-  density, li, amplitude, envelope, crossingX } from './experience.js?v=notebook-guide';
+  density, li, amplitude, envelope, crossingX } from './experience.js?v=story-textbook';
 
 const root = document.documentElement;
 const seam = document.getElementById('seam');
 const seamRule = document.querySelector('.seam-rule');
 const eraBadge = document.getElementById('era');
 const metaTheme = document.getElementById('metaTheme');
-const modeToggle = document.getElementById('modeToggle');
 const progress = document.getElementById('progress');
 const shortcutHelp = document.getElementById('shortcuts');
 const sections = [...document.querySelectorAll('main > section[id]')];
@@ -76,20 +75,7 @@ export function setEra(era) {
 }
 
 function openNotes() {
-  for (const note of notes) note.open = inlineNotes.matches || root.dataset.mode === 'math';
-}
-
-export function setMode(mode) {
-  mode = mode === 'math' ? mode : 'intuition';
-  root.dataset.mode = mode;
-  modeToggle.setAttribute('aria-pressed', mode === 'math');
-  openNotes();
-  document.dispatchEvent(new Event('w8:mode'));
-  try {
-    localStorage.setItem('w8:mode', mode);
-  } catch {
-    // The current document can still change modes when storage is unavailable.
-  }
+  for (const note of notes) note.open = inlineNotes.matches;
 }
 
 function renderFacts() {
@@ -254,10 +240,6 @@ function refreshLayout() {
   scheduleScroll();
 }
 
-function toggleMode() {
-  setMode(root.dataset.mode === 'math' ? 'intuition' : 'math');
-}
-
 function handleKeyboard(event) {
   if (root.dataset.xp === 'open') return;
   if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey
@@ -271,16 +253,11 @@ function handleKeyboard(event) {
     shortcutTimer = setTimeout(() => { shortcutHelp.hidden = true; }, 3000);
   } else if (event.key.toLowerCase() === 'h') {
     location.assign('../');
-  } else if (event.key.toLowerCase() === 'm') {
-    toggleMode();
   } else if (/^[1-4]$/.test(event.key)) {
     document.getElementById('act' + event.key).scrollIntoView({ behavior: reduced.matches ? 'instant' : 'smooth' });
   }
 }
 
-let storedMode;
-try { storedMode = localStorage.getItem('w8:mode'); } catch { storedMode = 'intuition'; }
-setMode(query.get('mode') === 'math' ? 'math' : storedMode);
 root.classList.remove('no-js');
 renderFacts();
 renderSieve();
@@ -290,7 +267,7 @@ initLean(document.getElementById('lean'));
 initLab(document.getElementById('act2'));
 initExperience();
 
-modeToggle.addEventListener('click', toggleMode);
+openNotes();
 inlineNotes.addEventListener('change', openNotes);
 document.addEventListener('keydown', handleKeyboard);
 addEventListener('scroll', scheduleScroll, { passive: true });
@@ -329,17 +306,13 @@ export function runSelfTest() {
   check(100 ** (0.85 - 0.5), 5.0119, 0.001);
   leanStep('reset');
   for (const action of ['intro', 'rw', 'exact']) leanStep(action);
-  check(getState().state === 3 && getState().kernel === 'pass', true);
+  check(getState().state === 3 && getState().simulation === 'complete', true);
   leanStep('reset');
   leanStep('intro');
   leanStep('wrong');
   check(getState().state === 1 && getState().error === 'mismatch', true);
   leanStep('reset');
   check(getState().state === 0 && getState().error === 'none', true);
-  const initialMode = root.dataset.mode;
-  toggleMode();
-  check(root.dataset.mode !== initialMode, true);
-  setMode(initialMode);
   check(root.scrollWidth <= innerWidth + 1, true);
 
   const checkRel = (actual, expected, relTol) => Math.abs(actual - expected) <= Math.abs(expected) * relTol;

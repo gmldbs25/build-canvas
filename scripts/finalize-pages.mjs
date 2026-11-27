@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { textbookRoutes } from "../riemann-lean/v2/book/contents.mjs";
 
 const dist = path.resolve("dist-pages");
 const base = "https://gmldbs25.github.io/build-canvas/";
@@ -59,7 +60,11 @@ for (const page of pages) {
   await writeFile(filename, html.replace(/<\/head>/i, tags + "\n</head>"));
 }
 // Work 08 supplies its own share card and metadata.
-const sitemapSlugs = [...pages.map(page => page.slug), "riemann-lean"];
+const textbook = "riemann-lean/textbook";
+const sitemapSlugs = [
+  ...pages.map(page => page.slug), "riemann-lean", textbook,
+  ...textbookRoutes.map(route => textbook + "/" + route.slice(0, -1)),
+];
 // The unlisted personal archive intentionally stays outside the public sitemap.
 await writeFile(path.join(dist, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + sitemapSlugs.map(slug => '<url><loc>' + base + (slug ? slug + '/' : '') + '</loc></url>').join("\n") + '\n</urlset>\n');
 await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: " + base + "sitemap.xml\n");

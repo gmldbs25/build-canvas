@@ -1,5 +1,5 @@
-import { GAMMA } from './data.js';
-import { psiApprox, psiTrue, waveAmplitude } from './psi.js';
+import { GAMMA } from './data.js?v=story-textbook';
+import { psiApprox, psiTrue, waveAmplitude } from './psi.js?v=story-textbook';
 
 const root = document.documentElement;
 const xpRoot = document.getElementById('xpRoot');
@@ -159,6 +159,7 @@ function onKeydown(event) {
   const ownsKeys = target?.closest('input, select, textarea, [contenteditable], [role="tablist"], [role="tab"], [role="slider"], [data-xp-keys]');
   if (key === 'Escape') closeExperience();
   else if (ownsKeys) return;
+  else if (key.toLowerCase() === 'h') location.assign('../');
   else if (/^[1-4]$/.test(key)) setStep(Number(key));
   else if (state.step >= 3 && (key === 'ArrowRight' || key === 'ArrowLeft')) {
     (key === 'ArrowRight' ? next : previous).click();

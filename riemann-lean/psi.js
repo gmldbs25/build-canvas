@@ -1,4 +1,4 @@
-import { GAMMA } from './data.js';
+import { GAMMA } from './data.js?v=story-textbook';
 
 export const LENS = Object.freeze({ xMin: 2, xMax: 100, yMax: 105, residual: 10 });
 
@@ -1001,7 +1001,6 @@ export function initLab(root = document) {
   }
 
   document.addEventListener('w8:era', refreshTheme, { signal });
-  document.addEventListener('w8:mode', draw, { signal });
   updateControls();
 
   return () => {

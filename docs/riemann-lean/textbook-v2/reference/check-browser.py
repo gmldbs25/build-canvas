@@ -41,6 +41,151 @@ def screenshot(page, output, name, wide=False):
     im.save(output / f'{name}.webp', quality=85)
 
 
+def verify_story(browser, portfolio, options, baseline):
+    story = portfolio + 'riemann-lean/'
+    base = story + 'textbook/'
+    problems, font_failures = set(), set()
+    for width in WIDTHS:
+        mobile = width <= 390
+        context = browser.new_context(viewport={'width': width, 'height': 844 if mobile else 1000},
+                                      has_touch=mobile, reduced_motion='reduce')
+        page = context.new_page()
+        page.on('pageerror', lambda error: problems.add(str(error)))
+
+        def flag_failure(url):
+            if url.startswith(portfolio):
+                problems.add(url)
+            else:
+                font_failures.add(url.split('/')[2])
+
+        page.on('response', lambda response: flag_failure(response.url) if response.status >= 400 else None)
+        page.on('requestfailed', lambda request: flag_failure(request.url) if request.failure != 'net::ERR_ABORTED' else None)
+        page.goto(story)
+        page.evaluate("localStorage.setItem('w8:mode', 'math')")
+        page.goto(story + '?mode=math&selftest=1')
+        page.locator('#selftest[data-result]').wait_for()
+        assert page.locator('#selftest').get_attribute('data-result') == 'pass', page.locator('#selftest').inner_text()
+        assert page.locator('#heroTitle').is_visible()
+        assert not page.locator('#modeToggle, [data-mode], .only-math, .only-intuition').count()
+        assert page.locator('#sieve button').count() == 100
+        page.keyboard.press('m')
+        page.keyboard.press('?')
+        assert 'M ' not in page.locator('#shortcuts').inner_text()
+        page.keyboard.press('Escape')
+        assert not page.locator('#shortcuts').is_visible()
+
+        assert page.evaluate('document.documentElement.scrollWidth') == width, ('story overflow', width)
+        bridge = page.get_by_role('link', name='리만 가설, 깊이 읽기', exact=False)
+        textbook = page.get_by_role('link', name='심화 교과서 ↗', exact=True)
+        assert textbook.is_visible()
+        assert textbook.evaluate('link => link.getBoundingClientRect().right <= innerWidth')
+        for act in range(1, 5):
+            anchor = f'#act{act}'
+            page.goto(story + anchor)
+            page.locator(f'.chapters a[href="{anchor}"][aria-current="location"]').wait_for()
+            assert page.locator('html').get_attribute('data-era') == ('paper' if act < 3 else 'terminal')
+
+        page.goto(story)
+        for key in '1234':
+            page.keyboard.press(key)
+            page.locator(f'.chapters a[href="#act{key}"][aria-current="location"]').wait_for()
+        assert '증명은 끝났고,' in page.locator('#act4Title').inner_text()
+        assert '이해는 이제 시작이다.' in page.locator('#act4Title').inner_text()
+        bridge.focus()
+        assert bridge.evaluate('el => el === document.activeElement')
+        bridge.press('Enter')
+        page.wait_for_url(base)
+        page.go_back()
+        page.wait_for_url(story)
+
+        page.goto(story + '#act2')
+        page.locator('#psiCanvas').wait_for()
+        preset = page.locator('[data-preset="60"]')
+        preset.scroll_into_view_if_needed()
+        page.evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+        preset.click()
+        assert page.locator('#nRange').input_value() == '60'
+        plane_tab = page.locator('[data-lab-tab="plane"]')
+        if plane_tab.is_visible():
+            plane_tab.click()
+        page.locator('#planeCanvas').wait_for()
+        page.locator('#sigmaRange').press('End')
+        assert page.locator('#labPlate').get_attribute('data-sigma-state') == 'escaped'
+        page.locator('#resetSigma').click()
+        assert page.locator('#sigmaRange').input_value() == '0.5'
+
+        page.goto(story + '#act3')
+        page.locator('#lean [data-step="1"]').click()
+        page.locator('#wrongBtn').click()
+        assert page.locator('#leanError').inner_text().strip()
+        for step in (2, 3):
+            page.locator(f'#lean [data-step="{step}"]').click()
+        assert '3 / 3' in page.locator('#progressTxt').inner_text()
+        page.locator('#resetLean').click()
+        assert '0 / 3' in page.locator('#progressTxt').inner_text()
+
+        page.goto(story + '?xp=1&step=1')
+        dialog = page.get_by_role('dialog')
+        dialog.wait_for()
+        assert dialog.locator('.xp__numbers span').count() == 20
+        action = dialog.locator('#xpNext')
+        for _ in range(2):
+            action.tap() if mobile else action.click()
+        assert dialog.locator('.xp__numbers .prime').count() == 8
+        dialog.get_by_role('button', name='2단계 비율 비교').click()
+        action.click()
+        assert '관찰 기록' in dialog.locator('.xp__note').inner_text()
+        dialog.get_by_role('button', name='3단계 계단 그리기').click()
+        for _ in range(dialog.locator('.xp__timeline i').count() - 1):
+            action.click()
+        assert dialog.locator('input[type=range]').count()
+        dialog.locator('input[type=range]').press('End')
+        page.goto(story + '?xp=1&step=4')
+        dialog.wait_for()
+        assert dialog.locator('button[data-xp-step="4"]').get_attribute('aria-pressed') == 'true'
+        for _ in range(dialog.locator('.xp__timeline i').count() - 1):
+            action.click()
+        assert dialog.locator('input[type=range]').count()
+        dialog.locator('input[type=range]').press('End')
+        page.keyboard.press('Escape')
+        dialog.wait_for(state='hidden')
+        page.wait_for_url(story)
+        page.locator('#xpOpen').click()
+        page.wait_for_url(story + '?xp=1&step=1')
+        page.go_back()
+        dialog.wait_for(state='hidden')
+        page.go_forward()
+        dialog.wait_for()
+        page.keyboard.press('Escape')
+        dialog.wait_for(state='hidden')
+        page.keyboard.press('h')
+        page.wait_for_url(portfolio)
+        page.goto(story + '?xp=1&step=4')
+        dialog.wait_for()
+        dialog.locator('h2').press('h')
+        page.wait_for_url(portfolio)
+
+        if options.output and width in (390, 1440):
+            page.goto(story)
+            screenshot(page, options.output, f'story-hero-{width}', wide=True)
+            page.goto(story + '#act4')
+            page.locator('html[data-era=terminal]').wait_for()
+            screenshot(page, options.output, f'story-ending-{width}', wide=True)
+            bridge.evaluate('link => link.scrollIntoView({block: "center"})')
+            screenshot(page, options.output, f'story-textbook-link-{width}', wide=True)
+            if baseline:
+                page.goto(baseline)
+                screenshot(page, options.output, f'before-story-hero-{width}', wide=True)
+                page.goto(baseline + '#act4')
+                page.locator('html[data-era=terminal]').wait_for()
+                screenshot(page, options.output, f'before-story-ending-{width}', wide=True)
+        context.close()
+        print(f'{width}px story: 4 acts, era change, notes, wave/plane, Mini Lean, links and keyboard', flush=True)
+    assert not problems, problems
+    if font_failures:
+        print('External story font requests failed: ' + ', '.join(sorted(font_failures)), flush=True)
+
+
 def verify_chapters(browser, base, options):
     configs = list(range(options.first, options.last + 1))
     all_labs = set()
@@ -165,8 +310,36 @@ def verify_reference_labs(browser, base):
     page.close()
 
 
+def verify_proof_labs(browser, base):
+    page = browser.new_page()
+    page.goto(base + 'chapter-11/#11-b')
+    lean = page.locator('[data-lab="11-b"]')
+    lean.get_by_role('combobox').select_option('positive')
+    advance = lean.get_by_role('button', name='다음 단계')
+    for _ in range(3):
+        advance.click()
+    assert '실제 Lean 컴파일 성공 · exit code 0' in lean.inner_text()
+    lean.get_by_role('button', name='의도적으로 실패한 제출 보기').click()
+    assert '기록된 Lean 오류' in lean.inner_text()
+    assert 'SHA-256:' in lean.inner_text()
+    page.goto(base + 'chapter-12/#12-a')
+    explorer = page.locator('[data-lab="12-a"]')
+    explorer.locator('[data-view=graph]').click()
+    explorer.locator('select').first.select_option('compact')
+    assert explorer.locator('.proof-edge').count() == 17
+    explorer.get_by_role('combobox', name='의존성 그래프 깊이').select_option('1')
+    assert 0 < explorer.locator('.proof-edge').count() < 17
+    explorer.locator('.proof-edge').first.click()
+    assert '간선 근거:' in explorer.inner_text()
+    explorer.locator('[data-view=ledger]').click()
+    assert explorer.locator('a[href*="math.mit.edu"]').count()
+    page.close()
+    print('11–12: successful and failed Lean replay, proof graph and source ledger', flush=True)
+
+
 def verify_navigation(browser, base, portfolio):
     page = browser.new_page()
+    story = f'{portfolio}riemann-lean/' if portfolio else None
     for target, previous in (
         ('01/#01-b', '?xp=1&step=1'), ('03/#03-a', '?xp=1&step=2'),
         ('09/#09-a', '?xp=1&step=3'), ('10/#10-a', '?xp=1&step=4'),
@@ -174,6 +347,31 @@ def verify_navigation(browser, base, portfolio):
     ):
         page.goto(base + previous, wait_until='commit')
         page.wait_for_url(f'{base}chapter-{target}')
+    if story:
+        for route in tuple(f'chapter-{number:02d}/' for number in range(1, 13)) + ('epilogue/', 'glossary/'):
+            fragment = '?09-a-n=60&09-a-x=4#09-a' if route == 'chapter-09/' else ''
+            page.goto(story + route + fragment, wait_until='commit')
+            page.wait_for_url(base + route + fragment)
+            assert page.locator('link[rel=canonical]').get_attribute('href').endswith('/textbook/' + route)
+        page.reload()
+        assert page.url == base + 'glossary/'
+
+        page.goto(base + 'chapter-09/?09-a-n=60&09-a-x=4#09-a')
+        assert '2.14768468' in page.locator('.w08-readouts').inner_text()
+        page.get_by_role('link', name='← 이야기로 돌아가기').click()
+        page.wait_for_url(story)
+        assert page.locator('#act4').count() == 1
+        page.go_back()
+        page.wait_for_url(base + 'chapter-09/?09-a-n=60&09-a-x=4#09-a')
+        page.go_forward()
+        page.wait_for_url(story)
+        page.evaluate("""localStorage.setItem('build-canvas.work-08.study.v2', JSON.stringify({
+            visited: ['06'], completed: ['06'], resume: { id: '06', section: '#6-2' }
+        }))""")
+        page.goto(base)
+        assert page.locator('[data-resume]').get_attribute('href').endswith('chapter-06/#6-2')
+        assert '학습 완료로 표시한 장 1' in page.locator('[data-study-status]').inner_text()
+        page.locator('[data-clear]').click()
     page.goto(f'{base}chapter-09/#09-a')
     page.locator('[data-complete]').click()
     assert page.locator('[data-complete]').get_attribute('aria-pressed') == 'true'
@@ -194,6 +392,13 @@ def verify_navigation(browser, base, portfolio):
         page.locator('h1').click()
         page.keyboard.press('h')
         page.wait_for_url(portfolio)
+        page.locator('a[href="./riemann-lean/"]').click()
+        page.wait_for_url(story)
+        page.get_by_role('link', name='심화 교과서 ↗').click()
+        page.wait_for_url(base)
+        page.locator('h1').click()
+        page.keyboard.press('h')
+        page.wait_for_url(portfolio)
         for slug in OTHER_WORKS:
             assert page.locator(f'a[href="./{slug}/"]').count() >= 1, slug
             assert page.goto(portfolio + slug + '/').status == 200, slug
@@ -204,6 +409,11 @@ def verify_navigation(browser, base, portfolio):
     print('Navigation: old routes, manual study marks, resume and storage reset', flush=True)
     with browser.new_context(java_script_enabled=False) as plain:
         page = plain.new_page()
+        if story:
+            page.goto(story + 'chapter-09/#09-a')
+            assert 'noindex' in page.locator('meta[name=robots]').get_attribute('content')
+            page.get_by_role('link', name='새 교과서 페이지로 이동 →').click()
+            page.wait_for_url(base + 'chapter-09/')
         page.goto(f'{base}chapter-09/#09-a')
         assert page.locator('math').count() == 2
         assert '대표 관찰' in page.locator('[data-lab]').inner_text()
@@ -219,6 +429,13 @@ def verify_accessibility(browser, base):
         page.goto(f'{base}chapter-{chapter}/')
         assert page.get_by_role('main').get_by_role('heading', level=1).count() == 1
         assert page.get_by_role('link', name='Build Canvas 홈 (H)').count() == 1
+        back = page.get_by_role('link', name='← 이야기로 돌아가기')
+        assert back.is_visible()
+        assert back.evaluate('el => el.getBoundingClientRect().right <= innerWidth')
+        page.locator('.mast-contents summary').press('Enter')
+        assert page.locator('.mast-panel').get_by_role('link', name='교과서 목차').is_visible()
+        page.keyboard.press('Escape')
+        assert not page.locator('.mast-panel').is_visible()
         contrast = page.evaluate("""() => {
           const style = getComputedStyle(document.body);
           function luminance(name) {
@@ -285,25 +502,36 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--directory', type=Path, default=Path('dist-pages'))
     parser.add_argument('--work-only', action='store_true')
+    parser.add_argument('--story-only', action='store_true')
+    parser.add_argument('--baseline-story', type=Path)
     parser.add_argument('--first', type=int, default=1)
     parser.add_argument('--last', type=int, default=12)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--gallery', type=Path)
     parser.add_argument('--chromium', default='/usr/bin/chromium')
     options = parser.parse_args()
+    if options.work_only and options.story_only:
+        parser.error('--work-only serves the standalone textbook and cannot be used with --story-only')
     directory = options.directory.resolve(strict=True)
     with TemporaryDirectory(prefix='work8-browser-') as tmp:
         (Path(tmp) / 'build-canvas').symlink_to(directory, target_is_directory=True)
+        if options.baseline_story:
+            (Path(tmp) / 'baseline').symlink_to(options.baseline_story.resolve(strict=True), target_is_directory=True)
         handler = functools.partial(QuietHandler, directory=tmp)
         with ThreadingHTTPServer(('127.0.0.1', 0), handler) as server, sync_playwright() as playwright:
             Thread(target=server.serve_forever, daemon=True).start()
             portfolio = f'http://127.0.0.1:{server.server_port}/build-canvas/'
-            base = portfolio if options.work_only else portfolio + 'riemann-lean/'
+            base = portfolio if options.work_only else portfolio + 'riemann-lean/textbook/'
             browser = playwright.chromium.launch(executable_path=options.chromium, args=['--no-sandbox'])
+            if options.story_only:
+                baseline = f'http://127.0.0.1:{server.server_port}/baseline/' if options.baseline_story else None
+                verify_story(browser, portfolio, options, baseline)
+                return
             verify_chapters(browser, base, options)
             if options.first <= 7 and options.last >= 10:
                 verify_reference_labs(browser, base)
             if options.first == 1 and options.last == 12:
+                verify_proof_labs(browser, base)
                 verify_navigation(browser, base, None if options.work_only else portfolio)
                 verify_accessibility(browser, base)
                 measure(browser, base)

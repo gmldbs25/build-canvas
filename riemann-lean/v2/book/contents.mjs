@@ -7,6 +7,12 @@ export const parts = [
   { numeral: 'IV', title: '기계가 검증하는 수학', chapters: ['11', '12'] },
 ];
 
+export const textbookRoutes = [
+  ...parts.flatMap(part => part.chapters.map(id => `chapter-${id}/`)),
+  'epilogue/',
+  'glossary/',
+];
+
 export const questions = {
   '01': '모든 자연수는 어떤 재료로 이루어져 있을까?',
   '02': '불규칙하게 나타나는 소수에도 평균적인 간격이 있을까?',
